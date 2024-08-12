@@ -1,0 +1,610 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shishughar/database/helper/translation_language_helper.dart';
+import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
+import 'package:shishughar/style/styles.dart';
+import 'package:shishughar/utils/globle_method.dart';
+import 'package:shishughar/utils/validate.dart';
+
+import '../../../custom_widget/custom_btn.dart';
+import '../../../custom_widget/custom_text.dart';
+import '../../../custom_widget/custom_textfield.dart';
+import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
+import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
+import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
+import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
+import '../../../database/helper/village_data_helper.dart';
+import '../../../model/databasemodel/tabVillage_model.dart';
+import '../../../model/dynamic_screen_model/options_model.dart';
+import 'enrolled_exit_child_tab.dart';
+
+class NotEnrolledExitChildrenListedScreen extends StatefulWidget {
+  final int crecheId;
+  final String village_id;
+  const NotEnrolledExitChildrenListedScreen({super.key,
+    required this.crecheId,
+    required this.village_id
+  });
+
+  @override
+  _NotEnrolledChildrenListedScreenState createState() =>
+      _NotEnrolledChildrenListedScreenState();
+}
+
+class _NotEnrolledChildrenListedScreenState
+    extends State<NotEnrolledExitChildrenListedScreen> {
+  TextEditingController Searchcontroller = TextEditingController();
+  List<Map<String, dynamic>> childHHData = [];
+  List<Map<String, dynamic>> filterData = [];
+  List<OptionsModel> relationChilddata = [];
+  List<TabVillage> villages = [];
+  List<Translation> translats = [];
+  String lng = 'en';
+  String? selectedVillage;
+  List<OptionsModel> villageList = [];
+  String? selectedItem;
+  bool isDropdownActivated = false;
+  int? ageLimit;
+  List<OptionsModel> genderList = [];
+  bool _isOverlayVisible = false;
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int? maxAgeLimit;
+  int? minAgeLimit;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeData();
+  }
+
+  Future<void> initializeData() async {
+    translats.clear();
+    var lngtr = await Validate().readString(Validate.sLanguage);
+    if (lngtr != null) {
+      lng = lngtr;
+    }
+
+    genderList = await OptionsModelHelper().getMstCommonOptions('Gender',lng);
+    relationChilddata =
+        await OptionsModelHelper().getMstCommonOptions('Relation',lng);
+    List<String> valueItems = [
+      CustomText.Enrolled,
+      CustomText.ChildName,
+      CustomText.RelationshipChild,
+      CustomText.ageInMonth,
+      CustomText.NorecordAvailable,
+      CustomText.hhNameS,
+      CustomText.minAgeInMonthEn,
+      CustomText.maxAgeInMonthEn,
+      CustomText.Search,
+      CustomText.clear,
+      CustomText.Village,
+      CustomText.ageInMonthEn
+    ];
+    await TranslationDataHelper()
+        .callTranslateString(valueItems)
+        .then((value) => translats.addAll(value));
+    villageValue();
+    fetchChildHHDataList();
+    setState(() {});
+  }
+
+  Future<void> fetchChildHHDataList() async {
+    childHHData = await EnrolledExitChilrenResponceHelper().getNotEnrollChildren(widget.village_id);
+
+    filterData = childHHData;
+    Searchcontroller.text = '';
+    selectedItem = null;
+
+    setState(() {});
+  }
+
+  // filteredGetData(BuildContext context) async {
+  //   if (selectedItem != null && ageLimit != null) {
+  //     filterData = childHHData.where((element) {
+  //       var ViItem = Global.getItemValues(element['responces'], 'gender_id');
+  //       var ageItem =
+  //       int.parse(Global.getItemValues(element['responces'], 'child_age'));
+  //       return ViItem == selectedItem && ageItem <= ageLimit! + 1;
+  //     }).toList();
+  //   } else if (selectedItem != null && ageLimit == null) {
+  //     filterData = childHHData.where((element) {
+  //       var ViItem = Global.getItemValues(element['responces'], 'gender_id');
+  //       return ViItem == selectedItem;
+  //     }).toList();
+  //   } else if (ageLimit != null && selectedItem == null) {
+  //     filterData = childHHData.where((element) {
+  //       var ageItem =
+  //       int.parse(Global.getItemValues(element['responces'], 'child_age'));
+  //       return ageItem <= ageLimit! + 1;
+  //     }).toList();
+  //   } else {
+  //     filterData = childHHData;
+  //   }
+  //   setState(() {});
+  // }
+
+  filteredGetData(BuildContext context) async {
+    if (selectedItem != null && maxAgeLimit != null && minAgeLimit != null) {
+      filterData = childHHData.where((element) {
+        var ViItem = Global.getItemValues(element['responces'], 'gender_id');
+        var ageItem =
+            int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        return ViItem == selectedItem &&
+            ageItem <= maxAgeLimit! &&
+            ageItem >= minAgeLimit!;
+      }).toList();
+    } else if (selectedItem != null &&
+        maxAgeLimit == null &&
+        minAgeLimit == null) {
+      filterData = childHHData.where((element) {
+        var ViItem = Global.getItemValues(element['responces'], 'gender_id');
+        return ViItem == selectedItem;
+      }).toList();
+    } else if (selectedItem == null &&
+        maxAgeLimit != null &&
+        minAgeLimit != null) {
+      filterData = childHHData.where((element) {
+        // var ViItem = Global.getItemValues(element['responces'], 'gender_id');
+        var ageItem =
+            int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        return ageItem <= maxAgeLimit! && ageItem >= minAgeLimit!;
+      }).toList();
+    } else if (maxAgeLimit != null &&
+        selectedItem == null &&
+        minAgeLimit == null) {
+      filterData = childHHData.where((element) {
+        var ageItem =
+            int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        return ageItem <= maxAgeLimit!;
+      }).toList();
+    } else if (minAgeLimit != null &&
+        selectedItem == null &&
+        maxAgeLimit == null) {
+      filterData = childHHData.where((element) {
+        var ageItem =
+            int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        return ageItem >= minAgeLimit!;
+      }).toList();
+    } else {
+      filterData = childHHData;
+    }
+    setState(() {});
+  }
+
+  void toggleOverlayVisibility() {
+    setState(() {
+      _isOverlayVisible =
+          !_isOverlayVisible; // Toggle the visibility of the overlay
+    });
+  }
+
+  void toggleDropDown() {
+    setState(() {
+      isDropdownActivated = !isDropdownActivated;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      endDrawer: SafeArea(
+        child: Drawer(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 30),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            "assets/filter_icon.png",
+                            scale: 2.4,
+                          ),
+                          SizedBox(
+                            width: 10.w,
+                          ),
+                          Text(
+                            CustomText.Filter,
+                            style: Styles.labelcontrollerfont,
+                          ),
+                          Spacer(),
+                          InkWell(
+                              onTap: () async {
+                                _scaffoldKey.currentState!.closeEndDrawer();
+                                // cleaAllFilter();
+                              },
+                              child: Image.asset(
+                                'assets/cross.png',
+                                color: Colors.grey,
+                                scale: 4,
+                              )),
+                        ],
+                      ),
+                    ),
+                    SizedBox(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: DynamicCustomTextFieldInt(
+                            // width: MediaQuery.of(context).size.width * 0.36,
+                            initialvalue: minAgeLimit,
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.minAgeInMonthEn, lng),
+                            // isRequred: 1,
+                            onChanged: (value) {
+                              minAgeLimit = value;
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: DynamicCustomTextFieldInt(
+                            // width: MediaQuery.of(context).size.width * 0.36,
+                            initialvalue: maxAgeLimit,
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.maxAgeInMonthEn, lng),
+                            onChanged: (value) {
+                              maxAgeLimit = value;
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                    DynamicCustomDropdownField(
+                      // height: MediaQuery.of(context).size.height * 0.2,
+                      // width: MediaQuery.of(context).size.width * 0.4,
+                      hintText: Global.returnTrLable(
+                          translats, CustomText.Gender, lng),
+                      // isRequred: 1,
+                      items: genderList,
+                      selectedItem: selectedItem,
+                      onChanged: (value) {
+                        selectedItem = value?.name;
+                        print('selectedVillage $selectedItem');
+                      },
+                    ),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(3.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: CElevatedButton(
+                              text: Global.returnTrLable(
+                                  translats, CustomText.clear, lng!),
+                              color: Color(0xffF26BA3),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                cleaAllFilter();
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 4.w),
+                          Expanded(
+                            child: CElevatedButton(
+                              text: Global.returnTrLable(
+                                  translats, CustomText.Search, lng!),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                filteredGetData(context);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]),
+            )),
+      ),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        child: Column(children: [
+          Row(
+            children: [
+              Expanded(
+                  child: CustomTextFieldRow(
+                controller: Searchcontroller,
+                onChanged: (value) {
+                  print(value);
+                  filterDataQu(value);
+                },
+                hintText:
+                    Global.returnTrLable(translats, CustomText.Search, lng),
+                prefixIcon: Image.asset(
+                  "assets/search.png",
+                  scale: 2.4,
+                ),
+              )),
+              SizedBox(
+                width: 10.w,
+              ),
+              InkWell(
+                onTap: () {
+                  _scaffoldKey.currentState!.openEndDrawer();
+                },
+                child: Image.asset(
+                  "assets/filter_icon.png",
+                  scale: 2.4,
+                ),
+              )
+
+              // InkWell(
+              //   onTap: () {
+              //     showOverlay(context);
+              //     toggleOverlayVisibility();
+              //   },
+              //   child: Image.asset(
+              //     "assets/filter_icon.png",
+              //     scale: 2.4,
+              //   ),
+              // )
+            ],
+          ),
+          SizedBox(
+            height: 10.h,
+          ),
+          Expanded(
+            child: (filterData.length > 0)
+                ? ListView.builder(
+                    itemCount: filterData.length,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          var selectedItem = filterData[index];
+                          String refStatus = '';
+                          String enrolledChildGuid = '';
+                          String? minDate=await callDateOfExit(Global.getItemValues(
+                              selectedItem['responces'],
+                              'hhcguid'));
+                          if (!Global.validString(enrolledChildGuid)) {
+                            enrolledChildGuid = Validate().randomGuid();
+                            EnrolledExitChilrenTab.childName=Global.getItemValues(selectedItem['responces'],
+                                'child_name');
+                            refStatus = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        EnrolledExitChilrenTab(
+                                          isEditable: true,
+                                            CHHGUID: Global.getItemValues(
+                                                selectedItem['responces'],
+                                                'hhcguid'),
+                                            HHGUID: Global.getItemValues(
+                                                selectedItem['hhResponce'],
+                                                'hhguid'),
+                                            HHname: Global.stringToInt(
+                                                selectedItem['name'].toString()),
+                                            EnrolledChilGUID: enrolledChildGuid,
+                                            crecheId: widget.crecheId,
+                                            minDate: minDate,
+                                            isNew: 0,
+                                            isImageUpdate:false)));
+                          }
+                          if (refStatus == 'itemRefresh') {
+                            await fetchChildHHDataList();
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.h),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xff5A5A5A).withOpacity(
+                                        0.2), // Shadow color with opacity
+                                    offset: Offset(
+                                        0, 3), // Horizontal and vertical offset
+                                    blurRadius: 6, // Blur radius
+                                    spreadRadius: 0, // Spread radius
+                                  ),
+                                ],
+                                color: Colors.white,
+                                border: Border.all(color: Color(0xffE7F0FF)),
+                                borderRadius: BorderRadius.circular(10.r)),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w, vertical: 8.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
+                                        style: Styles.black104,
+                                      ),
+                                      Text(
+                                        '${Global.returnTrLable(translats, CustomText.hhNameS, lng).trim()} : ',
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
+                                      Text(
+                                        '${Global.returnTrLable(translats, CustomText.ageInMonth, lng).trim()} : ',
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
+                                      Text(
+                                        '${Global.returnTrLable(translats, CustomText.Village, lng).trim()} : ',
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 10),
+                                  SizedBox(
+                                    height: 40.h,
+                                    width: 2,
+                                    child: VerticalDivider(
+                                      color: Color(0xffE6E6E6),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          Global.getItemValues(
+                                              filterData[index]['responces'],
+                                              'child_name'),
+                                          style: Styles.blue125,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          Global.getItemValues(
+                                              filterData[index]['hhResponce'],
+                                              'hosuehold_head_name'),
+                                          style: Styles.blue125,
+                                          strutStyle: StrutStyle(height: .5),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          Global.getItemValues(
+                                              filterData[index]['responces'],
+                                              'child_age'),
+                                          style: Styles.blue125,
+                                          strutStyle: StrutStyle(height: .5),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          callVillageName(
+                                              filterData[index]['hhResponce']),
+                                          style: Styles.blue125,
+                                          strutStyle: StrutStyle(height: .5),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: 5),
+                                  (filterData[index]['is_edited']==0 && filterData[index]['is_uploaded']==1)?
+                                  Image.asset(
+                                    "assets/sync.png",
+                                    scale: 1.5,
+                                  ):
+                                  Image.asset(
+                                    "assets/sync_gray.png",
+                                    scale: 1.5,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Center(
+                    child: Text(Global.returnTrLable(
+                        translats, CustomText.NorecordAvailable, lng)),
+                  ),
+          ),
+          SizedBox(height: 10.h)
+        ]),
+      ),
+    );
+  }
+
+  String getfindRelationValues(String id) {
+    String returnValue = "";
+
+    if (Global.validString(id)) {
+      var reltionvl =
+          relationChilddata.where((element) => element.name == id).toList();
+      if (reltionvl.length > 0) {
+        returnValue = reltionvl[0].values!;
+      }
+    }
+
+    return returnValue;
+  }
+
+  filterDataQu(String entry) {
+    if (entry.length > 0) {
+      filterData = childHHData
+          .where((element) =>
+              (Global.getItemValues(
+                      element['hhResponce'], 'hosuehold_head_name'))
+                  .toLowerCase()
+                  .startsWith(entry.toLowerCase()) ||
+              (Global.getItemValues(element['responces'], 'child_name'))
+                  .toLowerCase()
+                  .startsWith(entry.toLowerCase()))
+          .toList();
+    } else
+      filterData = childHHData;
+    setState(() {});
+  }
+
+  Future<String?> villageValue() async {
+    villages = await VillageDataHelper().getTabVillageList();
+    villageList = villages
+        .map((model) => OptionsModel(
+            name: model.name.toString(), values: model.value, flag: 'tabBlock'))
+        .toList();
+    setState(() {});
+  }
+
+  String callVillageName(String crecheItem) {
+    String returnValue = '';
+    var items = villages
+        .where((element) =>
+            element.name ==
+            int.parse(Global.getItemValues(crecheItem, 'village_id')))
+        .toList();
+    if (items.length > 0) {
+      returnValue = items[0].value!;
+    }
+    return returnValue;
+  }
+
+  filteredgetData(BuildContext context) async {
+    if (selectedVillage == null) {
+      Validate().singleButtonPopup(
+          Global.returnTrLable(translats, CustomText.plSelect_village, lng),
+          Global.returnTrLable(translats, CustomText.ok, lng),
+          false,
+          context);
+    } else {
+      filterData = childHHData.where((item) {
+        var viItem = Global.getItemValues(item['hhResponce'], 'village_id');
+        return viItem.toString() == selectedVillage.toString();
+      }).toList();
+      setState(() {});
+    }
+  }
+
+  void cleaAllFilter() {
+    filterData = childHHData;
+    selectedItem = null;
+    selectedVillage = null;
+    Searchcontroller.text = '';
+    maxAgeLimit = null;
+    minAgeLimit = null;
+    setState(() {});
+  }
+  Future<String?> callDateOfExit(String CHHGUID)async{
+    return await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
+  }
+}
