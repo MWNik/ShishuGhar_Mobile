@@ -268,7 +268,6 @@ class _HouseholdScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-         
           titleText: Global.returnTrLable(translats, quesItem.label, lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -350,8 +349,11 @@ class _HouseholdScreenState
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           readable: role == 'Creche Supervisor'
               ? quesItem.fieldname == 'child_age'
-              ? widget.dobisReadable==true?widget.dobisReadable:DependingLogic().callReadableLogic(logics, myMap, quesItem)
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  ? widget.dobisReadable == true
+                      ? widget.dobisReadable
+                      : DependingLogic()
+                          .callReadableLogic(logics, myMap, quesItem)
+                  : DependingLogic().callReadableLogic(logics, myMap, quesItem)
               : true,
           initialvalue: myMap[quesItem.fieldname!],
           isVisible:
@@ -388,13 +390,16 @@ class _HouseholdScreenState
           initialValue: myMap[quesItem.fieldname],
           labelControlls: translats,
           lng: lng,
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable:  role == 'Creche Supervisor'
+          isRequred: quesItem.fieldname == 'is_dob_available'
+              ? 1
+              : (quesItem.reqd == 1
+                  ? quesItem.reqd
+                  : DependingLogic()
+                      .dependeOnMendotory(logics, myMap, quesItem)),
+          readable: role == 'Creche Supervisor'
               ? quesItem.fieldname == 'is_dob_available'
-              ? widget.dobisReadable
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  ? widget.dobisReadable
+                  : DependingLogic().callReadableLogic(logics, myMap, quesItem)
               : true,
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
@@ -660,6 +665,19 @@ class _HouseholdScreenState
             validStatus = false;
             break;
           }
+        } else if (element.fieldname == 'is_dob_available') {
+          var valuees = myMap[element.fieldname];
+          if (!Global.validString(valuees.toString().trim())) {
+            Validate().singleButtonPopup(
+                Global.returnTrLable(
+                    labelControlls, 'Please fill all mandatory fields!', lng!),
+                Global.returnTrLable(labelControlls, CustomText.ok, lng!),
+                false,
+                context);
+
+            validStatus = false;
+            break;
+          }
         }
         var validationMsg =
             DependingLogic().validationMessge(logics, myMap, element);
@@ -747,6 +765,10 @@ class _HouseholdScreenState
         // myMap[key] = value;
         myMap[key] = value;
       });
+      if (myMap['child_dob'] != null) {
+        myMap['child_age'] = Validate()
+            .calculateAgeInMonths(Validate().stringToDate(myMap['child_dob']));
+      }
     }
   }
 

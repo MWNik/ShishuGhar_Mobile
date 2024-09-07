@@ -157,7 +157,7 @@ class _ChildFollowUpTabScreenState extends State<ChildFollowUpTabScreen>
                     unselectedLabelStyle: Styles.white124P,
                     labelColor: Colors.white,
                     controller: _tabController,
-                    isScrollable: true,
+                    isScrollable: false,
                     tabs: tabController(),
                     onTap: (index) {
                       if (_tabController.indexIsChanging) {

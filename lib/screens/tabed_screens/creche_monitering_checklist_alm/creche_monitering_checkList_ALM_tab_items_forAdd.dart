@@ -81,6 +81,7 @@ class _CmcALMTabItemSCreenForAddState extends State<CmcALMTabItemSCreenForAdd> {
   List<TabBlock> allBlockRecords = [];
   List<TabVillage> allVillageRecords = [];
   Map<String, dynamic> _myMap = {};
+  int? isEditFromExisting = 0;
 
   @override
   void initState() {
@@ -833,7 +834,7 @@ class _CmcALMTabItemSCreenForAddState extends State<CmcALMTabItemSCreenForAdd> {
               almguid: widget.almguid,
               name: _myMap['name'],
               is_deleted: 0,
-              is_edited: 1,
+              is_edited: widget.isEdit == false?2:isEditFromExisting,
               is_uploaded: 0,
           created_by: _myMap['appcreated_by'],
           created_at: _myMap['appcreated_on'],
@@ -851,6 +852,7 @@ class _CmcALMTabItemSCreenForAddState extends State<CmcALMTabItemSCreenForAdd> {
     if (records.isNotEmpty) {
       final Map<String, dynamic> responseData =
       jsonDecode(records.first.responces!);
+      isEditFromExisting = records[0].is_edited;
       responseData.forEach((key, value) => _myMap[key] = value);
 
       final createdOnNotNull = responseData['appcreated_on'] != null;

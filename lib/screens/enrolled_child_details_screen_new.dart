@@ -147,266 +147,290 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppbar(
-        text:
-            Global.returnTrLable(labelControlls, CustomText.ChildDetails, lng),
-        onTap: () {
-          Navigator.pop(
-            context,
-          );
-        },
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 15.w,
+    return WillPopScope(
+      onWillPop: () async{
+        Navigator.pop(context, 'itemRefresh');
+        return false;
+      },
+      child: Scaffold(
+        appBar: CustomAppbar(
+          text:
+              Global.returnTrLable(labelControlls, CustomText.ChildDetails, lng),
+          onTap: () {
+            Navigator.pop(
+              context, 'itemRefresh'
+            );
+          },
         ),
-        child: Column(
-          children: [
-            GestureDetector(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Color(0xffE7F0FF)),
-                      borderRadius: BorderRadius.circular(10.r)),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
+        body: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 15.w,
+          ),
+          child: Column(
+            children: [
+              GestureDetector(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Color(0xffE7F0FF)),
+                        borderRadius: BorderRadius.circular(10.r)),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                  Global.returnTrLable(
+                                      labelControlls, CustomText.ChildId, lng),
+                                  style: Styles.black104),
+                              Text(
                                 Global.returnTrLable(
-                                    labelControlls, CustomText.ChildId, lng),
-                                style: Styles.black104),
-                            Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.ChildName, lng),
-                              style: Styles.black104,
-                              strutStyle: StrutStyle(height: 1.3),
-                            ),
-                            Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.ageInMonth, lng),
-                              style: Styles.black104,
-                              strutStyle: StrutStyle(height: 1.3),
-                            ),
-                            Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.Gender, lng),
-                              style: Styles.black104,
-                              strutStyle: StrutStyle(height: 1.3),
-                            ),
-                            Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.CrecheName, lng),
-                              style: Styles.black104,
-                              strutStyle: StrutStyle(height: 1.3),
-                            ),
-                            Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.hhName, lng),
-                              style: Styles.black104,
-                              strutStyle: StrutStyle(height: 1.3),
-                            ),
-                            Text(
-                              Global.returnTrLable(labelControlls,
-                                  CustomText.DateofEnrollement, lng),
-                              style: Styles.black104,
-                              strutStyle: StrutStyle(height: 1.3),
-                            ),
-                            Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.Supervisor, lng),
-                              style: Styles.black104,
-                              strutStyle: StrutStyle(height: 1.3),
-                            ),
-                          ],
-                        ),
-                        SizedBox(width: 10),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.15,
-                          width: 2,
-                          child: VerticalDivider(
-                            color: Color(0xffE6E6E6),
+                                    labelControlls, CustomText.ChildName, lng),
+                                style: Styles.black104,
+                                strutStyle: StrutStyle(height: 1.3),
+                              ),
+                              Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.ageInMonth, lng),
+                                style: Styles.black104,
+                                strutStyle: StrutStyle(height: 1.3),
+                              ),
+                              Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.Gender, lng),
+                                style: Styles.black104,
+                                strutStyle: StrutStyle(height: 1.3),
+                              ),
+                              Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.CrecheName, lng),
+                                style: Styles.black104,
+                                strutStyle: StrutStyle(height: 1.3),
+                              ),
+                              Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.hhName, lng),
+                                style: Styles.black104,
+                                strutStyle: StrutStyle(height: 1.3),
+                              ),
+                              Text(
+                                Global.returnTrLable(labelControlls,
+                                    CustomText.DateofEnrollement, lng),
+                                style: Styles.black104,
+                                strutStyle: StrutStyle(height: 1.3),
+                              ),
+                              Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.Supervisor, lng),
+                                style: Styles.black104,
+                                strutStyle: StrutStyle(height: 1.3),
+                              ),
+                            ],
                           ),
-                        ),
-                        SizedBox(width: 10),
-                        enrolledItem != null
-                            ? Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      Global.getItemValues(
-                                          enrolledItem!.responces!, 'child_id'),
-                                      style: Styles.blue125,
-                                      overflow: TextOverflow.ellipsis,
-                                      strutStyle: StrutStyle(height: 1),
-                                    ),
-                                    Text(
-                                      Global.getItemValues(
-                                          enrolledItem!.responces!,
-                                          'child_name'),
-                                      style: Styles.blue125,
-                                      overflow: TextOverflow.ellipsis,
-                                      strutStyle: StrutStyle(height: 1.1),
-                                    ),
-                                    Text(
-                                      Global.getItemValues(
-                                          enrolledItem!.responces!,
-                                          'age_at_enrollment_in_months'),
-                                      style: Styles.blue125,
-                                      overflow: TextOverflow.ellipsis,
-                                      strutStyle: StrutStyle(height: 1.2),
-                                    ),
-                                    Text(
-                                      gender,
-                                      style: Styles.blue125,
-                                      strutStyle: StrutStyle(height: 1.2),
-                                    ),
-                                    Text(
-                                      crechName,
-                                      style: Styles.blue125,
-                                      strutStyle: StrutStyle(height: 1.2),
-                                    ),
-                                    Text(
-                                      hhName,
-                                      style: Styles.blue125,
-                                      overflow: TextOverflow.ellipsis,
-                                      strutStyle: StrutStyle(height: 1.2),
-                                    ),
-                                    Text(
-                                      Global.validString(Global.getItemValues(enrolledItem!.responces!, 'date_of_enrollment'))?Validate().displeDateFormate(
-                                          Global.getItemValues(
-                                              enrolledItem!.responces!,
-                                              'date_of_enrollment')):'',
-                                      style: Styles.blue125,
-                                      strutStyle: StrutStyle(height: 1.2),
-                                    ),
-                                    Text(
-                                      supName,
-                                      style: Styles.blue125,
-                                      overflow: TextOverflow.ellipsis,
-                                      strutStyle: StrutStyle(height: 1.2),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : SizedBox(),
-                      ],
+                          SizedBox(width: 10),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.15,
+                            width: 2,
+                            child: VerticalDivider(
+                              color: Color(0xffE6E6E6),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          enrolledItem != null
+                              ? Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        Global.getItemValues(
+                                            enrolledItem!.responces!, 'child_id'),
+                                        style: Styles.blue125,
+                                        overflow: TextOverflow.ellipsis,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
+                                      Text(
+                                        Global.getItemValues(
+                                            enrolledItem!.responces!,
+                                            'child_name'),
+                                        style: Styles.blue125,
+                                        overflow: TextOverflow.ellipsis,
+                                        strutStyle: StrutStyle(height: 1.1),
+                                      ),
+                                      Text(
+                                        // Global.getItemValues(
+                                        //     enrolledItem!.responces!,
+                                        //     'age_at_enrollment_in_months'),
+                                        Global.validString(Global.getItemValues(
+                                                enrolledItem!.responces!,
+                                                'child_dob'))
+                                            ? Validate()
+                                                .calculateAgeInMonths(Validate()
+                                                    .stringToDate(
+                                                        Global.getItemValues(
+                                                            enrolledItem!
+                                                                .responces!,
+                                                            'child_dob')))
+                                                .toString()
+                                            : Global.getItemValues(
+                                                enrolledItem!.responces!,
+                                                'age_at_enrollment_in_months'),
+                                        style: Styles.blue125,
+                                        overflow: TextOverflow.ellipsis,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                      ),
+                                      Text(
+                                        gender,
+                                        style: Styles.blue125,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                      ),
+                                      Text(
+                                        crechName,
+                                        style: Styles.blue125,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                      ),
+                                      Text(
+                                        hhName,
+                                        style: Styles.blue125,
+                                        overflow: TextOverflow.ellipsis,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                      ),
+                                      Text(
+                                        Global.validString(Global.getItemValues(
+                                                enrolledItem!.responces!,
+                                                'date_of_enrollment'))
+                                            ? Validate().displeDateFormate(
+                                                Global.getItemValues(
+                                                    enrolledItem!.responces!,
+                                                    'date_of_enrollment'))
+                                            : '',
+                                        style: Styles.blue125,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                      ),
+                                      Text(
+                                        supName,
+                                        style: Styles.blue125,
+                                        overflow: TextOverflow.ellipsis,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : SizedBox(),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 7.h),
-            Expanded(
-                child: GridView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                        mainAxisExtent: 90.h),
-                    itemCount: image.length,
-                    physics: BouncingScrollPhysics(),
-                    itemBuilder: (ctx, i) {
-                      return InkWell(
-                        onTap: () async {
-                          await onclick(i, image[i]);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xff5A5A5A).withOpacity(
-                                      0.1), // Shadow color with opacity
-                                  offset: Offset(
-                                      0, 1), // Horizontal and vertical offset
-                                  blurRadius: 5, // Blur radius
-                                  spreadRadius: 0, // Spread radius
-                                ),
-                              ],
-                              color: Color(0xffF2F7FF),
-                              borderRadius: BorderRadius.circular(5.r),
-                              border: Border.all(
-                                color: Color(0xffE7F0FF),
-                              )),
-                          height: 168.h,
-                          width: 146.w,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                  child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Visibility(
-                                      visible: true,
-                                      child: Stack(
-                                        children: [
-                                          SizedBox(
-                                            height: 40,
-                                            width: 40,
-                                            child: Image.asset(
-                                              image[i],
-                                              filterQuality: FilterQuality.high,
-                                              scale: 0.7,
-                                              color: Color(0xff5979AA),
-                                            ),
-                                          )
-                                        ],
-                                      )),
-                                  SizedBox(
-                                    height: 15.h,
+              SizedBox(height: 7.h),
+              Expanded(
+                  child: GridView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                          mainAxisExtent: 90.h),
+                      itemCount: image.length,
+                      physics: BouncingScrollPhysics(),
+                      itemBuilder: (ctx, i) {
+                        return InkWell(
+                          onTap: () async {
+                            await onclick(i, image[i]);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xff5A5A5A).withOpacity(
+                                        0.1), // Shadow color with opacity
+                                    offset: Offset(
+                                        0, 1), // Horizontal and vertical offset
+                                    blurRadius: 5, // Blur radius
+                                    spreadRadius: 0, // Spread radius
                                   ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 7),
-                                    child: Text(
-                                      text[i],
-                                      style: Styles.listlablefont,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  )
                                 ],
-                              ))
-                            ],
+                                color: Color(0xffF2F7FF),
+                                borderRadius: BorderRadius.circular(5.r),
+                                border: Border.all(
+                                  color: Color(0xffE7F0FF),
+                                )),
+                            height: 168.h,
+                            width: 146.w,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                    child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Visibility(
+                                        visible: true,
+                                        child: Stack(
+                                          children: [
+                                            SizedBox(
+                                              height: 40,
+                                              width: 40,
+                                              child: Image.asset(
+                                                image[i],
+                                                filterQuality: FilterQuality.high,
+                                                scale: 0.7,
+                                                color: Color(0xff5979AA),
+                                              ),
+                                            )
+                                          ],
+                                        )),
+                                    SizedBox(
+                                      height: 15.h,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 7),
+                                      child: Text(
+                                        text[i],
+                                        style: Styles.listlablefont,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    )
+                                  ],
+                                ))
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }))
-          ],
+                        );
+                      }))
+            ],
+          ),
         ),
+        // bottomNavigationBar: BottomNavigationBar(
+        //   useLegacyColorScheme: true,
+        //   showUnselectedLabels: true,
+        //   showSelectedLabels: true,
+        //   selectedItemColor: Colors.black,
+        //   unselectedItemColor: Color(0xffAAAAAA),
+        //   selectedLabelStyle: Styles.Selectedbottambar,
+        //   unselectedLabelStyle: Styles.unSelectedbottambar,
+        //   unselectedIconTheme: IconThemeData(color: Colors.red),
+        //   currentIndex: _currentIndex,
+        //   onTap: (index) {
+        //     setState(() {
+        //       _currentIndex = index;
+        //     });
+        //   },
+        //   items: initBottomBar(),
+        // ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   useLegacyColorScheme: true,
-      //   showUnselectedLabels: true,
-      //   showSelectedLabels: true,
-      //   selectedItemColor: Colors.black,
-      //   unselectedItemColor: Color(0xffAAAAAA),
-      //   selectedLabelStyle: Styles.Selectedbottambar,
-      //   unselectedLabelStyle: Styles.unSelectedbottambar,
-      //   unselectedIconTheme: IconThemeData(color: Colors.red),
-      //   currentIndex: _currentIndex,
-      //   onTap: (index) {
-      //     setState(() {
-      //       _currentIndex = index;
-      //     });
-      //   },
-      //   items: initBottomBar(),
-      // ),
     );
   }
 
@@ -418,7 +442,7 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
 
   bool checkEditable() {
     bool returnStatus = true;
-    if (enrolledItem != null&& Global.validString(enrolledItem!.created_at)) {
+    if (enrolledItem != null && Global.validString(enrolledItem!.created_at)) {
       var creation = DateTime.parse(enrolledItem!.created_at.toString());
       var datePart = DateTime(creation.year, creation.month, creation.day);
       var now = DateTime.now();
@@ -432,13 +456,13 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
     if (i == 0) {
       bool isEdit = checkEditable();
       String? minDate = await callDateOfExit(enrolledItem!.CHHGUID!);
-      EnrolledExitChilrenTab.childName=Global.getItemValues(enrolledItem!.responces!, 'child_name');
+      EnrolledExitChilrenTab.childName =
+          Global.getItemValues(enrolledItem!.responces!, 'child_name');
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => EnrolledExitChilrenTab(
-              isEditable: isEdit,
+              isEditable: true,
               CHHGUID: widget.CHHGUID,
-              HHGUID:Global.getItemValues(
-                  enrolledItem!.responces!, 'hhguid'),
+              HHGUID: Global.getItemValues(enrolledItem!.responces!, 'hhguid'),
               HHname: widget.HHname,
               EnrolledChilGUID: widget.EnrolledChilGUID,
               crecheId: widget.crechId,

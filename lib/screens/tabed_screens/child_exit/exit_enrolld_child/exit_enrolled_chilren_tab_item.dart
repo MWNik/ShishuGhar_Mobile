@@ -453,11 +453,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           minDate = minDateforExit;
         }
         return CustomDatepickerDynamic(
-          initialvalue: quesItem.fieldname == 'date_of_enrollment_awc'
-              ? (Global.validString(myMap['date_of_enrollment_awc'])
-                  ? myMap[quesItem.fieldname]
-                  : Global.initCurrentDate())
-              : myMap[quesItem.fieldname!],
+          initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           readable: widget.isEditable == true
               ? (widget.isForExit
@@ -909,16 +905,14 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
       var reffralItem = await ChildReferralTabResponseHelper()
           .callChildReffralsByEnrolledGUID(widget.EnrolledChilGUID);
       if (reffralItem.length > 0) {
-        reffralItem.forEach((reItem) async {
-          if(reItem['visit_count']>0){
-            Map<String, dynamic> jsonBody = jsonDecode(reItem['responces']!);
-            jsonBody['visit_count'] = 0;
-            var itemResponce = jsonEncode(jsonBody);
-            await ChildReferralTabResponseHelper().updateVisitFollowUps(itemResponce,reItem['child_referral_guid'],0);
-          }
-        });
-
-
+        if (reffralItem.last['visit_count'] > 0) {
+          Map<String, dynamic> jsonBody =
+              jsonDecode(reffralItem.last['responces']!);
+          jsonBody['visit_count'] = 0;
+          var itemResponce = jsonEncode(jsonBody);
+          await ChildReferralTabResponseHelper().updateVisitFollowUps(
+              itemResponce, reffralItem.last['child_referral_guid'], 0);
+        }
       }
     }
   }
@@ -965,10 +959,15 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
         var validationMsg =
             DependingLogic().validationMessge(logics, myMap, element);
         if (Global.validString(validationMsg)) {
-          Validate()
-              .singleButtonPopup(validationMsg!, CustomText.ok, false, context);
-          validStatus = false;
-          break;
+          if ((Global.validString(myMap['reason_for_exit'].toString()) &&
+              element.fieldname == 'age_at_enrollment_in_months')) {
+            validStatus = true;
+          } else {
+            Validate().singleButtonPopup(
+                validationMsg!, CustomText.ok, false, context);
+            validStatus = false;
+            break;
+          }
         }
       }
       ;

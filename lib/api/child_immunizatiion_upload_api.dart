@@ -7,6 +7,8 @@ import '../utils/constants.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../utils/validate.dart';
+
 class ChildImmunizationUploadApi {
   Future<http.Response> childImmunzationUpload(
       String token, String responce) async {
@@ -16,6 +18,7 @@ class ChildImmunizationUploadApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
+      await Validate().createUploadedJson("Token $token\n\n$json");
       var response = await http.post(url, body: responce, headers: headers);
       return response;
     } catch (e) {
@@ -33,6 +36,7 @@ class ChildImmunizationUploadApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
+      await Validate().createUploadedJson("Token $token\n\n$json");
       var response = await http.put(url, body: responce, headers: headers);
       return response;
     } catch (e) {

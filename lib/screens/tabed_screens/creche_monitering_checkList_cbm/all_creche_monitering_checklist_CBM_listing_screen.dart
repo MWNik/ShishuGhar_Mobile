@@ -323,10 +323,20 @@ class _cmcCBMListingScreenState extends State<AllcmcCBMListingScreen> {
                                       "assets/sync.png",
                                       scale: 1.5,
                                     ):
-                                    Image.asset(
+                                    (filterData[index].is_edited == 1 && filterData[index].is_uploaded == 0)?Image.asset(
                                       "assets/sync_gray.png",
                                       scale: 1.5,
-                                    )
+                                    ): Icon(
+                                                Icons.error_outline_outlined,
+                                                color: Colors.red.shade700,
+                                                shadows: [
+                                                  BoxShadow(
+                                                      spreadRadius: 2,
+                                                      blurRadius: 4,
+                                                      color:
+                                                          Colors.red.shade200)
+                                                ],
+                                              )
                                   ]),
                             ),
                           ),

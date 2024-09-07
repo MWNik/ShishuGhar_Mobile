@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import '../utils/constants.dart';
+import '../utils/validate.dart';
 
 class CashBookReceiptApi {
   Future<Response> callCashBookReceiptMeta(
@@ -43,8 +44,8 @@ class CashBookReceiptApi {
     var headers = {'Authorization': token};
 
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
-
     try {
+      await Validate().createUploadedJson("Token $token\n\n$responce");
       var response = await http.post(url, body: responce, headers: headers);
       return response;
     } catch (e) {
@@ -61,6 +62,7 @@ class CashBookReceiptApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
+      await Validate().createUploadedJson("Token $token\n\n$responce");
       var response = await http.put(url, body: responce, headers: headers);
       return response;
     } catch (e) {

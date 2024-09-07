@@ -1,6 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -184,16 +185,16 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           title: Text(
             lng != null
                 ? Global.returnTrLable(
-                locationControlls, CustomText.ShishuGharDetails, lng!)
+                    locationControlls, CustomText.ShishuGharDetails, lng!)
                 : '',
             style: Styles.white145,
           ),
           actions: [
             isConnected
                 ? Image.asset(
-              "assets/online.png",
-              scale: 2,
-            )
+                    "assets/online.png",
+                    scale: 2,
+                  )
                 : Image.asset("assets/offline.png", scale: 2),
             GestureDetector(
               onTap: () {
@@ -213,25 +214,25 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                   ),
                   syncCount > 0
                       ? Positioned(
-                    top: 0,
-                    bottom: 24,
-                    left: 20,
-                    right: 0,
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0xffF26BA3),
-                      ),
-                      padding: EdgeInsets.all(4),
-                      child: Text(
-                        "$syncCount",
-                        style: Styles.white74P,
-                      ),
-                    ),
-                  )
+                          top: 0,
+                          bottom: 24,
+                          left: 20,
+                          right: 0,
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xffF26BA3),
+                            ),
+                            padding: EdgeInsets.all(4),
+                            child: Text(
+                              "$syncCount",
+                              style: Styles.white74P,
+                            ),
+                          ),
+                        )
                       : SizedBox(),
                 ],
               ),
@@ -386,7 +387,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                           title: Text(
                             lng != null
                                 ? Global.returnTrLable(locationControlls,
-                                CustomText.MyProfile, lng!)
+                                    CustomText.MyProfile, lng!)
                                 : '',
                             style: Styles.black125,
                           ),
@@ -397,8 +398,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => UserDetailsScreen(
-                                      isEdit: true,
-                                    )));
+                                          isEdit: true,
+                                        )));
                             // _showLanguageDialog(context);
                           },
                         ),
@@ -415,7 +416,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                           title: Text(
                             lng != null
                                 ? Global.returnTrLable(locationControlls,
-                                CustomText.ChangePassword, lng!)
+                                    CustomText.ChangePassword, lng!)
                                 : '',
                             style: Styles.black125,
                           ),
@@ -443,7 +444,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                           title: Text(
                             lng != null
                                 ? Global.returnTrLable(locationControlls,
-                                CustomText.languages, lng!)
+                                    CustomText.languages, lng!)
                                 : '',
                             style: Styles.black125,
                           ),
@@ -452,7 +453,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                               title: Text(
                                 lng != null
                                     ? Global.returnTrLable(locationControlls,
-                                    CustomText.English, lng!)
+                                        CustomText.English, lng!)
                                     : '',
                                 style: Styles.Grey10,
                               ),
@@ -464,8 +465,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => DashboardScreen(
-                                        index: 0,
-                                      )),
+                                            index: 0,
+                                          )),
                                 );
                               },
                             ),
@@ -473,7 +474,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                               title: Text(
                                 lng != null
                                     ? Global.returnTrLable(locationControlls,
-                                    CustomText.Hindi, lng!)
+                                        CustomText.Hindi, lng!)
                                     : '',
                                 style: Styles.Grey10,
                               ),
@@ -485,8 +486,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => DashboardScreen(
-                                        index: 0,
-                                      )),
+                                            index: 0,
+                                          )),
                                 );
                               },
                             ),
@@ -494,7 +495,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                               title: Text(
                                 lng != null
                                     ? Global.returnTrLable(locationControlls,
-                                    CustomText.Odiya, lng!)
+                                        CustomText.Odiya, lng!)
                                     : '',
                                 style: Styles.Grey10,
                               ),
@@ -506,8 +507,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => DashboardScreen(
-                                        index: 0,
-                                      )),
+                                            index: 0,
+                                          )),
                                 );
                               },
                             ),
@@ -521,6 +522,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             endIndent: 15,
                           ),
                         ),
+
                         ExpansionTile(
                           leading: Image.asset(
                             'assets/user_manual.png',
@@ -530,7 +532,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                           title: Text(
                             lng != null
                                 ? Global.returnTrLable(locationControlls,
-                                CustomText.userMannual, lng!)
+                                    CustomText.userMannual, lng!)
                                 : '',
                             style: Styles.black125,
                           ),
@@ -540,14 +542,14 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                               title: Text(
                                 lng != null
                                     ? Global.returnTrLable(locationControlls,
-                                    CustomText.English, lng!)
+                                        CustomText.English, lng!)
                                     : '',
                                 style: Styles.Grey10,
                               ),
                               onTap: () async {
                                 List<UserManualResponsesModel> responce =
-                                await UserManualFieldsHelper()
-                                    .getResponsebylang('English');
+                                    await UserManualFieldsHelper()
+                                        .getResponsebylang('English');
                                 String url = responce[0].url ?? '';
                                 if (Global.validString(url)) {
                                   showLoaderDialog(context);
@@ -561,14 +563,14 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                               title: Text(
                                 lng != null
                                     ? Global.returnTrLable(locationControlls,
-                                    CustomText.Hindi, lng!)
+                                        CustomText.Hindi, lng!)
                                     : '',
                                 style: Styles.Grey10,
                               ),
                               onTap: () async {
                                 List<UserManualResponsesModel> responce =
-                                await UserManualFieldsHelper()
-                                    .getResponsebylang('Hindi');
+                                    await UserManualFieldsHelper()
+                                        .getResponsebylang('Hindi');
                                 String url = responce[0].url ?? '';
                                 if (Global.validString(url)) {
                                   showLoaderDialog(context);
@@ -582,14 +584,14 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                               title: Text(
                                 lng != null
                                     ? Global.returnTrLable(locationControlls,
-                                    CustomText.Odiya, lng!)
+                                        CustomText.Odiya, lng!)
                                     : '',
                                 style: Styles.Grey10,
                               ),
                               onTap: () async {
                                 List<UserManualResponsesModel> responce =
-                                await UserManualFieldsHelper()
-                                    .getResponsebylang('Odia');
+                                    await UserManualFieldsHelper()
+                                        .getResponsebylang('Odia');
                                 String url = responce[0].url ?? '';
                                 if (Global.validString(url)) {
                                   showLoaderDialog(context);
@@ -611,6 +613,35 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                         ),
                         ListTile(
                           leading: Image.asset(
+                            'assets/database_ic.png',
+                            color: Colors.black,
+                            scale: 1.5,
+                          ),
+                          title: Text(
+                            lng != null
+                                ? Global.returnTrLable(locationControlls,
+                                CustomText.dbBackup, lng!)
+                                : '',
+                            style: Styles.black125,
+                          ),
+                          onTap: ()
+                          async {
+                            HomeReplicaScreen.scaffoldKey!.currentState
+                                ?.closeDrawer();
+                            // _showLanguageDialog(context);
+                            await Validate().createDbBackup();
+                          },
+                        ),
+                        Visibility(
+                          visible: true,
+                          child: Divider(
+                            color: Color(0xffEEEEEE),
+                            indent: 15,
+                            endIndent: 15,
+                          ),
+                        ),
+                        ListTile(
+                          leading: Image.asset(
                             'assets/app_info.png',
                             color: Colors.black,
                             scale: 1.5,
@@ -618,7 +649,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                           title: Text(
                             lng != null
                                 ? Global.returnTrLable(
-                                locationControlls, CustomText.appInfo, lng!)
+                                    locationControlls, CustomText.appInfo, lng!)
                                 : '',
                             style: Styles.black125,
                           ),
@@ -644,7 +675,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             title: Text(
                               lng != null
                                   ? Global.returnTrLable(locationControlls,
-                                  CustomText.Logout, lng!)
+                                      CustomText.Logout, lng!)
                                   : '',
                               style: Styles.red125,
                             ),
@@ -659,7 +690,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                     context);
                               } else {
                                 SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
+                                    await SharedPreferences.getInstance();
 
                                 showLoaderDialog(context);
                                 await prefs.clear();
@@ -672,8 +703,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                        const LoginScreen()),
-                                        (Route<dynamic> route) => false);
+                                            const LoginScreen()),
+                                    (Route<dynamic> route) => false);
                               }
                               ;
                             }),
@@ -685,19 +716,35 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                       ]),
                 ),
                 Center(
-                  child: RichText(
-                    text: TextSpan(
-                      text: CustomText.Version,
-                      style: Styles.black124,
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: "$appVersionName", style: Styles.black126P),
-                        Constants.baseUrl=='https://uat.shishughar.in/api/'?
-                        TextSpan(text: "  (UAT)", style: Styles.red125)
-                            :Constants.baseUrl=='https://shishughar.in/api/'?
-                        TextSpan(  text: "  (PROD)", style: Styles.red125) :
-                        TextSpan(  text: "  (DEV)", style: Styles.red125),
-                      ],
+                  child: GestureDetector(
+                    onDoubleTap: () async {
+                      HomeReplicaScreen.scaffoldKey!.currentState
+                          ?.closeDrawer();
+                      var databaseDir =
+                          Directory('${Constants.uploadeJsonFile}json_.txt');
+                      File file = File(databaseDir.path);
+                      var status = await file.exists();
+                      if (status) {
+                        await Validate().shareFile(file);
+                      }
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        text: CustomText.Version,
+                        style: Styles.black124,
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: "$appVersionName", style: Styles.black126P),
+                          Constants.baseUrl == 'https://uat.shishughar.in/api/'
+                              ? TextSpan(text: "  (UAT)", style: Styles.red125)
+                              : Constants.baseUrl ==
+                                      'https://shishughar.in/api/'
+                                  ? TextSpan(
+                                      text: " ", style: Styles.red125)
+                                  : TextSpan(
+                                      text: "  (DEV)", style: Styles.red125),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -736,15 +783,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             children: [
                               index == 0
                                   ? Image.asset(
-                                "assets/watch.png",
-                                height: 55.h,
-                                width: 55.w,
-                              )
+                                      "assets/watch.png",
+                                      height: 55.h,
+                                      width: 55.w,
+                                    )
                                   : Image.asset(
-                                "assets/Thumbs.png",
-                                height: 55.h,
-                                width: 55.w,
-                              ),
+                                      "assets/Thumbs.png",
+                                      height: 55.h,
+                                      width: 55.w,
+                                    ),
                               SizedBox(
                                 width: 10.w,
                               ),
@@ -839,20 +886,20 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                             image[i],
                                             filterQuality: FilterQuality.high,
                                             scale: image[i] ==
-                                                'assets/verifydata.png' ||
-                                                image[i] ==
-                                                    'assets/creche_profile/flagged_children_new.png' ||
-                                                image[i] ==
-                                                    'assets/creche_profile/child_followUp_new.png' ||
-                                                image[i] ==
-                                                    'assets/village_ic.png'
+                                                        'assets/verifydata.png' ||
+                                                    image[i] ==
+                                                        'assets/creche_profile/flagged_children_new.png' ||
+                                                    image[i] ==
+                                                        'assets/creche_profile/child_followUp_new.png' ||
+                                                    image[i] ==
+                                                        'assets/village_ic.png'
                                                 ? image[i] ==
-                                                'assets/verifydata.png'
-                                                ? 2.7
-                                                : 0.9
+                                                        'assets/verifydata.png'
+                                                    ? 2.7
+                                                    : 0.9
                                                 : 3.8,
                                             color: image[i] ==
-                                                'assets/creche_profile/flagged_children_new.png'
+                                                    'assets/creche_profile/flagged_children_new.png'
                                                 ? null
                                                 : Color(0xff5979AA),
                                           ),
@@ -887,7 +934,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                   ),
                                   Padding(
                                     padding:
-                                    EdgeInsets.symmetric(horizontal: 7),
+                                        EdgeInsets.symmetric(horizontal: 7),
                                     child: Text(
                                       Global.returnTrLable(
                                           locationControlls, text[i], lng!),
@@ -953,7 +1000,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           .houseHoldFieldsData(userName!, password!, token!);
       if (response.statusCode == 200) {
         HouseHoldFieldModel houseHoldFieldModel =
-        HouseHoldFieldModel.fromJson(jsonDecode(response.body));
+            HouseHoldFieldModel.fromJson(jsonDecode(response.body));
         await callInsertHouseHoldFields(houseHoldFieldModel);
 
         if (only == false) {
@@ -1007,7 +1054,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .syncCrecheData(userName, password, token);
     if (cresheData.statusCode == 200) {
       CrecheFieldModel houseHoldFieldModel =
-      CrecheFieldModel.fromJson(jsonDecode(cresheData.body));
+          CrecheFieldModel.fromJson(jsonDecode(cresheData.body));
       if (only == false) {
         Validate().saveString(Validate.creChemodifiedDate,
             houseHoldFieldModel.tabCreche!.modified!);
@@ -1050,14 +1097,14 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
     if (child_data.statusCode == 200) {
       EnrolledChildrenFieldModel childMetaModel =
-      EnrolledChildrenFieldModel.fromJson(jsonDecode(child_data.body));
+          EnrolledChildrenFieldModel.fromJson(jsonDecode(child_data.body));
       if (only == false) {
         Validate().saveString(Validate.childProfilemodifiedDate,
             childMetaModel.tabChild_HH_Meta_Form!.modified!);
       }
       await callInsertEnrolledChildrendHHFields(childMetaModel);
       if (only == false) {
-        await callEnrolledExitMetaApi(userName, password, token,false);
+        await callEnrolledExitMetaApi(userName, password, token, false);
       } else {
         Navigator.pop(context);
       }
@@ -1086,19 +1133,20 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<void> callEnrolledExitMetaApi(
-      String userName, String password, String token,bool only) async {
-    if(only)
-      showLoaderDialog(context);
+      String userName, String password, String token, bool only) async {
+    if (only) showLoaderDialog(context);
     var child_data = await ChildEnrolledExitApi()
         .callChildEnrolledExitMetaApi(userName, password, token);
 
     if (child_data.statusCode == 200) {
       EnrolledExitChildrenFieldModel childMetaModel =
-      EnrolledExitChildrenFieldModel.fromJson(jsonDecode(child_data.body));
-      if(only == false){ Validate().saveString(Validate.childEnrolledExitmodifiedData,
-          childMetaModel.tabChild_Enrollment_and_Exit!.modified!);}
+          EnrolledExitChildrenFieldModel.fromJson(jsonDecode(child_data.body));
+      if (only == false) {
+        Validate().saveString(Validate.childEnrolledExitmodifiedData,
+            childMetaModel.tabChild_Enrollment_and_Exit!.modified!);
+      }
       await callInsertEnrolledExitCMeta(childMetaModel);
-      if(only == false)
+      if (only == false)
         await callCreshDataApi(userName, password, token, false);
     } else if (child_data.statusCode == 401) {
       Navigator.pop(context);
@@ -1127,7 +1175,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   Future<void> callApiLogicData(
       String userName, String password, String token) async {
     var logisResponce =
-    await FormLogicApiService().fetchLogicData(userName, password, token);
+        await FormLogicApiService().fetchLogicData(userName, password, token);
 
     if (logisResponce.statusCode == 200) {
       Map<String, dynamic> responseData = json.decode(logisResponce.body);
@@ -1208,6 +1256,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     Creche = await Validate().readString(Validate.CrecheSName);
     username = (await Validate().readString(Validate.userName))!;
     fullName = (await Validate().readString(Validate.fullName))!;
+    // await GetLocation().cachingCurrentLocationn(context);
     await _getAppVersionName();
     await locationData();
     await pendingDataForVerify();
@@ -1252,9 +1301,10 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                 callFieldData(true);
               }
             },
-            'Child Enrollment and Exit' :(String date1, String date2) async {
+            'Child Enrollment and Exit': (String date1, String date2) async {
               if (compareDates(date1, date2)) {
-                Validate().saveString(Validate.childEnrolledExitmodifiedData, date2);
+                Validate()
+                    .saveString(Validate.childEnrolledExitmodifiedData, date2);
                 callEnrolledExitMetaApi(userName!, password!, token!, true);
               }
             },
@@ -1341,6 +1391,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
               if (compareDates(date1, date2))
                 callChildGrievancesMeta(userName!, password!, token!, true);
             },
+
           };
 
           for (var element in docTypeList) {
@@ -1402,11 +1453,18 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       case 'Creche Committee Meeting':
         return await Validate().readString(Validate.crecheCommitteUpdateDate);
       case 'Creche Monitoring Checklist':
+        return await Validate().readString(Validate.crecheMonitoringMeta);
+
       case 'Creche Monitoring Checklist CC':
+        return await Validate().readString(Validate.crecheMonitoringMeta);
       case 'Creche Monitoring Checklist CBM':
         return await Validate().readString(Validate.crecheMonitoringMeta);
       case 'Grievance':
         return await Validate().readString(Validate.childGravienceUpdatedDate);
+      case 'Creche Stock':
+        return await Validate().readString(Validate.stockmetaUpdateDate);
+      case 'reche Requisition':
+        return await Validate().readString(Validate.requisitionMetaUpdateDate);
       default:
         return null;
     }
@@ -1439,9 +1497,9 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     DateTime date1 = DateTime.parse(dateString1);
     DateTime date2 = DateTime.parse(dateString2);
     var dateTillMinut1 =
-    DateTime(date1.year, date1.month, date1.day, date1.hour, date1.minute);
+        DateTime(date1.year, date1.month, date1.day, date1.hour, date1.minute);
     var dateTillMinut2 =
-    DateTime(date2.year, date2.month, date2.day, date2.hour, date2.minute);
+        DateTime(date2.year, date2.month, date2.day, date2.hour, date2.minute);
 
     if (dateTillMinut1.isBefore(dateTillMinut2)) {
       return true;
@@ -1457,14 +1515,17 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   Future<void> checkConnectivity() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     setState(() {
-      isConnected = connectivityResult == ConnectivityResult.mobile ||
-          connectivityResult == ConnectivityResult.wifi;
+      isConnected = (connectivityResult.contains(ConnectivityResult.mobile) ||
+          connectivityResult.contains(ConnectivityResult.wifi));
     });
     // Add a listener to listen for changes in connectivity
     Connectivity().onConnectivityChanged.listen((result) {
       setState(() {
-        isConnected = result == ConnectivityResult.mobile ||
-            result == ConnectivityResult.wifi;
+        // isConnected = result ==
+        //     (connectivityResult.contains(ConnectivityResult.mobile) ||
+        //         connectivityResult.contains(ConnectivityResult.wifi));
+        isConnected = result.contains(ConnectivityResult.mobile) ||
+            result.contains(ConnectivityResult.wifi);
       });
     });
   }
@@ -1627,23 +1688,23 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       var visitNots = await CmcCCTabResponseHelper().getCcForUpload();
       hhItems = hhItems
           .where((element) =>
-      (Global.getItemValues(
-          element.responces!, 'verification_status') ==
-          '4' ||
-          Global.getItemValues(
-              element.responces!, 'verification_status') ==
-              '5') &&
-          element.is_edited == 1)
+              (Global.getItemValues(
+                          element.responces!, 'verification_status') ==
+                      '4' ||
+                  Global.getItemValues(
+                          element.responces!, 'verification_status') ==
+                      '5') &&
+              element.is_edited == 1)
           .toList();
 
       syncCount = hhItems.length + visitNots.length;
 
       var pendingItems =
-      await HouseHoldTabResponceHelper().getHouseHoldUploadeItems();
+          await HouseHoldTabResponceHelper().getHouseHoldUploadeItems();
       pendingItems = pendingItems
           .where((element) => (Global.getItemValues(
-          element.responces!, 'verification_status') ==
-          '3'))
+                  element.responces!, 'verification_status') ==
+              '3'))
           .toList();
       countVerifyForPending = pendingItems.length;
     } else if (role == 'Accounts and Logistics Manager') {
@@ -1797,10 +1858,10 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
             builder: (BuildContext context) => ShiShuGharScreen(type: 0)));
       }
     } else if (i == 1) {
-      if (role == 'Cluster Coordinator') {
-        refStatus = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => ShiShuGharScreen(type: 0)));
-      }
+      // if (role == 'Cluster Coordinator') {
+      //   // refStatus = await Navigator.of(context).push(MaterialPageRoute(
+      //   //     builder: (BuildContext context) => ShiShuGharScreen(type: 0)));
+      // }
       //  else if (role == 'Creche Supervisor') {
       //   refStatus = await Navigator.of(context).push(MaterialPageRoute(
       //       builder: (BuildContext context) =>
@@ -1812,12 +1873,12 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       //   refStatus = await Navigator.of(context).push(MaterialPageRoute(
       //       builder: (BuildContext context) => AllcmcCBMListingScreen()));
       // }
-      else if (role == "Creche Supervisor") {
+      if (role == "Creche Supervisor") {
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => ReffralTabScreen(
-              tabTitle: Global.returnTrLable(
-                  locationControlls, CustomText.FlaggedChilderen, lng!),
-            )));
+                  tabTitle: Global.returnTrLable(
+                      locationControlls, CustomText.FlaggedChilderen, lng!),
+                )));
       }
     } else if (i == 2) {
       // if (role == 'Creche Supervisor') {
@@ -1833,16 +1894,17 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       if (role == "Creche Supervisor") {
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => FollowUpTabScreenAllChild(
-              tabTitle: Global.returnTrLable(
-                  locationControlls, CustomText.fllowUp, lng!),
-            )));
-      } else if (role == "Cluster Coordinator") {
-        refStatus = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => ReffralTabScreen(
-              tabTitle: Global.returnTrLable(
-                  locationControlls, CustomText.FlaggedChilderen, lng!),
-            )));
+                  tabTitle: Global.returnTrLable(
+                      locationControlls, CustomText.fllowUp, lng!),
+                )));
       }
+      // else if (role == "Cluster Coordinator") {
+      //   refStatus = await Navigator.of(context).push(MaterialPageRoute(
+      //       builder: (BuildContext context) => ReffralTabScreen(
+      //             tabTitle: Global.returnTrLable(
+      //                 locationControlls, CustomText.FlaggedChilderen, lng!),
+      //           )));
+      // }
     } else if (i == 3) {
       // if (role == 'Cluster Coordinator') {
       //   refStatus = await Navigator.of(context).push(MaterialPageRoute(
@@ -1858,11 +1920,11 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       //           )));
       // }
       if (role == "Cluster Coordinator") {
-        refStatus = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => FollowUpTabScreenAllChild(
-              tabTitle: Global.returnTrLable(
-                  locationControlls, CustomText.fllowUp, lng!),
-            )));
+        // refStatus = await Navigator.of(context).push(MaterialPageRoute(
+        //     builder: (BuildContext context) => FollowUpTabScreenAllChild(
+        //           tabTitle: Global.returnTrLable(
+        //               locationControlls, CustomText.fllowUp, lng!),
+        //         )));
       } else if (role == "Creche Supervisor") {
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) =>
@@ -1911,8 +1973,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       //       builder: (BuildContext context) => SynchronizationScreen()));
       // }
       if (role == 'Cluster Coordinator') {
-        refStatus = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => GrievanceHomeListing()));
+        // refStatus = await Navigator.of(context).push(MaterialPageRoute(
+        //     builder: (BuildContext context) => GrievanceHomeListing()));
       } else {
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => SynchronizationScreen()));
@@ -1933,10 +1995,10 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       String userName, String password, String token, bool only) async {
     if (only) showLoaderDialog(context);
     var responce =
-    await AttendanceMetaApi().callAttendanceData(userName, password, token);
+        await AttendanceMetaApi().callAttendanceData(userName, password, token);
     if (responce.statusCode == 200) {
       ChildAttendanceFieldModel attendanceData =
-      ChildAttendanceFieldModel.fromJson(jsonDecode(responce.body));
+          ChildAttendanceFieldModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildAttendance(attendanceData);
       Validate().saveString(Validate.ChildAttendeceUpdateDate,
@@ -1989,7 +2051,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callChildGrowthMeta(userName, password, token);
     if (responce.statusCode == 200) {
       ChildGrowthMetaFieldsModel childGrowthMetaFields =
-      ChildGrowthMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          ChildGrowthMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       Validate().saveString(Validate.ChildAntroUpdateDate,
           childGrowthMetaFields.tabChild_Growth_Meta!.modified!);
@@ -2041,10 +2103,10 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       String userName, String password, String token, bool only) async {
     if (only) showLoaderDialog(context);
     var responce =
-    await ChildEventMetaApi().callChildEventMeta(userName, password, token);
+        await ChildEventMetaApi().callChildEventMeta(userName, password, token);
     if (responce.statusCode == 200) {
       ChildEventMetaFieldsModel childEventMetaFields =
-      ChildEventMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          ChildEventMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildEvent(childEventMetaFields);
 
@@ -2094,7 +2156,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callChildImmunizationMeta(userName, password, token);
     if (responce.statusCode == 200) {
       ChildImmunizationMetaFieldsModel childImmunizationMetaFields =
-      ChildImmunizationMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          ChildImmunizationMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildImmunization(childImmunizationMetaFields);
       Validate().saveString(Validate.ChildImmunizationUpdateDate,
@@ -2147,7 +2209,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callChildHealthMeta(userName, password, token);
     if (responce.statusCode == 200) {
       ChildHelthMetaFieldsModel childHealthMetaFields =
-      ChildHelthMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          ChildHelthMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildHealth(childHealthMetaFields);
       Validate().saveString(Validate.ChildHealthUpdateDate,
@@ -2193,10 +2255,10 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       String userName, String password, String token, bool only) async {
     if (only) showLoaderDialog(context);
     var responce =
-    await ChildExitMetaApi().callChidExitMeta(userName, password, token);
+        await ChildExitMetaApi().callChidExitMeta(userName, password, token);
     if (responce.statusCode == 200) {
       ChildExitMetaFieldsModel childExitMetaFields =
-      ChildExitMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          ChildExitMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildExit(childExitMetaFields);
 
@@ -2245,7 +2307,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callChildGrievancesMeta(userName, password, token);
     if (responce.statusCode == 200) {
       ChildGrievancesMetaFieldsModel childExitMetaFields =
-      ChildGrievancesMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          ChildGrievancesMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildGrievances(childExitMetaFields);
 
@@ -2295,7 +2357,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callChildReferralMeta(userName, password, token);
     if (responce.statusCode == 200) {
       ChildReferralMetaFieldsModel childFollowUpMetaFields =
-      ChildReferralMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          ChildReferralMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildReferral(childFollowUpMetaFields);
 
@@ -2365,7 +2427,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callChildFollowUpMeta(userName, password, token);
     if (responce.statusCode == 200) {
       ChildFollowUpMetaFieldsModel childFollowUpMetaFields =
-      ChildFollowUpMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          ChildFollowUpMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildFollowUp(childFollowUpMetaFields);
 
@@ -2415,7 +2477,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callCrecheCommitteeMeetingMeta(userName, password, token);
     if (responce.statusCode == 200) {
       CrecheCommitteFieldsMetaModel crecheCommitteMetaFields =
-      CrecheCommitteFieldsMetaModel.fromJson(jsonDecode(responce.body));
+          CrecheCommitteFieldsMetaModel.fromJson(jsonDecode(responce.body));
 
       await callInsertCrecheCommitte(crecheCommitteMetaFields);
 
@@ -2470,7 +2532,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callCashBookExpensesMeta(userName, password, token);
     if (responce.statusCode == 200) {
       CashBookExpensesFieldsMetaModel cashbookExpensesMetaFields =
-      CashBookExpensesFieldsMetaModel.fromJson(jsonDecode(responce.body));
+          CashBookExpensesFieldsMetaModel.fromJson(jsonDecode(responce.body));
 
       await callInsertCashBookExpensesMeta(cashbookExpensesMetaFields);
 
@@ -2513,7 +2575,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callCashBookReceiptMeta(userName, password, token);
     if (responce.statusCode == 200) {
       CashBookReceiptFieldsMetaModel cashbookReceiptMetaFields =
-      CashBookReceiptFieldsMetaModel.fromJson(jsonDecode(responce.body));
+          CashBookReceiptFieldsMetaModel.fromJson(jsonDecode(responce.body));
 
       await callInsertCashBookreceiptMeta(cashbookReceiptMetaFields);
 
@@ -2563,7 +2625,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .cmcALMMetaApi(userName, password, token);
     if (responce.statusCode == 200) {
       CmcALMMetaFieldsModel cmcALMMEtaFields =
-      CmcALMMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          CmcALMMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertcmcALMData(cmcALMMEtaFields);
 
@@ -2603,7 +2665,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .cmcCBMMetaApi(userName, password, token);
     if (responce.statusCode == 200) {
       CmcCBMMetaFieldsModel cmcCBMMEtaFields =
-      CmcCBMMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          CmcCBMMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertcmcCBMData(cmcCBMMEtaFields);
 
@@ -2643,7 +2705,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .cmcCCMetaApi(userName, password, token);
     if (responce.statusCode == 200) {
       CmcCCMetaFieldsModel cmcCCMEtaFields =
-      CmcCCMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          CmcCCMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertcmcCCData(cmcCCMEtaFields);
 
@@ -2684,7 +2746,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
     if (response.statusCode == 200) {
       final childExitMetaFields =
-      CrecheMonitoringMetaModel.fromJson(jsonDecode(response.body));
+          CrecheMonitoringMetaModel.fromJson(jsonDecode(response.body));
 
       await callInsertCrecheMonitoringMeta(childExitMetaFields);
 
@@ -2732,7 +2794,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         .callVillageProfileMeta(userName, password, token);
     if (responce.statusCode == 200) {
       VillageProfileMetaFieldsModel villageProfileMetaFields =
-      VillageProfileMetaFieldsModel.fromJson(jsonDecode(responce.body));
+          VillageProfileMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertVillageProfileMeta(villageProfileMetaFields);
 
@@ -2740,6 +2802,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           villageProfileMetaFields.tab_village!.modified!);
 
       if (only == false) {
+        // await stockMetaData(userName, password, token, false);
         await callCashBookReceiptMetaApi(userName, password, token);
       } else
         Navigator.pop(context);
@@ -2782,10 +2845,10 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       String userName, String password, String token, bool only) async {
     if (only) showLoaderDialog(context);
     var responce =
-    await CrecheCheckInApi().checkInMeta(userName, password, token);
+        await CrecheCheckInApi().checkInMeta(userName, password, token);
     if (responce.statusCode == 200) {
       CheckInFieldsMetaModel checkInMetaFields =
-      CheckInFieldsMetaModel.fromJson(jsonDecode(responce.body));
+          CheckInFieldsMetaModel.fromJson(jsonDecode(responce.body));
 
       await callInsertCheckInFields(checkInMetaFields);
 
@@ -2829,47 +2892,50 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     showLoaderDialog(context);
     var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
     var chilProfiles =
-    await EnrolledChilrenResponceHelper().callChildrenForUpload();
+        await EnrolledChilrenResponceHelper().callChildrenForUpload();
     var crecheProfile = await CrecheDataHelper().callCrecheForUpload();
     var chilAttendence =
-    await ChildAttendanceResponceHelper().callChildAttendencesAllForUpoad();
+        await ChildAttendanceResponceHelper().callChildAttendencesAllForUpoad();
     var crecheCheckIn =
-    await CheckInResponseHelper().callCrecheCheckInResponses();
+        await CheckInResponseHelper().callCrecheCheckInResponses();
     var anthropomentry =
-    await ChildGrowthResponseHelper().callChildGrowthResponsesForUpload();
+        await ChildGrowthResponseHelper().callChildGrowthResponsesForUpload();
     var childeventResponses =
-    await ChildEventTabResponceHelper().getEditedChildEventsForUpload();
+        await ChildEventTabResponceHelper().getEditedChildEventsForUpload();
     var childImmunizationDAta =
-    await ChildImmunizationResponseHelper().getChildImmunizationForUpload();
+        await ChildImmunizationResponseHelper().getChildImmunizationForUpload();
     var childHeathData =
-    await ChildHealthTabResponceHelper().getChildHealthForUpload();
+        await ChildHealthTabResponceHelper().getChildHealthForUpload();
     var childexitdata =
-    await ChildExitResponceHelper().getEditedChildExitForUpload();
+        await ChildExitResponceHelper().getEditedChildExitForUpload();
     var grievanceData =
-    await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
+        await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
     var creCheMonitoring =
-    await CrecheMonitorResponseHelper().getCrecheResponseForUpload();
+        await CrecheMonitorResponseHelper().getCrecheResponseForUpload();
     var referralData =
-    await ChildReferralTabResponseHelper().getChildReferralForUpload();
+        await ChildReferralTabResponseHelper().getChildReferralForUpload();
     var followUpData =
-    await ChildFollowUpTabResponseHelper().getChildFollowUpForUpload();
+        await ChildFollowUpTabResponseHelper().getChildFollowUpForUpload();
     var ccmData =
-    await CrecheCommittieResponnseHelper().getCrecheCommittieForUpload();
+        await CrecheCommittieResponnseHelper().getCrecheCommittieForUpload();
     var cashBookDataExpences = await CashBookResponseExpencesHelper()
         .getEditedCashBookForExpenceUpload();
+    // var stockData = await StockResponseHelper().getStockForUpload();
+    // var requisitionData =
+    //     await RequisitionResponseHelper().getRequisitonsForUpload();
 
     var cashBookDataReciept = await CashBookReceiptResponseHelper()
         .getEditedCashBookReceiptForUpload();
 
     var villageProfiles =
-    await VillageProfileResponseHelper().getVillageProfileforUpload();
+        await VillageProfileResponseHelper().getVillageProfileforUpload();
     var ImageFileData = await ImageFileTabHelper().getImageForUpload();
 
     hhItems = hhItems
         .where((element) =>
-    Global.stringToInt(Global.getItemValues(
-        element.responces!, 'verification_status')) >
-        1)
+            Global.stringToInt(Global.getItemValues(
+                element.responces!, 'verification_status')) >
+            1)
         .toList();
 
     Navigator.pop(context);
@@ -2890,11 +2956,13 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         ccmData.length +
         cashBookDataExpences.length +
         villageProfiles.length +
-        ImageFileData.length +
-        cashBookDataReciept.length;
+        ImageFileData.length
+        +
+        // stockData.length +
+        // requisitionData.length +
+        cashBookDataReciept.length
+    ;
 
     return totalPendingCount;
   }
-
-
 }

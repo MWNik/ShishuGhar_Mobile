@@ -131,15 +131,25 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldFloat> {
                 },
                 style: Styles.black124,
                 keyboardType:TextInputType.numberWithOptions(decimal: true), // Allow decimal numbers
-                inputFormatters: (widget.fieldName=='height' || widget.fieldName=='height_on_referral')?<TextInputFormatter>[
+                inputFormatters:
+                (widget.fieldName=='height' ||
+                    widget.fieldName=='height_on_referral')
+                    ?<TextInputFormatter>[
                   FilteringTextInputFormatter.allow(
                       RegExp(r'^\d{0,3}(?:\.\d{0,2})?')
+                  ), // Allow only digits and up to 2 decimal places
+                ]:(widget.fieldName=='weight' ||
+                  widget.fieldName=='weight_on_referral')?
+                <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d{0,5}(?:\.\d{0,3})?')
                   ), // Allow only digits and up to 2 decimal places
                 ]:<TextInputFormatter>[
                   FilteringTextInputFormatter.allow(
                       RegExp(r'^\d{0,2}(?:\.\d{0,3})?')
                   ), // Allow only digits and up to 2 decimal places
                 ],
+
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(10),
                   suffixIcon: widget.suffixIcon,

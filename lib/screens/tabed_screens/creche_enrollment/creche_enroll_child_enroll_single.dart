@@ -147,6 +147,7 @@ class _CrecheEnrollChildEnrollScreenState
                                       HHGUID: Global.getItemValues(crecheEnrollChild[index]['responces'], 'hhguid'),
                                       EnrolledChilGUID: crecheEnrollChild[index]['ChildEnrollGUID'],
                                       HHname: crecheEnrollChild[index]['HHname'],
+                                      ChildName: Global.getItemValues(crecheEnrollChild[index]['responces'], 'child_name'),
                                       crecheId: crecheEnrollChild[index]['creche_id'],
                                       isNew: 0,
                                       isImageUpdate: false,

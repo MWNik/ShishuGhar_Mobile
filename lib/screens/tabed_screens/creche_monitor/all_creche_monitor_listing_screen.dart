@@ -18,8 +18,8 @@ import '../../../style/styles.dart';
 import 'creche_monitor_tab_forAdd.dart';
 
 class AllCrecheMonitorListingScreen extends StatefulWidget {
-
-  const AllCrecheMonitorListingScreen({super.key,
+  const AllCrecheMonitorListingScreen({
+    super.key,
   });
 
   @override
@@ -29,19 +29,18 @@ class AllCrecheMonitorListingScreen extends StatefulWidget {
 
 class _CrecheMonitorListingScreenState
     extends State<AllCrecheMonitorListingScreen> {
-  List<CrecheMonitorResponseModel> crecheMonitorData=[];
-  List<CrecheMonitorResponseModel> filterData=[];
+  List<CrecheMonitorResponseModel> crecheMonitorData = [];
+  List<CrecheMonitorResponseModel> filterData = [];
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<OptionsModel> creches = [];
   List<Translation> translatsLabel = [];
   String lng = 'en';
   String? selectedCreche;
 
-
   @override
   void initState() {
     super.initState();
-     initializeData();
+    initializeData();
   }
 
   Future<void> initializeData() async {
@@ -59,15 +58,12 @@ class _CrecheMonitorListingScreenState
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translatsLabel = value);
-    creches =
-    await OptionsModelHelper().callCrechInOptionAll('Creche');
-    crecheMonitorData = await CrecheMonitorResponseHelper()
-        .callCrecheMonitoringResponse();
-    filterData=crecheMonitorData;
+    creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
+    crecheMonitorData =
+        await CrecheMonitorResponseHelper().callCrecheMonitoringResponse();
+    filterData = crecheMonitorData;
     setState(() {});
-
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +96,7 @@ class _CrecheMonitorListingScreenState
       ),
       appBar: CustomAppbar(
         text: Global.returnTrLable(translatsLabel, CustomText.VisitNotes, lng),
-        onTap: () =>    Navigator.pop(context, 'itemRefresh'),
+        onTap: () => Navigator.pop(context, 'itemRefresh'),
       ),
       endDrawer: SafeArea(
         child: Drawer(
@@ -196,8 +192,7 @@ class _CrecheMonitorListingScreenState
         child: Column(children: [
           Row(
             children: [
-              Expanded(
-                  child: SizedBox()),
+              Expanded(child: SizedBox()),
               SizedBox(
                 width: 10.w,
               ),
@@ -212,129 +207,152 @@ class _CrecheMonitorListingScreenState
               )
             ],
           ),
-        Expanded(
+          Expanded(
+            child: filterData.length > 0
+                ? ListView.builder(
+                    itemCount: filterData.length,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      final responce = filterData[index].responces;
 
-        child:filterData.length>0?
-        ListView.builder(
-        itemCount: filterData.length,
-        shrinkWrap: true,
-        physics: BouncingScrollPhysics(),
-        scrollDirection: Axis.vertical,
-        itemBuilder: (BuildContext context, int index) {
-          final responce = filterData[index].responces;
+                      return GestureDetector(
+                        onTap: () async {
+                          final cmgUid = filterData[index].cmguid;
+                          var created_at = DateTime.parse(
+                              filterData[index].created_at.toString());
+                          var date = DateTime(created_at.year, created_at.month,
+                              created_at.day);
+                          bool isViewScreen = date
+                              .add(Duration(days: 7))
+                              .isBefore(
+                                  DateTime.parse(Validate().currentDate()));
 
-          return GestureDetector(
-            onTap: () async {
-              final cmgUid = filterData[index].cmguid;
-              var created_at = DateTime.parse(filterData[index].created_at.toString());
-              var date  = DateTime(created_at.year,created_at.month,created_at.day);
-              bool isViewScreen = date.add(Duration(days: 7)).isBefore(DateTime.parse(Validate().currentDate()));
-
-              final allowRefresh = await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => CrecheMonitorTabForAdd(
-                    cmgUid: cmgUid!,
-                    dateOfVisit: Global.getItemValues(filterData[index].responces, 'date_of_visit'),
-                    isEdit: true,
-                    isViewScreen: isViewScreen,
-                  ),
-                ),
-              );
-
-              if (allowRefresh == 'itemRefresh') {
-                initializeData();
-              }
-            },
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 5.h),
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border:
-                    Border.all(color: Color(0xffE7F0FF)),
-                    borderRadius:
-                    BorderRadius.circular(10.r)),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 10.w, vertical: 8.h),
-                  child: Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.start,
-                    crossAxisAlignment:
-                    CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        mainAxisAlignment:
-                        MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${Global.returnTrLable(translatsLabel, CustomText.Creches, lng)} : ',
-                            style: Styles.black104,
-                            strutStyle: StrutStyle(height: 1),
-                          ),
-                          Text(
-                            '${Global.returnTrLable(translatsLabel,CustomText.datevisit, lng)} : ',
-                            style: Styles.black104,
-                            strutStyle: StrutStyle(height: 1),
-                          ),
-                         
-                        ],
-                      ),
-                      SizedBox(width: 10),
-                      SizedBox(
-                        height: 20.h,
-                        width: 2,
-                        child: VerticalDivider(
-                          color: Color(0xffE6E6E6),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          mainAxisAlignment:
-                          MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              callCreCheName(Global.getItemValues(responce!, 'creche_id')),
-                              style: Styles.blue125,
-                              overflow: TextOverflow.ellipsis,
+                          final allowRefresh = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  CrecheMonitorTabForAdd(
+                                cmgUid: cmgUid!,
+                                dateOfVisit: Global.getItemValues(
+                                    filterData[index].responces,
+                                    'date_of_visit'),
+                                isEdit: true,
+                                isViewScreen: isViewScreen,
+                              ),
                             ),
-                            Text(
-                              (Global.validString(
-                                  Global.getItemValues(filterData[index].responces, 'date_of_visit')))?
-                              Validate().displeDateFormate(Global.getItemValues(responce!, 'date_of_visit')):'',
-                              style: Styles.blue125,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          );
 
-                          ],
+                          if (allowRefresh == 'itemRefresh') {
+                            initializeData();
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.h),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: Color(0xffE7F0FF)),
+                                borderRadius: BorderRadius.circular(10.r)),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w, vertical: 8.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${Global.returnTrLable(translatsLabel, CustomText.Creches, lng)} : ',
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
+                                      Text(
+                                        '${Global.returnTrLable(translatsLabel, CustomText.datevisit, lng)} : ',
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 10),
+                                  SizedBox(
+                                    height: 20.h,
+                                    width: 2,
+                                    child: VerticalDivider(
+                                      color: Color(0xffE6E6E6),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          callCreCheName(Global.getItemValues(
+                                              responce!, 'creche_id')),
+                                          style: Styles.blue125,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          (Global.validString(
+                                                  Global.getItemValues(
+                                                      filterData[index]
+                                                          .responces,
+                                                      'date_of_visit')))
+                                              ? Validate().displeDateFormate(
+                                                  Global.getItemValues(
+                                                      responce!,
+                                                      'date_of_visit'))
+                                              : '',
+                                          style: Styles.blue125,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: 5),
+                                  (filterData[index].is_edited == 0 &&
+                                          filterData[index].is_uploaded == 1)
+                                      ? Image.asset(
+                                          "assets/sync.png",
+                                          scale: 1.5,
+                                        )
+                                      : (filterData[index].is_edited == 1 &&
+                                              filterData[index].is_uploaded ==
+                                                  0)
+                                          ? Image.asset(
+                                              "assets/sync_gray.png",
+                                              scale: 1.5,
+                                            )
+                                          : Icon(
+                                              Icons.error_outline_outlined,
+                                              color: Colors.red.shade700,
+                                              shadows: [
+                                                BoxShadow(
+                                                    spreadRadius: 2,
+                                                    blurRadius: 4,
+                                                    color: Colors.red.shade200)
+                                              ],
+                                            )
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 5),
-                      (filterData[index].is_edited==0 && filterData[index].is_uploaded==1)?
-                      Image.asset(
-                        "assets/sync.png",
-                        scale: 1.5,
-                      ):
-                      Image.asset(
-                        "assets/sync_gray.png",
-                        scale: 1.5,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      )
-              : Center(
-          child: Text( Global.returnTrLable(translatsLabel, CustomText.NorecordAvailable, lng))),
-        ),
+                      );
+                    },
+                  )
+                : Center(
+                    child: Text(Global.returnTrLable(
+                        translatsLabel, CustomText.NorecordAvailable, lng))),
+          ),
         ]),
       ),
     );
@@ -343,28 +361,28 @@ class _CrecheMonitorListingScreenState
   void cleaAllFilter() {
     filterData = crecheMonitorData;
     selectedCreche = null;
-    setState((){});
+    setState(() {});
   }
 
   filteredGetData(
-      BuildContext mContext,
-      ) async {
+    BuildContext mContext,
+  ) async {
     if (selectedCreche != null) {
       filterData = crecheMonitorData.where((item) {
         var creche_id = Global.getItemValues(item.responces!, 'creche_id');
         return creche_id.toString() == selectedCreche.toString();
       }).toList();
 
-      setState((){});
+      setState(() {});
     }
-
   }
 
-  String callCreCheName(String crechName){
-    String creCheItem='';
-    var crechSelected=creches.where((element) => element.name==crechName).toList();
-    if(crechSelected.length>0){
-      creCheItem=crechSelected.first.values!;
+  String callCreCheName(String crechName) {
+    String creCheItem = '';
+    var crechSelected =
+        creches.where((element) => element.name == crechName).toList();
+    if (crechSelected.length > 0) {
+      creCheItem = crechSelected.first.values!;
     }
     return creCheItem;
   }

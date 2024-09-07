@@ -20,6 +20,7 @@ class HHDataUploadApi {
     };
     String json=jsonEncode(body);
     print("upload json $json");
+    await Validate().createUploadedJson("Token $token\n\n$json");
     try {
       var response = await http.post(Uri.parse(endurl), headers: headers, body: json);
       print("body res ${response.body}");
@@ -68,6 +69,7 @@ class HHDataUploadApi {
     // };
     String json = jsonEncode(data); //HH data in json format
     print("upload json $json");
+    await Validate().createUploadedJson("Token $token\n\n$json");
     try {
       bool proceed = true;
       for (var element in childrenList) {
@@ -136,6 +138,7 @@ class HHDataUploadApi {
 
     String json=jsonEncode(hhData);
     print("upload data $json");
+    await Validate().createUploadedJson("Token $token\n\n$json");
     try {
       var response = await http.post(Uri.parse(endurl), headers: headers, body: json);
       print("body res ${response.body}");
@@ -156,6 +159,7 @@ class HHDataUploadApi {
     };
     String json = jsonEncode(childList);
     print("upload json $json");
+    await Validate().createUploadedJson("Token $token\n\n$json");
     try {
       var response =
       await http.post(Uri.parse(endurl), headers: headers, body: json);
@@ -177,6 +181,7 @@ class HHDataUploadApi {
     childrenList.remove('name');
     String json = jsonEncode(childrenList);
     print("upload json $json");
+    await Validate().createUploadedJson("Token $token\n\n$json");
     try {
       var response =
       await http.put(Uri.parse(endurl), headers: headers, body: json);

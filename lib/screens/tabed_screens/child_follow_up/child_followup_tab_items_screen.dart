@@ -253,7 +253,9 @@ class _ChildFollowupTabItemsScreenState
         return DynamicCustomDropdownField(
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           readable: role == 'Creche Supervisor' ? false : true,
           hintText: quesItem.fieldname == 'recoverd'
               ? Global.returnTrLable(translats, CustomText.Selecthere, lng)
@@ -278,7 +280,9 @@ class _ChildFollowupTabItemsScreenState
           minDate: quesItem.fieldname == 'followup_visit_date'
               ? widget.minDate
               : null,
-          isRequred: quesItem.reqd,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           readable: role == 'Creche Supervisor'
               ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
               : true,
@@ -307,7 +311,9 @@ class _ChildFollowupTabItemsScreenState
         return DynamicCustomTextFieldNew(
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           maxline: (quesItem.length != 0) ? quesItem.length! % 35 : 1,
@@ -329,7 +335,9 @@ class _ChildFollowupTabItemsScreenState
       case 'Int':
         return DynamicCustomTextFieldInt(
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           readable: role == 'Creche Supervisor'
@@ -371,6 +379,9 @@ class _ChildFollowupTabItemsScreenState
       //   );
       case 'Check':
         return DynamicCustomYesNoCheckboxWithLabel(
+          isRequred: quesItem.fieldname == 'is_child_available'
+              ? 1
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: myMap[quesItem.fieldname],
           labelControlls: translats,
@@ -391,7 +402,9 @@ class _ChildFollowupTabItemsScreenState
           maxline: 3,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: role == 'Creche Supervisor'
@@ -411,7 +424,9 @@ class _ChildFollowupTabItemsScreenState
       case 'Select':
         return DynamicCustomTextFieldInt(
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           readable: role == 'Creche Supervisor'
               ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
@@ -433,7 +448,9 @@ class _ChildFollowupTabItemsScreenState
         return DynamicCustomTextFieldNew(
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           readable: role == 'Creche Supervisor'
               ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
@@ -466,7 +483,9 @@ class _ChildFollowupTabItemsScreenState
           keyboardtype: TextInputType.number,
           fieldName: quesItem.fieldname!,
           hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
-          isRequred: quesItem.reqd,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
@@ -521,10 +540,23 @@ class _ChildFollowupTabItemsScreenState
           break;
         }
 
-        var dateValidation = checkFlloupToCurrentDate(myMap['followup_visit_date']);
+        var dateValidation =
+            checkFlloupToCurrentDate(myMap['followup_visit_date']);
         if (dateValidation) {
-          Validate()
-              .singleButtonPopup('Future date is not allowed in followup visit date', CustomText.ok, false, context);
+          Validate().singleButtonPopup(
+              'Future date is not allowed in followup visit date',
+              CustomText.ok,
+              false,
+              context);
+          validStatus = false;
+          break;
+        }
+        if(myMap['is_child_available']==null){
+          Validate().singleButtonPopup(
+              'Please select Is child available? ',
+              CustomText.ok,
+              false,
+              context);
           validStatus = false;
           break;
         }
@@ -772,49 +804,67 @@ class _ChildFollowupTabItemsScreenState
   Future callCheckNextFollowUp() async {
     var reffralItem = await ChildReferralTabResponseHelper()
         .getChildReferralResponcewithGuid(widget.child_referral_guid);
-    if(Global.validToInt(reffralItem.first.visit_count)>0){
-      var folloUps = await ChildFollowUpTabResponseHelper()
-          .checkReffralCounts(widget.enrolChildGuid, widget.child_referral_guid);
+    if (Global.validToInt(reffralItem.first.visit_count) > 0) {
+      var folloUps = await ChildFollowUpTabResponseHelper().checkReffralCounts(
+          widget.enrolChildGuid, widget.child_referral_guid);
       var alredyGenrated = await ChildFollowUpTabResponseHelper()
-          .getScduledEnrollGuid(widget.enrolChildGuid, widget.child_referral_guid);
-      if(Global.validToInt(reffralItem.first.visit_count) == folloUps.length){
-        Map<String, dynamic> jsonBody = jsonDecode(reffralItem.first.responces!);
-        jsonBody['visit_count'] = 0;
-        var itemResponce = jsonEncode(jsonBody);
-        await ChildReferralTabResponseHelper().updateVisitFollowUps(itemResponce,  reffralItem.first.child_referral_guid!,0);
-      }else if (reffralItem.length > 0 && alredyGenrated.length==0) {
-        if (reffralItem.first.visit_count != folloUps.length) {
-          DateTime? folloupDate;
-          if (reffralItem.first.visit_count == 3) {
-            folloupDate = DateTime.parse(folloUps.last.schedule_date!)
-                .add(Duration(days: 7));
+          .getScduledEnrollGuid(
+              widget.enrolChildGuid, widget.child_referral_guid);
+      if(myMap['reasons']!='3'){
+        if (Global.validToInt(reffralItem.first.visit_count) == folloUps.length) {
+          Map<String, dynamic> jsonBody =
+          jsonDecode(reffralItem.first.responces!);
+          jsonBody['visit_count'] = 0;
+          var itemResponce = jsonEncode(jsonBody);
+          await ChildReferralTabResponseHelper().updateVisitFollowUps(
+              itemResponce, reffralItem.first.child_referral_guid!, 0);
+        }
+        else if (reffralItem.length > 0 && alredyGenrated.length == 0) {
+          if (reffralItem.first.visit_count != folloUps.length) {
+            DateTime? folloupDate;
+            if (reffralItem.first.visit_count == 3) {
+              folloupDate = DateTime.parse(folloUps.last.schedule_date!)
+                  .add(Duration(days: 7));
+            } else {
+              folloupDate = DateTime.parse(folloUps.last.schedule_date!)
+                  .add(Duration(days: 15));
+            }
+            await ChildFollowUpTabResponseHelper().autoCreateFollowRecord(
+                '${DateFormat('yyyy-MM-dd').format(folloupDate)}',
+                widget.child_referral_guid,
+                widget.enrolChildGuid,
+                widget.creche_id,
+                userName);
           }
-          else {
-            folloupDate = DateTime.parse(folloUps.last.schedule_date!)
-                .add(Duration(days: 15));
-          }
-          await ChildFollowUpTabResponseHelper().autoCreateFollowRecord(
-              '${DateFormat('yyyy-MM-dd').format(folloupDate)}',
-              widget.child_referral_guid,
-              widget.enrolChildGuid,
-              widget.creche_id,
-              userName);
         }
       }
-    }
+      else{
+        Map<String, dynamic> jsonBody =
+        jsonDecode(reffralItem.first.responces!);
+        jsonBody['visit_count'] = 0;
+        var itemResponce = jsonEncode(jsonBody);
+        await ChildReferralTabResponseHelper().updateVisitFollowUps(
+            itemResponce, reffralItem.first.child_referral_guid!, 0);
+        if(alredyGenrated.length>0){
+          alredyGenrated.forEach((element) async {
+            await ChildFollowUpTabResponseHelper().deleteFollowUpBYFollowpGUID(element.child_followup_guid!);
+          });
 
+        }
+      }
+
+    }
   }
 
-  bool checkFlloupToCurrentDate(String folloupdate){
-    bool validDate=false;
-    if(Global.validString(folloupdate)){
-      var followpDate=DateTime.parse(folloupdate);
-      var currentDate=DateTime.parse(Validate().currentDate());
-      if(followpDate.isAfter(currentDate)){
-        validDate=true;
+  bool checkFlloupToCurrentDate(String folloupdate) {
+    bool validDate = false;
+    if (Global.validString(folloupdate)) {
+      var followpDate = DateTime.parse(folloupdate);
+      var currentDate = DateTime.parse(Validate().currentDate());
+      if (followpDate.isAfter(currentDate)) {
+        validDate = true;
       }
     }
     return validDate;
   }
-
 }

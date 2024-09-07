@@ -208,11 +208,12 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
     var items = widget.screenItem[itemId];
     if (items != null) {
       for (int i = 0; i < items.length; i++) {
-        screenItems.add(widgetTypeWidget(i, items[i]));
-        screenItems.add(SizedBox(height: 5.h));
         if (!DependingLogic().callDependingLogic(logics, myMap, items[i])) {
           myMap.remove(items[i].fieldname);
         }
+        screenItems.add(widgetTypeWidget(i, items[i]));
+        screenItems.add(SizedBox(height: 5.h));
+
       }
     }
     return screenItems;

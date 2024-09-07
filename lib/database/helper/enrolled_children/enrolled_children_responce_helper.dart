@@ -222,8 +222,7 @@ class EnrolledChilrenResponceHelper {
             //         element['hhResponce'], 'verification_status') ==
             //     "4"
             //     &&
-                (filterDataForEnrolledChild(element)>=7 && filterDataForEnrolledChild(element)<=36)
-            && (Global.getItemValues(element['hhResponce'], 'village_id') ==
+               (Global.getItemValues(element['hhResponce'], 'village_id') ==
                 villageId.toString()
             )
     )

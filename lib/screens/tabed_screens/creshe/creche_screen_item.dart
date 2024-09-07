@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
@@ -712,6 +714,55 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
     }
   }
 
+  Future<Position> getCurrentPositionWithTimeout() async {
+    int retryCount = 0;
+    while (retryCount < 2) {
+      try {
+        return await Geolocator.getCurrentPosition()
+            .timeout(Duration(seconds: 10));
+      } catch (e) {
+        if (e is TimeoutException) {
+          retryCount++;
+          print('Timeout reached, retrying... ($retryCount)');
+          await Future.delayed(
+              Duration(seconds: 1)); // wait 1 second before retrying
+        } else {
+          rethrow; // rethrow other exceptions
+        }
+      }
+    }
+    throw TimeoutException(
+        'Failed to get current position after $retryCount retries');
+  }
+
+
+  Future<void> _getLocation(String fieldName) async {
+
+      try {
+        showLoaderDialog(context);
+
+        final currentLocation = await getCurrentPositionWithTimeout();
+
+        myMap['latitude'] = '${currentLocation.latitude}';
+        myMap['longitude'] = '${currentLocation.longitude}';
+        myMap[fieldName] = '${currentLocation.latitude},${currentLocation.longitude}';
+        isNew = false;
+          setState(() {});
+      } catch (e) {
+        if (e is TimeoutException) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content:
+                  Text("Location not get please try again.")));
+
+        }
+        print('Error getting location: $e');
+      } finally {
+        Navigator.pop(context);
+      }
+  }
+
   Future<void> checkPermissionStatus(String fieldName) async {
     var status = await Permission.location.status;
     if (status.isDenied) {
@@ -760,10 +811,10 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
       if (!serviceEnabled) {
         return;
       } else {
-        await getLocation(fieldName);
+        await _getLocation(fieldName);
       }
     } else {
-      await getLocation(fieldName);
+      await _getLocation(fieldName);
     }
   }
 

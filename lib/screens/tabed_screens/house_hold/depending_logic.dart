@@ -23,6 +23,7 @@ class DependingLogic {
             (element.type_of_logic_id == '1' ||
                 element.type_of_logic_id == '3' ||
                 element.type_of_logic_id == '12' ||
+                element.type_of_logic_id == '24' ||
                 element.type_of_logic_id == '18'))
         .toList();
     if (parentQlogic.length > 0) {
@@ -56,13 +57,27 @@ class DependingLogic {
             //   break;
             // }
           }
-        } else if (element.type_of_logic_id == '18') {
+        }
+        else if (element.type_of_logic_id == '18') {
           var dependVAlu = answred[element.dependentControls];
           if (dependVAlu != null) {
             var multiItems = Global.splitData(dependVAlu, ',');
             if (multiItems.contains(element.algorithmExpression.toString())) {
               dependingAns = true;
               break;
+            }
+          }
+        }
+        else if (element.type_of_logic_id == '24') {
+          if(element.dependentControls==element.parentControl){
+            var dependVAlu = answred[element.dependentControls];
+            if((!Global.validString(element.algorithmExpression))&& dependVAlu!=null){
+              dependingAns = true;
+            }
+          }else{
+            var dependVAlu = answred[element.dependentControls];
+            if((!Global.validString(element.algorithmExpression))&& dependVAlu!=null){
+              dependingAns = true;
             }
           }
         }
@@ -125,11 +140,11 @@ class DependingLogic {
           if (dependVAlu != null) {
             var date = Validate().stringToDate(dependVAlu);
             int? calucalteDate;
-            if (element.algorithmExpression.toLowerCase() == 'm')
+            if (Global.validToString(element.algorithmExpression).toLowerCase() == 'm')
               calucalteDate = Validate().calculateAgeInMonths(date);
-            else if (element.algorithmExpression.toLowerCase() == 'y')
+            else if (Global.validToString(element.algorithmExpression).toLowerCase() == 'y')
               calucalteDate = Validate().calculateAgeInYear(date);
-            else if (element.algorithmExpression.toLowerCase() == 'd')
+            else if (Global.validToString(element.algorithmExpression).toLowerCase() == 'd')
               calucalteDate = Validate().calculateAgeInDays(date);
 
             item[element.parentControl] = calucalteDate;
@@ -191,11 +206,8 @@ class DependingLogic {
     var parentQlogic = logics
         .where((element) =>
             element.dependentControls.contains(parentItem.fieldname!) &&
-            (element.type_of_logic_id == '4'))
+            (element.type_of_logic_id == '4'||element.type_of_logic_id == '22'))
         .toList();
-    //   var items= logics.where((element) => element.parentControl.contains(parentItem.fieldname!) &&(element.type_of_logic_id=='20')
-    // ).toList();
-    // parentQlogic.addAll(items);
     if (parentQlogic.length > 0) {
       for (int i = 0; i < parentQlogic.length; i++) {
         var element = parentQlogic[i];
@@ -214,15 +226,55 @@ class DependingLogic {
             }
           }
         }
-        // else if(element.type_of_logic_id=='20'){
-        //   var dependVAlu=answred[element.dependentControls];
-        //   var algo=Global.splitData(element.algorithmExpression,'');
-        //   if(dependVAlu!=null && algo.length==2){
-        //     if(dependVAlu==algo[0]){
-        //
-        //     }
-        //   }
-        // }
+        if (element.type_of_logic_id == '22') {
+          var dependVAlu = Global.splitData(element.dependentControls, ':');
+          if (dependVAlu.length > 0) {
+            double? fiValue1;
+            dependVAlu.forEach((depV) {
+              if(depV.contains('+')){
+                double? temp;
+                var depenItem=Global.splitData(depV,'+');
+                depenItem.forEach((action){
+                  if(temp!=null){
+                    temp = temp!+Global.stringToDouble(answred[action.toString().trim()].toString());
+                  }else temp = Global.stringToDouble(answred[action.toString().trim()].toString());
+                });
+                if(fiValue1!=null&&temp!=null){
+                  if(element.algorithmExpression=='-'){
+                    fiValue1=(fiValue1!-temp!);
+                  }else if(element.algorithmExpression=='+'){
+                    fiValue1=(fiValue1!+temp!);
+                  }
+                }
+                else fiValue1=temp;
+
+              }
+              else  if(depV.contains('-')){
+                double? temp;
+                var depenItem=Global.splitData(depV,'-');
+                depenItem.forEach((action){
+                  if(temp!=null){
+                    temp = temp!-Global.stringToDouble(answred[action.toString().trim()].toString());
+                  }else temp = Global.stringToDouble(answred[action.toString().trim()].toString());
+                });
+
+                if(fiValue1!=null&&temp!=null){
+                  if(element.algorithmExpression=='-'){
+                    fiValue1=(fiValue1!-temp!);
+                  }else if(element.algorithmExpression=='+'){
+                    fiValue1=(fiValue1!+temp!);
+                  }
+                }
+                else fiValue1=temp;
+              }
+
+            });
+            if (fiValue1 != null) {
+              item[element.parentControl] = fiValue1;
+            }
+          }
+        }
+
       }
     }
 
@@ -255,7 +307,7 @@ class DependingLogic {
         } else if (parentQlogic[i].type_of_logic_id == '16') {
           var parentDate = answred[parentQlogic[i].parentControl];
           if (parentDate != null) {
-            items.add(parentQlogic[i].algorithmExpression);
+            items.add(Global.validToString(parentQlogic[i].algorithmExpression));
             print("object,${parentDate.split('-').map(int.parse).toList()}");
             if (parentQlogic[i].algorithmExpression == '<') {
               List<dynamic> dateParts =
@@ -327,7 +379,8 @@ class DependingLogic {
             element.type_of_logic_id == '12' ||
             element.type_of_logic_id == '18' ||
             element.type_of_logic_id == '6' ||
-            element.type_of_logic_id == '16'))
+            element.type_of_logic_id == '16'||
+            element.type_of_logic_id == '23'))
         .toList();
 
     // parentQlogic.addAll(logicdependControl);
@@ -376,7 +429,8 @@ class DependingLogic {
                 }
               }
             }
-          } else {
+          }
+          else {
             var parrentValue = Global.stringToIntNull(
                 answred[element.parentControl].toString());
             var dependVAlu = Global.stringToIntNull(
@@ -388,25 +442,29 @@ class DependingLogic {
                   "Value of ${parentItem.label} must be less than Or equal to $dependVAlu";
                   break;
                 }
-              } else if (element.algorithmExpression == '<') {
+              }
+              else if (element.algorithmExpression == '<') {
                 if (!(parrentValue < dependVAlu)) {
                   retuenValu =
                   "Value of ${parentItem.label} must be less than $dependVAlu";
                   break;
                 }
-              } else if (element.algorithmExpression == '>=') {
+              }
+              else if (element.algorithmExpression == '>=') {
                 if (!(parrentValue >= dependVAlu)) {
                   retuenValu =
                   "Value of ${parentItem.label} must be greater than Or equal to $dependVAlu";
                   break;
                 }
-              } else if (element.algorithmExpression == '>') {
+              }
+              else if (element.algorithmExpression == '>') {
                 if (!(parrentValue > dependVAlu)) {
                   retuenValu =
                   "Value of ${parentItem.label} must be greater than $dependVAlu";
                   break;
                 }
-              } else if (element.algorithmExpression == '==') {
+              }
+              else if (element.algorithmExpression == '==') {
                 if (!(parrentValue==dependVAlu)) {
                   retuenValu =
                   "Value of ${parentItem.label} must be equal to $dependVAlu";
@@ -415,9 +473,10 @@ class DependingLogic {
               }
             }
           }
-        } else if (element.type_of_logic_id == '1' ||
+        }
+        else if (element.type_of_logic_id == '1' ||
             element.type_of_logic_id == '3') {
-          if (element.type_of_logic_id == '1') {
+          if (element.type_of_logic_id == '1'&&element.parentControl==parentItem.fieldname) {
             var dependVAlu = answred[element.dependentControls].toString();
             if (dependVAlu == element.algorithmExpression.toString()) {
               var parentValu = answred[element.parentControl].toString();
@@ -440,7 +499,8 @@ class DependingLogic {
               }
             }
           }
-        } else if (element.type_of_logic_id == '7') {
+        }
+        else if (element.type_of_logic_id == '7') {
           var dependVAlu = answred[element.dependentControls].toString();
           var parentValue = answred[element.parentControl].toString();
           if (element.algorithmExpression.toString() == '>') {
@@ -456,7 +516,8 @@ class DependingLogic {
               }
             }
           }
-        } else if (element.type_of_logic_id == '9') {
+        }
+        else if (element.type_of_logic_id == '9') {
           var dependVAlu = answred[element.dependentControls];
           var parentValue = answred[element.parentControl];
           if (element.algorithmExpression.toString() == '>') {
@@ -481,7 +542,8 @@ class DependingLogic {
               }
             }
           }
-        } else if (element.type_of_logic_id == '17') {
+        }
+        else if (element.type_of_logic_id == '17') {
           if (element.parentControl == element.dependentControls) {
             var exp = Global.splitData(element.algorithmExpression, ',');
             if (exp.length > 0) {
@@ -512,7 +574,8 @@ class DependingLogic {
               }
             }
           }
-        } else if (element.type_of_logic_id == '19') {
+        }
+        else if (element.type_of_logic_id == '19') {
           if (element.parentControl == element.dependentControls) {
             var exp = Global.splitData(element.algorithmExpression, ',');
             if (exp.length > 0) {
@@ -590,8 +653,122 @@ class DependingLogic {
                 }
               }
             }
+          }else{
+            var parrentValue = Global.stringToDouble(
+                answred[element.parentControl].toString());
+            var dependVAlu = Global.stringToDouble(
+                answred[element.dependentControls].toString());
+            if (answred[element.parentControl] != null && answred[element.dependentControls] != null) {
+              if (element.algorithmExpression == '<=') {
+                if (!(parrentValue <= dependVAlu)) {
+                  retuenValu =
+                  "Value of ${parentItem.label} must be less than Or equal to $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '<') {
+                if (!(parrentValue < dependVAlu)) {
+                  retuenValu =
+                  "Value of ${parentItem.label} must be less than $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '>=') {
+                if (!(parrentValue >= dependVAlu)) {
+                  retuenValu =
+                  "Value of ${parentItem.label} must be greater than Or equal to $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '>') {
+                if (!(parrentValue > dependVAlu)) {
+                  retuenValu =
+                  "Value of ${parentItem.label} must be greater than $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '==') {
+                if (!(parrentValue==dependVAlu)) {
+                  retuenValu =
+                  "Value of ${parentItem.label} must be equal to $dependVAlu";
+                  break;
+                }
+              }
+            }
+              if (parentItem.reqd == 1) {
+                if (Global.validString(
+                    answred[element.dependentControls].toString())) {
+                  if (element.algorithmExpression == '<=') {
+                    if (!(dependVAlu <= parrentValue)) {
+                      retuenValu =
+                      "Value of ${parentItem.label} must be less than Or equal to $parrentValue";
+                      break;
+                    }
+                  } else if (element.algorithmExpression == '<') {
+                    if (!(dependVAlu < parrentValue)) {
+                      retuenValu =
+                      "Value of ${parentItem.label} must be less than $parrentValue";
+                      break;
+                    }
+                  } else if (element.algorithmExpression == '>=') {
+                    if (!(dependVAlu >= parrentValue)) {
+                      retuenValu =
+                      "Value of ${parentItem.label} must be greater than Or equal to $parrentValue";
+                      break;
+                    }
+                  } else if (element.algorithmExpression == '>') {
+                    if (!(dependVAlu > parrentValue)) {
+                      retuenValu =
+                      "Value of ${parentItem.label} must be greater than $parrentValue";
+                      break;
+                    }
+                  } else if (element.algorithmExpression == '==') {
+                    if (!(dependVAlu == parrentValue)) {
+                      retuenValu =
+                      "Value of ${parentItem.label} must be equal to $parrentValue";
+                      break;
+                    }
+                  }
+                } else
+                  'Please enter value in ${parentItem.label}';
+              }
+              else if (Global.validString(
+                  answred[element.dependentControls].toString())) {
+                if (element.algorithmExpression == '<=') {
+                  if (!(parrentValue <= dependVAlu)) {
+                    retuenValu =
+                    "Value of ${parentItem.label} must be less than Or equal to $dependVAlu";
+                    break;
+                  }
+                }
+                else if (element.algorithmExpression == '<') {
+                  if (!(parrentValue < dependVAlu)) {
+                    retuenValu =
+                    "Value of ${parentItem.label} must be less than $dependVAlu";
+                    break;
+                  }
+                }
+                else if (element.algorithmExpression == '>=') {
+                  if (!(parrentValue >= dependVAlu)) {
+                    retuenValu =
+                    "Value of ${parentItem.label} must be greater than Or equal to $dependVAlu";
+                    break;
+                  }
+                }
+                else if (element.algorithmExpression == '>') {
+                  if (!(parrentValue > dependVAlu)) {
+                    retuenValu =
+                    "Value of ${parentItem.label} must be greater than $dependVAlu";
+                    break;
+                  }
+                }
+                else if (element.algorithmExpression == '==') {
+                  if (!(parrentValue == dependVAlu)) {
+                    retuenValu =
+                    "Value of ${parentItem.label} must be equal to $dependVAlu";
+                    break;
+                  }
+                }
+              }
           }
-        } else if (element.type_of_logic_id == '12') {
+        }
+        else if (element.type_of_logic_id == '12') {
           var dependVAlu = answred[element.dependentControls];
           var elgoFieldName =
           Global.splitData(element.algorithmExpression.toString(), ',');
@@ -609,7 +786,8 @@ class DependingLogic {
             });
             break;
           }
-        } else if (element.type_of_logic_id == '18') {
+        }
+        else if (element.type_of_logic_id == '18') {
           var dependVAlu = answred[element.dependentControls];
           if (dependVAlu != null) {
             var multiItems = Global.splitData(dependVAlu, ',');
@@ -623,7 +801,8 @@ class DependingLogic {
               break;
             }
           }
-        } else if (element.type_of_logic_id == '16') {
+        }
+        else if (element.type_of_logic_id == '16') {
           var dependVAlu = answred[element.dependentControls];
           var parentVAlu = answred[element.parentControl];
           if (dependVAlu != null && parentVAlu != null) {
@@ -647,6 +826,104 @@ class DependingLogic {
                 "Please enter Before ${parentItem.label} to $parentVAlu";
                 break;
               }
+            }
+          }
+        }
+        else if (element.type_of_logic_id == '23') {
+          var parentVAlu = answred[element.parentControl];
+          if(parentVAlu!=null){
+            var dependVAlu = Global.splitData(element.dependentControls, ':');
+            if (dependVAlu.length > 0) {
+              double? fiValue1;
+              dependVAlu.forEach((depV) {
+                if(depV.contains('+')){
+                  double? temp;
+                  var depenItem=Global.splitData(depV,'+');
+                  depenItem.forEach((action){
+                    if(temp!=null){
+                      temp = temp!+Global.stringToDouble(answred[action.toString().trim()].toString());
+                    }else temp = Global.stringToDouble(answred[action.toString().trim()].toString());
+                  });
+                  if(fiValue1!=null&&temp!=null){
+                    if (element.algorithmExpression == '<=') {
+                      if ((temp! <= fiValue1!)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be less than Or equal to $temp";
+                      }
+                    }
+                    else if (element.algorithmExpression == '<') {
+                      if ((temp! < fiValue1!)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be less than $temp";
+                      }
+                    }
+                    else if (element.algorithmExpression == '>=') {
+                      if ((temp! >= fiValue1!)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be greater than Or equal to $temp";
+                      }
+                    }
+                    else if (element.algorithmExpression == '>') {
+                      if ((temp! > fiValue1!)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be greater than $temp";
+                      }
+                    }
+                    else if (element.algorithmExpression == '==') {
+                      if ((temp==fiValue1)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be equal to $temp";
+                      }
+                    }
+                  }
+                  else fiValue1=temp;
+
+                }
+                else  if(depV.contains('-')){
+                  double? temp;
+                  var depenItem=Global.splitData(depV,'-');
+                  depenItem.forEach((action){
+                    if(temp!=null){
+                      temp = temp!-Global.stringToDouble(answred[action.toString().trim()].toString());
+                    }else temp = Global.stringToDouble(answred[action.toString().trim()].toString());
+                  });
+
+                  if(fiValue1!=null&&temp!=null){
+                    if (element.algorithmExpression == '<=') {
+                      if ((temp! <= fiValue1!)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be less than Or equal to $temp";
+                      }
+                    }
+                    else if (element.algorithmExpression == '<') {
+                      if ((temp! < fiValue1!)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be less than $temp";
+                      }
+                    }
+                    else if (element.algorithmExpression == '>=') {
+                      if ((temp! >= fiValue1!)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be greater than Or equal to $temp";
+                      }
+                    }
+                    else if (element.algorithmExpression == '>') {
+                      if ((temp! > fiValue1!)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be greater than $temp";
+                      }
+                    }
+                    else if (element.algorithmExpression == '==') {
+                      if ((temp==fiValue1)) {
+                        retuenValu =
+                        "Value of ${parentItem.label} must be equal to $temp";
+                      }
+                    }
+                  }
+                  else fiValue1=temp;
+                }
+
+              });
             }
           }
         }

@@ -10,6 +10,7 @@ class ChildAttendanceResponceModel {
   String? created_by;
   String? update_at;
   String? updated_by;
+  String? date_of_attendance;
 
   ChildAttendanceResponceModel(
       {this.creche_id,
@@ -22,7 +23,9 @@ class ChildAttendanceResponceModel {
       this.created_by,
       this.update_at,
       this.updated_by,
-      this.is_uploaded});
+      this.is_uploaded,
+      this.date_of_attendance,
+      });
 
   factory ChildAttendanceResponceModel.fromJson(Map<String, dynamic> json) =>
       ChildAttendanceResponceModel(
@@ -37,6 +40,7 @@ class ChildAttendanceResponceModel {
         update_at: json["update_at"],
         updated_by: json["updated_by"],
         is_uploaded: json["is_uploaded"],
+        date_of_attendance: json["date_of_attendance"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -51,5 +55,6 @@ class ChildAttendanceResponceModel {
         "update_at": update_at,
         "updated_by": updated_by,
         "is_uploaded": is_uploaded,
+        "date_of_attendance": date_of_attendance,
       };
 }

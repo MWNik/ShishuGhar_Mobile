@@ -537,8 +537,11 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     if (childRecord.length > 0) {
       List<String> enrollDateListString = [];
       childRecord.forEach((element) {
-        enrollDateListString
-            .add(Global.getItemValues(element.responces, 'date_of_enrollment'));
+        if(Global.validString(Global.getItemValues(element.responces, 'date_of_enrollment'))){
+          enrollDateListString
+              .add(Global.getItemValues(element.responces, 'date_of_enrollment'));
+        }
+
       });
       List<DateTime> enrollDatelist = [];
       enrollDateListString.forEach((element) {

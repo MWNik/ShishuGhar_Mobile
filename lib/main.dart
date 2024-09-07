@@ -5,10 +5,12 @@ import 'package:in_app_update/in_app_update.dart';
 import 'package:shishughar/screens/splashScreen.dart';
 import 'database/database_helper.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  var dataBaseHelper=DatabaseHelper();
+  var dataBaseHelper = DatabaseHelper();
   await dataBaseHelper.openDb();
+
+  
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
     DeviceOrientation.portraitUp,
@@ -86,12 +88,13 @@ class _UpdateCheckScreenState extends State<UpdateCheckScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _performImmediateUpdate();
+                _navigateToSplashScreen();
               },
               child: Text('Cancel'),
-            ),TextButton(
+            ),
+            TextButton(
               onPressed: () {
-                _navigateToSplashScreen();
+                _performImmediateUpdate();
               },
               child: Text('Update'),
             ),
@@ -120,4 +123,3 @@ class _UpdateCheckScreenState extends State<UpdateCheckScreen> {
     );
   }
 }
-

@@ -5,15 +5,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/src/response.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shishughar/api/child_enrolled_exit_api.dart';
+
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/database/helper/creche_helper/creche_data_helper.dart';
 import 'package:shishughar/database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
+
 import 'package:shishughar/screens/coordinator_location_screen.dart';
-import 'package:shishughar/screens/dashboardscreen.dart';
+
 import 'package:shishughar/screens/pendingSyncScreen.dart';
-import 'package:shishughar/screens/pendingSyncScreenNew.dart';
 import 'package:shishughar/screens/tabed_screens/attendence/attendance_responce_helper.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
@@ -677,6 +678,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
         } else
           villagesss = '${element.name}';
       });
+      print(villagesss);
 
       var response = await DownloadDataApi()
           .callVillagesDataDownload(villagesss, userName!, password!, token!);
@@ -791,6 +793,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
       print("exp ${e.toString()}");
     }
   }
+
+
 
   Future<void> initializeData() async {
     lngtr = await Validate().readString(Validate.sLanguage);
@@ -2298,15 +2302,10 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
         Validate().saveString(
             Validate.dataDownloadDateTime, Validate().currentDateTime());
         await initializeData();
-        // await callVillageProfiledata(mContext);
-
-        // Validate().singleButtonPopup(
-        //     Global.returnTrLable(locationControlls,
-        //         CustomText.data_downloaded_successfully, lngtr!),
-        //     Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
-        //     false,
-        //     mContext);
+        
+        // await callStockData(mContext);
         await callUserManualData(mContext);
+        
       } else if (response.statusCode == 401) {
         Navigator.pop(mContext);
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -2389,6 +2388,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
     var ImageFileData = await ImageFileTabHelper().getImageForUpload();
     var childEnrollExitData =
         await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
+   /* var stockData = await StockResponseHelper().getStockForUpload();
+    var requisitionData = await RequisitionResponseHelper().getRequisitonsForUpload();*/
     hhItems = hhItems
         .where((element) =>
             Global.stringToInt(Global.getItemValues(
@@ -2416,7 +2417,11 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
         ImageFileData.length +
         villageProfiles.length +
         cashBookDataReciept.length +
-        childEnrollExitData.length;
+        childEnrollExitData.length
+    /*    +
+        stockData.length +
+        requisitionData.length*/
+    ;
 
     return totalPendingCount;
   }

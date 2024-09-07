@@ -3,6 +3,8 @@ import 'package:http/http.dart';
 import '../utils/constants.dart';
 import 'dart:convert';
 
+import '../utils/validate.dart';
+
 class ChildEnrolledExitApi {
 
   Future<Response> callChildEnrolledExitMetaApi(
@@ -44,6 +46,7 @@ class ChildEnrolledExitApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
+      await Validate().createUploadedJson("Token $token\n\n$json");
       var response = await http.post(url, body: responce, headers: headers);
       return response;
     } catch (e) {
@@ -65,6 +68,7 @@ class ChildEnrolledExitApi {
     var responseJs = jsonEncode(responseMap);
 
     try {
+      await Validate().createUploadedJson("Token $token\n\n$json");
       var response = await http.put(url, body: responseJs, headers: headers);
       return response;
     } catch (e) {

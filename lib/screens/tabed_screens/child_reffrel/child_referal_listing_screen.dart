@@ -149,7 +149,6 @@ class _ChildReferralListingScreenState
       var filterItem=reffrelChildrenList.where((element) =>
       (element.childenrolledguid==enrolledGUID && element.cgmguid==cgmguid)).toList();
       if(filterItem.length>0){
-        // var keyItem= Global.splitData(key, '#!');
         tempFoeRemove.add(key);
       }else{
         var extedItem=enrolledChildrenList.where((element) =>

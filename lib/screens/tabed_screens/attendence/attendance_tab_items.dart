@@ -641,7 +641,9 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
               created_at: myMap['app_created_on'],
               created_by: myMap['app_created_by'],
               update_at: myMap['app_updated_on'],
-              updated_by: myMap['app_updated_by']);
+              updated_by: myMap['app_updated_by'],
+            date_of_attendance: myMap['date_of_attendance'],
+          );
           await AttendanceResponnceHelper().inserts(item);
           await ChildAttendenceHelper().updateAttendenceHelper(widget.ChildAttenGUID,myMap['date_of_attendance']);
 
@@ -722,7 +724,9 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           created_at: myMap['app_created_on'],
           created_by: myMap['app_created_by'],
           update_at: myMap['app_updated_on'],
-          updated_by: myMap['app_updated_by']);
+          updated_by: myMap['app_updated_by'],
+        date_of_attendance: myMap['date_of_attendance'],
+      );
       await AttendanceResponnceHelper().inserts(item);
       await ChildAttendenceHelper().updateAttendenceHelper(widget.ChildAttenGUID,myMap['date_of_attendance']);
 
@@ -797,7 +801,9 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         created_at: currentAnswerd['app_created_on'],
         created_by: currentAnswerd['app_created_by'],
         update_at: currentAnswerd['app_updated_on'],
-        updated_by: currentAnswerd['app_updated_by']);
+        updated_by: currentAnswerd['app_updated_by'],
+      date_of_attendance: currentAnswerd['date_of_attendance'],
+    );
     await AttendanceResponnceHelper().inserts(item);
     await ChildAttendenceHelper().deleteAttendeceBYGUID(widget.ChildAttenGUID,date_of_attendance);
   }

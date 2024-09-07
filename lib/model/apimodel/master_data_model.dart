@@ -21,8 +21,8 @@ import 'package:shishughar/model/databasemodel/tab_primary_occupation_model.dart
 import 'package:shishughar/model/databasemodel/tab_verification_status_model.dart';
 import 'package:shishughar/model/databasemodel/tabstate_model.dart';
 import 'package:shishughar/model/databasemodel/vaccines_model.dart';
-
 import '../databasemodel/tab_social_category_model.dart';
+
 
 MasterDataModel masterDataModelFromJson(String str) => MasterDataModel.fromJson(json.decode(str));
 
@@ -67,6 +67,7 @@ class MasterDataModel {
     this.tabWeightToHeightBoys,
     this.tabWeightToHeightGirls,
     this.tabVaccines,
+
   });
 
   factory MasterDataModel.fromJson(Map<String, dynamic> json) => MasterDataModel(

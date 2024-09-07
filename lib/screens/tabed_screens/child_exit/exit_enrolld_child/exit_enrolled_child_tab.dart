@@ -23,6 +23,7 @@ class ExitEnrolledChilrenTab extends StatefulWidget {
   final String CHHGUID;
   final String HHGUID;
   final String EnrolledChilGUID;
+  final String ChildName;
   final int HHname;
   final int crecheId;
   final int isNew;
@@ -36,6 +37,7 @@ class ExitEnrolledChilrenTab extends StatefulWidget {
     required this.CHHGUID,
     required this.HHGUID,
     required this.HHname,
+    required this.ChildName,
     required this.crecheId,
     required this.EnrolledChilGUID,
     required this.isNew,
@@ -94,7 +96,7 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
     } else {
       return Scaffold(
         appBar: AppBar(
-          toolbarHeight: 60,
+          toolbarHeight: 40,
           backgroundColor: Color(0xff5979AA),
           leading: Padding(
             padding: EdgeInsets.only(left: 10),
@@ -109,20 +111,11 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
               ),
             ),
           ),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                Global.returnTrLable(
-                        translatsLabel, CustomText.ChildEnrollment, lng)
-                    .trim(),
-                style: Styles.white145,
-              ),
-              ExitEnrolledChilrenTab.childName!=null?Text(
-                ExitEnrolledChilrenTab.childName!,
-                style: Styles.white145,
-              ):Text(''),
-            ],
+          title: Text(
+            Global.returnTrLable(
+                translatsLabel, CustomText.child_exit, lng)
+                .trim(),
+            style: Styles.white145,
           ),
           actions: [
             (role == 'Cluster Coordinator')
@@ -146,6 +139,7 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
             unselectedLabelColor: Colors.grey.shade300,
             unselectedLabelStyle: Styles.white124P,
             labelColor: Colors.white,
+              isScrollable:false,
             onTap: (index) {
               if (_tabController.indexIsChanging) {
                 _tabController.index = _tabController.previousIndex;
@@ -157,7 +151,6 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
               }
             },
             controller: _tabController,
-            isScrollable: true,
             tabs: tabController(),
           ),
         ),
@@ -223,11 +216,11 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
     tabBreakItems.forEach((element) {
       bool isSelected = tabIndex == tabBreakItems.indexOf(element);
       Widget tabLabel = Text(
-        Global.returnTrLable(translatsLabel, element.label!, lng),
+        widget.ChildName,
         style: TextStyle(
             fontSize: isSelected ? 16.0 : 13.0,
             color: isSelected ? Colors.white : Colors.grey.shade300),
-      );
+      );;
       tabItem.add(Tab(
         child: tabLabel,
       ));

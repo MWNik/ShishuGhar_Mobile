@@ -123,18 +123,22 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
                           labelControlls, CustomText.back, lng),
                     ),
                   ),
-                  role=='Creche Supervisor'?SizedBox(width: 10):SizedBox(),
-                  role=='Creche Supervisor'?Expanded(
-                    child: CElevatedButton(
-                      color: Color(0xff5979AA),
-                      onPressed: () {
-                        nextTabSave(1);
-                        // widget.changeTab(1);
-                      },
-                      text: Global.returnTrLable(
-                          labelControlls, CustomText.Save, lng),
-                    ),
-                  ):SizedBox(),
+                  role == 'Creche Supervisor'
+                      ? SizedBox(width: 10)
+                      : SizedBox(),
+                  role == 'Creche Supervisor'
+                      ? Expanded(
+                          child: CElevatedButton(
+                            color: Color(0xff5979AA),
+                            onPressed: () {
+                              nextTabSave(1);
+                              // widget.changeTab(1);
+                            },
+                            text: Global.returnTrLable(
+                                labelControlls, CustomText.Save, lng),
+                          ),
+                        )
+                      : SizedBox(),
                   SizedBox(width: 10),
                   Expanded(
                     child: CElevatedButton(
@@ -192,11 +196,16 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         return DynamicCustomDropdownField(
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: role=='Creche Supervisor'?DependingLogic().callReadableLogic(logics, myMap, quesItem):true,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          readable: role == 'Creche Supervisor'
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           items: updateLocationDropDown(quesItem),
           selectedItem: myMap[quesItem.fieldname],
-          isVisible: DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (quesItem.fieldname == 'village_id' && value!.name != null) {
               myMap.remove('creche_id');
@@ -212,9 +221,16 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         return CustomDatepickerDynamic(
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          calenderValidate: DependingLogic().calenderValidation(logics, myMap, quesItem),
-          readable: nameId==null?role=='Creche Supervisor'?DependingLogic().callReadableLogic(logics, myMap, quesItem):true:true,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          calenderValidate:
+              DependingLogic().calenderValidation(logics, myMap, quesItem),
+          readable: nameId == null
+              ? role == 'Creche Supervisor'
+                  ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  : true
+              : true,
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
             var logData = DependingLogic()
@@ -223,7 +239,6 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
               if (logData.keys.length > 0) {
                 myMap.addEntries(
                     [MapEntry(logData.keys.first, logData.values.first)]);
-
               }
             }
             setState(() {});
@@ -235,11 +250,15 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         return DynamicCustomTextFieldNew(
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!,logics),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: role=='Creche Supervisor'?DependingLogic().callReadableLogic(logics, myMap, quesItem):true,
+          readable: role == 'Creche Supervisor'
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
@@ -254,16 +273,18 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       case 'Long Text':
         return DynamicCustomTextFieldNew(
           maxline: 3,
-          titleText: Global.returnTrLable(
-              translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          titleText:
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          hintText: Global.returnTrLable(
-              translats, quesItem.label!.trim(), lng),
+          hintText:
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -274,10 +295,14 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       case 'Int':
         return DynamicCustomTextFieldInt(
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: role=='Creche Supervisor'?DependingLogic().callReadableLogic(logics, myMap, quesItem):true,
+          readable: role == 'Creche Supervisor'
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
@@ -299,8 +324,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
               }
             } else {
               // setState(() {
-                myMap.remove(quesItem.fieldname);
-
+              myMap.remove(quesItem.fieldname);
             }
             // });
           },
@@ -320,20 +344,20 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       //       setState(() {});
       //     },
       //   );
-        case 'Check':
+      case 'Check':
         return DynamicCustomYesNoCheckboxWithLabel(
-          label: Global.returnTrLable(
-              translats, quesItem.label!.trim(), lng),
+          label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: myMap[quesItem.fieldname],
-          labelControlls:labelControlls,
+          labelControlls: labelControlls,
           lng: lng,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           readable: role == 'Creche Supervisor'
-              ? DependingLogic()
-              .callReadableLogic(logics, myMap, quesItem)
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
               : true,
-          isVisible: DependingLogic()
-              .callDependingLogic(logics, myMap, quesItem),
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -346,9 +370,13 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       case 'Select':
         return DynamicCustomTextFieldInt(
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
-          readable: role=='Creche Supervisor'?DependingLogic().callReadableLogic(logics, myMap, quesItem):true,
+          readable: role == 'Creche Supervisor'
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialvalue: myMap[quesItem.fieldname!],
@@ -366,9 +394,13 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         return DynamicCustomTextFieldNew(
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
-          readable: role=='Creche Supervisor'?DependingLogic().callReadableLogic(logics, myMap, quesItem):true,
+          readable: role == 'Creche Supervisor'
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -416,22 +448,21 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
               (items[i].options == 'Partner')) {
             if (items[i].options == 'Partner') {
               await OptionsModelHelper()
-                  .getPartnerMstCommonOptions(items[i].options!.trim(),responseData)
+                  .getPartnerMstCommonOptions(
+                      items[i].options!.trim(), responseData)
                   .then((data) {
                 options.addAll(data);
               });
               defaultDisableDailog(items[i].fieldname!, items[i].options!);
-            }
-            else if(items[i].options == 'Creche'){
+            } else if (items[i].options == 'Creche') {
               await OptionsModelHelper()
                   .callCrechInOptionAll(items[i].options!.trim())
                   .then((data) {
                 options.addAll(data);
-                if(data.length==1){
+                if (data.length == 1) {
                   defaultDisableDailog(items[i].fieldname!, items[i].options!);
                 }
               });
-
             } //else updateLocationDropDown(items[i]);
             // else {
             //   await OptionsModelHelper()
@@ -452,7 +483,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
     }
     print("item v ${defaultCommon.length}");
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng)
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });
@@ -483,7 +514,10 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       if (type == 1) {
         if (checkValidation()) {
           if (widget.tabIndex < (widget.totalTab - 1)) {
-            myMap['verification_status'] = "1";
+            myMap['verification_status'] = children__3_years != null
+                ? (childCount == children__3_years ? '2' : '1')
+                : '1';
+
             if (widget.tabIndex == (widget.totalTab) - 1) {
               myMap['verification_status'] = "2";
               saveNext = "Save";
@@ -542,24 +576,21 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       if (type == 1) {
         if (checkValidation()) {
           if (widget.tabIndex < (widget.totalTab - 1)) {
-            myMap['verification_status'] = "1";
+            // myMap['verification_status'] = myMap['verification_status'] == "1";
             if (widget.tabIndex == (widget.totalTab) - 1) {
-              myMap['verification_status'] = "2";
+              // myMap['verification_status'] = "2";
               saveNext = "Save";
             }
             await saveDataInData();
           } else if (widget.tabIndex == (widget.totalTab - 1)) {
             await saveDataInData();
-
           }
           setState(() {});
           Validate().singleButtonPopup(
-              Global.returnTrLable(
-                  labelControlls, CustomText.dataSaveSuc, lng),
+              Global.returnTrLable(labelControlls, CustomText.dataSaveSuc, lng),
               Global.returnTrLable(labelControlls, CustomText.ok, lng),
               false,
               context);
-
         }
         // else {
         //   var dataSaveSuc = await TranslationDataHelper()
@@ -579,9 +610,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       } else {
         if (widget.tabIndex == 0) {
           // Navigator.pop(context, 'itemRefresh');
-        } else {
-        }
-
+        } else {}
       }
     } else {
       if (type == 1) {
@@ -589,8 +618,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       } else {
         if (widget.tabIndex == 0) {
           Navigator.pop(context, 'itemRefresh');
-        } else {
-        }
+        } else {}
       }
     }
   }
@@ -614,7 +642,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
             break;
           }
         }
-        var validationMsg = DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg =
+            DependingLogic().validationMessge(logics, myMap, element);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
@@ -626,16 +655,16 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         }
 
         // children static validation for increase
-        var childrenValidation = checkFamilyMenberTab(element);
-        if (Global.validString(childrenValidation)) {
-          Validate().singleButtonPopup(
-              childrenValidation!,
-              Global.returnTrLable(labelControlls, CustomText.ok, lng),
-              false,
-              context);
-          validStatus = false;
-          break;
-        }
+        // var childrenValidation = checkFamilyMenberTab(element);
+        // if (Global.validString(childrenValidation)) {
+        //   Validate().singleButtonPopup(
+        //       childrenValidation!,
+        //       Global.returnTrLable(labelControlls, CustomText.ok, lng),
+        //       false,
+        //       context);
+        //   validStatus = false;
+        //   break;
+        // }
       }
       ;
     } else {
@@ -661,10 +690,10 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
 
       var name = myMap['name'];
       var creche_id = Global.stringToIntNull(myMap['creche_id']);
-      var dateOfVisit=myMap['date_of_visit'];
+      var dateOfVisit = myMap['date_of_visit'];
       print(responcesJs);
-      await HouseHoldTabResponceHelper()
-          .insertUpdate(widget.hhGuid, dateOfVisit, name, creche_id,responcesJs, userName);
+      await HouseHoldTabResponceHelper().insertUpdate(
+          widget.hhGuid, dateOfVisit, name, creche_id, responcesJs, userName);
     }
   }
 
@@ -681,7 +710,6 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         .toList();
 
     if (alredRecord.length > 0) {
-
       hiddenIten.forEach((element) {
         if (element.fieldname == 'hhguid') {
           myMap[element.fieldname!] = widget.hhGuid;
@@ -692,11 +720,11 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         }
         if (alredRecord[0].name != null) {
           myMap['name'] = alredRecord[0].name;
-          nameId=alredRecord[0].name;
+          nameId = alredRecord[0].name;
         }
       });
-      if(myMap['creche_id'] == null ){
-        myMap['creche_id'] = widget.crecheId;//change
+      if (myMap['creche_id'] == null) {
+        myMap['creche_id'] = widget.crecheId; //change
       }
     } else {
       hiddenIten.forEach((element) {
@@ -710,24 +738,23 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       });
       myMap['creche_id'] = widget.crecheId.toString(); //change
       myMap['date_of_visit'] = Global.initCurrentDate();
-      if(widget.crecheId>0){
+      if (widget.crecheId > 0) {
         var vaCrecheItem =
-        await CrecheDataHelper().getCrecheResponceItem(widget.crecheId);
+            await CrecheDataHelper().getCrecheResponceItem(widget.crecheId);
         List<HouseHoldFielItemdModel> fildItem =
-        widget.screenItem[widget.tabBreakItem.name!]!;
-        if(vaCrecheItem.length>0){
-          if(fildItem.length>0){
-            Map<String, dynamic> crechResponce = jsonDecode(vaCrecheItem[0].responces!);
+            widget.screenItem[widget.tabBreakItem.name!]!;
+        if (vaCrecheItem.length > 0) {
+          if (fildItem.length > 0) {
+            Map<String, dynamic> crechResponce =
+                jsonDecode(vaCrecheItem[0].responces!);
             fildItem.forEach((element) {
-              if(element.fieldname!='creche_id'){
-                if(crechResponce.containsKey(element.fieldname)){
+              if (element.fieldname != 'creche_id') {
+                if (crechResponce.containsKey(element.fieldname)) {
                   myMap[element.fieldname!] = crechResponce[element.fieldname!];
                 }
               }
             });
-
           }
-
         }
       }
     }
@@ -754,7 +781,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         if (children__3_years != null) {
           if (children__3_years! > 0) {
             if (childCount! > 0) {
-              if (children__3_years! > crrentValue) {
+              if (childCount! > crrentValue) {
                 return 'You can`t decrease ${item.label}';
               }
             }
@@ -765,12 +792,14 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   }
 
   String checkVerifyStatus() {
-      int? crrentValue = myMap['children__3_years'];
-      if (crrentValue != null) {
-          if (crrentValue==childCount) {
-           return '2';
-        }else return '1';
-    }else return '1';
+    int? crrentValue = myMap['children__3_years'];
+    if (crrentValue != null) {
+      if (Global.validToInt(childCount) >= crrentValue) {
+        return '2';
+      } else
+        return '1';
+    } else
+      return '1';
   }
 
   Future<void> setLabelTextData() async {
@@ -810,7 +839,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       options.removeWhere((element) => element.flag == 'tabDistrict');
       var statesId = myMap['state_id'];
       if (statesId != null) {
-        var updatedDistrict =  Global.callDistrict(districts, lng,OptionsModel(name:statesId));
+        var updatedDistrict =
+            Global.callDistrict(districts, lng, OptionsModel(name: statesId));
         //     .where((element) => element.stateId.toString() == statesId)
         //     .toList();
         // List<OptionsModel> updatedItems = updatedDistrict
@@ -830,7 +860,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       options.removeWhere((element) => element.flag == 'tabBlock');
       var district_id = myMap['district_id'];
       if (district_id != null) {
-        var updatedDistrict = Global.callBlocks(blocks, lng,OptionsModel(name:district_id));
+        var updatedDistrict =
+            Global.callBlocks(blocks, lng, OptionsModel(name: district_id));
         //     .where((element) => element.districtId.toString() == district_id)
         //     .toList();
         // List<OptionsModel> updatedItems = updatedDistrict
@@ -850,7 +881,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       options.removeWhere((element) => element.flag == 'tabGram Panchayat');
       var block_id = myMap['block_id'];
       if (block_id != null) {
-        var updatedDistrict = Global.callGramPanchyats(gramPanchayats, lng,OptionsModel(name:block_id));
+        var updatedDistrict = Global.callGramPanchyats(
+            gramPanchayats, lng, OptionsModel(name: block_id));
         //     .where((element) => element.blockId.toString() == block_id)
         //     .toList();
         // List<OptionsModel> updatedItems = updatedDistrict
@@ -870,7 +902,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       options.removeWhere((element) => element.flag == 'tabVillage');
       var gp_id = myMap['gp_id'];
       if (gp_id != null) {
-        var updatedDistrict =  Global.callFiltersVillages(villages, lng,OptionsModel(name:gp_id));
+        var updatedDistrict = Global.callFiltersVillages(
+            villages, lng, OptionsModel(name: gp_id));
         //     .where((element) => element.gpId.toString() == gp_id)
         //     .toList();
         // List<OptionsModel> updatedItems = updatedDistrict
@@ -884,14 +917,13 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
           defaultDisableDailog(item.fieldname!, item.options!);
         }
       }
-    }
-    else if (item.fieldtype == 'Link' &&
+    } else if (item.fieldtype == 'Link' &&
         item.fieldname == 'creche_id' &&
         item.options == 'Creche') {
       options.removeWhere((element) => element.flag == 'tabCreche');
       var village_id = myMap['village_id'];
       if (village_id != null) {
-        var creches=filterCreche(village_id);
+        var creches = filterCreche(village_id);
         options.addAll(creches);
         if (creches.length == 1) {
           defaultDisableDailog(item.fieldname!, item.options!);
@@ -901,7 +933,6 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
     List<OptionsModel> items = options
         .where((element) => element.flag == 'tab${item.options}')
         .toList();
-
 
     var selectedValue = myMap[item.fieldname];
     if (selectedValue != null) {
@@ -917,7 +948,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
     List<CresheDatabaseResponceModel> filteredRecords = [];
     filteredRecords = allCrecheRecords
         .where((element) =>
-    Global.getItemValues(element.responces, 'village_id') == villageId)
+            Global.getItemValues(element.responces, 'village_id') == villageId)
         .toList();
     List<OptionsModel> crecheOptionsList = [];
     filteredRecords.forEach((element) {

@@ -70,6 +70,16 @@ class EnrolledExitChilrenResponceHelper {
     return items;
   }
 
+  Future<void> updateEditFlag(String CHHGUID, int creche_id) async {
+    try {
+      await DatabaseHelper.database!.rawUpdate(
+          'Update enrollred_exit_child_responce set is_edited = ? where creche_id=? and CHHGUID=?',
+          [1, creche_id, CHHGUID]);
+    } catch (e) {
+      print("Error update table: $e");
+    }
+  }
+
   Future<String?> maxDateOfExit(String CHHGUID) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'SELECT MAX(date_of_exit) as date_of_exit FROM enrollred_exit_child_responce WHERE CHHGUID = ?',
@@ -81,6 +91,7 @@ class EnrolledExitChilrenResponceHelper {
       return null;
     }
   }
+
   Future<String?> getRecordByCHHGUID(String CHHGUID) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'SELECT * FROM enrollred_exit_child_responce WHERE CHHGUID = ? AND date_of_exit NOTNULL',
@@ -259,8 +270,7 @@ class EnrolledExitChilrenResponceHelper {
             //         element['hhResponce'], 'verification_status') ==
             //     "4"
             //     &&
-            (filterDataForEnrolledChild(element) >= 7 &&
-                filterDataForEnrolledChild(element) <= 36) &&
+
             (Global.getItemValues(element['hhResponce'], 'village_id') ==
                 villageId.toString()))
         .toList();
@@ -552,7 +562,7 @@ class EnrolledExitChilrenResponceHelper {
     String questionMarks = List.filled(enrollGuides.length, '?').join(',');
     List<dynamic> parameters = [...enrollGuides];
     var query =
-        'select * from enrollred_exit_child_responce where ChildEnrollGUID in($questionMarks) ';
+        'select * from enrollred_exit_child_responce where ChildEnrollGUID in($questionMarks)';
 
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.rawQuery(query, parameters);

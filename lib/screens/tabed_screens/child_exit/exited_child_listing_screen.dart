@@ -122,6 +122,7 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
                                          HHname: childExitData[index]['HHname'],
                                          crecheId: Global.stringToInt(widget.creche_id),
                                          HHGUID: Global.getItemValues(childExitData[index]['responces'], 'hhguid'),
+                                         ChildName: Global.getItemValues(childExitData[index]['responces'], 'child_name'),
                                          isNew: 0,
                                          isImageUpdate: false,
                                          isEditable: isEditable,

@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 
 import '../utils/constants.dart';
+import '../utils/validate.dart';
 
 class CrecheCheckInApi {
 
@@ -27,6 +28,7 @@ class CrecheCheckInApi {
     var headers = {'Authorization': token};
     print('JSON BODY FOR CHECK IN: $responce');
     try {
+      await Validate().createUploadedJson("Token $token\n\n$responce");
       var response = await http.post(url, body: responce, headers: headers);
       print('API response body: ${response.body}');
       return response;

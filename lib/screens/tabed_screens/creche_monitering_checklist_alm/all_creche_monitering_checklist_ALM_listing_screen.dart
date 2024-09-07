@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
@@ -19,8 +18,8 @@ import 'creche_moniterig_checkList_ALM_tab_screen.dart';
 import 'creche_monitering_checkList_ALM_tab_forAdd.dart';
 
 class AllcmcALMListingScreen extends StatefulWidget {
-
-  AllcmcALMListingScreen({super.key,
+  AllcmcALMListingScreen({
+    super.key,
   });
 
   @override
@@ -32,10 +31,9 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
   List<Translation> translats = [];
   String lng = 'en';
   String? selectedCreche;
-  List<CmcALMResponseModel> filterData=[];
+  List<CmcALMResponseModel> filterData = [];
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<OptionsModel> creches = [];
-
 
   @override
   void initState() {
@@ -59,20 +57,15 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats = value);
-    creches =
-    await OptionsModelHelper().callCrechInOptionAll('Creche');
+    creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
 
     await fetchCmcCBMRecords();
-
   }
 
   Future<void> fetchCmcCBMRecords() async {
+    cmcALMData = await CmcALMTabResponseHelper().callCrecheMonotoring();
 
-
-    cmcALMData = await CmcALMTabResponseHelper()
-        .callCrecheMonotoring();
-
-    filterData=cmcALMData;
+    filterData = cmcALMData;
     setState(() {});
   }
 
@@ -87,10 +80,7 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
             almguid = Validate().randomGuid();
             var refStatus = await Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => CmcALMTabSCreenForAdd(
-                  almguid: almguid,
-                    isEdit:false,
-                    isViewScreen:false
-                )));
+                    almguid: almguid, isEdit: false, isViewScreen: false)));
             if (refStatus == 'itemRefresh') {
               await fetchCmcCBMRecords();
             }
@@ -167,8 +157,8 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                         children: [
                           Expanded(
                             child: CElevatedButton(
-                              text: Global.returnTrLable(
-                                  translats, 'Clear', lng),
+                              text:
+                                  Global.returnTrLable(translats, 'Clear', lng),
                               color: Color(0xffF26BA3),
                               onPressed: () {
                                 Navigator.of(context).pop();
@@ -199,8 +189,7 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
         child: Column(children: [
           Row(
             children: [
-              Expanded(
-                  child: SizedBox()),
+              Expanded(child: SizedBox()),
               SizedBox(
                 width: 10.w,
               ),
@@ -225,20 +214,26 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                          var created_at = DateTime.parse(filterData[index].created_at.toString());
-                          var date  = DateTime(created_at.year,created_at.month,created_at.day);
-                          bool isViewScreen = date.add(Duration(days: 7)).isBefore(DateTime.parse(Validate().currentDate()));
+                          var created_at = DateTime.parse(
+                              filterData[index].created_at.toString());
+                          var date = DateTime(created_at.year, created_at.month,
+                              created_at.day);
+                          bool isViewScreen = date
+                              .add(Duration(days: 7))
+                              .isBefore(
+                                  DateTime.parse(Validate().currentDate()));
                           var cbmguid = filterData[index].almguid;
                           if (Global.validString(cbmguid)) {
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
                                         CmcALMTabSCreenForAdd(
-                                          almguid: cbmguid!,
-                                            isEdit:true,
-                                            date_of_visit:Global.getItemValues(filterData[index].responces, 'date_of_visit'),
-                                            isViewScreen:isViewScreen
-                                        )));
+                                            almguid: cbmguid!,
+                                            isEdit: true,
+                                            date_of_visit: Global.getItemValues(
+                                                filterData[index].responces,
+                                                'date_of_visit'),
+                                            isViewScreen: isViewScreen)));
 
                             if (refStatus == 'itemRefresh') {
                               await fetchCmcCBMRecords();
@@ -284,7 +279,6 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                                           '${Global.returnTrLable(translats, CustomText.datevisit, lng).trim()} : ',
                                           style: Styles.black104,
                                         ),
-
                                       ],
                                     ),
                                     SizedBox(width: 10),
@@ -304,31 +298,55 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            callCreCheName(Global.getItemValues(filterData[index].responces, 'creche_id')),
+                                            callCreCheName(Global.getItemValues(
+                                                filterData[index].responces,
+                                                'creche_id')),
                                             style: Styles.blue125,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
                                             (Global.validString(
-                                                Global.getItemValues(filterData[index].responces, 'date_of_visit')))?
-                                            Validate().displeDateFormate(Global.getItemValues(filterData[index].responces, 'date_of_visit')):'',
+                                                    Global.getItemValues(
+                                                        filterData[index]
+                                                            .responces,
+                                                        'date_of_visit')))
+                                                ? Validate().displeDateFormate(
+                                                    Global.getItemValues(
+                                                        filterData[index]
+                                                            .responces,
+                                                        'date_of_visit'))
+                                                : '',
                                             style: Styles.blue125,
                                             overflow: TextOverflow.ellipsis,
                                           ),
-
                                         ],
                                       ),
                                     ),
                                     SizedBox(width: 5),
-                                    (filterData[index].is_edited==0 && filterData[index].is_uploaded==1)?
-                                    Image.asset(
-                                      "assets/sync.png",
-                                      scale: 1.5,
-                                    ):
-                                    Image.asset(
-                                      "assets/sync_gray.png",
-                                      scale: 1.5,
-                                    )
+                                    (filterData[index].is_edited == 0 &&
+                                            filterData[index].is_uploaded == 1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : (filterData[index].is_edited == 1 &&
+                                                filterData[index].is_uploaded ==
+                                                    0)
+                                            ? Image.asset(
+                                                "assets/sync_gray.png",
+                                                scale: 1.5,
+                                              )
+                                            : Icon(
+                                                Icons.error_outline_outlined,
+                                                color: Colors.red.shade700,
+                                                shadows: [
+                                                  BoxShadow(
+                                                      spreadRadius: 2,
+                                                      blurRadius: 4,
+                                                      color:
+                                                          Colors.red.shade200)
+                                                ],
+                                              )
                                   ]),
                             ),
                           ),
@@ -348,28 +366,28 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
   void cleaAllFilter() {
     filterData = cmcALMData;
     selectedCreche = null;
-    setState((){});
+    setState(() {});
   }
 
   filteredGetData(
-      BuildContext mContext,
-      ) async {
+    BuildContext mContext,
+  ) async {
     if (selectedCreche != null) {
       filterData = cmcALMData.where((item) {
         var creche_id = Global.getItemValues(item.responces!, 'creche_id');
         return creche_id.toString() == selectedCreche.toString();
       }).toList();
 
-      setState((){});
+      setState(() {});
     }
-
   }
 
-  String callCreCheName(String crechName){
-    String creCheItem='';
-    var crechSelected=creches.where((element) => element.name==crechName).toList();
-    if(crechSelected.length>0){
-      creCheItem=crechSelected.first.values!;
+  String callCreCheName(String crechName) {
+    String creCheItem = '';
+    var crechSelected =
+        creches.where((element) => element.name == crechName).toList();
+    if (crechSelected.length > 0) {
+      creCheItem = crechSelected.first.values!;
     }
     return creCheItem;
   }

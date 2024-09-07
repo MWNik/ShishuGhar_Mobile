@@ -114,8 +114,8 @@ class _HeightforAgeBoysGirlsScreenState
         double x = (data['age_months'] as num).toDouble();
         (x > age_in_months!.last) ? maxX = x : maxX = age_in_months!.last;
         // (x < age_in_months!.first) ? minX = x : minX = age_in_months!.first;
-
-        double y = (data['height'] as num).toDouble();
+        var height = Global.validString(data['height'].toString())?data['height']:0.0;
+        double y = (height as num).toDouble();
 
         (y > height_max!.last) ? maxY = y : maxY = height_max!.last;
         // (y < height_min!.first) ? minY = y : minY = height_min!.first;

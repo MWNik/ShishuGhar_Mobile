@@ -30,7 +30,7 @@ class DynamicCustomTextFieldNew extends StatefulWidget {
   final TextStyle? labelstyle;
   final int? maxlength;
   final int? isRequred;
-   bool? isVisible;
+  bool? isVisible;
   TabFormsLogic? keyboard;
 
   DynamicCustomTextFieldNew({
@@ -75,32 +75,39 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
   @override
   Widget build(BuildContext context) {
     return Visibility(
-          visible: widget.isVisible != null ? widget.isVisible! : true,
+      visible: widget.isVisible != null ? widget.isVisible! : true,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            widget.titleText != null? RichText(
-              text: TextSpan(
-                text: widget.titleText == null ? "" : '${widget.titleText}',
-                style: Styles.black124,
-                children: (widget.isRequred ==1)
-                    ? [
-                  TextSpan(
-                    text: '*',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ]
-                    : [],
-              ),
-            ):SizedBox(),
-            widget.titleText != null?SizedBox(
-              height: 3.h,
-            ):SizedBox(),
+            widget.titleText != null
+                ? RichText(
+                    text: TextSpan(
+                      text:
+                          widget.titleText == null ? "" : '${widget.titleText}',
+                      style: Styles.black124,
+                      children: (widget.isRequred == 1)
+                          ? [
+                              TextSpan(
+                                text: '*',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ]
+                          : [],
+                    ),
+                  )
+                : SizedBox(),
+            widget.titleText != null
+                ? SizedBox(
+                    height: 3.h,
+                  )
+                : SizedBox(),
             Container(
               alignment: Alignment.center,
-              height: (Global.validToInt(widget.maxline)>1)?55.h:(widget.height ?? 35.h),
+              height: (Global.validToInt(widget.maxline) > 1)
+                  ? 55.h
+                  : (widget.height ?? 35.h),
               width: widget.width,
               decoration: BoxDecoration(
                 border: Border.all(color: Color(0xffACACAC)),
@@ -123,9 +130,15 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
                   });
                   widget.onChanged?.call(value);
                 },
-                keyboardType: widget.keyboard!=null?keyLogic(widget.keyboard!):widget.keyboardtype,
+                keyboardType: widget.keyboard != null
+                    ? keyLogic(widget.keyboard!)
+                    : widget.keyboardtype,
                 inputFormatters: <TextInputFormatter>[
-                  widget.keyboard!=null?FilteringTextInputFormatter.allow(RegExp(widget.keyboard!=null?keyLogicFormate(widget.keyboard!):(r'^[a-zA-Z0-9\s]+$'))):EmojiInputFormatter(), // Allow only digits and up to 2 decimal places
+                  // EmojiInputFormatter()
+                  CustomInputFormatter(RegExp(widget.keyboard != null
+                      ? keyLogicFormate(widget.keyboard!)
+                      : (r'^[a-zA-Z0-9\s]+$')))
+                  // Allow only digits and up to 2 decimal places
                 ],
                 style: Styles.black124,
                 decoration: InputDecoration(
@@ -133,7 +146,11 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
                   hintText: widget.hintText ?? CustomText.typehere,
                   prefixIcon: widget.prefixIcon,
                   border: InputBorder.none,
-                  fillColor: widget.readable!=null?widget.readable!?Color(0xFFEEEEEE): Colors.white:Colors.white,
+                  fillColor: widget.readable != null
+                      ? widget.readable!
+                          ? Color(0xFFEEEEEE)
+                          : Colors.white
+                      : Colors.white,
                   errorText: widget.errorText,
                   contentPadding: EdgeInsets.all(10),
                   filled: true,
@@ -159,11 +176,13 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
                 ),
               ),
             ),
-            widget.titleText != null?SizedBox(
-              height: 10.h,
-            ):SizedBox(
-              height: 5.h,
-            ),
+            widget.titleText != null
+                ? SizedBox(
+                    height: 10.h,
+                  )
+                : SizedBox(
+                    height: 5.h,
+                  ),
           ],
         ),
       ),
@@ -174,7 +193,8 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
   void didUpdateWidget(covariant DynamicCustomTextFieldNew oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialvalue != widget.initialvalue) {
-      controller?.text = (widget.initialvalue != null ? widget.initialvalue.toString() : '');
+      controller?.text =
+          (widget.initialvalue != null ? widget.initialvalue.toString() : '');
     }
   }
 
@@ -184,22 +204,44 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
     super.dispose();
   }
 
-  TextInputType keyLogic(TabFormsLogic keyboard){
-      if(keyboard.algorithmExpression=='1') { /////only number like mobile number
-        return TextInputType.number;
-      }else return TextInputType.text;
-    }
-
-  String keyLogicFormate(TabFormsLogic keyboard){
-    if(keyboard.algorithmExpression=='1') {
-      return r'[0-9]';
-    }else if(keyboard.algorithmExpression=='2'){
-     return r'^[a-zA-Z\s]+$';
-    }else if(keyboard.algorithmExpression=='3'){
-      return r'^[a-zA-Z\s,]+$';
-    }else return r'^[a-zA-Z0-9\s]+$';
+  TextInputType keyLogic(TabFormsLogic keyboard) {
+    if (keyboard.algorithmExpression == '1') {
+      /////only number like mobile number
+      return TextInputType.number;
+    } else
+      return TextInputType.text;
   }
 
+  String keyLogicFormate(TabFormsLogic keyboard) {
+    if (keyboard.algorithmExpression == '1') {
+      return r'^[0-9]*$';
+    } else if (keyboard.algorithmExpression == '2') {
+      return r'^[a-zA-Z\s]+$';
+    } else if (keyboard.algorithmExpression == '3') {
+      return r'^[a-zA-Z\s,]+$';
+    } else
+      return r'^[a-zA-Z0-9\s]+$';
+  }
+}
 
+class CustomInputFormatter extends TextInputFormatter {
+  RegExp allowedCharacters = RegExp(r'^[a-zA-Z0-9\s]+$');
 
+  CustomInputFormatter(this.allowedCharacters);
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Only return the new value if it matches the allowed characters
+    if (newValue.text.length < oldValue.text.length) {
+      return newValue;
+    }
+    if (allowedCharacters.hasMatch(newValue.text)) {
+      return newValue;
+    } else {
+      return oldValue; // Keep the old value if the new one has invalid characters
+    }
+  }
 }

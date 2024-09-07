@@ -66,6 +66,7 @@ class _CrecheMonitorTabItemForAddState
   List<Translation> _translation = [];
   Map<String, dynamic> _myMap = {};
   List<OptionsModel> items = [];
+  int? isEditFromExisting = 0;
 
   @override
   void initState() {
@@ -609,7 +610,7 @@ class _CrecheMonitorTabItemForAddState
               responces: responsesJs,
               name: _myMap['name'],
               is_deleted: 0,
-              is_edited: 1,
+              is_edited: widget.isEdit == false?2:isEditFromExisting,
               is_uploaded: 0,
               created_by: _myMap['appcreated_by'],
               created_at: _myMap['appcreated_on'],
@@ -628,6 +629,7 @@ class _CrecheMonitorTabItemForAddState
       final Map<String, dynamic> responseData =
           jsonDecode(records.first.responces!);
       responseData.forEach((key, value) => _myMap[key] = value);
+      isEditFromExisting = records[0].is_edited;
 
       final createdOnNotNull = responseData['appcreated_on'] != null;
       final createdByNotNull = responseData['appcreated_by'] != null;

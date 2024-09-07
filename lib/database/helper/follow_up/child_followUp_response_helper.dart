@@ -130,7 +130,7 @@ class ChildFollowUpTabResponseHelper {
       ) async {
 
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-        'select fowp.*,ecr.responces as enrResponces from child_followup_responce fowp left join (select * from enrollred_exit_child_responce where date_of_exit is null) as  ecr on ecr.ChildEnrollGUID=fowp.childenrolledguid where   fowp.responces  NOTNULL ',
+        'select fowp.*,ecr.responces as enrResponces from child_followup_responce fowp left join (select * from enrollred_exit_child_responce where date_of_exit is null) as  ecr on ecr.ChildEnrollGUID=fowp.childenrolledguid where  fowp.responces NOTNULL and ecr.responces  NOTNULL ORDER BY CASE  WHEN fowp.update_at IS NOT NULL AND length(RTRIM(LTRIM(fowp.update_at))) > 0 THEN fowp.update_at ELSE fowp.created_at END DESC',
        );
 
     return result;
@@ -277,6 +277,12 @@ class ChildFollowUpTabResponseHelper {
     await DatabaseHelper.database!.delete('child_followup_responce',
       where: 'child_referral_guid = ? AND childenrolledguid = ?',
       whereArgs: [child_referral_guid, childenrolledguid],);
+  }
+
+  Future<void> deleteFollowUpBYFollowpGUID(String child_followup_guid) async {
+    await DatabaseHelper.database!.delete('child_followup_responce',
+      where: 'child_followup_guid = ?',
+      whereArgs: [child_followup_guid],);
   }
 
 

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
+import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
@@ -46,9 +47,10 @@ class EnrolledChilrenTabItem extends StatefulWidget {
   final int isNew;
   final bool isImageUpdate;
   final bool isEditable;
-   String? minDate;
+  String? minDate;
+  int? isUploaded ;
 
-   EnrolledChilrenTabItem(
+  EnrolledChilrenTabItem(
       {super.key,
       required this.HHGUID,
       required this.cHHGuid,
@@ -61,16 +63,14 @@ class EnrolledChilrenTabItem extends StatefulWidget {
       required this.crecheId,
       required this.isImageUpdate,
       required this.isEditable,
-       this.minDate
-      });
+      this.minDate,
+      this.isUploaded});
 
   @override
   _EnrolledChilrenTabItemState createState() => _EnrolledChilrenTabItemState();
 }
 
 class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
-
-
   bool _isLoading = true;
   bool shouldEditMesure = false;
   List<HouseHoldTabResponceHelper> retrivedList = [];
@@ -86,6 +86,8 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
   String lng = 'eng';
   bool isRecordNew = true;
   String childDOB = '';
+  int? isEditedFromExisting = 0;
+  int? isUploaded = 0;
 
   @override
   void initState() {
@@ -161,7 +163,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
                   Divider(),
                   Padding(
                     padding:
-                    EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
                     child: Row(
                       children: [
                         Expanded(
@@ -172,7 +174,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
                               nextTab(0, context);
                             },
                             text: Global.returnTrLable(
-                                translats, CustomText.back, lng)
+                                    translats, CustomText.back, lng)
                                 .trim(),
                           ),
                         ),
@@ -180,89 +182,91 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
                         SizedBox(width: 10),
                         role == 'Creche Supervisor'
                             ? widget.tabIndex == (widget.totalTab - 1)
-                            ?
-                        //  Expanded(
-                        //     child: CElevatedButton(
-                        //     color: Color(0xff5979AA),
-                        //     onPressed: () {
-                        //       Navigator.pop(context, 'itemRefresh');
-                        //     },
-                        //     text: Global.returnTrLable(
-                        //         translats, CustomText.exit, lng),
-                        //   ))
-                        SizedBox()
-                            : (widget.isEditable == true
-                            ? Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xff5979AA),
-                            onPressed: () {
-                              saveOnly(1, context);
-                              // widget.changeTab(1);
-                            },
-                            text: Global.returnTrLable(
-                                translats, 'Save', lng)
-                                .trim(),
-                          ),
-                        )
-                            : SizedBox())
+                                ?
+                                //  Expanded(
+                                //     child: CElevatedButton(
+                                //     color: Color(0xff5979AA),
+                                //     onPressed: () {
+                                //       Navigator.pop(context, 'itemRefresh');
+                                //     },
+                                //     text: Global.returnTrLable(
+                                //         translats, CustomText.exit, lng),
+                                //   ))
+                                SizedBox()
+                                : (widget.isEditable == true
+                                    ? Expanded(
+                                        child: CElevatedButton(
+                                          color: Color(0xff5979AA),
+                                          onPressed: () {
+                                            saveOnly(1, context);
+                                            // widget.changeTab(1);
+                                          },
+                                          text: Global.returnTrLable(
+                                                  translats, 'Save', lng)
+                                              .trim(),
+                                        ),
+                                      )
+                                    : SizedBox())
                             : SizedBox(),
                         // ]
                         // ),
                         role == 'Creche Supervisor'
                             ? widget.tabIndex == (widget.totalTab - 1)
-                            ? (widget.isEditable == true?SizedBox(width: 10):SizedBox())
-                            : (widget.isEditable == true
-                            ? SizedBox(width: 10)
-                            : SizedBox())
+                                ? (widget.isEditable == true
+                                    ? SizedBox(width: 10)
+                                    : SizedBox())
+                                : (widget.isEditable == true
+                                    ? SizedBox(width: 10)
+                                    : SizedBox())
                             : SizedBox(),
                         widget.tabIndex == (widget.totalTab - 1)
                             ? (widget.isEditable == false
-                            ? Expanded(
-                            child: CElevatedButton(
-                              color: Color(0xff5979AA),
-                              onPressed: () {
-                                Navigator.pop(context, 'itemRefresh');
-                              },
-                              text: Global.returnTrLable(
-                                  translats, CustomText.exit, lng),
-                            ))
+                                ? Expanded(
+                                    child: CElevatedButton(
+                                    color: Color(0xff5979AA),
+                                    onPressed: () {
+                                      Navigator.pop(context, 'itemRefresh');
+                                    },
+                                    text: Global.returnTrLable(
+                                        translats, CustomText.exit, lng),
+                                  ))
+                                : Expanded(
+                                    child: CElevatedButton(
+                                      color: Color(0xff5979AA),
+                                      onPressed: () {
+                                        widget.isEditable == true
+                                            ? nextTab(1, context)
+                                            : widget.changeTab(1);
+                                      },
+                                      text: widget.tabIndex ==
+                                              (widget.totalTab - 1)
+                                          ? ((isRecordNew)
+                                              ? Global.returnTrLable(translats,
+                                                  CustomText.Enroll, lng)
+                                              : Global.returnTrLable(translats,
+                                                  CustomText.Submit, lng))
+                                          : Global.returnTrLable(
+                                              translats, CustomText.Next, lng),
+                                    ),
+                                  ))
                             : Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xff5979AA),
-                            onPressed: () {
-                              widget.isEditable == true
-                                  ? nextTab(1, context)
-                                  : widget.changeTab(1);
-                            },
-                            text: widget.tabIndex ==
-                                (widget.totalTab - 1)
-                                ? ((isRecordNew)
-                                ? Global.returnTrLable(translats,
-                                CustomText.Enroll, lng)
-                                : Global.returnTrLable(translats,
-                                CustomText.Submit, lng))
-                                : Global.returnTrLable(
-                                translats, CustomText.Next, lng),
-                          ),
-                        ))
-                            : Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xff369A8D),
-                            onPressed: () {
-                              widget.isEditable == true
-                                  ? nextTab(1, context)
-                                  : widget.changeTab(1);
-                            },
-                            text: widget.tabIndex == (widget.totalTab - 1)
-                                ? ((isRecordNew)
-                                ? Global.returnTrLable(
-                                translats, CustomText.Enroll, lng)
-                                : Global.returnTrLable(translats,
-                                CustomText.Submit, lng))
-                                : Global.returnTrLable(
-                                translats, CustomText.Next, lng),
-                          ),
-                        ),
+                                child: CElevatedButton(
+                                  color: Color(0xff369A8D),
+                                  onPressed: () {
+                                    widget.isEditable == true
+                                        ? nextTab(1, context)
+                                        : widget.changeTab(1);
+                                  },
+                                  text: widget.tabIndex == (widget.totalTab - 1)
+                                      ? ((isRecordNew)
+                                          ? Global.returnTrLable(
+                                              translats, CustomText.Enroll, lng)
+                                          : Global.returnTrLable(translats,
+                                              CustomText.Submit, lng))
+                                      : Global.returnTrLable(
+                                          translats, CustomText.Next, lng),
+                                ),
+                              ),
                       ],
                     ),
                   ),
@@ -427,10 +431,11 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           readable: widget.isEditable == true ? null : true,
-          minDate: quesItem.fieldname=='date_of_enrollment'?
-          Global.validString(widget.minDate)?
-          DateTime.parse(widget.minDate!).subtract(Duration(days: 1))
-              :null:null,
+          minDate: quesItem.fieldname == 'date_of_enrollment'
+              ? Global.validString(widget.minDate)
+                  ? DateTime.parse(widget.minDate!).subtract(Duration(days: 1))
+                  : null
+              : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
@@ -687,9 +692,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
         return CustomImageDynamic(
           child_guid: widget.cHHGuid,
           assetPath: myMap[quesItem.fieldname!],
-          readable: widget.isEditable == true
-              ? widget.isImageUpdate
-              : true,
+          readable: widget.isEditable == true ? widget.isImageUpdate : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -737,7 +740,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
       logicFields.add(items[i].fieldname!);
     }
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptionsWthouASC(defaultCommon,lng)
+        .getAllMstCommonNotINOptionsWthouASC(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });
@@ -765,9 +768,9 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
     if (type == 1) {
       if (_checkValidation()) {
         if (widget.tabIndex < (widget.totalTab - 1)) {
-          await saveDataInData();
+          await saveDataInData(false);
         } else if (widget.tabIndex == (widget.totalTab - 1)) {
-          await saveDataInData();
+          await saveDataInData(true);
           String msg = Global.returnTrLable(
               translats, CustomText.ChildEnrollsuccess, lng);
           if (!isRecordNew) {
@@ -804,7 +807,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
   saveOnly(int type, BuildContext mContext) async {
     if (type == 1) {
       if (_checkValidation()) {
-        await saveDataInData();
+        await saveDataInData(false);
         Validate().singleButtonPopup(
             Global.returnTrLable(translats, CustomText.dataSaveSuc, lng),
             Global.returnTrLable(translats, CustomText.ok, lng),
@@ -820,7 +823,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
     }
   }
 
-  Future<void> saveDataInData() async {
+  Future<void> saveDataInData(bool islastindex) async {
     var widgets = widget.screenItem[widget.tabBreakItem.name];
     if (widgets != null) {
       Map<String, dynamic> responces = {};
@@ -833,15 +836,33 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
       var name = myMap['name'];
       EnrolledExitChilrenTab.childName = myMap['child_name'];
       print(responcesJs);
-      await EnrolledChilrenResponceHelper().insertUpdate(
-          widget.cHHGuid,
-          widget.HHGUID,
-          name as int?,
-          responcesJs,
-          myMap['appcreated_on'],
-          myMap['appcreated_by'],
-          myMap['app_updated_on'],
-          myMap['app_updated_by']);
+      var childItems = EnrolledChildrenResponceModel(
+          CHHGUID: widget.cHHGuid,
+          HHGUID: widget.HHGUID,
+          name: name as int?,
+          responces: responcesJs,
+          created_at: myMap['appcreated_on'],
+          created_by: myMap['appcreated_by'],
+          update_at: myMap['app_updated_on'],
+          updated_by: myMap['app_updated_by'],
+          is_deleted: 0,
+          is_uploaded: 0,
+          is_edited:
+              islastindex ? 1 : (isRecordNew ? 2 : (widget.isUploaded == 0)?isEditedFromExisting:1));
+      await EnrolledChilrenResponceHelper().inserts(childItems);
+      if (islastindex) {
+        await EnrolledExitChilrenResponceHelper()
+            .updateEditFlag(widget.cHHGuid, widget.crecheId);
+      }
+      // await EnrolledChilrenResponceHelper().insertUpdate(
+      //     widget.cHHGuid,
+      //     widget.HHGUID,
+      //     name as int?,
+      //     responcesJs,
+      //     myMap['appcreated_on'],
+      //     myMap['appcreated_by'],
+      //     myMap['app_updated_on'],
+      //     myMap['app_updated_by']);
 
       if (childDOB != Global.getItemValues(responcesJs, 'child_dob')) {
         await HouseHoldChildrenHelperHelper()
@@ -901,14 +922,15 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
 
   Future<void> updateHiddenValue() async {
     var alredRecord = await EnrolledChilrenResponceHelper()
-        .callChildrenResponce(widget.cHHGuid,widget.HHGUID);
+        .callChildrenResponce(widget.cHHGuid, widget.HHGUID);
 
     if (alredRecord.length > 0) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
       responseData.forEach((key, value) {
         myMap[key] = value;
       });
-
+      isEditedFromExisting = alredRecord[0].is_edited;
+      isUploaded = alredRecord[0].is_uploaded;
       if (responseData['appcreated_on'] != null ||
           responseData['appcreated_by'] != null) {
         myMap['app_updated_on'] = Validate().currentDateTime();
@@ -930,7 +952,6 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
           myMap.remove('weight');
         }
       }
-
     } else {
       var fromHHInfo = await HouseHoldChildrenHelperHelper()
           .callHouseHoldChildrenItem(widget.cHHGuid);
@@ -939,24 +960,32 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
       childDOB = Global.getItemValues(fromHHInfo[0].responces, 'child_dob');
 
       responseData.forEach((key, value) {
-          if (key != 'appcreated_on' && key != 'appcreated_by' && key != 'name'&& key != 'hhcguid')
-          myMap[key] = value;
+        if (key != 'appcreated_on' &&
+            key != 'appcreated_by' &&
+            key != 'name' &&
+            key != 'hhcguid') myMap[key] = value;
       });
 
       myMap['appcreated_on'] = Validate().currentDate();
       myMap['appcreated_by'] = userName;
 
-      var crecheInfo= await CrecheDataHelper().getCrecheResponceItem(widget.crecheId);
-        if(crecheInfo.isNotEmpty) {
-          Map<String,dynamic> result = jsonDecode(crecheInfo.first.responces!);
-          List<String> locationItem = ['state_id','district_id','block_id','gp_id','village_id'];
-          result.forEach((key, value) {
-            if(locationItem.contains(key)){
-              myMap[key] = value;
-            }
-
-          });
-        }
+      var crecheInfo =
+          await CrecheDataHelper().getCrecheResponceItem(widget.crecheId);
+      if (crecheInfo.isNotEmpty) {
+        Map<String, dynamic> result = jsonDecode(crecheInfo.first.responces!);
+        List<String> locationItem = [
+          'state_id',
+          'district_id',
+          'block_id',
+          'gp_id',
+          'village_id'
+        ];
+        result.forEach((key, value) {
+          if (locationItem.contains(key)) {
+            myMap[key] = value;
+          }
+        });
+      }
     }
     myMap['chhguid'] = widget.cHHGuid;
     myMap['hhguid'] = widget.HHGUID;

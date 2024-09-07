@@ -22,15 +22,16 @@ import 'creche_monitering_checklist_CBM_tabItems_view_foradd.dart';
 
 class CmcCBMTabSCreenForAdd extends StatefulWidget {
   final String cbmguid;
-   String? date_of_visit;
+  String? date_of_visit;
   final bool isEdit;
   final bool isViewScreen;
 
   CmcCBMTabSCreenForAdd({
     super.key,
     required this.cbmguid,
-    required this.isEdit,  this.date_of_visit,
-    required this.isViewScreen,  //this.crecheName
+    required this.isEdit,
+    this.date_of_visit,
+    required this.isViewScreen, //this.crecheName
   });
 
   @override
@@ -52,8 +53,8 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
   List<Translation> translatsLabel = [];
   void Function()? ontap;
   String lng = "en";
-  List<String> unpicableDates= [];
-  bool isView=false;
+  List<String> unpicableDates = [];
+  bool isView = false;
 
   @override
   void initState() {
@@ -175,23 +176,23 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
     List<Widget> tabItem = [];
     for (int i = 0; i < tabBreakItems.length; i++) {
       if (tabBreakItems[i].parent == 'Creche Monitoring Checklist CBM') {
-        tabItem.add(
-            widget.isViewScreen?CmcCBMTabItemViewSCreenForAdd(
+        tabItem.add(widget.isViewScreen
+            ? CmcCBMTabItemViewSCreenForAdd(
                 cbmguid: widget.cbmguid!,
                 tabBreakItem: tabBreakItems[i],
                 screenItem: expendedItems,
                 changeTab: changeTab,
                 tabIndex: i,
-                totalTab: tabBreakItems.length
-            ):CmcCBMTabItemSCreenForAdd(
-            cbmguid: widget.cbmguid!,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            tabIndex: i,
+                totalTab: tabBreakItems.length)
+            : CmcCBMTabItemSCreenForAdd(
+                cbmguid: widget.cbmguid!,
+                tabBreakItem: tabBreakItems[i],
+                screenItem: expendedItems,
+                changeTab: changeTab,
+                tabIndex: i,
                 date_of_visit: widget.date_of_visit,
                 isEdit: widget.isEdit,
-            totalTab: tabBreakItems.length));
+                totalTab: tabBreakItems.length));
       }
     }
 
@@ -239,14 +240,16 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
           }
         }
       }
-      if(Global.validString(responseData['creche_id']) && unpicableDates.length==0){
-        unpicableDates = await fetchDatesList(responseData['creche_id']);
-      }
-      if(Global.validString(responseData['date_of_visit'])){
-        if (unpicableDates.contains(responseData['date_of_visit'])){
-          returnStatus = false;
+      if (widget.isEdit == false) {
+        if (Global.validString(responseData['creche_id']) &&
+            unpicableDates.length == 0) {
+          unpicableDates = await fetchDatesList(responseData['creche_id']);
         }
-
+        if (Global.validString(responseData['date_of_visit'])) {
+          if (unpicableDates.contains(responseData['date_of_visit'])) {
+            returnStatus = false;
+          }
+        }
       }
     }
     // Return false if conditions are not met
@@ -298,7 +301,7 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     // List<String> tabLabelItems = [];
-    // tabBreakItems.forEach((element) { 
+    // tabBreakItems.forEach((element) {
     //   if(Global.validString(element.label)){
     //     tabLabelItems.add(element.label!);
     //   }
@@ -306,7 +309,7 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
     // await TranslationDataHelper().callTranslateString(tabLabelItems).then((value) => translatsLabel.addAll(value));
     if (Global.validString(widget.date_of_visit)) {
       List<int> parts =
-      widget.date_of_visit.toString().split('-').map(int.parse).toList();
+          widget.date_of_visit.toString().split('-').map(int.parse).toList();
       var dov = DateTime(parts[0], parts[1], parts[2]);
       if (dov
           .add(Duration(days: 7))
@@ -364,9 +367,9 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
       },
     );
   }
+
   Future<List<String>> fetchDatesList(String creche_id) async {
-    List<CmcCBMResponseModel> cmcRespose =
-    await CmcCBMTabResponseHelper()
+    List<CmcCBMResponseModel> cmcRespose = await CmcCBMTabResponseHelper()
         .childCBMChild(Global.stringToInt(creche_id));
     List<String> visitdatesListString = [];
     cmcRespose.forEach((element) {

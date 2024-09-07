@@ -204,6 +204,8 @@ class CustomText {
 
   static String hh_detail = "HH Detail";
   static String ok = "Ok";
+  static String PrivacyPolicy = "Privacy Policy";
+  static String PrivacyPolicyDescription = "Privacy Policy Description";
   static String pleaseSelectChildrenForAttendence = "Please Select Children For Attendance";
   static String nointernetconnectionavailable = "No internet connection available";
   static String datevisit = "Date of visit";
@@ -224,6 +226,7 @@ class CustomText {
   static String geoWiDownDwnload   = "Geography wise Download data";
   static String downloadData   = "Download data";
   static String Cancel = "Cancel";
+  static String IAgree = "I Agree";
   static String StartDate = "Start Date";
   static String EndDate = "End Date";
   static String plSelect_state = "Please select state";
@@ -441,4 +444,12 @@ class CustomText {
   static String other = "Other";
   static String visitNoteAlrdyExists = "A Visit Note already exists for the selected Date";
   static String enrollExitChild = "Child Enrollment and Exit";
+  static String requisition = "Requisition";
+  static String stockDetails = "Stock Detail";
+  static String requiDetails = "Requisition Detail";
+  static String stockList = "Stock List";
+  static String requiList = "Requisition List";
+  static String addAttendance = "Please add attendance for the month first";
+  static String noItemsAvail = "No Items Available";
+  static String dbBackup = "Database backup";
 }

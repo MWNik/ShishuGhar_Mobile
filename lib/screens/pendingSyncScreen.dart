@@ -8,10 +8,8 @@ import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:http/src/response.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
-
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
-
 import '../api/cashBook_expenses_api.dart';
 import '../api/cashbook_receipt_api.dart';
 import '../api/child_attendance_upload_api.dart';
@@ -134,16 +132,22 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
                           onTap: () async {
-                            if (userRole == 'Creche Supervisor') {
-                              if (selectAllOpt == 0) {
-                                if (index > 0 && index < 11)
-                                  await uploadDataSequence1(context, index);
-                                else
-                                  await methods[index](context);
+                            var checkInte=await Validate().checkNetworkConnection();
+                            if(checkInte){
+                              if (userRole == 'Creche Supervisor') {
+                                if (selectAllOpt == 0) {
+                                  if (index > 0 && index < 9)
+                                    await uploadDataSequence1(context, index);
+                                  else
+                                    await methods[index](context);
+                                }
+                              } else {
+                                await methods[index](context);
                               }
-                            } else {
-                              await methods[index](context);
-                            }
+                            }else Validate().singleButtonPopup(Global.returnTrLable(locationControlls,
+                                CustomText.nointernetconnectionavailable, lng!), Global.returnTrLable(locationControlls,
+                                CustomText.ok, lng!), true, context);
+
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 5.h),
@@ -224,7 +228,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                             text: CustomText.uploadAll,
                             color: Color(0xff369A8D),
                             onPressed: () async {
-                              await uploadDataSequence1(context, 5);
+                              var checkInte=await Validate().checkNetworkConnection();
+                              if(checkInte) {
+                                await uploadDataSequence1(context, 5);
+                              }else
+                                Validate().singleButtonPopup(Global.returnTrLable(locationControlls,
+                                  CustomText.nointernetconnectionavailable, lng!), Global.returnTrLable(locationControlls,
+                                  CustomText.ok, lng!), true, context);
+
                             },
                           )
                         : SizedBox()
@@ -544,6 +555,39 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               locationControlls, CustomText.villageProfile, lng!)] =
           villageProfiles.length;
 
+
+
+      // var stockData = await StockResponseHelper().getStockForUpload();
+      // if (stockData.length > 1) {
+      //   syncInfo[Global.returnTrLable(
+      //           locationControlls, CustomText.Stock, lng!)] =
+      //       '[b]${stockData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      // } else {
+      //   syncInfo[Global.returnTrLable(
+      //           locationControlls, CustomText.Stock, lng!)] =
+      //       '[b]${stockData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      // }
+
+      // syncInfoCount[
+      //         Global.returnTrLable(locationControlls, CustomText.Stock, lng!)] =
+      //     stockData.length;
+
+      // var requisitionData =
+      //     await RequisitionResponseHelper().getRequisitonsForUpload();
+      // if (requisitionData.length > 1) {
+      //   syncInfo[Global.returnTrLable(
+      //           locationControlls, CustomText.requisition, lng!)] =
+      //       '[b]${requisitionData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      // } else {
+      //   syncInfo[Global.returnTrLable(
+      //           locationControlls, CustomText.requisition, lng!)] =
+      //       '[b]${requisitionData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      // }
+
+      // syncInfoCount[Global.returnTrLable(
+      //         locationControlls, CustomText.requisition, lng!)] =
+      //     requisitionData.length;
+
       var imageData = await ImageFileTabHelper().getImageForUpload();
       if (imageData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -558,23 +602,9 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
 
-      //       var childEnrollExitData =
-      //     await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
-      // if (childEnrollExitData.length > 1) {
-      //   syncInfo[Global.returnTrLable(
-      //           locationControlls, CustomText.enrollExitChild, lng!)] =
-      //       '[b]${childEnrollExitData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
-      // } else {
-      //   syncInfo[Global.returnTrLable(
-      //           locationControlls, CustomText.enrollExitChild, lng!)] =
-      //       '[b]${childEnrollExitData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
-      // }
-
-      // syncInfoCount[Global.returnTrLable(
-      //         locationControlls, CustomText.enrollExitChild, lng!)] =
-      //     childEnrollExitData.length;
+      
     } else if (userRole == 'Cluster Coordinator') {
-      var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
+     /* var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
       if (hhItems.length > 1) {
         syncInfo[Global.returnTrLable(
                 locationControlls, CustomText.HHListing, lng!)] =
@@ -585,7 +615,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             '[b]${hhItems.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
       }
       syncInfoCount[Global.returnTrLable(
-          locationControlls, CustomText.HHListing, lng!)] = hhItems.length;
+          locationControlls, CustomText.HHListing, lng!)] = hhItems.length;*/
 
       var cmcCCData = await CmcCCTabResponseHelper().getCcForUpload();
       if (cmcCCData.length > 1) {
@@ -677,7 +707,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   false,
                   context);
             }
-          } else if (responce.statusCode == 401) {
+          }
+          else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
             // Validate().singleButtonPopup(
             //     Global.returnTrLable(
@@ -1254,7 +1285,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       // crecheCheckIn.forEach((element) async {
       for (var element in crecheCheckIn) {
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
-
+        if (!Global.validString(jsonBody['checkin_location'])) {
+          if (Global.validString(jsonBody['latitude']) &&
+              Global.validString(jsonBody['longitude'])) {
+            var latitude = Global.stringToDouble(jsonBody['latitude']);
+            var longitude = Global.stringToDouble(jsonBody['longitude']);
+            jsonBody['checkin_location'] =
+            await Validate().getAddressFromLatLng(latitude, longitude);
+          }
+        }
         if (element.name == null) {
           var responce = await CrecheCheckInApi()
               .checkInUpload(token!, jsonEncode(jsonBody));
@@ -1456,31 +1495,34 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       CustomText.token_expired,
       CustomText.ChildProfile,
       CustomText.CrecheProfileView,
-      CustomText.fllowUp
+      CustomText.fllowUp,
+      CustomText.nointernetconnectionavailable
     ];
     if (userRole == 'Creche Supervisor') {
       methods = [
-        uploadData,
-        uploadChildEnrolledExit,
-        uploadChildGrowthData,
-        uploadChildReferralData,
-        uploadChildFollowUpData,
-        uploadAttendance,
-        uploadChildEventData,
-        uploadChildHealthData,
-        uploadChildImmunizationData,
-        uploadCreCheProfile,
-        uploadCheckInData,
-        uploadChildGrievanceData,
-        uploadCrecheMonitorData,
-        uploadCrecheCommittieData,
-        uploadCashbookData,
-        uploadCashbookReceiptData,
-        uploadVillageProfile,
-        uploadImageFile,
+        uploadData,       //0
+        uploadChildEnrolledExit,   //1
+        uploadChildGrowthData,    //2
+        uploadChildReferralData,    //3
+        uploadChildFollowUpData,    //4
+        uploadAttendance,      //5
+        uploadChildEventData,     //6
+        uploadChildHealthData,     //7
+        uploadChildImmunizationData,     //8
+        uploadCreCheProfile,     //9
+        uploadCheckInData,     //10
+        uploadChildGrievanceData,     //11
+        uploadCrecheMonitorData,       //12
+        uploadCrecheCommittieData,      //13
+        uploadCashbookData,      //14
+        uploadCashbookReceiptData,      //15
+        uploadVillageProfile,       //16
+        // uploadStock,       //17
+        // uploadRequisition,    //18
+        uploadImageFile,     //17
       ];
     } else if (userRole == 'Cluster Coordinator') {
-      methods = [uploadDataCoordinator, uploadcmcCCData];
+      methods = [uploadcmcCCData];
     } else if (userRole == 'Accounts and Logistics Manager') {
       methods = [
         uploadcmcALMData,
@@ -3535,7 +3577,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           }
         }
         // if(resultMap['verification_status']!='4') {
-        //   resultMap['verification_status'] = "3";
+          resultMap['verification_status'] = "3";
         // }
 
         var token = await Validate().readString(Validate.appToken);
@@ -3617,10 +3659,10 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     }
   }
 
-  Future<void> uploadChildProfileSequence2(BuildContext mContext,
-      int methodeIndex) async {
-    var chilProfiles = await EnrolledChilrenResponceHelper()
-        .callChildrenForUpload();
+  Future<void> uploadChildProfileSequence2(
+      BuildContext mContext, int methodeIndex) async {
+    var chilProfiles =
+        await EnrolledChilrenResponceHelper().callChildrenForUpload();
     if (chilProfiles.length > 0) {
       showLoaderDialog(context);
       chilProfiles.forEach((element) async {
@@ -3631,7 +3673,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         if (element.name != null) {
           var responce = await EnrolledChildProfileUploadApi()
               .enrolledChildProfileUploadUpdate(
-              token!, itemResponce, element.name);
+                  token!, itemResponce, element.name);
           if (responce.statusCode == 200) {
             Validate().saveString(
                 Validate.dataUploadDateTime, Validate().currentDateTime());
@@ -3645,9 +3687,9 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             await prefs.remove(Validate.Password);
             ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(content:
-              Text(Global.returnTrLable(
-                  locationControlls, CustomText.token_expired, lng!))),
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
             );
             Navigator.pushReplacement(
                 context,
@@ -3664,15 +3706,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             Validate().singleButtonPopup(
                 Global.errorBodyToStringFromList(responce.body),
                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false, context);
+                false,
+                context);
 
             return;
           }
-        }
-        else {
-          var responce =
-          await EnrolledChildProfileUploadApi().enrolledChildProfileUpload(
-              token!, itemResponce);
+        } else {
+          var responce = await EnrolledChildProfileUploadApi()
+              .enrolledChildProfileUpload(token!, itemResponce);
           if (responce.statusCode == 200) {
             await updateResponcesChildProfile(responce);
             if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
@@ -3684,9 +3725,9 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             await prefs.remove(Validate.Password);
             ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(content:
-              Text(Global.returnTrLable(
-                  locationControlls, CustomText.token_expired, lng!))),
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
             );
             Navigator.pushReplacement(
                 context,
@@ -3703,7 +3744,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             Validate().singleButtonPopup(
                 Global.errorBodyToStringFromList(responce.body),
                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false, context);
+                false,
+                context);
 
             return;
           }
@@ -4621,6 +4663,280 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     }
   }
 
+
+  //   Future<void> uploadStock(BuildContext mContext) async {
+  //   var stockData =
+  //       await StockResponseHelper().getStockForUpload();
+  //   if (stockData.length > 0) {
+  //     showLoaderDialog(mContext);
+  //     var token = await Validate().readString(Validate.appToken);
+  //     stockData.forEach((element) async {
+  //       Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
+
+  //       if (element.name == null) {
+  //         var responce = await StockApi()
+  //             .stockUploadApi(token!, jsonEncode(jsonBody));
+  //         if (responce.statusCode == 200) {
+  //           Validate().saveString(
+  //               Validate.dataUploadDateTime, Validate().currentDateTime());
+
+  //           await updateStockResponse(responce);
+
+  //           if ((stockData.indexOf(element)) ==
+  //               (stockData.length - 1)) {
+  //             Navigator.pop(mContext);
+  //             if (selectAllOpt == 1) {
+  //               currentUploadStatus = 18;
+  //               await methods[currentUploadStatus](context);
+  //             } else
+  //               Validate().singleButtonPopup(
+  //                   Global.returnTrLable(locationControlls,
+  //                       CustomText.data_upload_success_msg, lng!),
+  //                   Global.returnTrLable(
+  //                       locationControlls, CustomText.ok, lng!),
+  //                   false,
+  //                   context);
+  //           }
+  //         } else if (responce.statusCode == 401) {
+  //           Navigator.pop(mContext);
+  //           SharedPreferences prefs = await SharedPreferences.getInstance();
+  //           await prefs.remove(Validate.Password);
+  //           ScaffoldMessenger.of(mContext).showSnackBar(
+  //             SnackBar(
+  //                 content: Text(Global.returnTrLable(
+  //                     locationControlls, CustomText.token_expired, lng!))),
+  //           );
+  //           Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (mContext) => LoginScreen(),
+  //               ));
+  //         } else {
+  //           Navigator.pop(mContext);
+  //           await callUploadData();
+  //           Validate().singleButtonPopup(
+  //               Global.errorBodyToStringFromList(responce.body),
+  //               Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //               false,
+  //               context);
+
+  //           return;
+  //         }
+  //       } else {
+  //         var responce = await StockApi().stockUpdateApi(
+  //             token!, jsonEncode(jsonBody), element.name);
+  //         if (responce.statusCode == 200) {
+  //           Validate().saveString(
+  //               Validate.dataUploadDateTime, Validate().currentDateTime());
+
+  //           await updateStockResponse(responce);
+
+  //           if ((stockData.indexOf(element)) ==
+  //               (stockData.length - 1)) {
+  //             Navigator.pop(mContext);
+  //             if (selectAllOpt == 1) {
+  //               currentUploadStatus = 18;
+  //               await methods[currentUploadStatus](context);
+  //             } else
+  //               Validate().singleButtonPopup(
+  //                   Global.returnTrLable(locationControlls,
+  //                       CustomText.data_upload_success_msg, lng!),
+  //                   Global.returnTrLable(
+  //                       locationControlls, CustomText.ok, lng!),
+  //                   false,
+  //                   context);
+  //           }
+  //         } else if (responce.statusCode == 401) {
+  //           Navigator.pop(mContext);
+  //           SharedPreferences prefs = await SharedPreferences.getInstance();
+  //           await prefs.remove(Validate.Password);
+  //           ScaffoldMessenger.of(mContext).showSnackBar(
+  //             SnackBar(
+  //                 content: Text(Global.returnTrLable(
+  //                     locationControlls, CustomText.token_expired, lng!))),
+  //           );
+  //           Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (mContext) => LoginScreen(),
+  //               ));
+  //         } else {
+  //           Navigator.pop(mContext);
+  //           await callUploadData();
+  //           Validate().singleButtonPopup(
+  //               Global.errorBodyToStringFromList(responce.body),
+  //               Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //               false,
+  //               context);
+
+  //           return;
+  //         }
+  //       }
+  //     });
+  //   }
+  //   else if(selectAllOpt==1){
+  //     currentUploadStatus=18;
+  //     await methods[currentUploadStatus](context);
+  //   }
+  //   else
+  //     Validate().singleButtonPopup(
+  //         Global.returnTrLable(
+  //             locationControlls, CustomText.nothing_for_upload_msg, lng!),
+  //         Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //         false,
+  //         mContext);
+  // }
+
+  // Future<void> updateStockResponse(Response value) async {
+  //   try {
+  //     Map<String, dynamic> resultMap = jsonDecode(value.body);
+  //     print(" responce $resultMap");
+  //     await StockResponseHelper()
+  //         .updateUploadedItem(resultMap);
+  //     await callUploadData();
+  //   } catch (e) {
+  //     print("exp ${e.toString()}");
+  //   }
+  // }
+
+
+
+  //   Future<void> uploadRequisition(BuildContext mContext) async {
+  //   var requisitionData =
+  //       await RequisitionResponseHelper().getRequisitonsForUpload();
+  //   if (requisitionData.length > 0) {
+  //     showLoaderDialog(mContext);
+  //     var token = await Validate().readString(Validate.appToken);
+  //     requisitionData.forEach((element) async {
+  //       Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
+
+  //       if (element.name == null) {
+  //         var responce = await RequisitionApi()
+  //             .requisitionUploadApi(token!, jsonEncode(jsonBody));
+  //         if (responce.statusCode == 200) {
+  //           Validate().saveString(
+  //               Validate.dataUploadDateTime, Validate().currentDateTime());
+
+  //           await updateRequisitionData(responce);
+
+  //           if ((requisitionData.indexOf(element)) ==
+  //               (requisitionData.length - 1)) {
+  //             Navigator.pop(mContext);
+  //             if (selectAllOpt == 1) {
+  //               currentUploadStatus = 19;
+  //               await methods[currentUploadStatus](context);
+  //             } else
+  //               Validate().singleButtonPopup(
+  //                   Global.returnTrLable(locationControlls,
+  //                       CustomText.data_upload_success_msg, lng!),
+  //                   Global.returnTrLable(
+  //                       locationControlls, CustomText.ok, lng!),
+  //                   false,
+  //                   context);
+  //           }
+  //         } else if (responce.statusCode == 401) {
+  //           Navigator.pop(mContext);
+  //           SharedPreferences prefs = await SharedPreferences.getInstance();
+  //           await prefs.remove(Validate.Password);
+  //           ScaffoldMessenger.of(mContext).showSnackBar(
+  //             SnackBar(
+  //                 content: Text(Global.returnTrLable(
+  //                     locationControlls, CustomText.token_expired, lng!))),
+  //           );
+  //           Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (mContext) => LoginScreen(),
+  //               ));
+  //         } else {
+  //           Navigator.pop(mContext);
+  //           await callUploadData();
+  //           Validate().singleButtonPopup(
+  //               Global.errorBodyToStringFromList(responce.body),
+  //               Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //               false,
+  //               context);
+
+  //           return;
+  //         }
+  //       } else {
+  //         var responce = await RequisitionApi().requisitionUpdateApi(
+  //             token!, jsonEncode(jsonBody), element.name);
+  //         if (responce.statusCode == 200) {
+  //           Validate().saveString(
+  //               Validate.dataUploadDateTime, Validate().currentDateTime());
+
+  //           await updateRequisitionData(responce);
+
+  //           if ((requisitionData.indexOf(element)) ==
+  //               (requisitionData.length - 1)) {
+  //             Navigator.pop(mContext);
+  //             if (selectAllOpt == 1) {
+  //               currentUploadStatus = 19;
+  //               await methods[currentUploadStatus](context);
+  //             } else
+  //               Validate().singleButtonPopup(
+  //                   Global.returnTrLable(locationControlls,
+  //                       CustomText.data_upload_success_msg, lng!),
+  //                   Global.returnTrLable(
+  //                       locationControlls, CustomText.ok, lng!),
+  //                   false,
+  //                   context);
+  //           }
+  //         } else if (responce.statusCode == 401) {
+  //           Navigator.pop(mContext);
+  //           SharedPreferences prefs = await SharedPreferences.getInstance();
+  //           await prefs.remove(Validate.Password);
+  //           ScaffoldMessenger.of(mContext).showSnackBar(
+  //             SnackBar(
+  //                 content: Text(Global.returnTrLable(
+  //                     locationControlls, CustomText.token_expired, lng!))),
+  //           );
+  //           Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (mContext) => LoginScreen(),
+  //               ));
+  //         } else {
+  //           Navigator.pop(mContext);
+  //           await callUploadData();
+  //           Validate().singleButtonPopup(
+  //               Global.errorBodyToStringFromList(responce.body),
+  //               Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //               false,
+  //               context);
+
+  //           return;
+  //         }
+  //       }
+  //     });
+  //   }
+  //   else if(selectAllOpt==1){
+  //     currentUploadStatus=19;
+  //     await methods[currentUploadStatus](context);
+  //   }
+  //   else
+  //     Validate().singleButtonPopup(
+  //         Global.returnTrLable(
+  //             locationControlls, CustomText.nothing_for_upload_msg, lng!),
+  //         Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //         false,
+  //         mContext);
+  // }
+
+  // Future<void> updateRequisitionData(Response value) async {
+  //   try {
+  //     Map<String, dynamic> resultMap = jsonDecode(value.body);
+  //     print(" responce $resultMap");
+  //     await RequisitionResponseHelper()
+  //         .updateUploadedItem(resultMap);
+  //     await callUploadData();
+  //   } catch (e) {
+  //     print("exp ${e.toString()}");
+  //   }
+  // }
+
+
   Future<int> callCountForUpload() async {
     showLoaderDialog(context);
     var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
@@ -4662,6 +4978,9 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         await VillageProfileResponseHelper().getVillageProfileforUpload();
     var childEnrollExitData =
         await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
+    // var stockData = await StockResponseHelper().getStockForUpload();
+    // var requisitionData =
+    //     await RequisitionResponseHelper().getRequisitonsForUpload();
 
     hhItems = hhItems
         .where((element) =>
@@ -4690,7 +5009,11 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         villageProfiles.length +
         ImageFileData.length +
         cashBookDataReciept.length +
-        childEnrollExitData.length;
+        childEnrollExitData.length 
+        // +
+        // stockData.length +
+        // requisitionData.length
+        ;
 
     return totalPendingCount;
   }

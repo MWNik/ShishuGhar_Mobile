@@ -244,9 +244,26 @@ class _AddAttendanceViewState extends State<AddAttendanceView> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          Global.getItemValues(
-                                              childHHData[index].responces!,
-                                              'age_at_enrollment_in_months'),
+                                          // Global.getItemValues(
+                                          //     childHHData[index].responces!,
+                                          //     'age_at_enrollment_in_months'),
+                                              Global.validString(
+                                                  Global.getItemValues(
+                                                      childHHData[index]
+                                                          .responces,
+                                                      'child_dob'))
+                                              ? Validate()
+                                                  .calculateAgeInMonths(
+                                                      Validate().stringToDate(
+                                                          Global.getItemValues(
+                                                              childHHData[index]
+                                                                  .responces,
+                                                              'child_dob')))
+                                                  .toString()
+                                              : Global.getItemValues(
+                                                  childHHData[index]
+                                                                  .responces,
+                                                  'age_at_enrollment_in_months'),
                                           style: Styles.blue125,
                                           strutStyle: StrutStyle(height: .5),
                                           overflow: TextOverflow.ellipsis,

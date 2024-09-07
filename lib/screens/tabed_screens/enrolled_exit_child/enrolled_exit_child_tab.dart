@@ -63,6 +63,7 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
   void Function()? ontap;
   String lng = "en";
   String? role;
+  int? isUploaded = 0;
 
 
   Future<void> initializeData() async {
@@ -188,7 +189,8 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
             minDate: widget.minDate,
             tabIndex: i,
             isNew: widget.isNew,
-            totalTab: tabBreakItems.length));
+            totalTab: tabBreakItems.length,
+            isUploaded: isUploaded,));
       }else if (tabBreakItems[i].parent == 'Child Enrollment and Exit') {
         tabItem.add(EnrolledExitChildTabItem(
             isForExit: false,
@@ -205,7 +207,8 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
             tabIndex: i,
             isNew: widget.isNew,
             screenType: 'Child Enrollment and Exit',
-            totalTab: tabBreakItems.length));
+            totalTab: tabBreakItems.length,
+            isUploaded: isUploaded,));
       }
     }
     return tabItem;
@@ -328,6 +331,10 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     // _tabController.addListener(handleTabChange);
 
+    var record = await EnrolledExitChilrenResponceHelper().callChildrenResponce(widget.EnrolledChilGUID);
+    if(record.isNotEmpty){
+      isUploaded = record.first.is_uploaded;
+    }
     setState(() {
       _isLoading = false;
     });

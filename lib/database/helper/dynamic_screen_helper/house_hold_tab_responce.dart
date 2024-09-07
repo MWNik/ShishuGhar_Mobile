@@ -142,7 +142,7 @@ class HouseHoldTabResponceHelper {
       if(responcesFromRespo.isNotEmpty){
         responcesFromRespo['verification_status']=verificationStatus.toString();
       }
-
+      responcesFromRespo['hhid']=hhData['hhid'];
       var hhDtaResponce = jsonEncode(responcesFromRespo);
       await DatabaseHelper.database!
           .rawQuery('UPDATE house_hold_responce SET name = ? ,responces = ? , is_uploaded=1 , is_edited=0 where HHGUID=?', [name,hhDtaResponce,hhguid]);

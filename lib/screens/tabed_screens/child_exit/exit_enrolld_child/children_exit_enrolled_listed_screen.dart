@@ -261,6 +261,7 @@ class _EnrolledChildrenListedScreenState
                                 builder: (BuildContext context) => ExitEnrolledChilrenTab(
                                   CHHGUID: selectedItem['CHHGUID'],
                                   HHGUID: selectedItem['HHGUID'],
+                                  ChildName: Global.getItemValues(selectedItem['responces'], 'child_name'),
                                     HHname: Global.stringToInt(selectedItem['HHname'].toString()),
                                     EnrolledChilGUID: selectedItem['ChildEnrollGUID'],
                                   isNew: 0,
@@ -362,9 +363,26 @@ class _EnrolledChildrenListedScreenState
                                         //   strutStyle: StrutStyle(height: .5),overflow: TextOverflow.ellipsis,
                                         // ),
                                         Text(
-                                          Global.getItemValues(
-                                              filterData[index]['responces'],
-                                              'age_at_enrollment_in_months'),
+                                          // Global.getItemValues(
+                                          //     filterData[index]['responces'],
+                                          //     'age_at_enrollment_in_months'),
+                                              Global.validString(
+                                                  Global.getItemValues(
+                                                      filterData[index]
+                                                          ['responces'],
+                                                      'child_dob'))
+                                              ? Validate()
+                                                  .calculateAgeInMonths(
+                                                      Validate().stringToDate(
+                                                          Global.getItemValues(
+                                                              filterData[index]
+                                                                  ['responces'],
+                                                              'child_dob')))
+                                                  .toString()
+                                              : Global.getItemValues(
+                                                  filterData[index]
+                                                      ['responces'],
+                                                  'age_at_enrollment_in_months'),
                                           style: Styles.blue125,
                                           strutStyle: StrutStyle(height: .5),overflow: TextOverflow.ellipsis,
                                         ),

@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_string_dropdown.dart';
+import 'package:shishughar/custom_widget/custom_textfield.dart';
 import 'package:shishughar/database/helper/village_profile/village_profile_response_helper.dart';
 import 'package:shishughar/model/dynamic_screen_model/village_profile_response_model.dart';
 import 'package:shishughar/screens/tabed_screens/village_profile/village_profile_tab_screen.dart';
@@ -28,6 +31,8 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
   TextEditingController Searchcontroller = TextEditingController();
   List<Translation> translatsLabel = [];
   List<VillageProfileResponseModel> villageProfileList = [];
+  List<VillageProfileResponseModel> filteredList = [];
+
   String lng = 'en';
   String role = '';
 
@@ -78,8 +83,22 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
   Future<void> fetchVillageProfileRecords() async {
     villageProfileList =
         await VillageProfileResponseHelper().getAllVillageProfilerecords();
+    filteredList = villageProfileList;
     setState(() {});
   }
+
+
+  filterDataQu(String entry){
+    if(entry.length>0) {
+      filteredList = villageProfileList.where((element) =>
+    element.village_name.toString().toLowerCase().startsWith(entry.toLowerCase()) 
+      ).toList();
+    }else filteredList=villageProfileList;
+    setState(() {});
+    print('dd ${filteredList.length}');
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +120,22 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
             // SizedBox(
             //   height: MediaQuery.of(context).size.height * 0.09,
             // ),
-            (villageProfileList.isNotEmpty)
+            CustomTextFieldRow(
+              controller: Searchcontroller,
+              onChanged:(value) {
+                print(value);
+                filterDataQu(value);
+              },
+              hintText: (lng!=null)?Global.returnTrLable(translatsLabel, 'Search', lng!):'',
+              prefixIcon: Image.asset(
+                "assets/search.png",
+                scale: 2.4,
+              ),
+            ),
+            (filteredList.isNotEmpty)
                 ? Expanded(
                     child: ListView.builder(
-                      itemCount: villageProfileList.length,
+                      itemCount: filteredList.length,
                       shrinkWrap: true,
                       physics: BouncingScrollPhysics(),
                       scrollDirection: Axis.vertical,
@@ -115,7 +146,7 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
                                         VillageProfileTabScreen(
-                                            name: villageProfileList[index]
+                                            name: filteredList[index]
                                                 .name!)));
                             if (refStatus == 'itemRefresh') {
                               await fetchVillageProfileRecords();
@@ -193,7 +224,7 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                              villageProfileList[index]
+                                              filteredList[index]
                                                       .village_code ??
                                                   '',
                                               style: Styles.blue125,
@@ -201,7 +232,7 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
                                                   StrutStyle(height: 1.2),
                                               overflow: TextOverflow.ellipsis),
                                           Text(
-                                              villageProfileList[index]
+                                              filteredList[index]
                                                       .village_name ??
                                                   '',
                                               style: Styles.blue125,
@@ -212,7 +243,7 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
                                       ),
                                     ),
                                     SizedBox(height: 5),
-                                    (villageProfileList[index].is_edited==0 && villageProfileList[index].is_uploaded==1)?
+                                    (filteredList[index].is_edited==0 && filteredList[index].is_uploaded==1)?
                                     Image.asset(
                                       "assets/sync.png",
                                       scale: 1.5,

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -33,6 +34,7 @@ import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/constants.dart';
+import 'package:shishughar/utils/get_Location.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
@@ -40,7 +42,7 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int
 import '../../../database/helper/check_in/check_in_response_helper.dart';
 import '../../../database/helper/check_in/checkin_meta_helper.dart';
 import '../../../model/dynamic_screen_model/checkIn_response_model.dart';
-
+import 'package:geolocator/geolocator.dart';
 
 class CheckInDetailsScreen extends StatefulWidget {
   final int creche_id;
@@ -60,8 +62,7 @@ class CheckInDetailsScreen extends StatefulWidget {
   State<CheckInDetailsScreen> createState() => _CheckInDetailsScreen();
 }
 
-class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
-     {
+class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
   List<TabFormsLogic> logics = [];
   List<HouseHoldFielItemdModel> allItems = [];
   Map<String, dynamic> myMap = {};
@@ -106,12 +107,11 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
   }
 
   Future<void> initializedData() async {
-    var isConnected=await Validate().checkInternetConnectivity();
-    if(!isConnected){
-      Validate().singleButtonPopup(CustomText.nointernetconnectionavailable, CustomText.ok, true, context);
-      return ;
-    }
-
+    // var isConnected=await Validate().checkInternetConnectivity();
+    // if(!isConnected){
+    //   Validate().singleButtonPopup(CustomText.nointernetconnectionavailable, CustomText.ok, true, context);
+    //   return ;
+    // }
 
     lng = (await Validate().readString(Validate.sLanguage))!;
     translats.clear();
@@ -174,16 +174,22 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
           initImage(imagePath);
         }
         setState(() {});
-      } else
-       await checkPermissionStatus();
+      } else {
+        // Map<String,String> map = {};
+        // map = await GetLocation().checkLocationPermission(context);
+        // lats = map['lats'];
+        // langs = map['langs'];
+        // address =  map['address'];
+        // if(address != null) {
+        //   setState(() { });
+        // }
+        // checkPermissionStatus();
+        checkLocationPermission();
+      }
     }
     await updateHiddenValue();
 
     await callScrenControllers('Creche Check In');
-
-
-
-
   }
 
   Future<void> _clearImagePath() async {
@@ -246,10 +252,10 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
       }
     }
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptionsWthouASC(defaultCommonMulti,lng!)
+        .getAllMstCommonNotINOptionsWthouASC(defaultCommonMulti, lng!)
         .then((value) {
       options.addAll(value);
     });
@@ -354,12 +360,10 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
           created_at: myMap['appcreated_on'],
           created_by: myMap['appcreated_by'],
           update_at: Validate().currentDateTime(),
-          updated_by: userName
-          );
+          updated_by: userName);
       await CheckInResponseHelper().inserts(checkinItems);
     }
   }
-
 
   Future<void> updateHiddenValue() async {
     userName = (await Validate().readString(Validate.userName))!;
@@ -437,7 +441,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          readable:   widget.isEdit?true:DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEdit
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
@@ -507,9 +513,13 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
           initialvalue: initialValue,
           maxlength: quesItem.length,
           keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
-          readable:   (quesItem.fieldname == 'longitude'||
-    quesItem.fieldname == 'latitude'||quesItem.fieldname == 'checkin_location')?
-          true:widget.isEdit?true:DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: (quesItem.fieldname == 'longitude' ||
+                  quesItem.fieldname == 'latitude' ||
+                  quesItem.fieldname == 'checkin_location')
+              ? true
+              : widget.isEdit
+                  ? true
+                  : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isVisible:
@@ -529,7 +539,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable:   widget.isEdit?true:DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEdit
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isVisible:
@@ -568,15 +580,17 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
         }
         return DynamicMultiCheckGridView(
           items: items,
-        childRatio: 4,
+          childRatio: 4,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           titleText:
-          Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
-          readable:   widget.isEdit?true:DependingLogic().callReadableLogic(logics, myMap, quesItem),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+          readable: widget.isEdit
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           selectedItem: myMap[quesItem.fieldname],
           responceFieldName: itemResopnceField,
           onChanged: (value) {
@@ -597,7 +611,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable:   widget.isEdit?true:DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEdit
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
@@ -612,7 +628,6 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
       case 'Long Text':
         return DynamicCustomTextFieldNew(
           maxline: 3,
-
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
@@ -620,7 +635,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable:   widget.isEdit?true:DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEdit
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isVisible:
@@ -639,7 +656,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
-          readable:   widget.isEdit?true:DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEdit
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           initialvalue: myMap[quesItem.fieldname!],
@@ -754,8 +773,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
         return DoubleButtonDailog(
             message: Global.returnTrLable(
                 translats, CustomText.Plsselecimgoption, lng!),
-            posButton:
-                Global.returnTrLable(translats, CustomText.Camera, lng!),
+            posButton: Global.returnTrLable(translats, CustomText.Camera, lng!),
             negButton:
                 Global.returnTrLable(translats, CustomText.Gallery, lng!));
       },
@@ -766,16 +784,16 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
     } else
       file = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (file != null) {
-//        
-        var save = await savePickedImage(file, "image_${widget.ccinguid}_${DateTime.now().millisecondsSinceEpoch}.png");
-        imagePath = save.path.split('/').last;
-        _image = File(save.path);
-        setState(() {
-          myMap['creche_image'] = imagePath;
-        });
-        await saveImageInDatabase(
-            imagePath!, Global.validToString('creche_image'));
-      
+//
+      var save = await savePickedImage(file,
+          "image_${widget.ccinguid}_${DateTime.now().millisecondsSinceEpoch}.png");
+      imagePath = save.path.split('/').last;
+      _image = File(save.path);
+      setState(() {
+        myMap['creche_image'] = imagePath;
+      });
+      await saveImageInDatabase(
+          imagePath!, Global.validToString('creche_image'));
     }
   }
 
@@ -865,34 +883,40 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
                                   )),
                             ),
                             SizedBox(height: 3.h),
-                      (widget.isEdit == false)
-                          ? (_image != null)
-                              ? Center(
-                                  child: Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.04, // Adjust height as needed
-                                    width: MediaQuery.of(context).size.width *
-                                        0.1, // Adjust width as needed
+                            (widget.isEdit == false)
+                                ? (_image != null)
+                                    ? Center(
+                                        child: Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.04, // Adjust height as needed
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.1, // Adjust width as needed
 
-                                    child: ElevatedButton(
-                                        onPressed: () => _clearImagePath(),
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                Colors.red, // Background color
-                                            // onPrimary: Colors.white, // Text color
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            padding: EdgeInsets.zero),
-                                        child: Icon(
-                                          Icons.delete,
-                                          size: 20,
-                                        )),
-                                  ),
-                                )
-                              : SizedBox()
-                          : SizedBox(),
+                                          child: ElevatedButton(
+                                              onPressed: () =>
+                                                  _clearImagePath(),
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors
+                                                      .red, // Background color
+                                                  // onPrimary: Colors.white, // Text color
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                  ),
+                                                  padding: EdgeInsets.zero),
+                                              child: Icon(
+                                                Icons.delete,
+                                                size: 20,
+                                              )),
+                                        ),
+                                      )
+                                    : SizedBox()
+                                : SizedBox(),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: cWidget(),
@@ -975,6 +999,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
     var status = await Permission.location.status;
     if (status.isDenied) {
       status = await Permission.location.request();
+      await Future.delayed(Duration(seconds: 2));
       if (status.isGranted) {
         await requestServiceEnable();
       } else {
@@ -997,6 +1022,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
             );
           },
         );
+        await Future.delayed(Duration(seconds: 2));
         if (shouldProceed == true) {
           var status = await Permission.location.status;
           if (status.isGranted) {
@@ -1049,6 +1075,189 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
       Navigator.pop(context);
     }
   }
+// Future<void> checkLocationPermission(
+//       ) async {
+//     if (await _hasLocationPermission()) {
+//        await _requestServiceEnable();
+//     } else {
+//        await _requestPermission();
+//     }
+//   }
+//   Future<bool> _hasLocationPermission() async {
+//     return await Permission.location.status.isGranted;
+//   }
+//   Future<void> _requestPermission() async {
+//     final status = await Permission.location.request();
+//     if (status.isGranted) {
+//        await _requestServiceEnable();
+//     } else {
+//       await _showPermissionDialog();
+
+//     }
+//   }
+//    Future<void> _showPermissionDialog() async {
+//     bool shouldProceed = await showDialog(
+//       context: context,
+//       barrierDismissible: false,
+//       builder: (context) {
+//         return AlertDialog(
+//           title: Text('Permission Required'),
+//           content: Text('Please allow location permission'),
+//           actions: [
+//             TextButton(
+//               onPressed: () async {
+//                 await AppSettings.openAppSettings();
+//                 Navigator.of(context).pop(true);
+//               },
+//               child: Text('Settings'),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+
+//      if(shouldProceed == true){
+//         await _requestPermission();}
+
+//   }
+//   Future<void> _requestServiceEnable(
+//       ) async {
+//     final location = Location();
+//     if (await location.serviceEnabled()) {
+//        await _getLocation();
+//     } else {
+//       final serviceEnabled = await location.requestService();
+//       if (serviceEnabled) {
+//          await _getLocation();
+//       } else {
+
+//       }
+//     }
+//   }
+//   Future<void> _getLocation() async {
+//     final location = Location();
+
+//     try {
+//       showLoaderDialog(context);
+//       final currentLocation = await location.getLocation();
+//       lats = currentLocation.latitude.toString();
+//       langs = currentLocation.longitude.toString();
+//        address = await Validate().getAddressFromLatLng(
+//           currentLocation.latitude!, currentLocation.longitude!);
+//       // Navigator.pop(context);
+//        if(address != null){
+//         setState(() {
+
+//         });
+//        }
+//     } catch (e) {
+//       print('Error getting location: $e');
+
+//     } finally {
+//       Navigator.pop(context);
+//     }
+//   }
+  Future<void> checkLocationPermission() async {
+    if (await _hasLocationPermission()) {
+      await _requestServiceEnable();
+    } else {
+      await _requestPermission();
+    }
+  }
+
+  Future<bool> _hasLocationPermission() async {
+    return await Permission.location.status.isGranted;
+  }
+
+  Future<void> _requestPermission() async {
+    final status = await Permission.location.request();
+    if (status.isGranted) {
+      // if (_permissionRequested) {
+      await _requestServiceEnable();
+      // }
+    } else {
+      await _showPermissionDialog();
+    }
+  }
+
+  Future<void> _showPermissionDialog() async {
+    bool shouldProceed = await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Permission Required'),
+          content: Text('Please allow location permission'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await AppSettings.openAppSettings();
+                // Navigator.of(context).pop(true);
+              },
+              child: Text('Settings'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldProceed == true) {
+      // _permissionRequested = true;
+      await _requestPermission();
+    }
+  }
+
+  Future<void> _requestServiceEnable() async {
+    final location = Location();
+    // bool isServiceEnabled = await location.serviceEnabled();
+    bool isServiceEnable = await Geolocator.isLocationServiceEnabled();
+    if (isServiceEnable) {
+      await _getLocation(isServiceEnable);
+    } else {
+      // _serviceEnableRequested = true;
+      final serviceEnabled = await location.requestService();
+      await Future.delayed(Duration(seconds: 2));
+      if (serviceEnabled) {
+        await _getLocation(serviceEnabled);
+      } 
+      else {
+        print("Location Service not Enable");
+        // Handle the case where the user denies the request
+      }
+    }
+  }
+
+  // bool _serviceEnableRequested = false;
+
+  // Future<void> _getLocation(bool shouldProceed) async {
+  //   // final location = Location();
+  //
+  //   if (shouldProceed) {
+  //     try {
+  //       showLoaderDialog(context);
+  //       // Future.delayed(Duration(seconds: 10));
+  //       // final currentLocation = await location.getLocation();
+  //       final currentLocation = await Geolocator.getCurrentPosition();
+  //       lats = currentLocation.latitude.toString();
+  //       langs = currentLocation.longitude.toString();
+  //       address = await Validate().getAddressFromLatLng(
+  //           currentLocation.latitude!, currentLocation.longitude!);
+  //       // Navigator.pop(context);
+  //       if (address != null) {
+  //         setState(() {});
+  //       }
+  //     } catch (e) {
+  //       print('Error getting location: $e');
+  //     } finally {
+  //       Navigator.pop(context);
+  //     }
+  //   } else {
+  //     Validate().singleButtonPopup(
+  //         "Service Not Enaled", CustomText.ok, false, context);
+  //   }
+  // }
+
+  // bool _permissionRequested = false;
 
   // @override
   // void dispose() {
@@ -1090,5 +1299,70 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen>
         );
       },
     );
+  }
+
+  Future<Position> getCurrentPositionWithTimeout() async {
+    int retryCount = 0;
+    while (retryCount < 2) {
+      try {
+        return await Geolocator.getCurrentPosition()
+            .timeout(Duration(seconds: 10));
+      } catch (e) {
+        if (e is TimeoutException) {
+          retryCount++;
+          print('Timeout reached, retrying... ($retryCount)');
+          await Future.delayed(
+              Duration(seconds: 1)); // wait 1 second before retrying
+        } else {
+          rethrow; // rethrow other exceptions
+        }
+      }
+    }
+    throw TimeoutException(
+        'Failed to get current position after $retryCount retries');
+  }
+
+
+  Future<void> _getLocation(bool shouldProceed) async {
+
+    if (shouldProceed) {
+      try {
+        showLoaderDialog(context);
+
+        final currentLocation = await getCurrentPositionWithTimeout();
+
+        lats = currentLocation.latitude.toString();
+        langs = currentLocation.longitude.toString();
+        address = await Validate().getAddressFromLatLng(
+            currentLocation.latitude!, currentLocation.longitude!);
+        // Navigator.pop(context);
+        if (address != null) {
+          setState(() {});
+        }
+      } catch (e) {
+        if (e is TimeoutException) {
+          // bool shouldProceed = await showDialog(context: context, builder: (context){
+          //   return SingleButtonPopupDialog(message: Global.returnTrLable(translats, CustomText.turnOnInternet, lng!),
+          //     button: Global.returnTrLable(translats, CustomText.ok, lng!),);
+          // });
+          //
+          // if(shouldProceed){
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content:
+                        Text("Location not get please try again.")));
+
+          // }
+
+        }
+        print('Error getting location: $e');
+      } finally {
+        Navigator.pop(context);
+      }
+    } else {
+      Validate().singleButtonPopup(
+          "Service Not Enaled", CustomText.ok, false, context);
+    }
   }
 }

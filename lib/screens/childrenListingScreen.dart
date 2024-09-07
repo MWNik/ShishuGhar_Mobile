@@ -74,8 +74,8 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
           String cHHGUID='';
 
           if(!Global.validString(cHHGUID)) {
-            var checkChil = await checkChildrenLimit(hhChilddata.length);
-            if (checkChil) {
+            // var checkChil = await checkChildrenLimit(hhChilddata.length);
+            // if (checkChil) {
               cHHGUID = Validate().randomGuid();
               print("childes $cHHGUID");
               var refStatus = await Navigator.of(context).push(
@@ -86,12 +86,12 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
               if (refStatus == 'itemRefresh') {
                 await fetchHhChildrenDataList();
               }
-            } else {
-              Validate().singleButtonPopup(Global.returnTrLable(childListingControlls,
-                  'Can not add children more than ${hhChilddata.length}', lng!),
-                  Global.returnTrLable(childListingControlls, CustomText.ok, lng!), false, context);
+            // } else {
+            //   Validate().singleButtonPopup(Global.returnTrLable(childListingControlls,
+            //       'Can not add children more than ${hhChilddata.length}', lng!),
+            //       Global.returnTrLable(childListingControlls, CustomText.ok, lng!), false, context);
 
-            }
+            // }
           }
         },
         child: Image.asset(
@@ -326,9 +326,9 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
                                 ),
                                 SizedBox(height: 8),
                                 Text(
-                                  getItemValues(
-                                      hhChilddata[index].responces!,
-                                      'child_age'),
+                                  Global.validString(getItemValues(hhChilddata[index].responces!, 'child_dob'))
+                                      ?Validate().calculateAgeInMonths(Validate().stringToDate(getItemValues(hhChilddata[index].responces!, 'child_dob'))).toString():
+                                          getItemValues(hhChilddata[index].responces!, 'child_age'),
                                   style: Styles.black125,overflow: TextOverflow.ellipsis
                                 ),
                               ],

@@ -21,10 +21,8 @@ import 'enrolled_exit_child_tab.dart';
 class NotEnrolledExitChildrenListedScreen extends StatefulWidget {
   final int crecheId;
   final String village_id;
-  const NotEnrolledExitChildrenListedScreen({super.key,
-    required this.crecheId,
-    required this.village_id
-  });
+  const NotEnrolledExitChildrenListedScreen(
+      {super.key, required this.crecheId, required this.village_id});
 
   @override
   _NotEnrolledChildrenListedScreenState createState() =>
@@ -64,9 +62,9 @@ class _NotEnrolledChildrenListedScreenState
       lng = lngtr;
     }
 
-    genderList = await OptionsModelHelper().getMstCommonOptions('Gender',lng);
+    genderList = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
     relationChilddata =
-        await OptionsModelHelper().getMstCommonOptions('Relation',lng);
+        await OptionsModelHelper().getMstCommonOptions('Relation', lng);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -90,8 +88,14 @@ class _NotEnrolledChildrenListedScreenState
   }
 
   Future<void> fetchChildHHDataList() async {
-    childHHData = await EnrolledExitChilrenResponceHelper().getNotEnrollChildren(widget.village_id);
+    childHHData = await EnrolledExitChilrenResponceHelper()
+        .getNotEnrollChildren(widget.village_id);
 
+    childHHData = childHHData.where((element) {
+      var isdobavail =
+          Global.getItemValues(element['responces'], 'is_dob_available');
+      return Global.stringToInt(isdobavail.toString()) == 1;
+    }).toList();
     filterData = childHHData;
     Searchcontroller.text = '';
     selectedItem = null;
@@ -368,18 +372,19 @@ class _NotEnrolledChildrenListedScreenState
                           var selectedItem = filterData[index];
                           String refStatus = '';
                           String enrolledChildGuid = '';
-                          String? minDate=await callDateOfExit(Global.getItemValues(
-                              selectedItem['responces'],
-                              'hhcguid'));
+                          String? minDate = await callDateOfExit(
+                              Global.getItemValues(
+                                  selectedItem['responces'], 'hhcguid'));
                           if (!Global.validString(enrolledChildGuid)) {
                             enrolledChildGuid = Validate().randomGuid();
-                            EnrolledExitChilrenTab.childName=Global.getItemValues(selectedItem['responces'],
-                                'child_name');
+                            EnrolledExitChilrenTab.childName =
+                                Global.getItemValues(
+                                    selectedItem['responces'], 'child_name');
                             refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
                                         EnrolledExitChilrenTab(
-                                          isEditable: true,
+                                            isEditable: true,
                                             CHHGUID: Global.getItemValues(
                                                 selectedItem['responces'],
                                                 'hhcguid'),
@@ -387,12 +392,13 @@ class _NotEnrolledChildrenListedScreenState
                                                 selectedItem['hhResponce'],
                                                 'hhguid'),
                                             HHname: Global.stringToInt(
-                                                selectedItem['name'].toString()),
+                                                selectedItem['name']
+                                                    .toString()),
                                             EnrolledChilGUID: enrolledChildGuid,
                                             crecheId: widget.crecheId,
                                             minDate: minDate,
                                             isNew: 0,
-                                            isImageUpdate:false)));
+                                            isImageUpdate: false)));
                           }
                           if (refStatus == 'itemRefresh') {
                             await fetchChildHHDataList();
@@ -436,11 +442,11 @@ class _NotEnrolledChildrenListedScreenState
                                         style: Styles.black104,
                                         strutStyle: StrutStyle(height: 1),
                                       ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.ageInMonth, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
-                                      ),
+                                      // Text(
+                                      //   '${Global.returnTrLable(translats, CustomText.ageInMonth, lng).trim()} : ',
+                                      //   style: Styles.black104,
+                                      //   strutStyle: StrutStyle(height: 1),
+                                      // ),
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.Village, lng).trim()} : ',
                                         style: Styles.black104,
@@ -479,14 +485,14 @@ class _NotEnrolledChildrenListedScreenState
                                           strutStyle: StrutStyle(height: .5),
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        Text(
-                                          Global.getItemValues(
-                                              filterData[index]['responces'],
-                                              'child_age'),
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        // Text(
+                                        //   Global.getItemValues(
+                                        //       filterData[index]['responces'],
+                                        //       'child_age'),
+                                        //   style: Styles.blue125,
+                                        //   strutStyle: StrutStyle(height: .5),
+                                        //   overflow: TextOverflow.ellipsis,
+                                        // ),
                                         Text(
                                           callVillageName(
                                               filterData[index]['hhResponce']),
@@ -498,15 +504,16 @@ class _NotEnrolledChildrenListedScreenState
                                     ),
                                   ),
                                   SizedBox(width: 5),
-                                  (filterData[index]['is_edited']==0 && filterData[index]['is_uploaded']==1)?
-                                  Image.asset(
-                                    "assets/sync.png",
-                                    scale: 1.5,
-                                  ):
-                                  Image.asset(
-                                    "assets/sync_gray.png",
-                                    scale: 1.5,
-                                  )
+                                  (filterData[index]['is_edited'] == 0 &&
+                                          filterData[index]['is_uploaded'] == 1)
+                                      ? Image.asset(
+                                          "assets/sync.png",
+                                          scale: 1.5,
+                                        )
+                                      : Image.asset(
+                                          "assets/sync_gray.png",
+                                          scale: 1.5,
+                                        )
                                 ],
                               ),
                             ),
@@ -604,7 +611,8 @@ class _NotEnrolledChildrenListedScreenState
     minAgeLimit = null;
     setState(() {});
   }
-  Future<String?> callDateOfExit(String CHHGUID)async{
+
+  Future<String?> callDateOfExit(String CHHGUID) async {
     return await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
   }
 }

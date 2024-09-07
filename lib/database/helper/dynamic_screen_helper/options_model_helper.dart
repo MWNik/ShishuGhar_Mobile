@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import '../../../model/dynamic_screen_model/house_hold_tab_responce_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
@@ -32,7 +31,7 @@ class OptionsModelHelper {
   }
 
   Future<List<OptionsModel>> getLocationData(
-      String tableName, Map<String, dynamic> responseData,String lng) async {
+      String tableName, Map<String, dynamic> responseData, String lng) async {
     var tabName = 'tab$tableName'.replaceAll(" ", "");
     int? selectedLocation;
     String? selectedLocationID;
@@ -108,6 +107,17 @@ class OptionsModelHelper {
       print("it ${item.name}");
     }
     return optionsModel;
+  }
+  Future<List<OptionsModel>> getYearOptions() async {
+    String flag = 'tabYear';
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery('select * from mstCommon where flag=? order by seq_id  ASC',[flag]);
+
+    List<OptionsModel> options = [];
+    for(var element in result){
+      var item = new OptionsModel(name: element['name'].toString(),values: element['value'].toString(),flag: flag);
+      options.add(item);
+    }
+    return options;
   }
 
   Future<List<OptionsModel>> getMstCommonOptions(
@@ -223,6 +233,60 @@ class OptionsModelHelper {
     return optionsModel;
   }
 
+  Future<List<OptionsModel>> getAllMstCommonNotINPartenerStock(String flag,
+      int crechId, String rguid, int year, int month, String lang) async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from mstCommon WHERE flag=? and  name not in(select item_id from tabCreche_requisition_response where creche_id=? and item_id NOTNULL and rguid!=? and year=? and month=?) order by CASE WHEN value LIKE ? THEN 1 ELSE 0 END,  seq_id  ASC',
+        [flag, crechId, rguid, year, month, '%other%']);
+
+    List<OptionsModel> optionsModel = [];
+
+    for (var element in result) {
+      var value = element['value'].toString();
+      if (lang == 'hi' && Global.validString(element['hindi'].toString())) {
+        value = element['hindi'].toString();
+      } else if (lang == 'od' &&
+          Global.validString(element['oidya'].toString())) {
+        value = element['oidya'].toString();
+      }
+      print(element);
+      var item = new OptionsModel(
+          name: element['name'].toString(),
+          values: value,
+          flag: element['flag'].toString());
+      optionsModel.add(item);
+      print("it ${item.name}");
+    }
+    return optionsModel;
+  }
+
+  Future<List<OptionsModel>> getAllMstCommonNotINPartenerStockWithoyExisting(
+      String flag, int crechId, int year, int month, String lang) async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from mstCommon WHERE flag=? and  name not in(select item_id from tabCreche_requisition_response where creche_id=? and item_id NOTNULL  and year=? and month=?) order by CASE WHEN value LIKE ? THEN 1 ELSE 0 END,  seq_id  ASC',
+        [flag, crechId, year, month, '%other%']);
+
+    List<OptionsModel> optionsModel = [];
+
+    for (var element in result) {
+      var value = element['value'].toString();
+      if (lang == 'hi' && Global.validString(element['hindi'].toString())) {
+        value = element['hindi'].toString();
+      } else if (lang == 'od' &&
+          Global.validString(element['oidya'].toString())) {
+        value = element['oidya'].toString();
+      }
+      print(element);
+      var item = new OptionsModel(
+          name: element['name'].toString(),
+          values: value,
+          flag: element['flag'].toString());
+      optionsModel.add(item);
+      print("it ${item.name}");
+    }
+    return optionsModel;
+  }
+
   Future<List<OptionsModel>> getAllMstCommonNotINOptionsWthouASC(
       List<String> defaultCommon, String lang) async {
     String questionMarks = List.filled(defaultCommon.length, '?').join(',');
@@ -316,6 +380,7 @@ class OptionsModelHelper {
     return optionsModel;
   }
 
+
   Future<List<OptionsModel>> callCrechInOptionID(
       String tableName, int crecheNameId) async {
     var tabName = 'tab$tableName';
@@ -358,21 +423,24 @@ class OptionsModelHelper {
     if (tabName == 'State') {
       if (lng == 'hi' && Global.validString(item['state_hi'].toString())) {
         value = item['state_hi'].toString();
-      } else if (lng == 'od' && Global.validString(item['state_od'].toString())) {
+      } else if (lng == 'od' &&
+          Global.validString(item['state_od'].toString())) {
         value = item['state_od'].toString();
       } else
         value = item['value'].toString();
     } else if (tabName == 'District') {
       if (lng == 'hi' && Global.validString(item['district_hi'].toString())) {
         value = item['district_hi'].toString();
-      } else if (lng == 'od' && Global.validString(item['district_od'].toString())) {
+      } else if (lng == 'od' &&
+          Global.validString(item['district_od'].toString())) {
         value = item['district_od'].toString();
       } else
         value = item['value'].toString();
     } else if (tabName == 'Block') {
       if (lng == 'hi' && Global.validString(item['block_hi'].toString())) {
         value = item['block_hi'].toString();
-      } else if (lng == 'od' && Global.validString(item['block_od'].toString())) {
+      } else if (lng == 'od' &&
+          Global.validString(item['block_od'].toString())) {
         value = item['block_od'].toString();
       } else
         value = item['value'].toString();
@@ -386,7 +454,8 @@ class OptionsModelHelper {
     } else if (tabName == 'Village') {
       if (lng == 'hi' && Global.validString(item['village_hi'].toString())) {
         value = item['village_hi'].toString();
-      } else if (lng == 'od' && Global.validString(item['village_od'].toString())) {
+      } else if (lng == 'od' &&
+          Global.validString(item['village_od'].toString())) {
         value = item['village_od'].toString();
       } else
         value = item['value'].toString();
