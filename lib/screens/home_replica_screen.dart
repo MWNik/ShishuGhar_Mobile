@@ -624,11 +624,11 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                 : '',
                             style: Styles.black125,
                           ),
-                          onTap: ()
-                          async {
+                          onTap: () async {
                             HomeReplicaScreen.scaffoldKey!.currentState
                                 ?.closeDrawer();
                             // _showLanguageDialog(context);
+                            // throw Exception();
                             await Validate().createDbBackup();
                           },
                         ),
@@ -659,6 +659,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             // _showLanguageDialog(context);
                           },
                         ),
+
                         Visibility(
                           visible: true,
                           child: Divider(
@@ -740,7 +741,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                               : Constants.baseUrl ==
                                       'https://shishughar.in/api/'
                                   ? TextSpan(
-                                      text: " ", style: Styles.red125)
+                                      text: "  (PROD)", style: Styles.red125)
                                   : TextSpan(
                                       text: "  (DEV)", style: Styles.red125),
                         ],
@@ -1292,106 +1293,165 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
             'Household Form': (String date1, String date2) async {
               if (compareDates(date1, date2)) {
                 Validate().saveString(Validate.householdForm, date2);
-                callFieldData(true);
+                await callFieldData(true);
               }
             },
             'Household Child Form': (String date1, String date2) async {
               if (compareDates(date1, date2)) {
                 Validate().saveString(Validate.householdChildForm, date2);
-                callFieldData(true);
+                await callFieldData(true);
               }
             },
             'Child Enrollment and Exit': (String date1, String date2) async {
               if (compareDates(date1, date2)) {
                 Validate()
                     .saveString(Validate.childEnrolledExitmodifiedData, date2);
-                callEnrolledExitMetaApi(userName!, password!, token!, true);
+                await callEnrolledExitMetaApi(
+                    userName!, password!, token!, true);
               }
             },
             'Child Profile': (String date1, String date2) async {
               if (compareDates(date1, date2)) {
                 Validate().saveString(Validate.childProfilemodifiedDate, date2);
-                callEnrooledChildrenDataApi(userName!, password!, token!, true);
+                await callEnrooledChildrenDataApi(
+                    userName!, password!, token!, true);
               }
             },
             'Creche': (String date1, String date2) async {
               if (compareDates(date1, date2)) {
                 Validate().saveString(Validate.creChemodifiedDate, date2);
-                callCreshDataApi(userName!, password!, token!, true);
+                await callCreshDataApi(userName!, password!, token!, true);
               }
             },
             'Child Health': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callChildHealthData(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.ChildHealthUpdateDate, date2);
+                await callChildHealthData(userName!, password!, token!, true);
+              }
             },
             'Child Event': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callChildEventData(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.childEventUpdateDate, date2);
+                await callChildEventData(userName!, password!, token!, true);
+              }
             },
             'Child Referral': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callChildReffrelMeta(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.childReferralUpdatedDate, date2);
+                await callChildReffrelMeta(userName!, password!, token!, true);
+              }
             },
             'Child Exit': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callChildExitMeta(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.childExitUpdatedDate, date2);
+                await callChildExitMeta(userName!, password!, token!, true);
+              }
             },
             'Child Immunization': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callChildImmunizationData(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate()
+                    .saveString(Validate.ChildImmunizationUpdateDate, date2);
+                await callChildImmunizationData(
+                    userName!, password!, token!, true);
+              }
             },
             'Child Follow up': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callChildFollowUpMeta(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.childFollowUpUpdatedDate, date2);
+                await callChildFollowUpMeta(userName!, password!, token!, true);
+              }
             },
             'Child Growth Monitoring': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callAnthropomertryData(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.ChildAntroUpdateDate, date2);
+                await callAnthropomertryData(
+                    userName!, password!, token!, true);
+              }
             },
             'Cashbook': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callCashBookExpensesMetaApi(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate()
+                    .saveString(Validate.cashbookExpencesMetaUpdateDate, date2);
+                await callCashBookExpensesMetaApi(
+                    userName!, password!, token!, true);
+              }
             },
             'Child Attendance': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callAttendanceData(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.ChildAttendeceUpdateDate, date2);
+                await callAttendanceData(userName!, password!, token!, true);
+              }
             },
             'Village': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                villageProfileMetaApi(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.villageProfileUpdateDate, date2);
+                await villageProfileMetaApi(userName!, password!, token!, true);
+              }
             },
             'Creche Check In': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                checkinFieldsMeta(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.chechInUpdateDate, date2);
+                await checkinFieldsMeta(userName!, password!, token!, true);
+              }
             },
             'Creche Monitoring Checklist ALM':
                 (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callCMCALMMetaApi(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.crecheMonitoringMeta, date2);
+                await callCMCALMMetaApi(userName!, password!, token!, true);
+              }
             },
             'Creche Committee Meeting': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callCrecheCommitteMeta(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.crecheCommitteUpdateDate, date2);
+
+                await callCrecheCommitteMeta(
+                    userName!, password!, token!, true);
+              }
             },
             'Creche Monitoring Checklist': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                crecheMonitoringApiMeta(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.crecheMonitoringMeta, date2);
+                await crecheMonitoringApiMeta(
+                    userName!, password!, token!, true);
+              }
             },
             'Creche Monitoring Checklist CC':
                 (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callCMCCCMetaApi(userName!, password!, token!, true);
+              {
+                Validate().saveString(Validate.crecheMonitoringMeta, date2);
+                if (compareDates(date1, date2))
+                  await callCMCCCMetaApi(userName!, password!, token!, true);
+              }
             },
             'Creche Monitoring Checklist CBM':
                 (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callCMCCBMMetaApi(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.crecheMonitoringMeta, date2);
+                await callCMCCBMMetaApi(userName!, password!, token!, true);
+              }
             },
             'Grievance': (String date1, String date2) async {
-              if (compareDates(date1, date2))
-                callChildGrievancesMeta(userName!, password!, token!, true);
+              if (compareDates(date1, date2)) {
+                Validate()
+                    .saveString(Validate.childGravienceUpdatedDate, date2);
+                await callChildGrievancesMeta(
+                    userName!, password!, token!, true);
+              }
             },
-
+            'Creche Stock': (String date1, String date2) async {
+              if (compareDates(date1, date2)) {
+                Validate().saveString(Validate.stockmetaUpdateDate, date2);
+                // await stockMetaData(userName!, password!, token!, true);
+              }
+            },
+            'Creche Requisition': (String date1, String date2) async {
+              if (compareDates(date1, date2)) {
+                Validate()
+                    .saveString(Validate.requisitionMetaUpdateDate, date2);
+                // await requisitionMetaData(userName!, password!, token!, true);
+              }
+            },
           };
 
           for (var element in docTypeList) {
@@ -1400,7 +1460,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
             if (date1 != null && docActions.containsKey(element.name)) {
               await docActions[element.name]!(date1, date2);
-              break;
+              // break;
             }
           }
         } else {
@@ -2001,8 +2061,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           ChildAttendanceFieldModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildAttendance(attendanceData);
-      Validate().saveString(Validate.ChildAttendeceUpdateDate,
-          attendanceData.tabChild_Attendance!.modified!);
+      // Validate().saveString(Validate.ChildAttendeceUpdateDate,
+      //     attendanceData.tabChild_Attendance!.modified!);
       if (only == false) {
         await callAnthropomertryData(userName, password, token, false);
       } else
@@ -2053,8 +2113,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ChildGrowthMetaFieldsModel childGrowthMetaFields =
           ChildGrowthMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
-      Validate().saveString(Validate.ChildAntroUpdateDate,
-          childGrowthMetaFields.tabChild_Growth_Meta!.modified!);
+      // Validate().saveString(Validate.ChildAntroUpdateDate,
+      //     childGrowthMetaFields.tabChild_Growth_Meta!.modified!);
 
       await callInsertAnthropomertry(childGrowthMetaFields);
 
@@ -2110,8 +2170,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertChildEvent(childEventMetaFields);
 
-      Validate().saveString(Validate.childEventUpdateDate,
-          childEventMetaFields.tabChild_Event_Meta!.modified!);
+      // Validate().saveString(Validate.childEventUpdateDate,
+      //     childEventMetaFields.tabChild_Event_Meta!.modified!);
       if (only == false) {
         await callChildImmunizationData(userName, password, token, false);
       } else {
@@ -2159,8 +2219,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           ChildImmunizationMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildImmunization(childImmunizationMetaFields);
-      Validate().saveString(Validate.ChildImmunizationUpdateDate,
-          childImmunizationMetaFields.tabChild_Immunization_Meta!.modified!);
+      // Validate().saveString(Validate.ChildImmunizationUpdateDate,
+      //     childImmunizationMetaFields.tabChild_Immunization_Meta!.modified!);
       if (only == false) {
         await callChildHealthData(userName, password, token, false);
       } else
@@ -2212,8 +2272,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           ChildHelthMetaFieldsModel.fromJson(jsonDecode(responce.body));
 
       await callInsertChildHealth(childHealthMetaFields);
-      Validate().saveString(Validate.ChildHealthUpdateDate,
-          childHealthMetaFields.tabChild_Health_Meta!.modified!);
+      // Validate().saveString(Validate.ChildHealthUpdateDate,
+      //     childHealthMetaFields.tabChild_Health_Meta!.modified!);
       if (only == false) {
         callChildExitMeta(userName, password, token, false);
       } else {
@@ -2262,8 +2322,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertChildExit(childExitMetaFields);
 
-      Validate().saveString(Validate.childExitUpdatedDate,
-          childExitMetaFields.tabChild_Exit_Meta!.modified!);
+      // Validate().saveString(Validate.childExitUpdatedDate,
+      //     childExitMetaFields.tabChild_Exit_Meta!.modified!);
       if (only == false) {
         await callChildGrievancesMeta(userName, password, token, false);
       } else
@@ -2311,8 +2371,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertChildGrievances(childExitMetaFields);
 
-      Validate().saveString(Validate.childGravienceUpdatedDate,
-          childExitMetaFields.tabChild_Grievances_Meta!.modified!);
+      // Validate().saveString(Validate.childGravienceUpdatedDate,
+      //     childExitMetaFields.tabChild_Grievances_Meta!.modified!);
       if (only == false) {
         await callChildReffrelMeta(userName, password, token, false);
       } else
@@ -2361,8 +2421,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertChildReferral(childFollowUpMetaFields);
 
-      Validate().saveString(Validate.childReferralUpdatedDate,
-          childFollowUpMetaFields.tabChild_referral_Meta!.modified!);
+      // Validate().saveString(Validate.childReferralUpdatedDate,
+      //     childFollowUpMetaFields.tabChild_referral_Meta!.modified!);
       if (only == false) {
         await callChildFollowUpMeta(userName, password, token, false);
       } else
@@ -2431,8 +2491,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertChildFollowUp(childFollowUpMetaFields);
 
-      Validate().saveString(Validate.childFollowUpUpdatedDate,
-          childFollowUpMetaFields.tabChild_FollowUp_Meta!.modified!);
+      // Validate().saveString(Validate.childFollowUpUpdatedDate,
+      //     childFollowUpMetaFields.tabChild_FollowUp_Meta!.modified!);
       if (only == false) {
         await callCrecheCommitteMeta(userName, password, token, false);
       } else
@@ -2481,8 +2541,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertCrecheCommitte(crecheCommitteMetaFields);
 
-      Validate().saveString(Validate.crecheCommitteUpdateDate,
-          crecheCommitteMetaFields.tabChild_creche_committe_Meta!.modified!);
+      // Validate().saveString(Validate.crecheCommitteUpdateDate,
+      //     crecheCommitteMetaFields.tabChild_creche_committe_Meta!.modified!);
 
       if (only == false) {
         await callCashBookExpensesMetaApi(userName, password, token, false);
@@ -2536,8 +2596,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertCashBookExpensesMeta(cashbookExpensesMetaFields);
 
-      Validate().saveString(Validate.cashbookExpencesMetaUpdateDate,
-          cashbookExpensesMetaFields.tab_cashbook_expenses!.modified!);
+      // Validate().saveString(Validate.cashbookExpencesMetaUpdateDate,
+      //     cashbookExpensesMetaFields.tab_cashbook_expenses!.modified!);
       if (only == false) {
         await checkinFieldsMeta(userName, password, token, false);
       } else
@@ -2579,8 +2639,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertCashBookreceiptMeta(cashbookReceiptMetaFields);
 
-      Validate().saveString(Validate.cashbookRecieptMetaUpdateDate,
-          cashbookReceiptMetaFields.tab_cashbook_receipt!.modified!);
+      // Validate().saveString(Validate.cashbookRecieptMetaUpdateDate,
+      //     cashbookReceiptMetaFields.tab_cashbook_receipt!.modified!);
       if (role == 'Cluster Coordinator') {
         await callCMCCCMetaApi(userName, password, token, false);
       } else if (role == 'Creche Supervisor') {
@@ -2629,8 +2689,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertcmcALMData(cmcALMMEtaFields);
 
-      Validate().saveString(Validate.crecheMonitoringMeta,
-          cmcALMMEtaFields.tabCreche_Monitoring_CheckList_ALM!.modified!);
+      // Validate().saveString(Validate.crecheMonitoringMeta,
+      //     cmcALMMEtaFields.tabCreche_Monitoring_CheckList_ALM!.modified!);
       Navigator.pop(context);
     } else if (responce.statusCode == 401) {
       Navigator.pop(context);
@@ -2669,8 +2729,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertcmcCBMData(cmcCBMMEtaFields);
 
-      Validate().saveString(Validate.crecheMonitoringMeta,
-          cmcCBMMEtaFields.tabCreche_Monitoring_CheckList_CBM!.modified!);
+      // Validate().saveString(Validate.crecheMonitoringMeta,
+      //     cmcCBMMEtaFields.tabCreche_Monitoring_CheckList_CBM!.modified!);
       Navigator.pop(context);
     } else if (responce.statusCode == 401) {
       Navigator.pop(context);
@@ -2709,8 +2769,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertcmcCCData(cmcCCMEtaFields);
 
-      Validate().saveString(Validate.crecheMonitoringMeta,
-          cmcCCMEtaFields.tabCreche_Monitoring_CheckList_CC!.modified!);
+      // Validate().saveString(Validate.crecheMonitoringMeta,
+      //     cmcCCMEtaFields.tabCreche_Monitoring_CheckList_CC!.modified!);
       Navigator.pop(context);
     } else if (responce.statusCode == 401) {
       Navigator.pop(context);
@@ -2750,8 +2810,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertCrecheMonitoringMeta(childExitMetaFields);
 
-      Validate().saveString(
-          Validate.crecheMonitoringMeta, childExitMetaFields.meta!.modified!);
+      // Validate().saveString(
+      //     Validate.crecheMonitoringMeta, childExitMetaFields.meta!.modified!);
       Navigator.pop(context);
     } else if (response.statusCode == 401) {
       Navigator.pop(context);
@@ -2798,8 +2858,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertVillageProfileMeta(villageProfileMetaFields);
 
-      Validate().saveString(Validate.villageProfileUpdateDate,
-          villageProfileMetaFields.tab_village!.modified!);
+      // Validate().saveString(Validate.villageProfileUpdateDate,
+      //     villageProfileMetaFields.tab_village!.modified!);
 
       if (only == false) {
         // await stockMetaData(userName, password, token, false);
@@ -2852,8 +2912,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       await callInsertCheckInFields(checkInMetaFields);
 
-      Validate().saveString(Validate.chechInUpdateDate,
-          checkInMetaFields.tab_checkin_meta!.modified!);
+      // Validate().saveString(Validate.chechInUpdateDate,
+      //     checkInMetaFields.tab_checkin_meta!.modified!);
 
       // await callCashBookReceiptMetaApi(userName, password, token);
       if (only == false) {
@@ -2888,6 +2948,9 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     }
   }
 
+
+
+
   Future<int> callCountForUpload() async {
     showLoaderDialog(context);
     var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
@@ -2920,9 +2983,6 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         await CrecheCommittieResponnseHelper().getCrecheCommittieForUpload();
     var cashBookDataExpences = await CashBookResponseExpencesHelper()
         .getEditedCashBookForExpenceUpload();
-    // var stockData = await StockResponseHelper().getStockForUpload();
-    // var requisitionData =
-    //     await RequisitionResponseHelper().getRequisitonsForUpload();
 
     var cashBookDataReciept = await CashBookReceiptResponseHelper()
         .getEditedCashBookReceiptForUpload();
@@ -2956,12 +3016,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         ccmData.length +
         cashBookDataExpences.length +
         villageProfiles.length +
-        ImageFileData.length
-        +
-        // stockData.length +
-        // requisitionData.length +
-        cashBookDataReciept.length
-    ;
+        ImageFileData.length +
+        cashBookDataReciept.length;
 
     return totalPendingCount;
   }

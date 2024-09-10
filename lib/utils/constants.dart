@@ -30,4 +30,5 @@ class Constants {
   // Color constants
   static Color buttonVioletColor = const Color(0xff393185);
   static Color pinkThemeColor = const Color(0xffDB4B73);
+
 }

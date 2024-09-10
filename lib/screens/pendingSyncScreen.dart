@@ -3617,7 +3617,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
             return;
           }
-        } else {
+        }
+        else {
           var responce =
               await HHDataUploadApi().uploadHHData(token!, resultMap);
           if (responce.statusCode == 200) {
