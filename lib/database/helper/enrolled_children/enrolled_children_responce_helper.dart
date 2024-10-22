@@ -84,6 +84,30 @@ class EnrolledChilrenResponceHelper {
     return items;
   }
 
+  Future<List<HouseHoldTabResponceMosdel>> callChildrenForUploadEditOrDarft() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery('select * from enrollred_chilren_responce where is_edited=1 or is_edited=2');
+    List<HouseHoldTabResponceMosdel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(HouseHoldTabResponceMosdel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
+  Future<List<HouseHoldTabResponceMosdel>> callChildrenForUploadOnly() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery('select * from enrollred_chilren_responce where is_edited=1 and name is null');
+    List<HouseHoldTabResponceMosdel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(HouseHoldTabResponceMosdel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<HouseHoldTabResponceMosdel>> getCrecheUploadeItems() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'select * from enrollred_chilren_responce where is_edited=0 and is_uploaded=1');
@@ -127,16 +151,7 @@ class EnrolledChilrenResponceHelper {
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> callEnrollChildrenAll() async {
-    var query =
-        'Select * from (select * from enrollred_exit_child_responce WHERE CHHGUID in(Select CHHGUID from house_hold_children) and date_of_exit isnull ) ens left join (select hhRes.HHGUID,hhRes.responces as hhResponce,chre.CHHGUID from house_hold_responce hhRes INNER join house_hold_children as  chre on hhRes.HHGUID=chre.HHGUID) as hhs on hhs.CHHGUID=ens.CHHGUID ORDER BY CASE  WHEN ens.update_at IS NOT NULL AND length(RTRIM(LTRIM(ens.update_at))) > 0 THEN ens.update_at ELSE ens.created_at END DESC';
 
-    List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery(query);
-
-
-    return result;
-  }
 
   Future<List<EnrolledChildrenResponceModel>> enrolledChildByCreche(int crecheIdName) async {
     var query =
@@ -222,8 +237,7 @@ class EnrolledChilrenResponceHelper {
             //         element['hhResponce'], 'verification_status') ==
             //     "4"
             //     &&
-                (filterDataForEnrolledChild(element)>=7 && filterDataForEnrolledChild(element)<=36)
-            && (Global.getItemValues(element['hhResponce'], 'village_id') ==
+               (Global.getItemValues(element['hhResponce'], 'village_id') ==
                 villageId.toString()
             )
     )

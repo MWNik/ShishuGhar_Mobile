@@ -59,17 +59,6 @@ class ChildExitResponceHelper {
     return items;
   }
 
-  Future<List<Map<String, dynamic>>> childExtedlistingByCreche(
-      int? crecheIdName,
-      ) async {
-    var query = 'select cer.*,ecr.responces as ecrResponce from child_exit_responce cer left join enrollred_chilren_responce as ecr on cer.childenrolledguid =ecr.ChildEnrollGUID where cer.creche_id =? ORDER BY CASE  WHEN cer.update_at IS NOT NULL AND length(RTRIM(LTRIM(cer.update_at))) > 0 THEN cer.update_at ELSE cer.created_at END DESC';
-
-    List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query, [crecheIdName]);
-
-
-    return result;
-  }
 
   Future<List<ChildExitTabResponceModel>> childEventsByChild(
       String? crecheIdName, String? childenrolledguid) async {
@@ -167,7 +156,7 @@ class ChildExitResponceHelper {
   Future<List<Map<String, dynamic>>> exitedChildHistoryByEnrollChildGUID(
       String? childenrolledguid) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-        'select ecr.*,cr.responces as crResponces from enrollred_exit_child_responce ecr left join tab_creche_response as cr on ecr.creche_id=cr.name where ecr.CHHGUID=(select CHHGUID from enrollred_exit_child_responce where ChildEnrollGUID=?) and ecr.date_of_exit NOTNULL',[childenrolledguid]);
+        'select ecr.*,cr.responces as crResponces from enrollred_exit_child_responce ecr left join tab_creche_response as cr on ecr.creche_id=cr.name where ecr.CHHGUID=(select CHHGUID from enrollred_exit_child_responce where ChildEnrollGUID=?) and ecr.date_of_exit NOTNULL ',[childenrolledguid]);
 
 
     return result;
@@ -184,10 +173,10 @@ class ChildExitResponceHelper {
   Future<List<Map<String, dynamic>>> childExtedlistingByCrechenew(
       int? crecheIdName,
       ) async {
-    var query = 'select * from enrollred_exit_child_responce  where creche_id =? and date_of_exit NOTNULL ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
+    var query = 'select * from enrollred_exit_child_responce  where creche_id =? and date_of_exit NOTNULL ORDER BY LOWER( SUBSTR(responces, INSTR(responces, ?) + LENGTH(?) ) ) asc';
 
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query, [crecheIdName]);
+    await DatabaseHelper.database!.rawQuery(query, [crecheIdName,'child_name":"','child_name":"']);
 
 
     return result;

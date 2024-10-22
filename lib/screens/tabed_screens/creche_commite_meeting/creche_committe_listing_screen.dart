@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
 import '../../../database/helper/creche_comite_meeting/creche_committie_response_helper.dart';
@@ -29,10 +30,15 @@ class CrecheCommitteListingScreen extends StatefulWidget {
 class _CrecheCommitteListingScreenState
     extends State<CrecheCommitteListingScreen> {
   List<CrecheCommittieResponseModel> meetinglist = [];
+  List<CrecheCommittieResponseModel> filterData = [];
+  List<CrecheCommittieResponseModel> unsynchedList = [];
+  List<CrecheCommittieResponseModel> allList = [];
+  bool isOnlyUnsynched = false;
   List<Translation> translats = [];
   List<String> existingDate = [];
   String lng = 'en';
   DateTime? minDate;
+  String? role;
 
   @override
   void initState() {
@@ -41,6 +47,7 @@ class _CrecheCommitteListingScreenState
   }
 
   Future<void> initializeData() async {
+    role = (await Validate().readString(Validate.role))!;
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -57,7 +64,9 @@ class _CrecheCommitteListingScreenState
       CustomText.Village,
       CustomText.DateS,
       CustomText.MajorTopic,
-      CustomText.ccListing
+      CustomText.ccListing,
+      CustomText.all,
+      CustomText.unsynched
     ];
 
     await TranslationDataHelper()
@@ -80,193 +89,223 @@ class _CrecheCommitteListingScreenState
     var currentDateString = Validate().currentDate();
     List<int> parts = currentDateString.split('-').map(int.parse).toList();
     var backDate =
-    DateTime(parts[0], parts[1], parts[2]).subtract(Duration(days: 7));
+        DateTime(parts[0], parts[1], parts[2]).subtract(Duration(days: 7));
     if (minDate != null) {
       if (minDate!.isBefore(backDate)) {
         minDate = backDate;
       }
-    } else if(minDate == null){
+    } else if (minDate == null) {
       minDate = backDate;
     }
+
+    unsynchedList =
+        meetinglist.where((element) => element.is_edited == 1).toList();
+    allList = meetinglist;
+    filterData = isOnlyUnsynched ? unsynchedList : allList;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: InkWell(
-        onTap: () async {
-          String ccGuid = '';
-          if (!Global.validString(ccGuid)) {
-            ccGuid = Validate().randomGuid();
-            var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    CrecheCommitteDetailsScreen(
-                      creche_id: widget.creche_id,
-                      ccGuid: ccGuid,
-                      isImageUpdate: false,
-                      minDate: minDate,
-                        existingList:existingDate
-                    )));
-            if (refStatus == 'itemRefresh') {
-              await fetchCommittieMeetingrecords();
-            }
-          }
-        },
-        child: Image.asset(
-          "assets/add_btn.png",
-          scale: 2.7,
-          color: Color(0xff5979AA),
-        ),
-      ),
+      floatingActionButton: role == CustomText.crecheSupervisor.trim()
+          ? InkWell(
+              onTap: () async {
+                String ccGuid = '';
+                if (!Global.validString(ccGuid)) {
+                  ccGuid = Validate().randomGuid();
+                  var refStatus = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              CrecheCommitteDetailsScreen(
+                                  creche_id: widget.creche_id,
+                                  ccGuid: ccGuid,
+                                  isImageUpdate: false,
+                                  minDate: minDate,
+                                  existingList: existingDate)));
+                  if (refStatus == 'itemRefresh') {
+                    await fetchCommittieMeetingrecords();
+                  }
+                }
+              },
+              child: Image.asset(
+                "assets/add_btn.png",
+                scale: 2.7,
+                color: Color(0xff5979AA),
+              ),
+            )
+          : SizedBox(),
       appBar: CustomAppbar(
         text: Global.returnTrLable(translats, CustomText.ccListing, lng),
         subTitle: widget.crecheName,
         onTap: () => Navigator.pop(context, 'itemRefresh'),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
+        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
         child: Column(children: [
-          Expanded(
-            child: (meetinglist.length > 0)
-                ? ListView.builder(
-                itemCount: meetinglist.length,
-                shrinkWrap: true,
-                physics: BouncingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () async {
-                      var created_at = DateTime.parse(
-                          meetinglist[index].created_at.toString());
-                      var date = DateTime(created_at.year, created_at.month,
-                          created_at.day);
-                      bool isUneditable = date
-                          .add(Duration(days: 7))
-                          .isBefore(
-                          DateTime.parse(Validate().currentDate()));
-                      if (existingDate.contains(Global.getItemValues(
-                          meetinglist[index].responces, 'meeting_date'))) {
-                        var currentRecordDate = Global.getItemValues(
-                            meetinglist[index].responces, 'meeting_date');
-                        existingDate.remove(currentRecordDate);
-                      }
-
-                      var ccGuid = meetinglist[index].ccguid;
-                      if (Global.validString(ccGuid)) {
-                        var refStatus = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                isUneditable ? CrecheCommitteDetailsViewScreen(
-                                  creche_id: widget.creche_id,
-                                  ccGuid: ccGuid,
-                                ) : CrecheCommitteDetailsScreen(
-                                    creche_id: widget.creche_id,
-                                    ccGuid: ccGuid,
-                                    minDate: minDate,
-                                    existingList:existingDate,
-                                    isImageUpdate: Global.validString(
-                                        Global.getItemValues(
-                                            meetinglist[index]
-                                                .responces!,
-                                            'image')))));
-
-                        if (refStatus == 'itemRefresh') {
-                          await fetchCommittieMeetingrecords();
-                        }
-                      }
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5.h),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: Color(0xffE7F0FF)),
-                            borderRadius: BorderRadius.circular(10.r)),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10.w, vertical: 8.h),
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${Global.returnTrLable(
-                                          translats, CustomText.DateS, lng).trim()} : ',
-                                      style: Styles.black104,
-                                    ),
-                                    Text(
-                                      '${Global.returnTrLable(
-                                          translats, CustomText.MajorTopic, lng)
-                                          .trim()} : ',
-                                      style: Styles.black104,
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(width: 10),
-                                SizedBox(
-                                  height: 10.h,
-                                  width: 2,
-                                  child: VerticalDivider(
-                                    color: Color(0xffE6E6E6),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        Validate().displeDateFormate(
-                                            Global.getItemValues(
-                                                meetinglist[index]
-                                                    .responces!,
-                                                'meeting_date')),
-                                        style: Styles.blue125,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        Global.getItemValues(
-                                            meetinglist[index].responces!,
-                                            'major_topic'),
-                                        style: Styles.blue125,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: 5),
-                                (meetinglist[index].is_edited == 0 &&
-                                    meetinglist[index].is_uploaded == 1)
-                                    ? Image.asset(
-                                  "assets/sync.png",
-                                  scale: 1.5,
-                                )
-                                    : Image.asset(
-                                  "assets/sync_gray.png",
-                                  scale: 1.5,
-                                )
-                              ]),
-                        ),
-                      ),
+          role == CustomText.crecheSupervisor
+              ? Container(
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: AnimatedRollingSwitch(
+                      title1:
+                          Global.returnTrLable(translats, CustomText.all, lng),
+                      title2: Global.returnTrLable(
+                          translats, CustomText.unsynched, lng),
+                      isOnlyUnsynched: isOnlyUnsynched ?? false,
+                      onChange: (value) async {
+                        setState(() {
+                          isOnlyUnsynched = value;
+                        });
+                        await fetchCommittieMeetingrecords();
+                      },
                     ),
-                  );
-                })
+                  ),
+                )
+              : SizedBox(),
+          Expanded(
+            child: (filterData.length > 0)
+                ? ListView.builder(
+                    itemCount: filterData.length,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          var created_at = DateTime.parse(
+                              filterData[index].created_at.toString());
+                          var date = DateTime(created_at.year, created_at.month,
+                              created_at.day);
+                          bool isUneditable =
+                              role == CustomText.crecheSupervisor.trim()
+                                  ? date.add(Duration(days: 7)).isBefore(
+                                      DateTime.parse(Validate().currentDate()))
+                                  : true;
+                          if (existingDate.contains(Global.getItemValues(
+                              filterData[index].responces, 'meeting_date'))) {
+                            var currentRecordDate = Global.getItemValues(
+                                filterData[index].responces, 'meeting_date');
+                            existingDate.remove(currentRecordDate);
+                          }
+
+                          var ccGuid = filterData[index].ccguid;
+                          if (Global.validString(ccGuid)) {
+                            var refStatus = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        isUneditable
+                                            ? CrecheCommitteDetailsViewScreen(
+                                                creche_id: widget.creche_id,
+                                                ccGuid: ccGuid,
+                                              )
+                                            : CrecheCommitteDetailsScreen(
+                                                creche_id: widget.creche_id,
+                                                ccGuid: ccGuid,
+                                                minDate: minDate,
+                                                existingList: existingDate,
+                                                isImageUpdate:
+                                                    Global.validString(
+                                                        Global.getItemValues(
+                                                            filterData[index]
+                                                                .responces!,
+                                                            'image')))));
+
+                            if (refStatus == 'itemRefresh') {
+                              await fetchCommittieMeetingrecords();
+                            }
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.h),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: Color(0xffE7F0FF)),
+                                borderRadius: BorderRadius.circular(10.r)),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w, vertical: 8.h),
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} : ',
+                                          style: Styles.black104,
+                                        ),
+                                        Text(
+                                          '${Global.returnTrLable(translats, CustomText.MajorTopic, lng).trim()} : ',
+                                          style: Styles.black104,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 10.h,
+                                      width: 2,
+                                      child: VerticalDivider(
+                                        color: Color(0xffE6E6E6),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            Validate().displeDateFormate(
+                                                Global.getItemValues(
+                                                    filterData[index]
+                                                        .responces!,
+                                                    'meeting_date')),
+                                            style: Styles.cardBlue10,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.getItemValues(
+                                                filterData[index].responces!,
+                                                'major_topic'),
+                                            style: Styles.cardBlue10,
+                                            maxLines: 1,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    (filterData[index].is_edited == 0 &&
+                                            filterData[index].is_uploaded == 1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : Image.asset(
+                                            "assets/sync_gray.png",
+                                            scale: 1.5,
+                                          )
+                                  ]),
+                            ),
+                          ),
+                        ),
+                      );
+                    })
                 : Center(
-              child: Text(Global.returnTrLable(
-                  translats, CustomText.NorecordAvailable, lng)),
-            ),
+                    child: Text(Global.returnTrLable(
+                        translats, CustomText.NorecordAvailable, lng)),
+                  ),
           )
         ]),
       ),
@@ -282,5 +321,4 @@ class _CrecheCommitteListingScreenState
   //     });
   //   }
   // }
-
 }

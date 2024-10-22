@@ -23,10 +23,12 @@ import 'village_profile_tabItem_screen.dart';
 
 class VillageProfileTabScreen extends StatefulWidget {
   final int name;
+  final bool isEditable;
 
   const VillageProfileTabScreen({
     super.key,
     required this.name,
+    required this.isEditable,
   });
 
   @override
@@ -151,13 +153,15 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
       if (tabBreakItems[i].fieldname != 'demographical_profile') {
         tabItem.add(VillageProfileTbaItem(
             vName: widget.name,
+            isEditable: widget.isEditable,
             tabBreakItem: tabBreakItems[i],
             screenItem: expendedItems,
             changeTab: changeTab,
             tabIndex: i,
             totalTab: tabBreakItems.length));
       } else {
-        tabItem.add(DemograficalListingScreen(vName: widget.name));
+        tabItem.add(DemograficalListingScreen(vName: widget.name,
+          isEditable: widget.isEditable));
       }
     }
     return tabItem;

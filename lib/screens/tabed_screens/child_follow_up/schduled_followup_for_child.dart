@@ -187,7 +187,7 @@ class _ChildFollowUpsListingScreenState
                                           Text(
                                             Validate().displeDateFormate(
                                                 followUpsList[index].followup_visit_date!),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           /*Text(

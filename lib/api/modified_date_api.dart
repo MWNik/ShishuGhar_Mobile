@@ -16,21 +16,20 @@ class ModifiedDateApiService {
     String userName = prefs.getString(Validate.userName)!;
     String password = prefs.getString(Validate.Password)!;
 
-    final String apiUrl =
-        '${Constants.baseUrl}method/modified_date';
+    final String apiUrl = '${Constants.baseUrl}method/modified_date';
 
     final headers = {
       'Authorization': token,
     };
-    final body = {
-      "usr": userName,
-      "pwd": password
-    };
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: headers,body:body
-    );
-    print(response.body);
-    return response;
+    final body = {"usr": userName, "pwd": password};
+    try {
+      final response =
+          await http.post(Uri.parse(apiUrl), headers: headers, body: body);
+      print(response.body);
+      return response;
+    } catch (e) {
+      print("Error: $e");
+      return Response("Internal server eroor - $e", 500);
+    }
   }
 }

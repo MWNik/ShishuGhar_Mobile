@@ -118,10 +118,6 @@ class _ChildFollowUpTabScreenState extends State<ChildFollowUpTabScreen>
             title: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  widget.tabTitle,
-                  style: Styles.white145,
-                ),
                 RichText(
                   maxLines: 2,
                   textAlign: TextAlign.center,
@@ -129,7 +125,7 @@ class _ChildFollowUpTabScreenState extends State<ChildFollowUpTabScreen>
                     WidgetSpan(
                       child: Text(
                         '${widget.childName} ',
-                        style: Styles.white126P,
+                        style: Styles.white145,
                         textAlign: TextAlign.center,
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
@@ -138,14 +134,19 @@ class _ChildFollowUpTabScreenState extends State<ChildFollowUpTabScreen>
                     WidgetSpan(
                       child: Text(
                         '-${widget.childId}',
-                        style: Styles.white126P,
+                        style: Styles.white145,
                         textAlign: TextAlign.center,
                         softWrap: true,
                         // overflow: TextOverflow.ellipsis,
                       ),
                     )
                   ]),
-                )
+                ),
+                Text(
+                  widget.tabTitle,
+                  style: Styles.white126P,
+                ),
+                
               ],
             ),
             centerTitle: true,
@@ -157,7 +158,7 @@ class _ChildFollowUpTabScreenState extends State<ChildFollowUpTabScreen>
                     unselectedLabelStyle: Styles.white124P,
                     labelColor: Colors.white,
                     controller: _tabController,
-                    isScrollable: true,
+                    isScrollable: false,
                     tabs: tabController(),
                     onTap: (index) {
                       if (_tabController.indexIsChanging) {

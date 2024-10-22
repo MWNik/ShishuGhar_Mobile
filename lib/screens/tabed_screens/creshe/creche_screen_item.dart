@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_time_picker.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
@@ -14,14 +17,12 @@ import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart
 import 'package:shishughar/utils/validate.dart';
 import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
-import '../../../custom_widget/dynamic_screen_widget/custom_dynamic_image.dart';
 import '../../../custom_widget/dynamic_screen_widget/custom_dynamic_image_replica.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_yesno_checkbox.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
-import '../../../custom_widget/single_poup_dailog.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
@@ -41,7 +42,6 @@ class CrecheScreenItem extends StatefulWidget {
   final int totalTab;
   final bool isUpdate;
 
-
   const CrecheScreenItem(
       {super.key,
       required this.name,
@@ -50,8 +50,7 @@ class CrecheScreenItem extends StatefulWidget {
       required this.changeTab,
       required this.tabIndex,
       required this.totalTab,
-      required this.isUpdate
-      });
+      required this.isUpdate});
 
   @override
   _CrecheScreenItemState createState() => _CrecheScreenItemState();
@@ -69,12 +68,32 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
   String? saveNext = CustomText.Next;
   String? responce;
   String lng = "en";
-  bool isNew=true;
+  bool isNew = true;
+  String? role;
+  bool isOnlyView = false;
+  Map<String, FocusNode> _focusNode = {};
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     calinitialScreen();
+    var items = widget.screenItem[widget.tabBreakItem.name]!;
+    for (var elements in items) {
+      _focusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
+    }
+    _scrollController.addListener(() {
+      if (_scrollController.position.isScrollingNotifier.value) {
+        _focusNode.forEach((_, focusNode) => focusNode.unfocus());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _focusNode.forEach((_, focusNode) => focusNode.dispose());
+    super.dispose();
   }
 
   @override
@@ -90,6 +109,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: cWidget(widget.tabBreakItem.name!),
@@ -115,22 +135,30 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
                     ),
                   ),
                   SizedBox(width: 10),
-                  Expanded(
-                    child: CElevatedButton(
-                      color: Color(0xff5979AA),
-                      onPressed: () {
-                        saveData(1);
-                        // widget.changeTab(1);
-                      },
-                      text: Global.returnTrLable(translats, "Save", lng).trim(),
-                    ),
-                  ),
-                  SizedBox(width: 10),
+                  isOnlyView
+                      ? SizedBox()
+                      : Expanded(
+                          child: CElevatedButton(
+                            color: Color(0xff5979AA),
+                            onPressed: () {
+                              saveData(1);
+                              // widget.changeTab(1);
+                            },
+                            text: Global.returnTrLable(translats, "Save", lng)
+                                .trim(),
+                          ),
+                        ),
+                  isOnlyView ? SizedBox() : SizedBox(width: 10),
                   Expanded(
                     child: CElevatedButton(
                       color: Color(0xff369A8D),
                       onPressed: () {
-                        nextTab(1);
+                        if (isOnlyView == false) {
+                          nextTab(1);
+                        } else {
+                          widget.changeTab(1);
+                          setState(() {});
+                        }
                         // widget.changeTab(1);
                       },
                       text:
@@ -178,6 +206,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -185,6 +214,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
+          readable: isOnlyView ? true : null,
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
@@ -197,13 +227,14 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         );
       case 'Date':
         return CustomDatepickerDynamic(
+          focusNode: _focusNode[quesItem.fieldname],
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           calenderValidate: [],
-
+          readable: isOnlyView ? true : null,
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
             var logData = DependingLogic()
@@ -221,6 +252,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -229,7 +261,9 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: isOnlyView
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
@@ -243,13 +277,16 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: isOnlyView
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
@@ -289,31 +326,37 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
       //   );
       case 'Attach':
         return CustomImageDynamicReplica(
-          isDelitable: widget.isUpdate == true?false:true,
+          // isDelitable: widget.isUpdate == true ? false : true,
+          isDelitable: true,
           docType: CustomText.Creches,
           child_guid: widget.name.toString(),
-          readable: widget.isUpdate,
+          readable: isOnlyView,
           assetPath: myMap[quesItem.fieldname!],
           titleText:
-          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          onChanged: (value) async {
-          },
+          onChanged: (value) async {},
           onDelete: (value) async {
-            setState(() {
+            if (value) {
               myMap.remove(quesItem.fieldname);
-            });
+              // myMap[quesItem.fieldname!] = "duduludutdu";
+              setState(() {});
+            }
           },
           onName: (value) async {
-            myMap[quesItem.fieldname!] = value;
-            await saveImageInDatabase(value,Global.validToString(quesItem.fieldname));
-            setState(() {});
+            if (Global.validString(value)) {
+              myMap[quesItem.fieldname!] = value;
+              await saveImageInDatabase(
+                  value, Global.validToString(quesItem.fieldname));
+              setState(() {});
+            }
           },
         );
       case 'Long Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           maxline: 3,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
@@ -322,7 +365,9 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: isOnlyView
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isVisible:
@@ -343,7 +388,9 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: isOnlyView
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
@@ -357,12 +404,15 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: isOnlyView
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialvalue: myMap[quesItem.fieldname!],
@@ -378,13 +428,16 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         );
       case 'Small Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: isOnlyView
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -400,8 +453,34 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
               ? Global.returnTrLable(translats, quesItem.label!.trim(), lng)
               : CustomText.UpdateLocation,
           onPressed: () {
-            checkPermissionStatus(quesItem.fieldname!);
+            if (isOnlyView == false) {
+              checkPermissionStatus(quesItem.fieldname!);
+            }
           },
+        );
+      case 'Time':
+        return CustomTimepickerDynamic(
+          initialvalue: myMap[quesItem.fieldname!],
+          fieldName: quesItem.fieldname,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          onChanged: (value) {
+            myMap[quesItem.fieldname!] = value;
+            var logData = DependingLogic()
+                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            if (logData.isNotEmpty) {
+              if (logData.keys.length > 0) {
+                myMap.addEntries(
+                    [MapEntry(logData.keys.first, logData.values.first)]);
+                setState(() {});
+              }
+            }
+          },
+          titleText:
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
         );
       default:
         return SizedBox();
@@ -409,7 +488,6 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
     lng = (await Validate().readString(Validate.sLanguage))!;
     var alredRecord =
         await CrecheDataHelper().getCrecheResponceItem(widget.name);
@@ -444,13 +522,13 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
               defaultDisableDailog(items[i].fieldname!, items[i].options!);
             } else if (items[i].options == 'Days Of Week') {
               await OptionsModelHelper()
-                  .callDayOfWeekMstCommonOptions(items[i].options!.trim(),lng)
+                  .callDayOfWeekMstCommonOptions(items[i].options!.trim(), lng)
                   .then((data) {
                 options.addAll(data);
               });
             } else {
               await OptionsModelHelper()
-                  .getLocationData(items[i].options!.trim(), responseData,lng)
+                  .getLocationData(items[i].options!.trim(), responseData, lng)
                   .then((data) {
                 options.addAll(data);
               });
@@ -467,7 +545,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
     }
     print("item v ${defaultCommon.length}");
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((data) {
       options.addAll(data);
     });
@@ -490,12 +568,15 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
   }
 
   Future<void> calinitialScreen() async {
+    role = (await Validate().readString(Validate.role))!;
+    userName = (await Validate().readString(Validate.userName))!;
     translats.clear();
     await setLabelTextData();
     await TranslationDataHelper()
         .callCresheTranslate()
         .then((value) => translats.addAll(value));
     await callScrenControllers(CustomText.Creches);
+    isOnlyView = role == CustomText.crecheSupervisor.trim() ? false : true;
     setState(() {
       _isLoading = false;
     });
@@ -700,12 +781,101 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
           'Latitude: ${currentLocation.latitude}, Longitude: ${currentLocation.longitude}');
       myMap['latitude'] = '${currentLocation.latitude}';
       myMap['longitude'] = '${currentLocation.longitude}';
-      myMap[fieldName] = '${currentLocation.latitude},${currentLocation.longitude}';
+      myMap[fieldName] =
+          '${currentLocation.latitude},${currentLocation.longitude}';
       isNew = false;
       setState(() {});
       // Navigator.pop(context);
     } catch (e) {
       // Handle errors, such as no GPS signal or permissions denied
+      print('Error getting location: $e');
+    } finally {
+      Navigator.pop(context);
+    }
+  }
+
+
+  Future<Position> getCurrentPositionWithTimeout() async {
+    int retryCount = 0;
+
+    // Retry loop to get current location
+    while (retryCount < 2) {
+      try {
+        // Attempt to get the current position with a 10-second timeout
+        var position = await Geolocator.getCurrentPosition()
+            .timeout(Duration(seconds: 10));
+        return position;  // If successful, return the position
+      } catch (e) {
+        if (e is TimeoutException) {
+          retryCount++;
+          print('Timeout reached, retrying... ($retryCount)');
+          await Future.delayed(Duration(seconds: 1));  // Wait before retrying
+        } else {
+          try {
+            // Fallback to Location package if Geolocator fails
+            final locationData = await Location().getLocation();
+            if (locationData.latitude != null && locationData.longitude != null) {
+              return Position(
+                latitude: locationData.latitude ?? 0.0,
+                longitude: locationData.longitude ?? 0.0,
+                altitude: locationData.altitude ?? 0.0,
+                accuracy: locationData.accuracy ?? 0.0,
+                heading: locationData.heading ?? 0.0,
+                speed: locationData.speed ?? 0.0,
+                speedAccuracy: locationData.speedAccuracy ?? 0.0,
+                timestamp: locationData.time != null
+                    ? DateTime.fromMillisecondsSinceEpoch(
+                    locationData.time!.toInt())
+                    : DateTime.now(),
+                altitudeAccuracy: locationData.accuracy ?? 0.0,
+                headingAccuracy: locationData.accuracy ?? 0.0,
+              );
+            } else {
+              // If Location package fails, fallback to last known position
+              Position? lastKnownPosition =
+              await Geolocator.getLastKnownPosition();
+              if (lastKnownPosition != null) {
+                return lastKnownPosition;  // Return the last known position if available
+              }else
+                rethrow;  // Rethrow if no valid data found
+            }
+          } catch (e) {
+            print('Error using Location package: $e');
+            // Try to get the last known position as a final fallback
+            Position? lastKnownPosition =
+            await Geolocator.getLastKnownPosition();
+            if (lastKnownPosition != null) {
+              return lastKnownPosition;  // Return last known position
+            }else
+              rethrow;  // If all options fail, rethrow the error
+          }
+        }
+      }
+    }
+
+    // If both retries and fallbacks fail, throw TimeoutException
+    throw TimeoutException(
+        'Failed to get current position after $retryCount retries and no valid last known position.');
+  }
+
+  Future<void> _getLocation(String fieldName) async {
+    try {
+      showLoaderDialog(context);
+
+      final currentLocation = await getCurrentPositionWithTimeout();
+
+      myMap['latitude'] = '${currentLocation.latitude}';
+      myMap['longitude'] = '${currentLocation.longitude}';
+      myMap[fieldName] =
+          '${currentLocation.latitude},${currentLocation.longitude}';
+      isNew = false;
+      setState(() {});
+    } catch (e) {
+      if (e is TimeoutException) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Location not get please try again.")));
+      }
       print('Error getting location: $e');
     } finally {
       Navigator.pop(context);
@@ -760,13 +930,12 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
       if (!serviceEnabled) {
         return;
       } else {
-        await getLocation(fieldName);
+        await _getLocation(fieldName);
       }
     } else {
-      await getLocation(fieldName);
+      await _getLocation(fieldName);
     }
   }
-
 
   showLoaderDialog(BuildContext context) {
     showDialog(
@@ -791,9 +960,9 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
     );
   }
 
-  saveImageInDatabase(String imageName,String imageFieldName) async {
-    var item = await ImageFileTabHelper().getImageByDoctypeId(
-        widget.name.toString(), CustomText.Creches);
+  saveImageInDatabase(String imageName, String imageFieldName) async {
+    var item = await ImageFileTabHelper()
+        .getImageByDoctypeId(widget.name.toString(), CustomText.Creches);
     var items = ImageFileTabResponceModel(
       image_name: imageName,
       doctype: CustomText.Creches,

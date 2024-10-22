@@ -11,6 +11,7 @@ import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/enrolled_children/enrolled_children_field_helper.dart';
+import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
@@ -29,20 +30,21 @@ class EnrolledExitChilrenTab extends StatefulWidget {
   static String? childName;
   final bool isImageUpdate;
   final bool isEditable;
-   String? minDate;
+  String? minDate;
+  String? childId;
 
-  EnrolledExitChilrenTab({
-    super.key,
-    required this.CHHGUID,
-    required this.HHGUID,
-    required this.HHname,
-    required this.crecheId,
-    required this.EnrolledChilGUID,
-    required this.isNew,
-    required this.isImageUpdate,
-    required this.isEditable,
-     this.minDate
-  });
+  EnrolledExitChilrenTab(
+      {super.key,
+      required this.CHHGUID,
+      required this.HHGUID,
+      required this.HHname,
+      required this.crecheId,
+      required this.EnrolledChilGUID,
+      required this.isNew,
+      required this.isImageUpdate,
+      required this.isEditable,
+      this.minDate,
+      this.childId});
 
   @override
   _EnrolledChilrenTabState createState() => _EnrolledChilrenTabState();
@@ -63,7 +65,7 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
   void Function()? ontap;
   String lng = "en";
   String? role;
-
+  int? isUploaded = 0;
 
   Future<void> initializeData() async {
     lng = (await Validate().readString(Validate.sLanguage))!;
@@ -83,6 +85,7 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
     await TranslationDataHelper()
         .callTranslateEnrolledChildren()
         .then((value) => translatsLabel.addAll(value));
+
     await callScrenControllers('Child Profile');
   }
 
@@ -111,34 +114,25 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
           title: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                Global.returnTrLable(
-                        translatsLabel, CustomText.ChildEnrollment, lng)
-                    .trim(),
-                style: Styles.white145,
-              ),
-              EnrolledExitChilrenTab.childName!=null?Text(
-                EnrolledExitChilrenTab.childName!,
-                style: Styles.white145,
-              ):Text(''),
+              RichText(
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                text: TextSpan(children: [
+                  EnrolledExitChilrenTab.childName != null
+                      ? TextSpan(
+                          text: '${EnrolledExitChilrenTab.childName!}',
+                          style: Styles.white145)
+                      : TextSpan(text: ''),
+                  Global.validString(widget.childId)
+                      ? TextSpan(
+                          text:
+                              ' ${EnrolledExitChilrenTab.childName != null ? '-' : ''} ${widget.childId}',
+                          style: Styles.white145)
+                      : TextSpan(text: '')
+                ]),
+              )
             ],
           ),
-          actions: [
-            (role == 'Cluster Coordinator')
-                ? GestureDetector(
-                    onTap: () async {
-                      await updateVerificationStatus(context);
-                    },
-                    child: Image.asset(
-                      "assets/verify_icon.png",
-                      scale: 1.5,
-                    ),
-                  )
-                : SizedBox(),
-            SizedBox(
-              width: 10,
-            )
-          ],
           centerTitle: true,
           bottom: TabBar(
             indicatorColor: Colors.white,
@@ -177,35 +171,40 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
     for (int i = 0; i < tabBreakItems.length; i++) {
       if (tabBreakItems[i].parent == 'Child Profile') {
         tabItem.add(EnrolledChilrenTabItem(
-            isEditable: widget.isEditable,
-            HHGUID: widget.HHGUID,
-            cHHGuid: widget.CHHGUID,
-            isImageUpdate: widget.isImageUpdate,
-            crecheId:widget.crecheId,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            minDate: widget.minDate,
-            tabIndex: i,
-            isNew: widget.isNew,
-            totalTab: tabBreakItems.length));
-      }else if (tabBreakItems[i].parent == 'Child Enrollment and Exit') {
+          isEditable: widget.isEditable,
+          EnrolledChilGUID: widget.EnrolledChilGUID,
+          HHGUID: widget.HHGUID,
+          cHHGuid: widget.CHHGUID,
+          isImageUpdate: widget.isImageUpdate,
+          crecheId: widget.crecheId,
+          tabBreakItem: tabBreakItems[i],
+          screenItem: expendedItems,
+          changeTab: changeTab,
+          minDate: widget.minDate,
+          tabIndex: i,
+          isNew: widget.isNew,
+          totalTab: tabBreakItems.length,
+          isUploaded: isUploaded,
+        ));
+      } else if (tabBreakItems[i].parent == 'Child Enrollment and Exit') {
         tabItem.add(EnrolledExitChildTabItem(
-            isForExit: false,
-            isEditable: widget.isEditable,
-            EnrolledChilGUID: widget.EnrolledChilGUID,
-            cHHGuid: widget.CHHGUID,
-            isImageUpdate: widget.isImageUpdate,
-            crecheId:widget.crecheId,
-            HHname: widget.HHname,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            minDate: widget.minDate,
-            tabIndex: i,
-            isNew: widget.isNew,
-            screenType: 'Child Enrollment and Exit',
-            totalTab: tabBreakItems.length));
+          isForExit: false,
+          isEditable: widget.isEditable,
+          EnrolledChilGUID: widget.EnrolledChilGUID,
+          cHHGuid: widget.CHHGUID,
+          isImageUpdate: widget.isImageUpdate,
+          crecheId: widget.crecheId,
+          HHname: widget.HHname,
+          tabBreakItem: tabBreakItems[i],
+          screenItem: expendedItems,
+          changeTab: changeTab,
+          minDate: widget.minDate,
+          tabIndex: i,
+          isNew: widget.isNew,
+          screenType: 'Child Enrollment and Exit',
+          totalTab: tabBreakItems.length,
+          isUploaded: isUploaded,
+        ));
       }
     }
     return tabItem;
@@ -250,7 +249,6 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
     return tabItem;
   }
 
-
   Future<void> callScrenControllers(screen_type) async {
     List<HouseHoldFielItemdModel> allItems = [];
     var lngtr = await Validate().readString(Validate.sLanguage);
@@ -274,7 +272,7 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
       var tabsItems = allItems
           .where((element) => element.fieldtype == CustomText.tabBreak)
           .toList();
-      tabBreakItems=tabsItems;
+      tabBreakItems = tabsItems;
     });
 
     for (int i = 0; i < tabBreakItems.length; i++) {
@@ -297,37 +295,43 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
     // for children
 
     print("expendedItemsItem ${tabBreakItems}");
-    var childProfile=allItems.where((element) => element.parent=='Child Profile').toList();
-    var childEnrolled=allItems.where((element) => element.parent=='Child Enrollment and Exit').toList();
+    var childProfile =
+        allItems.where((element) => element.parent == 'Child Profile').toList();
+    var childEnrolled = allItems
+        .where((element) => element.parent == 'Child Enrollment and Exit')
+        .toList();
     for (int i = 0; i < tabBreakItems.length; i++) {
       if (i < (tabBreakItems.length) - 1) {
-        if(tabBreakItems[i].parent=='Child Enrollment and Exit'){
+        if (tabBreakItems[i].parent == 'Child Enrollment and Exit') {
           expendedItems[tabBreakItems[i].name!] = childEnrolled;
-        }else {
+        } else {
           var filtredItem = childProfile
               .where((element) =>
-          element.idx! > tabBreakItems[i].idx! &&
-              element.idx! < tabBreakItems[i + 1].idx!)
+                  element.idx! > tabBreakItems[i].idx! &&
+                  element.idx! < tabBreakItems[i + 1].idx!)
               .toList();
           expendedItems[tabBreakItems[i].name!] = filtredItem;
         }
       } else {
-        if(tabBreakItems[i].parent=='Child Enrollment and Exit'){
+        if (tabBreakItems[i].parent == 'Child Enrollment and Exit') {
           expendedItems[tabBreakItems[i].name!] = childEnrolled;
-        }else {
+        } else {
           var filtredItem = childProfile
               .where((element) => element.idx! > tabBreakItems[i].idx!)
               .toList();
           expendedItems[tabBreakItems[i].name!] = filtredItem;
         }
-
       }
     }
-
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     // _tabController.addListener(handleTabChange);
 
+    var record = await EnrolledExitChilrenResponceHelper()
+        .callChildrenResponce(widget.EnrolledChilGUID);
+    if (record.isNotEmpty) {
+      isUploaded = record.first.is_uploaded;
+    }
     setState(() {
       _isLoading = false;
     });
@@ -349,71 +353,129 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
     bool returnStatus = false;
     var alredRecord = await EnrolledExitChilrenResponceHelper()
         .callChildrenResponce(widget.EnrolledChilGUID);
+    // var enrolledChild = await EnrolledChilrenResponceHelper()
+    //     .callChildrenResponce(widget.CHHGUID,widget.HHGUID);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
-      EnrolledExitChilrenTab.childName=responseData['child_name'];
+      EnrolledExitChilrenTab.childName = responseData['child_name'];
       var items = expendedItems[tabBreakItems[index].name];
       // if (!returnStatus) {
-        if (items != null && items.isNotEmpty) {
-          for (int i = 0; i < items.length; i++) {
-            if (responseData.containsKey(items[i].fieldname)) {
-              print("Condition met for tab $index");
-              returnStatus = true;
-              break;
-            }
+      if (items != null && items.isNotEmpty) {
+        for (int i = 0; i < items.length; i++) {
+          if (responseData.containsKey(items[i].fieldname)) {
+            print("Condition met for tab $index");
+            returnStatus = true;
+            break;
           }
         }
+      }
       // }
       if (!returnStatus) {
         var nextco = (_tabController.index + 1);
         if (nextco == index) {
           var items = expendedItems[tabBreakItems[_tabController.index].name];
           for (int i = 0; i < items!.length; i++) {
-            if (items[i].reqd==1 && !responseData.containsKey(items[i].fieldname)) {
+            if (items[i].reqd == 1 &&
+                !responseData.containsKey(items[i].fieldname)) {
               returnStatus = false;
               break;
             }
-            if ( returnStatus && responseData.containsKey(items[i].fieldname)) {
+            if (returnStatus && responseData.containsKey(items[i].fieldname)) {
               print("Condition met for tab $index");
               returnStatus = true;
               break;
             }
-
-
-
           }
         }
       }
+      // if (!returnStatus) {
+      //   if(enrolledChild.length>0){
+      //     Map<String, dynamic> enResponce = jsonDecode(enrolledChild.first.responces!);
+      //     var nextco = (_tabController.index + 1);
+      //     if (nextco == index) {
+      //       var items = expendedItems[tabBreakItems[_tabController.index].name];
+      //       for (int i = 0; i < items!.length; i++) {
+      //         if (items[i].reqd==1 && !enResponce.containsKey(items[i].fieldname)) {
+      //           returnStatus = false;
+      //           break;
+      //         }
+      //         if (returnStatus && enResponce.containsKey(items[i].fieldname)) {
+      //           print("Condition met for tab $index");
+      //           returnStatus = true;
+      //           break;
+      //         }
+      //
+      //       }
+      //     }
+      //   }
+      //
+      // }
     }
     // Return false if conditions are not met
     return returnStatus;
   }
 
-  void handleTabChange(int index) async {
-    // bool shouldChangeTab =
-    // await checkConditionsBeforeChangingTab(_tabController.index);
-    // if (!shouldChangeTab) {
-    //   // If conditions are not met, revert back to the previous tab index
-    //   setState(() {
-    //     _tabController.index = tabIndex;
-    //   });
-    // } else {
-    //   // If conditions are met, update the tabIndex
-    //   setState(() {
-    //     tabIndex = _tabController.index;
-    //   });
-    // }
-
-    // showLoaderDialog(context);
-    await checkConditionsBeforeChangingTab(index).then((value) {
-      if (value) {
-        tabIndex = index;
-        setState(() {
-          _tabController.index = tabIndex;
-        });
+  Future<bool> checkConditionsBeforeChangingTabProfile(int index) async {
+    bool returnStatus = false;
+    var alredRecord = await EnrolledChilrenResponceHelper()
+        .callChildrenResponce(widget.CHHGUID, widget.HHGUID);
+    if (alredRecord.isNotEmpty) {
+      Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
+      EnrolledExitChilrenTab.childName = responseData['child_name'];
+      var items = expendedItems[tabBreakItems[index].name];
+      if (items != null && items.isNotEmpty) {
+        for (int i = 0; i < items.length; i++) {
+          if (responseData.containsKey(items[i].fieldname)) {
+            print("Condition met for tab $index");
+            returnStatus = true;
+            break;
+          }
+        }
       }
-      // Navigator.pop(context);
-    });
+      if (!returnStatus) {
+        var nextco = (_tabController.index + 1);
+        if (nextco == index) {
+          var items = expendedItems[tabBreakItems[_tabController.index].name];
+          for (int i = 0; i < items!.length; i++) {
+            if (items[i].reqd == 1 &&
+                !responseData.containsKey(items[i].fieldname)) {
+              returnStatus = false;
+              break;
+            }
+            if (returnStatus && responseData.containsKey(items[i].fieldname)) {
+              print("Condition met for tab $index");
+              returnStatus = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+    return returnStatus;
+  }
+
+  void handleTabChange(int index) async {
+    if (index > 0) {
+      await checkConditionsBeforeChangingTabProfile(index).then((value) {
+        if (value) {
+          tabIndex = index;
+          setState(() {
+            _tabController.index = tabIndex;
+          });
+        }
+        // Navigator.pop(context);
+      });
+    } else {
+      await checkConditionsBeforeChangingTab(index).then((value) {
+        if (value) {
+          tabIndex = index;
+          setState(() {
+            _tabController.index = tabIndex;
+          });
+        }
+        // Navigator.pop(context);
+      });
+    }
   }
 
   showLoaderDialog(BuildContext context) {
@@ -440,7 +502,7 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
 
   Future<void> updateVerificationStatus(BuildContext mContext) async {
     var varyItem = await OptionsModelHelper()
-        .getMstCommonOptions('CC Verification status',lng);
+        .getMstCommonOptions('CC Verification status', lng);
     varyItem = varyItem
         .where((element) => (element.name == '2') || (element.name == '3'))
         .toList();
@@ -538,8 +600,10 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
           name,
           Global.stringToInt(responseData['creche_id'].toString()),
           responcesJs,
-          responseData['appcreated_on'],responseData['appcreated_by'],
-          responseData['app_updated_on'],responseData['app_updated_by'],
+          responseData['appcreated_on'],
+          responseData['appcreated_by'],
+          responseData['app_updated_on'],
+          responseData['app_updated_by'],
           responseData['date_of_exit']);
     }
   }

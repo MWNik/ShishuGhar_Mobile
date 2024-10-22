@@ -64,7 +64,19 @@ class CmcCCTabResponseHelper {
 
   Future<List<CmcCCResponseModel>> getCcForUpload() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-        'select * from tabCreche_Monitering_Checklist_CC_response where is_edited=1');
+        'select * from tabCreche_Monitering_Checklist_CC_response where is_edited=1 ');
+    List<CmcCCResponseModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(CmcCCResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
+  Future<List<CmcCCResponseModel>> getCcForUploadEditDarft() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from tabCreche_Monitering_Checklist_CC_response where is_edited=1 or is_edited=2');
     List<CmcCCResponseModel> items = [];
 
     result.forEach((itemMap) {

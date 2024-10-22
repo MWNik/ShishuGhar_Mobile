@@ -28,6 +28,9 @@ class _CrecheListedScreen extends State<CrecheListedScreen> {
   List<Translation> translats = [];
   List<Translation> translatsLabel = [];
   String lng = 'en';
+  bool isOnlyUnsynched = false;
+  List<CresheDatabaseResponceModel> unsynchedList = [];
+  List<CresheDatabaseResponceModel> allList = [];
 
   @override
   void initState() {

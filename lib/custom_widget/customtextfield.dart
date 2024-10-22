@@ -26,6 +26,7 @@ class CustomTextField extends StatefulWidget {
   final int? maxlength;
   final bool enabled;
   final bool isInvalid;
+  final FocusNode? focusNode;
 
   CustomTextField({
     this.errorText,
@@ -49,6 +50,7 @@ class CustomTextField extends StatefulWidget {
     this.maxlength,
     this.enabled = true,
     this.isInvalid = false,
+    this.focusNode
   });
 
   @override
@@ -71,6 +73,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             height: 3.h,
           ),
           Container(
+            
             padding: EdgeInsets.only(left: 10.w),
             height: widget.height ?? 35.h,
             width: widget.width,
@@ -83,6 +86,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               height: 35.h,
               width: widget.width,
               child: TextFormField(
+                focusNode: widget.focusNode != null?widget.focusNode:null,
                 enabled: widget.enabled,
                 readOnly: widget.readable ?? false,
                 onTap: widget.onTap,

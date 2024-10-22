@@ -74,6 +74,18 @@ class CmcCBMTabResponseHelper {
     return items;
   }
 
+  Future<List<CmcCBMResponseModel>> getCBMForUploadDarft() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from tabCreche_Monitering_Checklist_CBM_response where is_edited=1 or is_edited=2');
+    List<CmcCBMResponseModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(CmcCBMResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<void> updateUploadedItem(Map<String, dynamic> item) async {
     var hhData = item['data'];
     var cename = hhData['name'];

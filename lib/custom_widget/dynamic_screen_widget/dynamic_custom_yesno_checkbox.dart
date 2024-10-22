@@ -138,9 +138,12 @@ class _CustomCheckboxWithLabelState
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialValue != widget.initialValue) {
       _value = widget.initialValue != null ? widget.initialValue : null;
-      _character = _value == 1 ? SingingCharacter.Yes : SingingCharacter.No;
+      _character = _value == 1
+          ? SingingCharacter.Yes
+          : (_value == 0 ? SingingCharacter.No : null);
     }
   }
+
 
   @override
   void dispose() {

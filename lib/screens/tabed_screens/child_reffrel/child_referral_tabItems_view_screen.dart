@@ -90,6 +90,7 @@ class _ChildFollowUpTabItemSCreenState
   }
 
   Future<void> initializeData() async {
+    
     enrolldDate = DateTime.parse(widget.enrollDate).subtract(Duration(days: 1));
     role = await Validate().readString(Validate.role);
     userName = (await Validate().readString(Validate.userName))!;
@@ -166,8 +167,8 @@ class _ChildFollowUpTabItemSCreenState
                             .trim(),
                       ),
                     ),
-                    isWeightOnDischargeeditable?
-                    SizedBox(width: 10):SizedBox(),
+                    role==CustomText.crecheSupervisor? isWeightOnDischargeeditable?
+                    SizedBox(width: 10):SizedBox():SizedBox(),
 
                     // role == 'Creche Supervisor'
                     //     ? widget.tabIndex == (widget.totalTab - 1)
@@ -192,7 +193,7 @@ class _ChildFollowUpTabItemSCreenState
                     //         ? SizedBox()
                     //         : SizedBox(width: 10)
                     //     : SizedBox(),
-                    isWeightOnDischargeeditable?
+                   role==CustomText.crecheSupervisor? isWeightOnDischargeeditable?
                     Expanded(
                       child: CElevatedButton(
                         color: Color(0xff369A8D),
@@ -206,7 +207,8 @@ class _ChildFollowUpTabItemSCreenState
                             : Global.returnTrLable(
                                 translats, CustomText.Next, lng),
                       ),
-                    ):SizedBox()
+                    ):
+                    SizedBox():SizedBox()
                   ]),
                 )
               ]),
@@ -709,7 +711,7 @@ class _ChildFollowUpTabItemSCreenState
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
+    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;

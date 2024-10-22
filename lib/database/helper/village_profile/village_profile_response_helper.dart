@@ -55,6 +55,18 @@ class VillageProfileResponseHelper {
     return items;
   }
 
+  Future<List<VillageProfileResponseModel>> getVillageProfileforUploadDarftEdit() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery('select * from tabVillage_response where is_edited=1 or is_edited=2');
+    List<VillageProfileResponseModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(VillageProfileResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<void> updateUploadedItem(Map<String, dynamic> item) async {
     var hhData = item['data'];
     var cename = hhData['name'];

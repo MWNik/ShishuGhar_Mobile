@@ -89,6 +89,7 @@ class _ChildImmunizationExpendedScreenSatet
 
 
   Future<void> initializeData() async {
+     userName = (await Validate().readString(Validate.userName))!;
     lng = (await Validate().readString(Validate.sLanguage))!;
     var dateTime=Global.stringToDate(Global.getItemValues(widget.enrolledItem!.responces!, 'child_dob')) ;
     childAgeInDays=Validate().calculateAgeInDays(dateTime!);
@@ -624,7 +625,7 @@ class _ChildImmunizationExpendedScreenSatet
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
+   
 
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {

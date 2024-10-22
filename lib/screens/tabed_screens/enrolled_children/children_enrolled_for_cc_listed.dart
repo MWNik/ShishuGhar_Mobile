@@ -1,6 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
+import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/style/styles.dart';
@@ -25,7 +26,8 @@ import 'enrolled_children_tab.dart';
 class EnrolledChildrenForCC extends StatefulWidget {
   // final String creCheName;
 
-  const EnrolledChildrenForCC({super.key,
+  const EnrolledChildrenForCC({
+    super.key,
     // required this.creCheName
   });
 
@@ -34,8 +36,7 @@ class EnrolledChildrenForCC extends StatefulWidget {
       _EnrolledChildrenListedScreenState();
 }
 
-class _EnrolledChildrenListedScreenState
-    extends State<EnrolledChildrenForCC> {
+class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
   TextEditingController Searchcontroller = TextEditingController();
   List<Map<String, dynamic>> childHHData = [];
   List<Map<String, dynamic>> filterData = [];
@@ -51,6 +52,9 @@ class _EnrolledChildrenListedScreenState
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int? maxAgeLimit;
   int? minAgeLimit;
+  bool isOnlyUnsyched = false;
+  List<Map<String, dynamic>> usynchedList = [];
+  List<Map<String, dynamic>> allList = [];
 
   @override
   void initState() {
@@ -64,10 +68,9 @@ class _EnrolledChildrenListedScreenState
     if (lngtr != null) {
       lng = lngtr;
     }
-    genderList = await OptionsModelHelper().getMstCommonOptions('Gender',lng);
+    genderList = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
 
-    creches =
-        await OptionsModelHelper().callCrechInOptionAll('Creche');
+    creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -76,20 +79,28 @@ class _EnrolledChildrenListedScreenState
       CustomText.hhNameS,
       CustomText.NorecordAvailable,
       CustomText.Search,
-      CustomText.Village,CustomText.ageInMonthEn
+      CustomText.Village,
+      CustomText.ageInMonthEn,
+      CustomText.all,
+      CustomText.unsynched,
+      CustomText.careGiverName,
+      CustomText.ChildId
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
     villageValue();
-    fetchChildHHDataList();
+    await fetchChildHHDataList();
     setState(() {});
   }
 
   Future<void> fetchChildHHDataList() async {
     childHHData =
-        await EnrolledChilrenResponceHelper().callEnrollChildrenAll();
-    filterData = childHHData;
+        await EnrolledExitChilrenResponceHelper().callEnrollChildrenAll();
+    usynchedList =
+        childHHData.where((element) => element['is_edited'] == 1).toList();
+    allList = childHHData;
+    filterData = isOnlyUnsyched ? usynchedList : allList;
     Searchcontroller.text = '';
     setState(() {});
   }
@@ -104,7 +115,8 @@ class _EnrolledChildrenListedScreenState
       child: Scaffold(
         key: _scaffoldKey,
         appBar: CustomAppbar(
-          text: Global.returnTrLable(translats, CustomText.enrolled_children, lng),
+          text: Global.returnTrLable(
+              translats, CustomText.enrolled_children, lng),
           onTap: () => Navigator.pop(context, 'itemRefresh'),
         ),
         endDrawer: SafeArea(
@@ -173,8 +185,7 @@ class _EnrolledChildrenListedScreenState
                             ),
                           ),
                           Expanded(
-                            child:
-                            DynamicCustomTextFieldInt(
+                            child: DynamicCustomTextFieldInt(
                               // width: MediaQuery.of(context).size.width * 0.36,
                               initialvalue: maxAgeLimit,
                               hintText: Global.returnTrLable(
@@ -182,7 +193,8 @@ class _EnrolledChildrenListedScreenState
                               onChanged: (value) {
                                 maxAgeLimit = value;
                               },
-                            ),)
+                            ),
+                          )
                         ],
                       ),
                       DynamicCustomDropdownField(
@@ -237,6 +249,22 @@ class _EnrolledChildrenListedScreenState
                           ],
                         ),
                       ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 25),
+                        child: AnimatedRollingSwitch(
+                          title1: Global.returnTrLable(
+                              translats, CustomText.all, lng),
+                          title2: Global.returnTrLable(
+                              translats, CustomText.unsynched, lng),
+                          isOnlyUnsynched: isOnlyUnsyched,
+                          onChange: (value) async {
+                            setState(() {
+                              isOnlyUnsyched = value;
+                            });
+                            await fetchChildHHDataList();
+                          },
+                        ),
+                      )
                     ]),
               )),
         ),
@@ -247,18 +275,18 @@ class _EnrolledChildrenListedScreenState
               children: [
                 Expanded(
                     child: CustomTextFieldRow(
-                      controller: Searchcontroller,
-                      onChanged: (value) {
-                        print(value);
-                        filterDataQu(value);
-                      },
-                      hintText:
+                  controller: Searchcontroller,
+                  onChanged: (value) {
+                    print(value);
+                    filterDataQu(value);
+                  },
+                  hintText:
                       Global.returnTrLable(translats, CustomText.Search, lng),
-                      prefixIcon: Image.asset(
-                        "assets/search.png",
-                        scale: 2.4,
-                      ),
-                    )),
+                  prefixIcon: Image.asset(
+                    "assets/search.png",
+                    scale: 2.4,
+                  ),
+                )),
                 SizedBox(
                   width: 10.w,
                 ),
@@ -283,23 +311,28 @@ class _EnrolledChildrenListedScreenState
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
                           onTap: () async {
-                              var selectedItem = filterData[index];
-                              // Validate().saveInt(Validate.crecheSelectedItem,
-                              //     Global.stringToInt(Global.getItemValues(selectedItem['responces'], 'creche_id'))
-                              //         );
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      EnrolledChildDetailScreen(
-                                          CHHGUID: selectedItem['CHHGUID'],
-                                          crechId:Global.stringToInt(Global.getItemValues(selectedItem['responces'], 'creche_id')),
-                                          HHname: Global.stringToInt(selectedItem['HHname'].toString()),
-                                          enName: Global.stringToInt(selectedItem['name'].toString()),
-                                          EnrolledChilGUID: selectedItem['ChildEnrollGUID'])));
+                            var selectedItem = filterData[index];
+                            // Validate().saveInt(Validate.crecheSelectedItem,
+                            //     Global.stringToInt(Global.getItemValues(selectedItem['responces'], 'creche_id'))
+                            //         );
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    EnrolledChildDetailScreen(
+                                        CHHGUID: selectedItem['CHHGUID'],
+                                        crechId: Global.stringToInt(
+                                            Global.getItemValues(
+                                                selectedItem['responces'],
+                                                'creche_id')),
+                                        HHname: Global.stringToInt(
+                                            selectedItem['HHname'].toString()),
+                                        enName: Global.stringToInt(
+                                            selectedItem['name'].toString()),
+                                        EnrolledChilGUID:
+                                            selectedItem['ChildEnrollGUID'])));
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 5.h),
                             child: Container(
-
                               decoration: BoxDecoration(
                                   boxShadow: [
                                     BoxShadow(
@@ -322,32 +355,34 @@ class _EnrolledChildrenListedScreenState
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${Global.returnTrLable(translats, 'Child Name', lng).trim()} : ',
+                                          '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
                                           style: Styles.black104,
                                         ),
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
                                           style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1),
+                                          strutStyle: StrutStyle(height: 1.2),
                                         ),
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.careGiverName, lng).trim()} : ',
                                           style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1),
+                                          strutStyle: StrutStyle(height: 1.2),
                                         ),
                                         Text(
-                                          '${Global.returnTrLable(translats, 'Child Age (In Months)', lng).trim()} : ',
+                                          '${Global.returnTrLable(translats, CustomText.ageInMonth, lng).trim()} : ',
                                           style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1),
+                                          strutStyle: StrutStyle(height: 1.2),
                                         ),
                                         Text(
-                                          '${Global.returnTrLable(translats, 'Village', lng).trim()} : ',
+                                          '${Global.returnTrLable(translats, CustomText.Village, lng).trim()} : ',
                                           style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1),
+                                          strutStyle: StrutStyle(height: 1.2),
                                         ),
                                       ],
                                     ),
@@ -362,53 +397,64 @@ class _EnrolledChildrenListedScreenState
                                     SizedBox(width: 10),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
                                           Text(
                                             Global.getItemValues(
                                                 filterData[index]['responces'],
                                                 'child_name'),
-                                            style: Styles.blue125,overflow: TextOverflow.ellipsis,),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                           Text(
                                             Global.getItemValues(
                                                 filterData[index]['responces'],
                                                 'child_id'),
-                                            style: Styles.blue125,
-                                            strutStyle: StrutStyle(height: .5),overflow: TextOverflow.ellipsis,
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
                                             Global.getItemValues(
                                                 filterData[index]['responces'],
                                                 'name_of_primary_caregiver'),
-                                            style: Styles.blue125,
-                                            strutStyle: StrutStyle(height: .5),overflow: TextOverflow.ellipsis,
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
                                             Global.getItemValues(
                                                 filterData[index]['responces'],
                                                 'age_at_enrollment_in_months'),
-                                            style: Styles.blue125,
-                                            strutStyle: StrutStyle(height: .5),overflow: TextOverflow.ellipsis,
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          Text(callVillageName(
-                                              filterData[index]['hhResponce']),
-                                            style: Styles.blue125,
-                                            strutStyle: StrutStyle(height: .5),overflow: TextOverflow.ellipsis,
+                                          Text(
+                                            callVillageName(filterData[index]
+                                                ['hhResponce']),
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ],
                                       ),
                                     ),
                                     SizedBox(width: 5),
-                                    (filterData[index]['is_edited']==0 && filterData[index]['is_uploaded']==1)?
-                                    Image.asset(
-                                      "assets/sync.png",
-                                      scale: 1.5,
-                                    ):
-                                    Image.asset(
-                                      "assets/sync_gray.png",
-                                      scale: 1.5,
-                                    )
+                                    (filterData[index]['is_edited'] == 0 &&
+                                            filterData[index]['is_uploaded'] ==
+                                                1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : Image.asset(
+                                            "assets/sync_gray.png",
+                                            scale: 1.5,
+                                          )
                                   ],
                                 ),
                               ),
@@ -429,10 +475,10 @@ class _EnrolledChildrenListedScreenState
     );
   }
 
-
   filterDataQu(String entry) {
+    var filterList = isOnlyUnsyched ? usynchedList : allList;
     if (entry.length > 0) {
-      filterData = childHHData
+      filterData = filterList
           .where((element) =>
               (Global.getItemValues(
                       element['responces'], 'name_of_primary_caregiver'))
@@ -443,21 +489,23 @@ class _EnrolledChildrenListedScreenState
                   .startsWith(entry.toLowerCase()))
           .toList();
     } else
-      filterData = childHHData;
+      filterData = filterList;
     setState(() {});
   }
+
   String callVillageName(String crecheItem) {
     String returnValue = '';
     var items = villages
         .where((element) =>
-    element.name ==
-        int.parse(Global.getItemValues(crecheItem, 'village_id')))
+            element.name ==
+            int.parse(Global.getItemValues(crecheItem, 'village_id')))
         .toList();
     if (items.length > 0) {
       returnValue = items[0].value!;
     }
     return returnValue;
   }
+
   Future<String?> villageValue() async {
     villages = await VillageDataHelper().getTabVillageList();
     // villageList = villages
@@ -470,115 +518,127 @@ class _EnrolledChildrenListedScreenState
   }
 
   filteredGetData(BuildContext context) async {
+    var filterList = isOnlyUnsyched ? usynchedList : allList;
     if (selectedItemDrop != null &&
         maxAgeLimit != null &&
-        minAgeLimit != null && selectedCreche != null) {
-      filterData = childHHData.where((element) {
+        minAgeLimit != null &&
+        selectedCreche != null) {
+      filterData = filterList.where((element) {
         var ViItem = Global.getItemValues(element['responces'], 'gender_id');
         var creche_id = Global.getItemValues(element['responces'], 'creche_id');
         var ageItem = int.parse(Global.getItemValues(
             element['responces'], 'age_at_enrollment_in_months'));
-        return ViItem == selectedItemDrop && creche_id == selectedCreche &&
+        return ViItem == selectedItemDrop &&
+            creche_id == selectedCreche &&
             ageItem <= maxAgeLimit! &&
             ageItem >= minAgeLimit!;
       }).toList();
     } else if (selectedItemDrop != null &&
-        maxAgeLimit == null && selectedCreche == null &&
+        maxAgeLimit == null &&
+        selectedCreche == null &&
         minAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var ViItem = Global.getItemValues(element['responces'], 'gender_id');
         return ViItem == selectedItemDrop;
       }).toList();
     } else if (selectedItemDrop == null &&
-        maxAgeLimit != null && selectedCreche == null &&
+        maxAgeLimit != null &&
+        selectedCreche == null &&
         minAgeLimit != null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         // var ViItem = Global.getItemValues(element['responces'], 'gender_id');
         var ageItem = int.parse(Global.getItemValues(
             element['responces'], 'age_at_enrollment_in_months'));
         return ageItem <= maxAgeLimit! && ageItem >= minAgeLimit!;
       }).toList();
     } else if (maxAgeLimit != null &&
-        selectedItemDrop == null && selectedCreche == null &&
+        selectedItemDrop == null &&
+        selectedCreche == null &&
         minAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var ageItem = int.parse(Global.getItemValues(
             element['responces'], 'age_at_enrollment_in_months'));
         return ageItem <= maxAgeLimit!;
       }).toList();
-    }
-    else if (minAgeLimit != null &&
-        selectedItemDrop == null && selectedCreche == null &&
+    } else if (minAgeLimit != null &&
+        selectedItemDrop == null &&
+        selectedCreche == null &&
         maxAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var ageItem = int.parse(Global.getItemValues(
             element['responces'], 'age_at_enrollment_in_months'));
         return ageItem >= minAgeLimit!;
       }).toList();
-    }
-    else if (minAgeLimit == null &&
-        selectedItemDrop == null && selectedCreche != null &&
+    } else if (minAgeLimit == null &&
+        selectedItemDrop == null &&
+        selectedCreche != null &&
         maxAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var creche_id = Global.getItemValues(element['responces'], 'creche_id');
         return creche_id == selectedCreche!;
       }).toList();
-
-    }
-    else if (minAgeLimit == null &&
-        selectedItemDrop != null && selectedCreche != null &&
+    } else if (minAgeLimit == null &&
+        selectedItemDrop != null &&
+        selectedCreche != null &&
         maxAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var creche_id = Global.getItemValues(element['responces'], 'creche_id');
         var genedr = Global.getItemValues(element['responces'], 'gender_id');
-        return creche_id == selectedCreche!  && genedr == selectedItemDrop;
+        return creche_id == selectedCreche! && genedr == selectedItemDrop;
       }).toList();
-
-    }else if (minAgeLimit != null &&
-        selectedItemDrop == null && selectedCreche != null &&
+    } else if (minAgeLimit != null &&
+        selectedItemDrop == null &&
+        selectedCreche != null &&
         maxAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var creche_id = Global.getItemValues(element['responces'], 'creche_id');
         var ageItem = int.parse(Global.getItemValues(
             element['responces'], 'age_at_enrollment_in_months'));
-        return ageItem >= minAgeLimit!&&creche_id == selectedCreche!;
+        return ageItem >= minAgeLimit! && creche_id == selectedCreche!;
       }).toList();
-    }else if (minAgeLimit != null &&
-        selectedItemDrop != null && selectedCreche != null &&
+    } else if (minAgeLimit != null &&
+        selectedItemDrop != null &&
+        selectedCreche != null &&
         maxAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var genedr = Global.getItemValues(element['responces'], 'gender_id');
         var creche_id = Global.getItemValues(element['responces'], 'creche_id');
         var ageItem = int.parse(Global.getItemValues(
             element['responces'], 'age_at_enrollment_in_months'));
-        return ageItem >= minAgeLimit!&&creche_id == selectedCreche!&&genedr == selectedItemDrop!;
+        return ageItem >= minAgeLimit! &&
+            creche_id == selectedCreche! &&
+            genedr == selectedItemDrop!;
       }).toList();
-    }else if (maxAgeLimit != null &&
-        selectedItemDrop != null && selectedCreche != null &&
+    } else if (maxAgeLimit != null &&
+        selectedItemDrop != null &&
+        selectedCreche != null &&
         minAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var genedr = Global.getItemValues(element['responces'], 'gender_id');
         var creche_id = Global.getItemValues(element['responces'], 'creche_id');
         var ageItem = int.parse(Global.getItemValues(
             element['responces'], 'age_at_enrollment_in_months'));
-        return ageItem <= maxAgeLimit! &&creche_id == selectedCreche!&&genedr == selectedItemDrop!;
+        return ageItem <= maxAgeLimit! &&
+            creche_id == selectedCreche! &&
+            genedr == selectedItemDrop!;
       }).toList();
-    }
-    else if (minAgeLimit != null &&
-        selectedItemDrop == null && selectedCreche != null &&
+    } else if (minAgeLimit != null &&
+        selectedItemDrop == null &&
+        selectedCreche != null &&
         maxAgeLimit != null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var creche_id = Global.getItemValues(element['responces'], 'creche_id');
         var ageItem = int.parse(Global.getItemValues(
             element['responces'], 'age_at_enrollment_in_months'));
-        return ageItem <= maxAgeLimit! && ageItem >= minAgeLimit!&&creche_id == selectedCreche!;
+        return ageItem <= maxAgeLimit! &&
+            ageItem >= minAgeLimit! &&
+            creche_id == selectedCreche!;
       }).toList();
-    }
-    else if (minAgeLimit != null &&
+    } else if (minAgeLimit != null &&
         maxAgeLimit != null &&
         selectedItemDrop != null &&
         selectedCreche == null) {
-      filterData = childHHData.where((element) {
+      filterData = filterList.where((element) {
         var genedr = Global.getItemValues(element['responces'], 'gender_id');
         var ageItem = int.parse(Global.getItemValues(
             element['responces'], 'age_at_enrollment_in_months'));
@@ -586,22 +646,19 @@ class _EnrolledChildrenListedScreenState
             ageItem >= minAgeLimit! &&
             selectedItemDrop == genedr;
       }).toList();
-    }
-    else {
-      filterData = childHHData;
+    } else {
+      filterData = filterList;
     }
     setState(() {});
   }
 
   void cleaAllFilter() {
-    filterData = childHHData;
+    filterData = isOnlyUnsyched ? usynchedList : allList;
     selectedItemDrop = null;
     Searchcontroller.text = '';
-    selectedCreche =  null;
+    selectedCreche = null;
     maxAgeLimit = null;
     minAgeLimit = null;
     setState(() {});
   }
-
-
 }

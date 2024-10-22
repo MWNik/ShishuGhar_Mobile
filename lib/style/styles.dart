@@ -41,6 +41,8 @@ class Styles {
       fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white);
   static TextStyle black146 = GoogleFonts.poppins(
       fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xff333333));
+  static TextStyle black12700 = GoogleFonts.poppins(
+      fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xff000000));
   static TextStyle red145 = GoogleFonts.poppins(
       fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xff5979AA));
   static TextStyle blue148 = GoogleFonts.poppins(
@@ -57,11 +59,13 @@ class Styles {
       fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xff333333));
   static TextStyle black123 = GoogleFonts.poppins(
       fontSize: 12, fontWeight: FontWeight.w300, color: Color(0xff000000));
+      static TextStyle black124r = GoogleFonts.poppins(
+      fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xff000000));
   static TextStyle black128 = GoogleFonts.poppins(
       fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xff000000));
   static TextStyle white125 = GoogleFonts.poppins(
       fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white);
-    static TextStyle Grey104 = GoogleFonts.poppins(
+  static TextStyle Grey104 = GoogleFonts.poppins(
       fontSize: 10, fontWeight: FontWeight.w400, color: Color(0xff939393));
   static TextStyle black54 = GoogleFonts.poppins(
       fontSize: 5, fontWeight: FontWeight.w400, color: Color(0xff333333));
@@ -73,6 +77,8 @@ class Styles {
       fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xffCF7571));
   static TextStyle blue125 = GoogleFonts.poppins(
       fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xff5979AA));
+  static TextStyle cardBlue10 = GoogleFonts.poppins(
+      fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xff5979AA));
   static TextStyle black64 = GoogleFonts.poppins(
       fontSize: 6, fontWeight: FontWeight.w400, color: Color(0xff333333));
   static TextStyle black66 = GoogleFonts.poppins(
@@ -97,10 +103,6 @@ class Styles {
       fontWeight: FontWeight.w500,
       color: const Color(0xff333333));
 
-
-
-
-
   //////////updated/////////
   static TextStyle labelFont = GoogleFonts.poppins(
       fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xffF3F6FF));
@@ -122,25 +124,16 @@ class Styles {
   static TextStyle unSelectedbottambar = GoogleFonts.poppins(
       fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xffAAAAAA));
 
-
-
-
-
-
-
-
-
-
-
   static TextStyle black85 = GoogleFonts.poppins(
       fontSize: 8, fontWeight: FontWeight.w500, color: Colors.black);
   static TextStyle red85 = GoogleFonts.poppins(
       fontSize: 8, fontWeight: FontWeight.w500, color: Color(0xffF35858));
+  static TextStyle red185 = GoogleFonts.poppins(
+      fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xffF35858));
   static TextStyle yellow85 = GoogleFonts.poppins(
       fontSize: 8, fontWeight: FontWeight.w500, color: Color(0xffF4B81D));
   static TextStyle green85 = GoogleFonts.poppins(
       fontSize: 8, fontWeight: FontWeight.w500, color: Color(0xffF71D831));
-
 
   static TextStyle blue124 = GoogleFonts.poppins(
       fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xff5979AA));

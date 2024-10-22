@@ -55,7 +55,7 @@ class _HeightforAgeBoysGirlsScreenState
     print(widget.gender_id);
     setState(() {
       age_in_months?.addAll(res.map((data) {
-        double result = (data.age_in_months as num).toDouble();
+        double result = (data.age_in_days as num).toDouble();
         return result;
       }).toList());
 
@@ -70,22 +70,22 @@ class _HeightforAgeBoysGirlsScreenState
       }).toList());
 
       green_cor?.addAll(res.map((data) {
-        double x = (data.age_in_months as num).toDouble();
+        double x = (data.age_in_days as num).toDouble();
         double y = (data.green as num).toDouble();
         return Offset(x, y);
       }).toList());
       red_cor?.addAll(res.map((data) {
-        double x = (data.age_in_months as num).toDouble();
+        double x = (data.age_in_days as num).toDouble();
         double y = (data.red as num).toDouble();
         return Offset(x, y);
       }).toList());
       yellow_max?.addAll(res.map((data) {
-        double x = (data.age_in_months as num).toDouble();
+        double x = (data.age_in_days as num).toDouble();
         double y = (data.yellow_max as num).toDouble();
         return Offset(x, y);
       }).toList());
       yellow_min?.addAll(res.map((data) {
-        double x = (data.age_in_months as num).toDouble();
+        double x = (data.age_in_days as num).toDouble();
         double y = (data.yellow_min as num).toDouble();
         return Offset(x, y);
       }).toList());
@@ -114,8 +114,8 @@ class _HeightforAgeBoysGirlsScreenState
         double x = (data['age_months'] as num).toDouble();
         (x > age_in_months!.last) ? maxX = x : maxX = age_in_months!.last;
         // (x < age_in_months!.first) ? minX = x : minX = age_in_months!.first;
-
-        double y = (data['height'] as num).toDouble();
+        var height = Global.validString(data['height'].toString())?data['height']:0.0;
+        double y = (height as num).toDouble();
 
         (y > height_max!.last) ? maxY = y : maxY = height_max!.last;
         // (y < height_min!.first) ? minY = y : minY = height_min!.first;

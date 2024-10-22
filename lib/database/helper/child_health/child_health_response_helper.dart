@@ -100,8 +100,8 @@ class ChildHealthTabResponceHelper {
       var creche_id = growthData['creche_id'];
       var child_health_guid = growthData['child_health_guid'];
       var childenrolledguid = growthData['childenrolledguid'];
-      var appCreatedOn = growthData['creation'];
-      var appcreated_by = growthData['owner'];
+      var appCreatedOn = growthData['appcreated_on'];
+      var appcreated_by = growthData['appcreated_by'];
       var app_updated_by = growthData['app_updated_by'];
       var app_updated_on = growthData['app_updated_on'];
       var finalHHData = Validate().keyesFromResponce(growthData);

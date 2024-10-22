@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shishughar/utils/constants.dart';
 
+import '../utils/validate.dart';
+
 class CrecheMonitoringApi {
   /// Get Check List Data
   Future<http.Response> getCheckListData({
@@ -64,7 +66,7 @@ class CrecheMonitoringApi {
       // final Map<String, dynamic> body = jsonDecode(dataResponse);
 
       final headers = {"Authorization": appToken ,'Content-Type': 'application/json'};
-
+      await Validate().createUploadedJson("Token $appToken\n\n$dataResponse");
       final response =
           await http.post(Uri.parse(endUrl), headers: headers, body: dataResponse);
 
@@ -90,7 +92,7 @@ class CrecheMonitoringApi {
       // final Map<String, dynamic> body = jsonDecode(dataResponse);
 
       final headers = {"Authorization": appToken, 'Content-Type': 'application/json'};
-
+      await Validate().createUploadedJson("Token $appToken\n\n$dataResponse");
       final response =
           await http.put(Uri.parse(endUrl), headers: headers, body: dataResponse);
 

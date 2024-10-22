@@ -24,6 +24,7 @@ class DynamicCustomDropdownField extends StatefulWidget {
   final int? isRequred;
   final bool? isVisible;
   final bool? readable;
+  final FocusNode? focusNode;
   
 
   DynamicCustomDropdownField(
@@ -40,7 +41,7 @@ class DynamicCustomDropdownField extends StatefulWidget {
       this.isRequred,
       this.isVisible,
       this.readable,
-   
+      this.focusNode
       });
 
   @override
@@ -90,6 +91,7 @@ class _CustomDropdownFieldState extends State<DynamicCustomDropdownField> {
               child: Padding(
                 padding: EdgeInsets.only(left: 10.w, right: 10.w),
                 child: DropdownButtonFormField<OptionsModel>(
+                  focusNode: widget.focusNode,
                   value: isDropdownEnabled
                       ? (widget.selectedItem != null
                       // ? widget.items.firstWhere((item) => item.name == widget.selectedItem)

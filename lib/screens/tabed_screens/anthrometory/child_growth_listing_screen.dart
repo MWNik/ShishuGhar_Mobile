@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
@@ -39,6 +40,10 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
   String lng = 'en';
   DateTime? lastGrowthDate;
   DateTime? maxGrowthDate;
+  List<ChildGrowthMetaResponseModel> unsynchedList = [];
+  List<ChildGrowthMetaResponseModel> allList = [];
+  bool isOnlyUnsynched = false;
+  String? role;
 
   void initState() {
     super.initState();
@@ -46,6 +51,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
   }
 
   Future<void> initializeData() async {
+    role = (await Validate().readString(Validate.role))!;
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -60,7 +66,9 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
       CustomText.hhNameS,
       CustomText.NorecordAvailable,
       CustomText.Search,
-      CustomText.Village
+      CustomText.Village,
+      CustomText.all,
+      CustomText.unsynched
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -75,51 +83,47 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     childHHData = await ChildGrowthResponseHelper()
         .anthormentryByCreche(widget.creche_nameId);
     if (childHHData.length > 0)
-      await callDatesList();
+      await callDatesListAddBackDatedEntryByJadish();
     else
       lastGrowthDate = await fetchEarliestEnnrollDate();
 
+    unsynchedList =
+        childHHData.where((element) => element.is_edited == 1).toList();
+    allList = childHHData;
+    childHHData = isOnlyUnsynched ? unsynchedList : allList;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // floatingActionButton: currentDateGrowth?null:InkWell(
-      //   onTap: () async {
-      //     String cgmguid = '';
-      //     if (!Global.validString(cgmguid)) {
-      //       cgmguid = Validate().randomGuid();
-      //       var refStatus = await Navigator.of(context).push(
-      //         MaterialPageRoute(
-      //           builder: (BuildContext context) => ChildGrowthExpendedFormScreen(
-      //             creche_nameId: widget.creche_nameId,
-      //             creche_name: widget.creche_name,
-      //             cgmguid: cgmguid,
-      //             lastGrowthDate: lastGrowthDate,
-      //           ),
-      //         ),
-      //       );
-      //       if (refStatus == 'itemRefresh') {
-      //         fetchEnrolleChild();
-      //       }
-      //     }
-      //   },
-      //   child: Image.asset(
-      //     "assets/add_btn.png",
-      //     scale: 2.7,
-      //     color: Color(0xff5979AA),
-      //   ),
-      // ),
       appBar: CustomAppbar(
         text: Global.returnTrLable(translats, CustomText.GrowthMonitoring, lng),
         subTitle: widget.creche_name,
         onTap: () => Navigator.pop(context),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
         child: Column(
+          // mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            Container(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: AnimatedRollingSwitch(
+                  title1: Global.returnTrLable(translats, CustomText.all, lng),
+                  title2: Global.returnTrLable(
+                      translats, CustomText.unsynched, lng),
+                  isOnlyUnsynched: isOnlyUnsynched ?? false,
+                  onChange: (value) async {
+                    setState(() {
+                      isOnlyUnsynched = value;
+                    });
+                    await fetchEnrolleChild();
+                  },
+                ),
+              ),
+            ),
             Expanded(
               child: (childHHData.length > 0)
                   ? ListView.builder(
@@ -130,27 +134,31 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
                           onTap: () async {
-                            var lstDate = await minMaxDate(childHHData[index].created_at);
+                            var lstDate =
+                                await minMaxDate(childHHData[index].created_at);
 
-                            if(callMeasurementEditableDate(childHHData[index].created_at!)){
-                              var refStatus = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          ChildGrowthExpendedFormScreen(
-                                            creche_nameId: widget.creche_nameId,
-                                            creche_name: widget.creche_name,
-                                            cgmguid: childHHData[index].cgmguid!,
-                                            lastGrowthDate: lstDate,
-                                            minGrowthDate: maxGrowthDate,
-                                            createdAt: childHHData[index].created_at,
-                                            isNew: childHHData[index].responces != null?true:false,
-                                          )));
+                            // if(callMeasurementEditableDate(childHHData[index].created_at!)){  allowed for back dated entry
+                            var refStatus = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        ChildGrowthExpendedFormScreen(
+                                          creche_nameId: widget.creche_nameId,
+                                          creche_name: widget.creche_name,
+                                          cgmguid: childHHData[index].cgmguid!,
+                                          lastGrowthDate: lstDate,
+                                          minGrowthDate: maxGrowthDate,
+                                          createdAt:
+                                              childHHData[index].created_at,
+                                          isNew: childHHData[index].responces !=
+                                                  null
+                                              ? true
+                                              : false,
+                                        )));
 
-                              if (refStatus == 'itemRefresh') {
-                                await fetchEnrolleChild();
-                              }
-                            }else Validate().singleButtonPopup(CustomText.growthMonitoring, CustomText.ok, false, context);
-
+                            if (refStatus == 'itemRefresh') {
+                              await fetchEnrolleChild();
+                            }
+                            // }else Validate().singleButtonPopup(CustomText.growthMonitoring, CustomText.ok, false, context);
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 5.h),
@@ -189,21 +197,6 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                                               : '${Global.returnTrLable(translats, CustomText.schduleed, lng).trim()} : ',
                                           style: Styles.black104,
                                         ),
-                                        // Text(
-                                        //   '${Global.returnTrLable(translats, "Height", lng).trim()} : ',
-                                        //   style: Styles.black104,
-                                        //   strutStyle: StrutStyle(height: 1),
-                                        // ),
-                                        // Text(
-                                        //   '${Global.returnTrLable(translats, 'Weight', lng).trim()} : ',
-                                        //   style: Styles.black104,
-                                        //   strutStyle: StrutStyle(height: 1),
-                                        // ),
-                                        // Text(
-                                        //   '${Global.returnTrLable(translats, 'Child Age (In Months)', lng).trim()} : ',
-                                        //   style: Styles.black104,
-                                        //   strutStyle: StrutStyle(height: 1),
-                                        // ),
                                       ],
                                     ),
                                     SizedBox(width: 10),
@@ -234,33 +227,9 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                                                 : showStringDayMonth(
                                                     childHHData[index]
                                                         .created_at!),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
-                                          // Text(
-                                          //   Global.getItemValues(
-                                          //       childHHData[index].responces!,
-                                          //       'height'),
-                                          //   style: Styles.blue125,
-                                          //   strutStyle: StrutStyle(height: .5),
-                                          //   overflow: TextOverflow.ellipsis,
-                                          // ),
-                                          // Text(
-                                          //   Global.getItemValues(
-                                          //       childHHData[index].responces!,
-                                          //       'weight'),
-                                          //   style: Styles.blue125,
-                                          //   strutStyle: StrutStyle(height: .5),
-                                          //   overflow: TextOverflow.ellipsis,
-                                          // ),
-                                          // Text(
-                                          //   Global.getItemValues(
-                                          //       childHHData[index].responces!,
-                                          //       'age_months'),
-                                          //   style: Styles.blue125,
-                                          //   strutStyle: StrutStyle(height: .5),
-                                          //   overflow: TextOverflow.ellipsis,
-                                          // ),
                                         ],
                                       ),
                                     ),
@@ -342,40 +311,9 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     }
     if (dateMesured != null || dateAladyCreate != null) {
       if (dateMesured != null && dateAladyCreate == null) {
-        DateTime messureDate = DateTime(dateMesured.year,dateMesured.month);
+        DateTime messureDate = DateTime(dateMesured.year, dateMesured.month);
         DateTime tDate = Validate().stringToDate(Validate().currentDate());
-        DateTime todayDate = DateTime(tDate.year,tDate.month);
-        if (todayDate.isAfter(messureDate)) {
-              while (messureDate.isBefore(todayDate)) {
-                messureDate = DateTime(messureDate.year, messureDate.month + 1);
-                if (messureDate.month > 12) {
-                  messureDate = DateTime(messureDate.year + 1, 1);
-                }
-                var item = ChildGrowthMetaResponseModel(
-                    cgmguid: Validate().randomGuid(),
-                    responces: null,
-                    is_uploaded: 0,
-                    is_edited: 1,
-                    is_deleted: 0,
-                    name: null,
-                    creche_id: widget.creche_nameId,
-                    created_by: (await Validate().readString(Validate.userName))!,
-                    created_at: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(messureDate.year,messureDate.month,DateTime.now().day)));
-                await ChildGrowthResponseHelper().inserts(item);
-              }
-
-              //     Validate().randomGuid(),
-              //     null,
-              //     widget.creche_nameId,
-              //     null,
-              //     (await Validate().readString(Validate.userName))!);
-
-            }
-
-      } else if (dateAladyCreate != null && dateMesured == null) {
-        DateTime messureDate = DateTime(dateAladyCreate.year,dateAladyCreate.month);
-        DateTime tDate = Validate().stringToDate(Validate().currentDate());
-        DateTime todayDate = DateTime(tDate.year,tDate.month);
+        DateTime todayDate = DateTime(tDate.year, tDate.month);
         if (todayDate.isAfter(messureDate)) {
           while (messureDate.isBefore(todayDate)) {
             messureDate = DateTime(messureDate.year, messureDate.month + 1);
@@ -391,7 +329,8 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                 name: null,
                 creche_id: widget.creche_nameId,
                 created_by: (await Validate().readString(Validate.userName))!,
-                created_at: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(messureDate.year,messureDate.month,DateTime.now().day)));
+                created_at: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(
+                    messureDate.year, messureDate.month, DateTime.now().day)));
             await ChildGrowthResponseHelper().inserts(item);
           }
 
@@ -400,17 +339,48 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
           //     widget.creche_nameId,
           //     null,
           //     (await Validate().readString(Validate.userName))!);
+        }
+      } else if (dateAladyCreate != null && dateMesured == null) {
+        DateTime messureDate =
+            DateTime(dateAladyCreate.year, dateAladyCreate.month);
+        DateTime tDate = Validate().stringToDate(Validate().currentDate());
+        DateTime todayDate = DateTime(tDate.year, tDate.month);
+        if (todayDate.isAfter(messureDate)) {
+          while (messureDate.isBefore(todayDate)) {
+            messureDate = DateTime(messureDate.year, messureDate.month + 1);
+            if (messureDate.month > 12) {
+              messureDate = DateTime(messureDate.year + 1, 1);
+            }
+            var item = ChildGrowthMetaResponseModel(
+                cgmguid: Validate().randomGuid(),
+                responces: null,
+                is_uploaded: 0,
+                is_edited: 1,
+                is_deleted: 0,
+                name: null,
+                creche_id: widget.creche_nameId,
+                created_by: (await Validate().readString(Validate.userName))!,
+                created_at: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(
+                    messureDate.year, messureDate.month, DateTime.now().day)));
+            await ChildGrowthResponseHelper().inserts(item);
+          }
 
+          //     Validate().randomGuid(),
+          //     null,
+          //     widget.creche_nameId,
+          //     null,
+          //     (await Validate().readString(Validate.userName))!);
         }
       } else if (dateAladyCreate != null && dateMesured != null) {
-        DateTime messureDate = DateTime(dateAladyCreate.year,dateAladyCreate.month);
+        DateTime messureDate =
+            DateTime(dateAladyCreate.year, dateAladyCreate.month);
         if (dateAladyCreate.isAfter(dateMesured)) {
-          messureDate = DateTime(dateAladyCreate.year,dateAladyCreate.month);
-        }else  messureDate = DateTime(dateMesured.year,dateMesured.month);
+          messureDate = DateTime(dateAladyCreate.year, dateAladyCreate.month);
+        } else
+          messureDate = DateTime(dateMesured.year, dateMesured.month);
 
         DateTime tDate = Validate().stringToDate(Validate().currentDate());
-        DateTime todayDate = DateTime(tDate.year,tDate.month);
-
+        DateTime todayDate = DateTime(tDate.year, tDate.month);
 
         if (todayDate.isAfter(messureDate)) {
           while (messureDate.isBefore(todayDate)) {
@@ -427,7 +397,8 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                 name: null,
                 creche_id: widget.creche_nameId,
                 created_by: (await Validate().readString(Validate.userName))!,
-                created_at: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(messureDate.year,messureDate.month,DateTime.now().day)));
+                created_at: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(
+                    messureDate.year, messureDate.month, DateTime.now().day)));
             await ChildGrowthResponseHelper().inserts(item);
           }
 
@@ -436,14 +407,83 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
           //     widget.creche_nameId,
           //     null,
           //     (await Validate().readString(Validate.userName))!);
-
         }
-
-
       }
-
-
     }
+    childHHData = await ChildGrowthResponseHelper()
+        .anthormentryByCreche(widget.creche_nameId);
+  }
+
+  Future<void> callDatesListAddBackDatedEntryByJadish() async {
+    //25/09/2024
+    List<String> dateStringData = [];
+    var childGroth =
+        childHHData.where((element) => element.responces != null).toList();
+    childGroth.forEach((element) {
+      var date = Global.getItemValues(element.responces!, 'measurement_date');
+      if (Global.validString(date)) {
+        dateStringData.add(date);
+      }
+    });
+    var dateList = dateStringData.map((dateString) {
+      List<int> dateParts = dateString.split('-').map(int.parse).toList();
+      return DateTime(dateParts[0], dateParts[1], 1);
+    }).toList();
+
+    //// is not fill data in mesuremt
+
+    List<String> dateStringDataCreated = [];
+    var childGrothCreated =
+        childHHData.where((element) => element.responces == null).toList();
+    childGrothCreated.forEach((element) {
+      var spledDate = Global.splitData(element.created_at!, " ");
+      if (spledDate.length == 2) {
+        DateTime? celectedDate = Validate().stringToDateNull(spledDate[0]);
+        if (celectedDate != null) {
+          dateStringDataCreated.add(spledDate[0]);
+        }
+      }
+    });
+
+    var createdData = dateStringDataCreated.map((dateString) {
+      List<int> dateParts = dateString.split('-').map(int.parse).toList();
+      return DateTime(dateParts[0], dateParts[1], 1);
+    }).toList();
+    dateList.addAll(createdData);
+
+    DateTime currentDateMonth =
+        Validate().stringToDate(Validate().currentDate());
+    DateTime messureDate = DateTime(2023, 12, currentDateMonth.day);
+
+    if (currentDateMonth.isAfter(messureDate)) {
+      while (messureDate.isBefore(currentDateMonth)) {
+        messureDate = DateTime(messureDate.year, messureDate.month + 1);
+        if (messureDate.month > 12) {
+          messureDate = DateTime(messureDate.year + 1, messureDate.day);
+        }
+        var dateItems = dateList
+            .where((element) => (element.month == messureDate.month &&
+                element.year == messureDate.year))
+            .toList();
+        if (dateItems.length == 0 && messureDate.isBefore(currentDateMonth)) {
+          var item = ChildGrowthMetaResponseModel(
+              cgmguid: Validate().randomGuid(),
+              responces: null,
+              is_uploaded: 0,
+              is_edited: 1,
+              is_deleted: 0,
+              name: null,
+              creche_id: widget.creche_nameId,
+              created_by: (await Validate().readString(Validate.userName))!,
+              created_at: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(
+                  messureDate.year, messureDate.month, DateTime.now().day)));
+          print(DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(
+              messureDate.year, messureDate.month, DateTime.now().day)));
+          await ChildGrowthResponseHelper().inserts(item);
+        }
+      }
+    }
+
     childHHData = await ChildGrowthResponseHelper()
         .anthormentryByCreche(widget.creche_nameId);
   }
@@ -537,8 +577,11 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     if (childRecord.length > 0) {
       List<String> enrollDateListString = [];
       childRecord.forEach((element) {
-        enrollDateListString
-            .add(Global.getItemValues(element.responces, 'date_of_enrollment'));
+        if (Global.validString(
+            Global.getItemValues(element.responces, 'date_of_enrollment'))) {
+          enrollDateListString.add(
+              Global.getItemValues(element.responces, 'date_of_enrollment'));
+        }
       });
       List<DateTime> enrollDatelist = [];
       enrollDateListString.forEach((element) {
@@ -550,17 +593,21 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     if (minEnrollDate != null) {
       String cgmguid = '';
       if (!Global.validString(cgmguid)) {
-        cgmguid = Validate().randomGuid();
         await ChildGrowthResponseHelper().insertUpdate(
-            Validate().randomGuid(),null,
+            cgmguid,
+            null,
             null,
             widget.creche_nameId,
             null,
-            (await Validate().readString(Validate.userName))!);
+            (await Validate().readString(Validate.userName))!,
+            Validate().currentDateTime());
         childHHData = await ChildGrowthResponseHelper()
             .anthormentryByCreche(widget.creche_nameId);
       }
     }
+    await callDatesListAddBackDatedEntryByJadish();
+
+    ///for back dated entry
     return minEnrollDate;
   }
 
@@ -578,33 +625,35 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     return schudleDate;
   }
 
-  bool callMeasurementGrwthDate(String? lastGrowthDate){
+  bool callMeasurementGrwthDate(String? lastGrowthDate) {
     var spledDate = Global.splitData(lastGrowthDate, " ");
     if (spledDate.length == 2) {
       DateTime todayDate = Validate().stringToDate(Validate().currentDate());
       DateTime? celectedDate = Validate().stringToDateNull(spledDate[0]);
-      var lastUpdatedDate=celectedDate!.add(Duration(days: 10));
-      if(todayDate.isAfter(lastUpdatedDate)){
+      var lastUpdatedDate = celectedDate!.add(Duration(days: 10));
+      if (todayDate.isAfter(lastUpdatedDate)) {
         return false;
-      }else return true;
-    }else{
+      } else
+        return true;
+    } else {
       DateTime todayDate = Validate().stringToDate(Validate().currentDate());
       DateTime? celectedDate = Validate().stringToDateNull(lastGrowthDate!);
-      var lastUpdatedDate=celectedDate!.add(Duration(days: 10));
-      if(todayDate.isAfter(lastUpdatedDate)){
+      var lastUpdatedDate = celectedDate!.add(Duration(days: 10));
+      if (todayDate.isAfter(lastUpdatedDate)) {
         return false;
-      }else return true;
+      } else
+        return true;
     }
-
   }
 
   bool callMeasurementEditableDate(String? date) {
     bool isEditable = true;
-    if(Global.validString(date)){
+    if (Global.validString(date)) {
       DateTime? selectedDate = DateTime.parse(date.toString());
       DateTime currentDate = DateTime.parse(Validate().currentDate());
-      DateTime editableDate = DateTime(selectedDate!.year,selectedDate.month +1,11);
-      if(currentDate.isBefore(editableDate)){
+      DateTime editableDate =
+          DateTime(selectedDate!.year, selectedDate.month + 1, 11);
+      if (currentDate.isBefore(editableDate)) {
         isEditable = true;
       } else {
         isEditable = false;

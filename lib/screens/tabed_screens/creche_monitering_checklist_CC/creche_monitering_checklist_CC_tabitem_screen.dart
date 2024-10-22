@@ -38,25 +38,23 @@ class CmcCCTabItemSCreen extends StatefulWidget {
   String? date_of_visit;
   final bool isEdit;
 
-
-   CmcCCTabItemSCreen({
-    required this.cmc_cc_guid,
-    required this.creche_id,
-    required this.tabBreakItem,
-    required this.screenItem,
-    required this.changeTab,
-    required this.tabIndex,
-    required this.totalTab,
-    required this.isEdit,
-    this.date_of_visit
-  });
+  CmcCCTabItemSCreen(
+      {required this.cmc_cc_guid,
+      required this.creche_id,
+      required this.tabBreakItem,
+      required this.screenItem,
+      required this.changeTab,
+      required this.tabIndex,
+      required this.totalTab,
+      required this.isEdit,
+      this.date_of_visit});
 
   @override
   State<CmcCCTabItemSCreen> createState() => _CmcCCTabItemSCreenState();
 }
 
 class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
-  List<String>unpicableDates = [];
+  List<String> unpicableDates = [];
   String? _role;
   String username = '';
   String _language = 'en';
@@ -67,7 +65,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
   bool _isLoading = true;
 
   Map<String, dynamic> _myMap = {};
-
+  int? isEditExisting;
   @override
   void initState() {
     super.initState();
@@ -92,7 +90,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
     ];
 
     //  final itemz = widget.screenItem[widget.tabBreakItem.name]!;
-    //  itemz.forEach((element) { 
+    //  itemz.forEach((element) {
     //   if(Global.validString(element.label)){
     //     valueNames.add(element.label!);
     //   }
@@ -111,7 +109,6 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
       _isLoading = false;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +213,8 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
       if (Global.validString(items[i].options)) {
         if (items[i].options == 'Creche') {
           await OptionsModelHelper()
-              .callCrechInOption(items[i].options!.trim(),Global.stringToInt(widget.creche_id))
+              .callCrechInOption(items[i].options!.trim(),
+                  Global.stringToInt(widget.creche_id))
               .then((data) {
             _options.addAll(data);
           });
@@ -228,7 +226,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
       logicFields.add(items[i].fieldname!);
     }
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lang!)
+        .getAllMstCommonNotINOptions(defaultCommon, lang!)
         .then((data) {
       _options.addAll(data);
     });
@@ -274,7 +272,8 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
               : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           items: items,
           selectedItem: _myMap[quesItem.fieldname],
-          hintText: Global.returnTrLable(_translation, CustomText.Selecthere, _language),
+          hintText: Global.returnTrLable(
+              _translation, CustomText.Selecthere, _language),
           isVisible:
               DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
           onChanged: (value) {
@@ -288,7 +287,9 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
       case 'Date':
         return CustomDatepickerDynamic(
           initialvalue: _myMap[quesItem.fieldname!],
-          minDate: quesItem.fieldname=='date_of_visit'?DateTime.now().subtract(Duration(days: 7)):null,
+          minDate: quesItem.fieldname == 'date_of_visit'
+              ? DateTime.now().subtract(Duration(days: 7))
+              : null,
           fieldName: quesItem.fieldname,
           // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
           isRequred: quesItem.reqd == 1
@@ -296,7 +297,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
               : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           calenderValidate:
               DependingLogic().calenderValidation(_logics, _myMap, quesItem),
-          onChanged: (value) async{
+          onChanged: (value) async {
             if (quesItem.fieldname == 'date_of_visit') {
               // if (Global.validString(_myMap['creche_id'])) {
               //   unpicableDates = await fetchDatesList();
@@ -362,7 +363,8 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
           initialvalue: _myMap[quesItem.fieldname!],
           readable:
               DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
-              hintText: Global.returnTrLable(_translation, CustomText.typehere, _language),
+          hintText: Global.returnTrLable(
+              _translation, CustomText.typehere, _language),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           isVisible:
@@ -503,9 +505,9 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
     if (type == 1) {
       if (_checkValidation()) {
         if (widget.tabIndex < (widget.totalTab - 1)) {
-          await saveDataInData();
+          await saveDataInData(false);
         } else if (widget.tabIndex == (widget.totalTab - 1)) {
-          await saveDataInData();
+          await saveDataInData(true);
           bool shouldProceed = await showDialog(
             context: context,
             builder: (context) {
@@ -550,15 +552,13 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
                 context);
             validStatus = false;
             break;
-          }
-          else if(element.fieldname=='date_of_visit'){
+          } else if (element.fieldname == 'date_of_visit') {
             if (unpicableDates.contains(values)) {
               _myMap.remove(element.fieldname);
               setState(() {});
               Validate().singleButtonPopup(
                   '${Global.returnTrLable(_translation, CustomText.visitNoteAlrdyExists, _language)} "${values}"',
-                  Global.returnTrLable(
-                      _translation, CustomText.ok, _language),
+                  Global.returnTrLable(_translation, CustomText.ok, _language),
                   false,
                   context);
               validStatus = false;
@@ -586,7 +586,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
   Future<void> saveOnly(int type) async {
     if (type == 1) {
       if (_checkValidation()) {
-        await saveDataInData();
+        await saveDataInData(false);
         Validate().singleButtonPopup(
             Global.returnTrLable(
                 _translation, CustomText.dataSaveSuc, _language),
@@ -603,7 +603,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
     }
   }
 
-  Future<void> saveDataInData() async {
+  Future<void> saveDataInData(bool isLastIndex) async {
     var widgets = widget.screenItem[widget.tabBreakItem.name];
     if (widgets != null) {
       Map<String, dynamic> responces = {};
@@ -615,12 +615,25 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
       var responcesJs = jsonEncode(_myMap);
       var name = _myMap['name'];
       print(responcesJs);
-      await CmcCCTabResponseHelper().insertUpdate(
-          widget.cmc_cc_guid,
-          name as int?,
-          responcesJs,
-          username,
-          Global.stringToInt(widget.creche_id));
+      var iteMS = CmcCCResponseModel(
+          cmc_cc_guid: widget.cmc_cc_guid,
+          creche_id: Global.stringToInt(widget.creche_id),
+          // childenrolledguid: enrolChildGuid,
+          responces: responcesJs,
+          is_uploaded: 0,
+          is_edited:
+              isLastIndex ? 1 : (widget.isEdit == false ? 2 : isEditExisting),
+          is_deleted: 0,
+          name: name,
+          created_by: username,
+          created_at: Validate().currentDateTime());
+      await CmcCCTabResponseHelper().inserts(iteMS);
+      // await CmcCCTabResponseHelper().insertUpdate(
+      //     widget.cmc_cc_guid,
+      //     name as int?,
+      //     responcesJs,
+      //     username,
+      //     Global.stringToInt(widget.creche_id));
     }
   }
 
@@ -632,7 +645,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
       final Map<String, dynamic> responseData =
           jsonDecode(records.first.responces!);
       responseData.forEach((key, value) => _myMap[key] = value);
-
+      isEditExisting = records.first.is_edited;
       final createdOnNotNull = responseData['appcreated_on'] != null;
       final createdByNotNull = responseData['appcreated_by'] != null;
 
@@ -677,15 +690,15 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
   }
 
   Future<List<String>> fetchDatesList() async {
-    List<CmcCCResponseModel> cmcRespose =
-    await CmcCCTabResponseHelper()
+    List<CmcCCResponseModel> cmcRespose = await CmcCCTabResponseHelper()
         .childALMChild(Global.stringToInt(widget.creche_id));
     List<String> visitdatesListString = [];
     cmcRespose.forEach((element) {
       visitdatesListString
           .add(Global.getItemValues(element.responces, 'date_of_visit'));
     });
-    if(Global.validString(widget.date_of_visit)&&visitdatesListString.contains(widget.date_of_visit)){
+    if (Global.validString(widget.date_of_visit) &&
+        visitdatesListString.contains(widget.date_of_visit)) {
       visitdatesListString.remove(widget.date_of_visit);
     }
     return visitdatesListString;

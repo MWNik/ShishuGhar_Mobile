@@ -14,8 +14,15 @@ import 'child_referal_listing_screen_child.dart';
 class ReffralTabScreen extends StatefulWidget {
   String tabTitle;
   String? enrolledChildGUID;
+  String? childName;
+  String? childId;
 
-  ReffralTabScreen({super.key, required this.tabTitle, this.enrolledChildGUID});
+  ReffralTabScreen(
+      {super.key,
+      required this.tabTitle,
+      this.enrolledChildGUID,
+      this.childId,
+      this.childName});
 
   @override
   State<ReffralTabScreen> createState() => _ReffralTabScreenState();
@@ -73,9 +80,33 @@ class _ReffralTabScreenState extends State<ReffralTabScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        RichText(
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                          text: TextSpan(children: [
+                            WidgetSpan(
+                              child: Text(
+                                '${widget.childName ?? ''}',
+                                style: Styles.white145,
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            WidgetSpan(
+                              child: Text(
+                                '${Global.validString(widget.childId) && Global.validString(widget.childName) ? '-' : ''}${widget.childId ?? ''}',
+                                style: Styles.white145,
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                                // overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                          ]),
+                        ),
                         Text(
                           Global.returnTrLable(translats, widget.tabTitle, lng),
-                          style: Styles.white145,
+                          style: Styles.white126P,
                         ),
                         // Add additional TextSpans here if needed
                       ],
@@ -142,8 +173,10 @@ class _ReffralTabScreenState extends State<ReffralTabScreen>
     for (int i = 0; i < tabCount; i++) {
       if (i == 1) {
         tabItem.add(ChildReferralCompletedListingScreen(
-            tabTitle: widget.tabTitle,
-            enrolledChildGUID: widget.enrolledChildGUID));
+          tabTitle: widget.tabTitle,
+          enrolledChildGUID: widget.enrolledChildGUID,
+          isHomeScreen: !Global.validString(widget.enrolledChildGUID),
+        ));
       } else {
         if (Global.validString(widget.enrolledChildGUID)) {
           tabItem.add(ChildReferralSpecificChildListingScreen(

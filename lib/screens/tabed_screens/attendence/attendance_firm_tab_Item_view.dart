@@ -165,7 +165,7 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
                                 nextTab(0, context);
                               },
                               text: Global.returnTrLable(
-                                  translats, CustomText.back, lng)
+                                      translats, CustomText.back, lng)
                                   .trim(),
                             ),
                           ),
@@ -196,10 +196,13 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
                           //     :
                           Expanded(
                             child: CElevatedButton(
-                              color: widget.tabIndex == (widget.totalTab - 1)?Color(0xff5979AA):Color(0xff369A8D),
+                              color: widget.tabIndex == (widget.totalTab - 1)
+                                  ? Color(0xff5979AA)
+                                  : Color(0xff369A8D),
                               onPressed: () {
-                                if(widget.tabIndex == (widget.totalTab - 1)){
-                                  Navigator.pop(context, CustomText.itemRefresh);
+                                if (widget.tabIndex == (widget.totalTab - 1)) {
+                                  Navigator.pop(
+                                      context, CustomText.itemRefresh);
                                 }
                                 nextTab(1, context);
                                 // widget.changeTab(1);
@@ -244,7 +247,6 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-      
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -268,7 +270,8 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
           calenderValidate: [],
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          readable: quesItem.fieldname=='date_of_attendance'?true:recrdedUpload,
+          readable:
+              quesItem.fieldname == 'date_of_attendance' ? true : recrdedUpload,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
@@ -535,7 +538,7 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
             } //else updateLocationDropDown(items[i]);
             else {
               await OptionsModelHelper()
-                  .getLocationData(items[i].options!.trim(), responseData,lng)
+                  .getLocationData(items[i].options!.trim(), responseData, lng)
                   .then((data) {
                 options.addAll(data);
               });
@@ -556,7 +559,7 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
     await updateHiddenValue();
     // await callDatesList();
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng)
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });
@@ -582,9 +585,29 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
   }
 
   nextTab(int type, BuildContext mContext) async {
+    bool status = false;
+    var widgets = widget.screenItem[widget.tabBreakItem.name];
+    List<TabFormsLogic> exitlogic = [];
     if (type == 1) {
       if (_checkValidation(mContext)) {
         if (widget.tabIndex < (widget.totalTab - 1)) {
+          if (widgets != null) {
+            Map<String, dynamic> responces = {};
+            widgets.forEach((element) async {
+              if (myMap[element.fieldname] != null) {
+                responces[element.fieldname!] = myMap[element.fieldname];
+              }
+              exitlogic.addAll(logics
+                  .where((logElement) =>
+                      logElement.parentControl == element.fieldname &&
+                      logElement.type_of_logic_id == '11')
+                  .toList());
+            });
+          }
+          bool status = checkExitStatus(exitlogic);
+          if (status) {
+            Navigator.pop(context, 'itemRefresh');
+          }
         } else if (widget.tabIndex == (widget.totalTab - 1)) {
           Navigator.pop(context, 'itemRefresh');
         }
@@ -624,17 +647,19 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
           var creche_id = Global.stringToInt(myMap['creche_id'].toString());
           print(responcesJs);
           var item = ChildAttendanceResponceModel(
-              creche_id: creche_id,
-              childattenguid: widget.ChildAttenGUID,
-              name: name,
-              is_uploaded: recrdedUpload ? 1 : 0,
-              responces: responcesJs,
-              is_edited: 1,
-              is_deleted: 0,
-              created_at: myMap['app_created_on'],
-              created_by: myMap['app_created_by'],
-              update_at: myMap['app_updated_on'],
-              updated_by: myMap['app_updated_by']);
+            creche_id: creche_id,
+            childattenguid: widget.ChildAttenGUID,
+            name: name,
+            is_uploaded: recrdedUpload ? 1 : 0,
+            responces: responcesJs,
+            is_edited: 1,
+            is_deleted: 0,
+            created_at: myMap['app_created_on'],
+            created_by: myMap['app_created_by'],
+            update_at: myMap['app_updated_on'],
+            updated_by: myMap['app_updated_by'],
+            date_of_attendance: myMap['date_of_attendance'],
+          );
           await AttendanceResponnceHelper().inserts(item);
           await ChildAttendenceHelper().updateAttendenceHelper(
               widget.ChildAttenGUID, myMap['date_of_attendance']);
@@ -683,6 +708,26 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
     }
   }
 
+  bool checkExitStatus(List<TabFormsLogic> exitlogic) {
+    bool status = false;
+    if (exitlogic.length > 0) {
+      for (int i = 0; i < exitlogic.length; i++) {
+        var element = exitlogic[i];
+        if (element.type_of_logic_id == '11') {
+          if (element.parentControl == element.dependentControls) {
+            var validValu = Global.validNum(element.algorithmExpression);
+            var parentValue = myMap[element.dependentControls];
+            if ((Global.validNum(parentValue.toString()) == validValu)) {
+              status = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+    return status;
+  }
+
   Future<bool> saveDataInData() async {
     bool status = false;
     var widgets = widget.screenItem[widget.tabBreakItem.name];
@@ -704,17 +749,19 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
       var creche_id = Global.stringToInt(myMap['creche_id'].toString());
       print(responcesJs);
       var item = ChildAttendanceResponceModel(
-          creche_id: creche_id,
-          childattenguid: widget.ChildAttenGUID,
-          name: name,
-          is_uploaded: recrdedUpload ? 1 : 0,
-          responces: responcesJs,
-          is_edited: 1,
-          is_deleted: 0,
-          created_at: myMap['app_created_on'],
-          created_by: myMap['app_created_by'],
-          update_at: myMap['app_updated_on'],
-          updated_by: myMap['app_updated_by']);
+        creche_id: creche_id,
+        childattenguid: widget.ChildAttenGUID,
+        name: name,
+        is_uploaded: recrdedUpload ? 1 : 0,
+        responces: responcesJs,
+        is_edited: 1,
+        is_deleted: 0,
+        created_at: myMap['app_created_on'],
+        created_by: myMap['app_created_by'],
+        update_at: myMap['app_updated_on'],
+        updated_by: myMap['app_updated_by'],
+        date_of_attendance: myMap['date_of_attendance'],
+      );
       await AttendanceResponnceHelper().inserts(item);
       await ChildAttendenceHelper().updateAttendenceHelper(
           widget.ChildAttenGUID, myMap['date_of_attendance']);
@@ -780,17 +827,19 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
     var responcesJs = jsonEncode(attemptAnsForExit);
     print(responcesJs);
     var item = ChildAttendanceResponceModel(
-        creche_id: Global.stringToInt(creche_id.toString()),
-        childattenguid: widget.ChildAttenGUID,
-        name: name,
-        is_uploaded: recrdedUpload ? 1 : 0,
-        responces: responcesJs,
-        is_edited: 1,
-        is_deleted: 0,
-        created_at: currentAnswerd['app_created_on'],
-        created_by: currentAnswerd['app_created_by'],
-        update_at: currentAnswerd['app_updated_on'],
-        updated_by: currentAnswerd['app_updated_by']);
+      creche_id: Global.stringToInt(creche_id.toString()),
+      childattenguid: widget.ChildAttenGUID,
+      name: name,
+      is_uploaded: recrdedUpload ? 1 : 0,
+      responces: responcesJs,
+      is_edited: 1,
+      is_deleted: 0,
+      created_at: currentAnswerd['app_created_on'],
+      created_by: currentAnswerd['app_created_by'],
+      update_at: currentAnswerd['app_updated_on'],
+      updated_by: currentAnswerd['app_updated_by'],
+      date_of_attendance: currentAnswerd['date_of_attendance'],
+    );
     await AttendanceResponnceHelper().inserts(item);
     await ChildAttendenceHelper()
         .deleteAttendeceBYGUID(widget.ChildAttenGUID, date_of_attendance);
@@ -854,7 +903,6 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
       if (alredRecord[0].name != null) {
         myMap['name'] = alredRecord[0].name;
       }
-
     } else {
       var creCheDetails =
           await CrecheDataHelper().getCrecheResponceItem(widget.creche_nameId!);

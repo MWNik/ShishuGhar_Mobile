@@ -639,7 +639,7 @@ class _ChildFollowUpTabItemSCreenState
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
+   
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -837,6 +837,7 @@ class _ChildFollowUpTabItemSCreenState
         minimumDate = DateTime(parts[0], parts[1], parts[2]).subtract(Duration(days: 1));
       }
     } else if (fieldname == 'date_of_referral') {
+      // var cDate = Global.validString(myMap['date_of_referral'])?DateTime.parse(myMap['date_of_referral']):DateTime.parse(Validate().currentDate());
       var cDate = DateTime.parse(Validate().currentDate());
       var minDate = cDate.subtract(Duration(days: 7));
       List<int> parts = widget.scheduleDate.toString().split('-').map(int.parse).toList();

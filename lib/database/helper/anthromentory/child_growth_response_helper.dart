@@ -96,7 +96,8 @@ class ChildGrowthResponseHelper {
     return items;
   }
 
-  Future<void> insertUpdate(String cgmguid,String? measurementDate, int? name,int? creche_name, String? responces, String userId) async {
+  Future<void> insertUpdate(String cgmguid,String? measurementDate,
+      int? name,int? creche_name, String? responces, String userId, String? created_at) async {
     var item = ChildGrowthMetaResponseModel(
         cgmguid: cgmguid,
         responces: responces,
@@ -107,7 +108,7 @@ class ChildGrowthResponseHelper {
         creche_id: creche_name,
         created_by: userId,
         measurement_date: measurementDate,
-        created_at: Validate().currentDateTime());
+        created_at: created_at);
     await DatabaseHelper.database!.insert(
         'child_anthormentry_responce', item.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -212,6 +213,20 @@ class ChildGrowthResponseHelper {
 
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
       query,
+    );
+
+    List<ChildGrowthMetaResponseModel> items = [];
+    result.forEach((itemMap) {
+      items.add(ChildGrowthMetaResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+  Future<List<ChildGrowthMetaResponseModel>> allAnthormentryDisableOCT() async {
+    var query = 'Select * from  child_anthormentry_responce where responces NOTNULL and measurement_date >=?';
+
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+      query,['2024-10-01']
     );
 
     List<ChildGrowthMetaResponseModel> items = [];

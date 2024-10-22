@@ -79,6 +79,7 @@ class _ChildHealthDetailViewScreenState extends State<ChildHealthDetailViewScree
   ];
 
   Future<void> initializeData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     lng = (await Validate().readString(Validate.sLanguage))!;
     labelControlls.clear();
     List<String> valueNames = [
@@ -406,7 +407,7 @@ class _ChildHealthDetailViewScreenState extends State<ChildHealthDetailViewScree
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
+    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;

@@ -14,16 +14,15 @@ import '../../utils/globle_method.dart';
 import 'line_chart.dart';
 
 class WeightforAgeBoysGirlsScreen extends StatefulWidget {
-
   final int gender_id;
-  final String   childenrollguid, childId, childName;
+  final String childenrollguid, childId, childName;
 
   WeightforAgeBoysGirlsScreen(
       {super.key,
       required this.gender_id,
       required this.childenrollguid,
       required this.childId,
-        required this.childName});
+      required this.childName});
 
   @override
   State<WeightforAgeBoysGirlsScreen> createState() =>
@@ -32,7 +31,6 @@ class WeightforAgeBoysGirlsScreen extends StatefulWidget {
 
 class _WeightforAgeBoysGirlsScreenState
     extends State<WeightforAgeBoysGirlsScreen> {
-
   List<Offset>? green_cor = [];
   List<Offset>? red_cor = [];
   List<Offset>? yellow_max = [];
@@ -49,22 +47,24 @@ class _WeightforAgeBoysGirlsScreenState
 
   Future getDatas() async {
     String? lngtr = await Validate().readString(Validate.sLanguage);
-    if(lngtr != null) {
+    if (lngtr != null) {
       lng = lngtr;
     }
     List<String> valueItems = [
       CustomText.NorecordAvailable,
       CustomText.GrowthChart
     ];
-    await TranslationDataHelper().callTranslateString(valueItems).then((value) => translats.addAll(value));
+    await TranslationDataHelper()
+        .callTranslateString(valueItems)
+        .then((value) => translats.addAll(value));
     var boys = await HeightWeightBoysGirlsHelper().callWeightforAgeBoys();
     var girls = await HeightWeightBoysGirlsHelper().callWeightforAgeGirls();
-    List res =widget.gender_id == 1 ? boys : girls;
+    List res = widget.gender_id == 1 ? boys : girls;
     // widget.gender_id == 1 ? boys : girls;
     print(widget.gender_id);
     setState(() {
       age_in_months?.addAll(res.map((data) {
-        double result = (data.age_in_months as num).toDouble();
+        double result = (data.age_in_days as num).toDouble();
         return result;
       }).toList());
 
@@ -79,22 +79,22 @@ class _WeightforAgeBoysGirlsScreenState
       }).toList());
 
       green_cor?.addAll(res.map((data) {
-        double x = (data.age_in_months as num).toDouble();
+        double x = (data.age_in_days as num).toDouble();
         double y = (data.green as num).toDouble();
         return Offset(x, y);
       }).toList());
       red_cor?.addAll(res.map((data) {
-        double x = (data.age_in_months as num).toDouble();
+        double x = (data.age_in_days as num).toDouble();
         double y = (data.red as num).toDouble();
         return Offset(x, y);
       }).toList());
       yellow_max?.addAll(res.map((data) {
-        double x = (data.age_in_months as num).toDouble();
+        double x = (data.age_in_days as num).toDouble();
         double y = (data.yellow_max as num).toDouble();
         return Offset(x, y);
       }).toList());
       yellow_min?.addAll(res.map((data) {
-        double x = (data.age_in_months as num).toDouble();
+        double x = (data.age_in_days as num).toDouble();
         double y = (data.yellow_min as num).toDouble();
         return Offset(x, y);
       }).toList());
@@ -120,11 +120,11 @@ class _WeightforAgeBoysGirlsScreenState
       }).toList();
 
       child.addAll(children.map((data) {
-        double x = (data['age_months'] as num).toDouble();
+        double x = (Global.stringToDouble(data['age_months'].toString())).toDouble();
         (x > age_in_months!.last) ? maxX = x : maxX = age_in_months!.last;
         // (x < age_in_months!.first) ? minX = x : minX = age_in_months!.first;
 
-        double y = (data['weight_for_age'] as num).toDouble();
+        double y = (Global.stringToDouble(data['weight'].toString())).toDouble();
 
         (y > height_max!.last) ? maxY = y : maxY = height_max!.last;
         // (y < height_min!.first) ? minY = y : minY = height_min!.first;
@@ -157,13 +157,13 @@ class _WeightforAgeBoysGirlsScreenState
     var orientation = MediaQuery.of(context).orientation;
     print(child);
     return WillPopScope(
-        onWillPop: () async {
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]);
-      return true;
-        },
+      onWillPop: () async {
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+        return true;
+      },
       child: Scaffold(
         appBar: CustomChildAppbar(
           text: Global.returnTrLable(translats, CustomText.GrowthChart, lng),
@@ -176,7 +176,6 @@ class _WeightforAgeBoysGirlsScreenState
             ]);
             Navigator.pop(context);
           },
-
         ),
         body: (child.length == 0)
             ? Center(
@@ -188,8 +187,8 @@ class _WeightforAgeBoysGirlsScreenState
                 height: MediaQuery.of(context).size.height,
                 child: orientation == Orientation.portrait
                     ? MultiLineChart(
-                  childName: widget.childName,
-                  childId: widget.childId,
+                        childName: widget.childName,
+                        childId: widget.childId,
                         coordinatesOne: red_cor!,
                         child: child,
                         coordinatesTwo: green_cor!,

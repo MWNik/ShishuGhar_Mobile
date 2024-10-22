@@ -9,9 +9,7 @@ import '../../../utils/globle_method.dart';
 import 'child_enrolled_exit_not_listed_screen.dart';
 import 'children_enrolled_exit_listed_screen.dart';
 
-
 class EnrolledExitChildListingTab extends StatefulWidget {
-
   final int creCheId;
   final String village_id;
 
@@ -22,24 +20,24 @@ class EnrolledExitChildListingTab extends StatefulWidget {
   });
 
   @override
-  _EnrolledChildrenListingTabState createState() => _EnrolledChildrenListingTabState();
+  _EnrolledChildrenListingTabState createState() =>
+      _EnrolledChildrenListingTabState();
 }
 
-class _EnrolledChildrenListingTabState extends State<EnrolledExitChildListingTab>
-    with TickerProviderStateMixin {
+class _EnrolledChildrenListingTabState
+    extends State<EnrolledExitChildListingTab> with TickerProviderStateMixin {
   bool _isLoading = true;
   late TabController _tabController;
   String lng = "en";
-  List<String> tabItems=[];
-  List<Widget> tabTitleItem = [];
   List<Translation> labelControlls = [];
+  String? role;
+  int tabCount = 2;
 
   @override
   void initState() {
     super.initState();
     setLabelTextData();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +51,7 @@ class _EnrolledChildrenListingTabState extends State<EnrolledExitChildListingTab
         },
         child: Scaffold(
           appBar: AppBar(
-            toolbarHeight: 40,
+            toolbarHeight: 60,
             backgroundColor: Color(0xff5979AA),
             leading: Padding(
               padding: EdgeInsets.only(left: 10),
@@ -68,11 +66,12 @@ class _EnrolledChildrenListingTabState extends State<EnrolledExitChildListingTab
                 ),
               ),
             ),
-            title:  Column(
+            title: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  Global.returnTrLable(labelControlls,CustomText.Enrolledchildren,lng),
+                  Global.returnTrLable(
+                      labelControlls, CustomText.Enrolledchildren, lng),
                   style: Styles.white145,
                 ),
                 // Text(
@@ -80,20 +79,54 @@ class _EnrolledChildrenListingTabState extends State<EnrolledExitChildListingTab
                 //   style: Styles.white145,
                 // ),
               ],
-
             ),
             centerTitle: true,
             bottom: _isLoading
                 ? null
-                : TabBar(
-              indicatorColor: Colors.white,
-              unselectedLabelColor: Colors.grey.shade300,
-              unselectedLabelStyle: Styles.white124P,
-              labelColor: Colors.white,
+                :TabBar(
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelPadding: EdgeInsets.zero,
+              indicator: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Color(0xffF26BA3),
+                    width: 3.0,
+                  ),
+                ),
+              ),
               controller: _tabController,
-              // isScrollable: true,
-              tabs: tabTitleItem,
+              unselectedLabelColor: Color(0xff369A8D),
+              tabs: [
+                Container(
+                  color: Color(0xff369A8D),
+                  width: double.infinity,
+                  child: Tab(
+                    child: Text(
+                      Global.returnTrLable(labelControlls, CustomText.Enrolled, lng),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+                Container(
+                  color: Color(0xff369A8D),
+                  width: double.infinity,
+                  child: Tab(
+                      child: Text(
+                        Global.returnTrLable(labelControlls, CustomText.NotEnroll, lng),
+                        style: TextStyle(color: Colors.white),
+                      )),
+                ),
+              ],
             ),
+            /* TabBar(
+                    indicatorColor: Colors.white,
+                    unselectedLabelColor: Colors.grey.shade300,
+                    unselectedLabelStyle: Styles.white124P,
+                    labelColor: Colors.white,
+                    controller: _tabController,
+                    // isScrollable: true,
+                    tabs: tabTitleItem,
+                  ),*/
           ),
           body: Column(
             children: [
@@ -111,28 +144,23 @@ class _EnrolledChildrenListingTabState extends State<EnrolledExitChildListingTab
     }
   }
 
+
   List<Widget> tabControllerScreen() {
     List<Widget> tabItem = [];
-    for (int i = 0; i < tabItems.length; i++) {
-      if(i==1){
-        tabItem.add(NotEnrolledExitChildrenListedScreen(crecheId:widget.creCheId,village_id:widget.village_id));
-      }else tabItem.add(EnrolledExitChildrenListedScreen(crecheId:widget.creCheId));
+    for (int i = 0; i < tabCount; i++) {
+      if (i == 1) {
+        tabItem.add(NotEnrolledExitChildrenListedScreen(
+            crecheId: widget.creCheId, village_id: widget.village_id));
+      } else
+        tabItem
+            .add(EnrolledExitChildrenListedScreen(crecheId: widget.creCheId));
     }
     return tabItem;
   }
 
 
-
-
-
-   tabController()  {
-    tabItems.clear();
-    tabItems.add(Global.returnTrLable(labelControlls,CustomText.Enrolled,lng));
-    tabItems.add(Global.returnTrLable(labelControlls,CustomText.NotEnroll,lng));
-    tabItems.forEach((element)  {
-      tabTitleItem.add(Tab(icon: Container(child: Text(element))));
-    });
-    _tabController = TabController(length: tabItems.length, vsync: this);
+  tabController() {
+    _tabController = TabController(length: tabCount, vsync: this);
     setState(() {
       _isLoading = false;
     });
@@ -145,13 +173,16 @@ class _EnrolledChildrenListingTabState extends State<EnrolledExitChildListingTab
   }
 
   Future<void> setLabelTextData() async {
+    role = (await Validate().readString(Validate.role))!;
     lng = (await Validate().readString(Validate.sLanguage))!;
-    List<String> valueNames = [CustomText.Enrolledchildren,CustomText.Enrolled
-      ,CustomText.NotEnroll];
+    List<String> valueNames = [
+      CustomText.Enrolledchildren,
+      CustomText.Enrolled,
+      CustomText.NotEnroll
+    ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls=value);
+        .then((value) => labelControlls = value);
     tabController();
   }
-
 }

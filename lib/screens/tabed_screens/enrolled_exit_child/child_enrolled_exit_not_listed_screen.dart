@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:path/path.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_checkbox.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/style/styles.dart';
@@ -21,10 +24,8 @@ import 'enrolled_exit_child_tab.dart';
 class NotEnrolledExitChildrenListedScreen extends StatefulWidget {
   final int crecheId;
   final String village_id;
-  const NotEnrolledExitChildrenListedScreen({super.key,
-    required this.crecheId,
-    required this.village_id
-  });
+  const NotEnrolledExitChildrenListedScreen(
+      {super.key, required this.crecheId, required this.village_id});
 
   @override
   _NotEnrolledChildrenListedScreenState createState() =>
@@ -43,6 +44,7 @@ class _NotEnrolledChildrenListedScreenState
   String? selectedVillage;
   List<OptionsModel> villageList = [];
   String? selectedItem;
+
   bool isDropdownActivated = false;
   int? ageLimit;
   List<OptionsModel> genderList = [];
@@ -50,6 +52,10 @@ class _NotEnrolledChildrenListedScreenState
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int? maxAgeLimit;
   int? minAgeLimit;
+  bool isOnlyUnsynched = false;
+  List<Map<String, dynamic>> unsynchedList = [];
+  String? role;
+  List<Map<String, dynamic>> allList = [];
 
   @override
   void initState() {
@@ -63,10 +69,10 @@ class _NotEnrolledChildrenListedScreenState
     if (lngtr != null) {
       lng = lngtr;
     }
-
-    genderList = await OptionsModelHelper().getMstCommonOptions('Gender',lng);
+    role = (await Validate().readString(Validate.role))!;
+    genderList = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
     relationChilddata =
-        await OptionsModelHelper().getMstCommonOptions('Relation',lng);
+        await OptionsModelHelper().getMstCommonOptions('Relation', lng);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -79,7 +85,10 @@ class _NotEnrolledChildrenListedScreenState
       CustomText.Search,
       CustomText.clear,
       CustomText.Village,
-      CustomText.ageInMonthEn
+      CustomText.ageInMonthEn,
+      CustomText.childCount,
+      CustomText.all,
+      CustomText.unsynched
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -90,9 +99,18 @@ class _NotEnrolledChildrenListedScreenState
   }
 
   Future<void> fetchChildHHDataList() async {
-    childHHData = await EnrolledExitChilrenResponceHelper().getNotEnrollChildren(widget.village_id);
+    childHHData = await EnrolledExitChilrenResponceHelper()
+        .getNotEnrollChildren(widget.village_id);
 
-    filterData = childHHData;
+    childHHData = childHHData.where((element) {
+      var isdobavail =
+          Global.getItemValues(element['responces'], 'is_dob_available');
+      return Global.stringToInt(isdobavail.toString()) == 1;
+    }).toList();
+    allList = childHHData;
+    unsynchedList =
+        childHHData.where((element) => element['is_edited'] == 1).toList();
+    filterData = isOnlyUnsynched ? unsynchedList : allList;
     Searchcontroller.text = '';
     selectedItem = null;
 
@@ -125,8 +143,9 @@ class _NotEnrolledChildrenListedScreenState
   // }
 
   filteredGetData(BuildContext context) async {
+    var filteredList = isOnlyUnsynched ? unsynchedList : allList;
     if (selectedItem != null && maxAgeLimit != null && minAgeLimit != null) {
-      filterData = childHHData.where((element) {
+      filterData = filteredList.where((element) {
         var ViItem = Global.getItemValues(element['responces'], 'gender_id');
         var ageItem =
             int.parse(Global.getItemValues(element['responces'], 'child_age'));
@@ -137,14 +156,14 @@ class _NotEnrolledChildrenListedScreenState
     } else if (selectedItem != null &&
         maxAgeLimit == null &&
         minAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filteredList.where((element) {
         var ViItem = Global.getItemValues(element['responces'], 'gender_id');
         return ViItem == selectedItem;
       }).toList();
     } else if (selectedItem == null &&
         maxAgeLimit != null &&
         minAgeLimit != null) {
-      filterData = childHHData.where((element) {
+      filterData = filteredList.where((element) {
         // var ViItem = Global.getItemValues(element['responces'], 'gender_id');
         var ageItem =
             int.parse(Global.getItemValues(element['responces'], 'child_age'));
@@ -153,7 +172,7 @@ class _NotEnrolledChildrenListedScreenState
     } else if (maxAgeLimit != null &&
         selectedItem == null &&
         minAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filteredList.where((element) {
         var ageItem =
             int.parse(Global.getItemValues(element['responces'], 'child_age'));
         return ageItem <= maxAgeLimit!;
@@ -161,13 +180,13 @@ class _NotEnrolledChildrenListedScreenState
     } else if (minAgeLimit != null &&
         selectedItem == null &&
         maxAgeLimit == null) {
-      filterData = childHHData.where((element) {
+      filterData = filteredList.where((element) {
         var ageItem =
             int.parse(Global.getItemValues(element['responces'], 'child_age'));
         return ageItem >= minAgeLimit!;
       }).toList();
     } else {
-      filterData = childHHData;
+      filterData = filteredList;
     }
     setState(() {});
   }
@@ -230,6 +249,11 @@ class _NotEnrolledChildrenListedScreenState
                         ],
                       ),
                     ),
+                    // DynamicCustomCheckboxWithLabel(
+                    //   label: Global.returnTrLable(translats, CustomText.unsynched, lng),
+                    //   onChanged: (value) {
+
+                    //   }),
                     SizedBox(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -305,6 +329,24 @@ class _NotEnrolledChildrenListedScreenState
                         ],
                       ),
                     ),
+                    role == CustomText.crecheSupervisor
+                        ? Padding(
+                            padding: EdgeInsets.only(top: 25),
+                            child: AnimatedRollingSwitch(
+                              title1: Global.returnTrLable(
+                                  translats, CustomText.all, lng),
+                              title2: Global.returnTrLable(
+                                  translats, CustomText.unsynched, lng),
+                              isOnlyUnsynched: isOnlyUnsynched ?? false,
+                              onChange: (value) async {
+                                setState(() {
+                                  isOnlyUnsynched = value;
+                                });
+                                await fetchChildHHDataList();
+                              },
+                            ),
+                          )
+                        : SizedBox()
                   ]),
             )),
       ),
@@ -352,6 +394,18 @@ class _NotEnrolledChildrenListedScreenState
               // )
             ],
           ),
+          Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  '${Global.returnTrLable(translats, CustomText.childCount, lng)}: ${filterData.length}',
+                  style: Styles.black12700,
+                )
+              ],
+            ),
+          ),
           SizedBox(
             height: 10.h,
           ),
@@ -363,39 +417,45 @@ class _NotEnrolledChildrenListedScreenState
                     physics: BouncingScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     itemBuilder: (BuildContext context, int index) {
+                      var selectedItem = filterData[index];
                       return GestureDetector(
                         onTap: () async {
-                          var selectedItem = filterData[index];
-                          String refStatus = '';
-                          String enrolledChildGuid = '';
-                          String? minDate=await callDateOfExit(Global.getItemValues(
-                              selectedItem['responces'],
-                              'hhcguid'));
-                          if (!Global.validString(enrolledChildGuid)) {
-                            enrolledChildGuid = Validate().randomGuid();
-                            EnrolledExitChilrenTab.childName=Global.getItemValues(selectedItem['responces'],
-                                'child_name');
-                            refStatus = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        EnrolledExitChilrenTab(
-                                          isEditable: true,
-                                            CHHGUID: Global.getItemValues(
-                                                selectedItem['responces'],
-                                                'hhcguid'),
-                                            HHGUID: Global.getItemValues(
-                                                selectedItem['hhResponce'],
-                                                'hhguid'),
-                                            HHname: Global.stringToInt(
-                                                selectedItem['name'].toString()),
-                                            EnrolledChilGUID: enrolledChildGuid,
-                                            crecheId: widget.crecheId,
-                                            minDate: minDate,
-                                            isNew: 0,
-                                            isImageUpdate:false)));
-                          }
-                          if (refStatus == 'itemRefresh') {
-                            await fetchChildHHDataList();
+                          if (role == CustomText.crecheSupervisor) {
+                            String refStatus = '';
+                            String enrolledChildGuid = '';
+                            String? minDate = await callDateOfExit(
+                                Global.getItemValues(
+                                    selectedItem['responces'], 'hhcguid'));
+                            if (!Global.validString(enrolledChildGuid)) {
+                              enrolledChildGuid = Validate().randomGuid();
+                              EnrolledExitChilrenTab.childName =
+                                  Global.getItemValues(
+                                      selectedItem['responces'], 'child_name');
+                              refStatus = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) => EnrolledExitChilrenTab(
+                                          isEditable: role ==
+                                                  CustomText.crecheSupervisor
+                                                      .trim()
+                                              ? true
+                                              : false,
+                                          CHHGUID: Global.getItemValues(
+                                              selectedItem['responces'],
+                                              'hhcguid'),
+                                          HHGUID: Global.getItemValues(
+                                              selectedItem['hhResponce'],
+                                              'hhguid'),
+                                          HHname: Global.stringToInt(
+                                              selectedItem['name'].toString()),
+                                          EnrolledChilGUID: enrolledChildGuid,
+                                          crecheId: widget.crecheId,
+                                          minDate: minDate,
+                                          isNew: 0,
+                                          isImageUpdate: false)));
+                            }
+                            if (refStatus == 'itemRefresh') {
+                              await fetchChildHHDataList();
+                            }
                           }
                         },
                         child: Padding(
@@ -434,17 +494,17 @@ class _NotEnrolledChildrenListedScreenState
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.hhNameS, lng).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.ageInMonth, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
-                                      ),
+                                      // Text(
+                                      //   '${Global.returnTrLable(translats, CustomText.ageInMonth, lng).trim()} : ',
+                                      //   style: Styles.black104,
+                                      //   strutStyle: StrutStyle(height: 1),
+                                      // ),
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.Village, lng).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                     ],
                                   ),
@@ -466,47 +526,48 @@ class _NotEnrolledChildrenListedScreenState
                                       children: [
                                         Text(
                                           Global.getItemValues(
-                                              filterData[index]['responces'],
+                                              selectedItem['responces'],
                                               'child_name'),
-                                          style: Styles.blue125,
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
                                           Global.getItemValues(
-                                              filterData[index]['hhResponce'],
+                                              selectedItem['hhResponce'],
                                               'hosuehold_head_name'),
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        Text(
-                                          Global.getItemValues(
-                                              filterData[index]['responces'],
-                                              'child_age'),
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        // Text(
+                                        //   Global.getItemValues(
+                                        //       selectedItem['responces'],
+                                        //       'child_age'),
+                                        //   style: Styles.cardBlue10,
+                                        //   strutStyle: StrutStyle(height: .5),
+                                        //   overflow: TextOverflow.ellipsis,
+                                        // ),
                                         Text(
                                           callVillageName(
-                                              filterData[index]['hhResponce']),
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
+                                              selectedItem['hhResponce']),
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),
                                   ),
                                   SizedBox(width: 5),
-                                  (filterData[index]['is_edited']==0 && filterData[index]['is_uploaded']==1)?
-                                  Image.asset(
-                                    "assets/sync.png",
-                                    scale: 1.5,
-                                  ):
-                                  Image.asset(
-                                    "assets/sync_gray.png",
-                                    scale: 1.5,
-                                  )
+                                  (selectedItem['is_edited'] == 0 &&
+                                          selectedItem['is_uploaded'] == 1)
+                                      ? Image.asset(
+                                          "assets/sync.png",
+                                          scale: 1.5,
+                                        )
+                                      : Image.asset(
+                                          "assets/sync_gray.png",
+                                          scale: 1.5,
+                                        )
                                 ],
                               ),
                             ),
@@ -541,8 +602,9 @@ class _NotEnrolledChildrenListedScreenState
   }
 
   filterDataQu(String entry) {
+    var filteredList = isOnlyUnsynched ? unsynchedList : allList;
     if (entry.length > 0) {
-      filterData = childHHData
+      filterData = filteredList
           .where((element) =>
               (Global.getItemValues(
                       element['hhResponce'], 'hosuehold_head_name'))
@@ -553,7 +615,7 @@ class _NotEnrolledChildrenListedScreenState
                   .startsWith(entry.toLowerCase()))
           .toList();
     } else
-      filterData = childHHData;
+      filterData = filteredList;
     setState(() {});
   }
 
@@ -596,7 +658,7 @@ class _NotEnrolledChildrenListedScreenState
   }
 
   void cleaAllFilter() {
-    filterData = childHHData;
+    filterData = isOnlyUnsynched ? unsynchedList : allList;
     selectedItem = null;
     selectedVillage = null;
     Searchcontroller.text = '';
@@ -604,7 +666,8 @@ class _NotEnrolledChildrenListedScreenState
     minAgeLimit = null;
     setState(() {});
   }
-  Future<String?> callDateOfExit(String CHHGUID)async{
+
+  Future<String?> callDateOfExit(String CHHGUID) async {
     return await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
   }
 }

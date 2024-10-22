@@ -48,18 +48,18 @@ class ChildImmunizationDetailsTab extends StatefulWidget {
   final String childDob;
   final EnrolledExitChildResponceModel? enrolledItem;
 
-  ChildImmunizationDetailsTab(
-      {super.key,
-      required this.creche_id,
-      required this.child_immunization_guid,
-      required this.chilenrolledGUID,
-      required this.enName,
-      required this.enrolledItem,
-      required this.childName,
-      required this.dateOfEnrolled,
-      required this.childHHID,
-      required this.childDob,
-      });
+  ChildImmunizationDetailsTab({
+    super.key,
+    required this.creche_id,
+    required this.child_immunization_guid,
+    required this.chilenrolledGUID,
+    required this.enName,
+    required this.enrolledItem,
+    required this.childName,
+    required this.dateOfEnrolled,
+    required this.childHHID,
+    required this.childDob,
+  });
 
   @override
   @override
@@ -73,6 +73,7 @@ class _ChildImmunizationExpendedScreenSatet
   Map<int, dynamic> createAtVaccines = {};
   bool _isLoading = true;
   String? lng = 'en';
+  String? role;
   List<Translation> labelControlls = [];
   List<VaccineModel> vaccinesOverdue = [];
   List<VaccineModel> vaccinesUpComming = [];
@@ -81,12 +82,13 @@ class _ChildImmunizationExpendedScreenSatet
   int tabCount = 2;
   DateTime? lastDate;
 
-
   Future<void> initializeData() async {
     List<int> dateParts = widget.childDob.split('-').map(int.parse).toList();
-    lastDate=DateTime(dateParts[0], dateParts[1], dateParts[2]).subtract(Duration(days:1));
+    lastDate = DateTime(dateParts[0], dateParts[1], dateParts[2])
+        .subtract(Duration(days: 1));
 
     lng = (await Validate().readString(Validate.sLanguage))!;
+    role = (await Validate().readString(Validate.role));
     var dateTime = Global.stringToDate(
         Global.getItemValues(widget.enrolledItem!.responces!, 'child_dob'));
     childAgeInDays = Validate().calculateAgeInDays(dateTime!);
@@ -110,6 +112,7 @@ class _ChildImmunizationExpendedScreenSatet
       // CustomText.vaccine,
       // CustomText.sideForVaccination,
       CustomText.vaccinationDate,
+      CustomText.ChildImmunizationDetails
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -150,10 +153,6 @@ class _ChildImmunizationExpendedScreenSatet
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        Global.returnTrLable(labelControlls,CustomText.ChildImmunization,lng!),
-                        style: Styles.white145,
-                      ),
                       RichText(
                         maxLines: 2,
                         textAlign: TextAlign.center,
@@ -161,7 +160,7 @@ class _ChildImmunizationExpendedScreenSatet
                           WidgetSpan(
                             child: Text(
                               '${widget.childName} ',
-                              style: Styles.white126P,
+                              style: Styles.white145,
                               textAlign: TextAlign.center,
                               softWrap: true,
                               overflow: TextOverflow.ellipsis,
@@ -170,13 +169,19 @@ class _ChildImmunizationExpendedScreenSatet
                           WidgetSpan(
                             child: Text(
                               '-${widget.childHHID}',
-                              style: Styles.white126P,
+                              style: Styles.white145,
                               textAlign: TextAlign.center,
                               softWrap: true,
                               // overflow: TextOverflow.ellipsis,
                             ),
                           )
                         ]),
+                      ),
+
+                      Text(
+                        Global.returnTrLable(
+                            labelControlls, CustomText.ChildImmunizationDetails, lng!),
+                        style: Styles.white126P,
                       ),
                       // Add additional TextSpans here if needed
                     ],
@@ -204,14 +209,18 @@ class _ChildImmunizationExpendedScreenSatet
                       color: getBorderColorByType('overdue'),
                       width: double.infinity,
                       child: Tab(
-                          child: Text(Global.returnTrLable(labelControlls, CustomText.overdue, lng!),
+                          child: Text(
+                              Global.returnTrLable(
+                                  labelControlls, CustomText.overdue, lng!),
                               style: TextStyle(color: Colors.white))),
                     ),
                     Container(
                       width: double.infinity,
                       color: getBorderColorByType('completed'),
                       child: Tab(
-                          child: Text(Global.returnTrLable(labelControlls, CustomText.complted,lng!),
+                          child: Text(
+                              Global.returnTrLable(
+                                  labelControlls, CustomText.complted, lng!),
                               style: TextStyle(color: Colors.white))),
                     ),
                   ]
@@ -220,21 +229,27 @@ class _ChildImmunizationExpendedScreenSatet
                       color: getBorderColorByType('overdue'),
                       width: double.infinity,
                       child: Tab(
-                          child: Text(Global.returnTrLable(labelControlls, CustomText.overdue, lng!),
+                          child: Text(
+                              Global.returnTrLable(
+                                  labelControlls, CustomText.overdue, lng!),
                               style: TextStyle(color: Colors.white))),
                     ),
                     Container(
                       width: double.infinity,
                       color: getBorderColorByType('completed'),
                       child: Tab(
-                          child: Text(Global.returnTrLable(labelControlls, CustomText.complted, lng!),
+                          child: Text(
+                              Global.returnTrLable(
+                                  labelControlls, CustomText.complted, lng!),
                               style: TextStyle(color: Colors.white))),
                     ),
                     Container(
                       width: double.infinity,
                       color: getBorderColorByType('upcoming'),
                       child: Tab(
-                          child: Text(Global.returnTrLable(labelControlls, CustomText.upcomming, lng!),
+                          child: Text(
+                              Global.returnTrLable(
+                                  labelControlls, CustomText.upcomming, lng!),
                               style: TextStyle(color: Colors.white))),
                     ),
                   ],
@@ -261,13 +276,12 @@ class _ChildImmunizationExpendedScreenSatet
     );
   }
 
-
   Future callVaccinelistItem() async {
     vaccinesOverdue.clear();
     vaccinesUpComming.clear();
     vaccinesCompleted.clear();
-    vaccinesDate={};
-    createAtVaccines={};
+    vaccinesDate = {};
+    createAtVaccines = {};
     vaccinesOverdue =
         await VaccinesDataHelper().callVaccinesByDays(childAgeInDays);
     vaccinesUpComming =
@@ -286,9 +300,9 @@ class _ChildImmunizationExpendedScreenSatet
         children.forEach((element) {
           var comVaId = Global.stringToInt(element['vaccine_id'].toString());
           completedVaccine.add(comVaId);
-          if(element['vaccination_date']!=null)
-          vaccinesDate[comVaId] = element['vaccination_date'];
-          if(element['vaccine_created_at']!=null){
+          if (element['vaccination_date'] != null)
+            vaccinesDate[comVaId] = element['vaccination_date'];
+          if (element['vaccine_created_at'] != null) {
             createAtVaccines[comVaId] = element['vaccine_created_at'];
           }
         });
@@ -319,17 +333,17 @@ class _ChildImmunizationExpendedScreenSatet
     });
   }
 
-  Future createVaccine(
-      int vaccineId, String vaccine, String sideForVaccination,int type) async {
+  Future createVaccine(int vaccineId, String vaccine, String sideForVaccination,
+      int type) async {
     String? vaccineDate;
     int? vaccinated;
-    if(type==1){
-      vaccineDate=vaccinesDate[vaccineId];
-      if(vaccineDate!=null){
-        vaccinated=1;
-      }else  vaccinated=0;
+    if (type == 1) {
+      vaccineDate = vaccinesDate[vaccineId];
+      if (vaccineDate != null) {
+        vaccinated = 1;
+      } else
+        vaccinated = 0;
     }
-
 
     showDialog(
       context: context,
@@ -394,37 +408,44 @@ class _ChildImmunizationExpendedScreenSatet
                               height:
                                   MediaQuery.of(context).size.height * 0.01),
                           DynamicCustomYesNoCheckboxWithLabel(
-                            label: Global.returnTrLable(labelControlls, CustomText.Vaccinated, lng!),
+                            label: Global.returnTrLable(
+                                labelControlls, CustomText.Vaccinated, lng!),
                             initialValue: vaccinated,
                             labelControlls: labelControlls,
                             lng: lng!,
                             isRequred: 1,
                             onChanged: (value) {
                               vaccinated = value;
-                              if(vaccinated==1){
-                                if(type==1){
-                                  vaccineDate=vaccinesDate[vaccineId];
-                                }else vaccineDate=Validate().currentDate();
-
+                              if (vaccinated == 1) {
+                                if (type == 1) {
+                                  vaccineDate = vaccinesDate[vaccineId];
+                                } else
+                                  vaccineDate = Validate().currentDate();
                               }
                               setState(() {});
                             },
                           ),
-                          vaccinated==1?SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.01):SizedBox(),
-                          vaccinated==1?CustomDatepickerDynamic(
-                            isRequred: 1,
-                            calenderValidate: [],
-                            initialvalue: vaccineDate,
-                            minDate:lastDate,
-                            readable: false,
-                            onChanged: (value) {
-                              vaccineDate = value;
-                            },
-                            titleText: Global.returnTrLable(labelControlls,
-                                CustomText.vaccinationDate, lng!),
-                          ):SizedBox(),
+                          vaccinated == 1
+                              ? SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.01)
+                              : SizedBox(),
+                          vaccinated == 1
+                              ? CustomDatepickerDynamic(
+                                  isRequred: 1,
+                                  calenderValidate: [],
+                                  initialvalue: vaccineDate,
+                                  minDate: lastDate,
+                                  readable: false,
+                                  onChanged: (value) {
+                                    vaccineDate = value;
+                                  },
+                                  titleText: Global.returnTrLable(
+                                      labelControlls,
+                                      CustomText.vaccinationDate,
+                                      lng!),
+                                )
+                              : SizedBox(),
                           SizedBox(
                               height:
                                   MediaQuery.of(context).size.height * 0.02),
@@ -454,25 +475,29 @@ class _ChildImmunizationExpendedScreenSatet
                                         CustomText.Submit, lng!),
                                     color: Color(0xff369A8D),
                                     onPressed: () async {
-                                      if (vaccinated!=null) {
-                                        if(vaccinated==1 && Global.validString(vaccineDate)){
+                                      if (vaccinated != null) {
+                                        if (vaccinated == 1 &&
+                                            Global.validString(vaccineDate)) {
+                                          Navigator.of(context).pop();
+                                          await saveVaccineIte(vaccineId,
+                                              vaccineDate!, vaccinated!);
+                                        } else if (vaccinated == 0) {
                                           Navigator.of(context).pop();
                                           await saveVaccineIte(
-                                              vaccineId, vaccineDate!,vaccinated!);
-                                        }else if (vaccinated==0){
-                                          Navigator.of(context).pop();
-                                          await saveVaccineIte(
-                                              vaccineId, null,vaccinated!);
-                                        }else Validate().singleButtonPopup(
-                                            Global.returnTrLable(
-                                                labelControlls,
-                                                CustomText.selectVacinationDate,
-                                                lng!),
-                                            Global.returnTrLable(labelControlls,
-                                                CustomText.ok, lng!),
-                                            false,
-                                            context);
-
+                                              vaccineId, null, vaccinated!);
+                                        } else
+                                          Validate().singleButtonPopup(
+                                              Global.returnTrLable(
+                                                  labelControlls,
+                                                  CustomText
+                                                      .selectVacinationDate,
+                                                  lng!),
+                                              Global.returnTrLable(
+                                                  labelControlls,
+                                                  CustomText.ok,
+                                                  lng!),
+                                              false,
+                                              context);
                                       } else
                                         Validate().singleButtonPopup(
                                             Global.returnTrLable(
@@ -499,7 +524,8 @@ class _ChildImmunizationExpendedScreenSatet
     );
   }
 
-  Future saveVaccineIte(int vaccineId, String? vaccineDate,int vaccinated) async {
+  Future saveVaccineIte(
+      int vaccineId, String? vaccineDate, int vaccinated) async {
     var userName = (await Validate().readString(Validate.userName))!;
     var alrecords = await ChildImmunizationResponseHelper()
         .getChildEventResponcewithGuid(widget.child_immunization_guid!);
@@ -511,12 +537,15 @@ class _ChildImmunizationExpendedScreenSatet
       if (childs != null) {
         children = List<Map<String, dynamic>>.from(childs);
         if (children.length > 0) {
-          var exitsItem = children.where((element) =>
-          element['vaccine_id'].toString() == vaccineId.toString()).toList();
+          var exitsItem = children
+              .where((element) =>
+                  element['vaccine_id'].toString() == vaccineId.toString())
+              .toList();
           if (exitsItem.length > 0) {
             if (vaccinated == 1) {
               exitsItem[0]['vaccination_date'] = vaccineDate;
-            }else exitsItem[0].remove('vaccination_date');
+            } else
+              exitsItem[0].remove('vaccination_date');
             exitsItem[0]['vaccinated'] = vaccinated;
           } else {
             Map<String, dynamic> childItem = {};
@@ -531,7 +560,7 @@ class _ChildImmunizationExpendedScreenSatet
         } else {
           Map<String, dynamic> childItem = {};
           childItem['vaccine_id'] = '$vaccineId';
-          if(vaccinated==1){
+          if (vaccinated == 1) {
             childItem['vaccination_date'] = vaccineDate;
           }
           childItem['vaccine_created_at'] = Validate().currentDateTime();
@@ -541,7 +570,7 @@ class _ChildImmunizationExpendedScreenSatet
       } else {
         Map<String, dynamic> childItem = {};
         childItem['vaccine_id'] = '$vaccineId';
-        if(vaccinated==1){
+        if (vaccinated == 1) {
           childItem['vaccination_date'] = vaccineDate;
         }
         childItem['vaccinated'] = vaccinated;
@@ -591,7 +620,7 @@ class _ChildImmunizationExpendedScreenSatet
         List<Map<String, dynamic>> children = [];
         Map<String, dynamic> childItem = {};
         childItem['vaccine_id'] = '$vaccineId';
-        if(vaccinated==1){
+        if (vaccinated == 1) {
           childItem['vaccination_date'] = vaccineDate;
         }
         childItem['vaccinated'] = vaccinated;
@@ -624,19 +653,15 @@ class _ChildImmunizationExpendedScreenSatet
         builder: (context) {
           return SingleButtonPopupDialog(
               message: Global.returnTrLable(
-                  labelControlls,
-                  CustomText.dataSaveSuc,
-                  lng!),button:  Global.returnTrLable(labelControlls,
-              CustomText.ok, lng!)
-          );
+                  labelControlls, CustomText.dataSaveSuc, lng!),
+              button:
+                  Global.returnTrLable(labelControlls, CustomText.ok, lng!));
         },
-
       );
-      if(shouldProceed){
+      if (shouldProceed) {
         await initializeData();
       }
     }
-
   }
 
   Color getBorderColorByType(String type) {
@@ -688,27 +713,31 @@ class _ChildImmunizationExpendedScreenSatet
               return GridTile(
                 child: GestureDetector(
                   onTap: () async {
-                    if(type=='overdue') {
-                      await createVaccine(
-                        vaccines[index].name!,
-                        vaccines[index].vaccine!,
-                        vaccines[index].site_for_vaccinations!,0,
-                      );
-                    }else if(type=='completed') {
-                      if(Global.validString(createAtVaccines[vaccines[index].name!])){
-                        var editDate=DateTime.parse(createAtVaccines[vaccines[index].name!])
-                            .add(Duration(days: 16));
-                        var currentDate=DateTime.parse(Validate().currentDateTime());
-                        if(editDate.isAfter(currentDate)){
-                          await createVaccine(
-                              vaccines[index].name!,
-                              vaccines[index].vaccine!,
-                              vaccines[index].site_for_vaccinations!,1
-                          );
+                    if (role == CustomText.crecheSupervisor) {
+                      if (type == 'overdue') {
+                        await createVaccine(
+                          vaccines[index].name!,
+                          vaccines[index].vaccine!,
+                          vaccines[index].site_for_vaccinations!,
+                          0,
+                        );
+                      } else if (type == 'completed') {
+                        if (Global.validString(
+                            createAtVaccines[vaccines[index].name!])) {
+                          var editDate = DateTime.parse(
+                                  createAtVaccines[vaccines[index].name!])
+                              .add(Duration(days: 16));
+                          var currentDate =
+                              DateTime.parse(Validate().currentDateTime());
+                          if (editDate.isAfter(currentDate)) {
+                            await createVaccine(
+                                vaccines[index].name!,
+                                vaccines[index].vaccine!,
+                                vaccines[index].site_for_vaccinations!,
+                                1);
+                          }
                         }
-
                       }
-
                     }
                   },
                   child: Container(
@@ -734,12 +763,11 @@ class _ChildImmunizationExpendedScreenSatet
                         Text('${vaccines[index].site_for_vaccinations}',
                             style: Styles.black123),
                         if (type == 'completed')
-                      Text(
-                          vaccinesDate[vaccines[index].name]!=null ?
-                          '${CustomText.DateS} : ${Validate().displeDateFormate(vaccinesDate[vaccines[index].name])}':
-                          '${CustomText.Vaccinated} : ${CustomText.No}',
-                              style: Styles.black123)
-                        ,
+                          Text(
+                              vaccinesDate[vaccines[index].name] != null
+                                  ? '${CustomText.DateS} : ${Validate().displeDateFormate(vaccinesDate[vaccines[index].name])}'
+                                  : '${CustomText.Vaccinated} : ${CustomText.No}',
+                              style: Styles.black123),
                       ],
                     ),
                   ),

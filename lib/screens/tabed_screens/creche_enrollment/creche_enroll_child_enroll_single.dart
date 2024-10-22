@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';
 import 'package:shishughar/model/apimodel/creche_database_responce_model.dart';
 import 'package:shishughar/screens/tabed_screens/child_exit/child_exit_details_screen.dart';
@@ -26,11 +27,15 @@ import 'enrolled_children_tab_item_details_only_view.dart';
 class CrecheEnrollChildEnrollSingleScreen extends StatefulWidget {
   final String? creche_id;
   final String? chilenrolledGUID;
+  final String? childId;
+  final String? childName;
 
   CrecheEnrollChildEnrollSingleScreen({
     super.key,
     required this.chilenrolledGUID,
     required this.creche_id,
+    this.childId,
+    this.childName,
   });
 
   @override
@@ -53,7 +58,6 @@ class _CrecheEnrollChildEnrollScreenState
   List<dynamic>? childenrollId;
 
   Future<void> initializeData() async {
-
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -74,29 +78,29 @@ class _CrecheEnrollChildEnrollScreenState
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
-    reasonOfExit =
-        await OptionsModelHelper().getMstCommonOptions('Reason for child exit',lng);
+    reasonOfExit = await OptionsModelHelper()
+        .getMstCommonOptions('Reason for child exit', lng);
     await fetchChildexits();
     print(crecheEnrollChild.length);
   }
 
   Future<void> fetchChildexits() async {
     crecheEnrollChild.clear();
-   await CrecheDataHelper()
-        .callCrechEnrolledByChildGUID(widget.chilenrolledGUID!).then((data) {
+    await CrecheDataHelper()
+        .callCrechEnrolledByChildGUID(widget.chilenrolledGUID!)
+        .then((data) {
       crecheEnrollChild.addAll(data);
     });
-   
-   await ChildExitResponceHelper()
+
+    await ChildExitResponceHelper()
         .exitedChildHistoryByEnrollChildGUID(widget.chilenrolledGUID)
-       .then((data) {
-     crecheEnrollChild.addAll(data);
-   });
+        .then((data) {
+      crecheEnrollChild.addAll(data);
+    });
 
     print("successs");
     setState(() {});
   }
-
 
   @override
   void initState() {
@@ -107,8 +111,11 @@ class _CrecheEnrollChildEnrollScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(
-        text: Global.returnTrLable(translats, CustomText.creche_enrollement, lng),
+      appBar: CustomChildAppbar(
+        subTitle1: widget.childName ?? '',
+        subTitle2: widget.childId ?? '',
+        text:
+            Global.returnTrLable(translats, CustomText.creche_enrollement, lng),
         onTap: () => Navigator.pop(context, 'itemRefresh'),
       ),
       body: Padding(
@@ -124,44 +131,65 @@ class _CrecheEnrollChildEnrollScreenState
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                            var refStatus = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                    crecheEnrollChild[index]['date_of_exit']!=null?
-                                    // ExitedChildDetailView(
-                                    //       childExitGuid: Global.getItemValues(
-                                    //           crecheEnrollChild[index]['exitResponces'],
-                                    //           'child_exit_guid'),
-                                    //       chilenrolledGUID: crecheEnrollChild[index]['ChildEnrollGUID'],
-                                    //       creche_id: widget.creche_id,
-                                    //   childId: Global.getItemValues(
-                                    //           crecheEnrollChild[index]['responces'],
-                                    //           'child_id'),
-                                    //   childName: Global.getItemValues(
-                                    //           crecheEnrollChild[index]['responces'],
-                                    //           'child_name'),
-                                    //     ):
-  //                                   
-                                    ExitEnrolledChilrenTab(
-                                      CHHGUID: crecheEnrollChild[index]['CHHGUID'],
-                                      HHGUID: Global.getItemValues(crecheEnrollChild[index]['responces'], 'hhguid'),
-                                      EnrolledChilGUID: crecheEnrollChild[index]['ChildEnrollGUID'],
-                                      HHname: crecheEnrollChild[index]['HHname'],
-                                      crecheId: crecheEnrollChild[index]['creche_id'],
-                                      isNew: 0,
-                                      isImageUpdate: false,
-                                      isEditable: false,
-                                    ):
-                                    EnrolledChilrenTabItemView(
-                                      cHHGuid: crecheEnrollChild[index]['CHHGUID'],
-                                      HHname: Global.stringToInt(crecheEnrollChild[index]['HHname'].toString()),
-                                      EnrolledChilGUID: crecheEnrollChild[index]['ChildEnrollGUID'],
-                                      crecheId: Global.stringToInt(widget.creche_id),
-                                    )));
-                            if (refStatus == 'itemRefresh') {
-                              await fetchChildexits();
-                            }
-
+                          var refStatus = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) => crecheEnrollChild[
+                                              index]['date_of_exit'] !=
+                                          null
+                                      ?
+                                      // ExitedChildDetailView(
+                                      //       childExitGuid: Global.getItemValues(
+                                      //           crecheEnrollChild[index]['exitResponces'],
+                                      //           'child_exit_guid'),
+                                      //       chilenrolledGUID: crecheEnrollChild[index]['ChildEnrollGUID'],
+                                      //       creche_id: widget.creche_id,
+                                      //   childId: Global.getItemValues(
+                                      //           crecheEnrollChild[index]['responces'],
+                                      //           'child_id'),
+                                      //   childName: Global.getItemValues(
+                                      //           crecheEnrollChild[index]['responces'],
+                                      //           'child_name'),
+                                      //     ):
+                                      //
+                                      ExitEnrolledChilrenTab(
+                                          isForExitList: false,
+                                        isForCrecheEnrollment: true,
+                                          CHHGUID: crecheEnrollChild[index]
+                                              ['CHHGUID'],
+                                          HHGUID: Global.getItemValues(
+                                              crecheEnrollChild[index]
+                                                  ['responces'],
+                                              'hhguid'),
+                                          EnrolledChilGUID:
+                                              crecheEnrollChild[index]
+                                                  ['ChildEnrollGUID'],
+                                          HHname: crecheEnrollChild[index]
+                                              ['HHname'],
+                                          crecheId: crecheEnrollChild[index]
+                                              ['creche_id'],
+                                          isNew: 0,
+                                          isImageUpdate: false,
+                                          isEditable: true,
+                                          childName: widget.childName ?? '',
+                                          childId: widget.childId ?? '',
+                                        )
+                                      : EnrolledChilrenTabItemView(
+                                          cHHGuid: crecheEnrollChild[index]
+                                              ['CHHGUID'],
+                                          HHname: Global.stringToInt(
+                                              crecheEnrollChild[index]['HHname']
+                                                  .toString()),
+                                          EnrolledChilGUID:
+                                              crecheEnrollChild[index]
+                                                  ['ChildEnrollGUID'],
+                                          crecheId: Global.stringToInt(
+                                              widget.creche_id),
+                                          childId: widget.childId ?? '',
+                                          childName: widget.childName ?? '',
+                                        )));
+                          if (refStatus == 'itemRefresh') {
+                            await fetchChildexits();
+                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),
@@ -195,22 +223,26 @@ class _CrecheEnrollChildEnrollScreenState
                                       Text(
                                         '${Global.returnTrLable(translats, 'Creche Name', lng).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
                                       ),
-                                      crecheEnrollChild[index]['date_of_exit']!=null?
-                                      Text(
-                                        '${Global.returnTrLable(translats, 'Date of Exit', lng).trim()} : ',
-                                        style: Styles.black104,
-                                      ):SizedBox(),
+                                      crecheEnrollChild[index]
+                                                  ['date_of_exit'] !=
+                                              null
+                                          ? Text(
+                                              '${Global.returnTrLable(translats, 'Date of Exit', lng).trim()} : ',
+                                              style: Styles.black104,
+                                              strutStyle:
+                                                  StrutStyle(height: 1.2),
+                                            )
+                                          : SizedBox(),
                                       Text(
                                         '${Global.returnTrLable(translats, "Age on the month of Enroll", lng).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         '${Global.returnTrLable(translats, 'Date of Enrollment', lng).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                     ],
                                   ),
@@ -231,36 +263,56 @@ class _CrecheEnrollChildEnrollScreenState
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          crecheEnrollChild[index]['exitResponces']!=null?Global.getItemValues(
-                                              crecheEnrollChild[index]['cResponces'],
-                                              'creche_name'):Global.getItemValues(
-                                              crecheEnrollChild[index]['crResponces'],
-                                              'creche_name'),
-                                          style: Styles.blue125,
+                                          crecheEnrollChild[index]
+                                                      ['exitResponces'] !=
+                                                  null
+                                              ? Global.getItemValues(
+                                                  crecheEnrollChild[index]
+                                                      ['cResponces'],
+                                                  'creche_name')
+                                              : Global.getItemValues(
+                                                  crecheEnrollChild[index]
+                                                      ['crResponces'],
+                                                  'creche_name'),
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        crecheEnrollChild[index]['date_of_exit']!=null? Text(
-                                            Validate().displeDateFormate(crecheEnrollChild[index]['date_of_exit']),
-                                          style: Styles.blue125,
-                                          overflow: TextOverflow.ellipsis,
-                                        ):SizedBox(),
+                                        crecheEnrollChild[index]
+                                                    ['date_of_exit'] !=
+                                                null
+                                            ? Text(
+                                                Validate().displeDateFormate(
+                                                    crecheEnrollChild[index]
+                                                        ['date_of_exit']),
+                                                style: Styles.cardBlue10,
+                                                overflow: TextOverflow.ellipsis,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                              )
+                                            : SizedBox(),
                                         Text(
                                           Global.getItemValues(
-                                              crecheEnrollChild[index]['responces'],
+                                              crecheEnrollChild[index]
+                                                  ['responces'],
                                               'age_at_enrollment_in_months'),
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          Global.validString(Global.getItemValues(
-                                              crecheEnrollChild[index]['responces'],
-                                              'date_of_enrollment'))?Validate().displeDateFormate(
-                                              Global.getItemValues(
-                                                  crecheEnrollChild[index]['responces'],
-                                                  'date_of_enrollment')):'',
-                                          style: Styles.blue125,
-                                          // strutStyle: StrutStyle(height: .3),
+                                          Global.validString(
+                                                  Global.getItemValues(
+                                                      crecheEnrollChild[index]
+                                                          ['responces'],
+                                                      'date_of_enrollment'))
+                                              ? Validate().displeDateFormate(
+                                                  Global.getItemValues(
+                                                      crecheEnrollChild[index]
+                                                          ['responces'],
+                                                      'date_of_enrollment'))
+                                              : '',
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
@@ -301,6 +353,4 @@ class _CrecheEnrollChildEnrollScreenState
     }
     return reason;
   }
-
-
 }

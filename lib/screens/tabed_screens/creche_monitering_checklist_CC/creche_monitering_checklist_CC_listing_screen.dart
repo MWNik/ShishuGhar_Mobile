@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
 import '../../../custom_widget/custom_text.dart';
@@ -17,11 +18,8 @@ class cmcCCListingScreen extends StatefulWidget {
   final String? creche_id;
   final String crecheName;
 
-
   cmcCCListingScreen(
-      {super.key, required this.creche_id,
-        required this.crecheName
-       });
+      {super.key, required this.creche_id, required this.crecheName});
 
   @override
   State<cmcCCListingScreen> createState() => _cmcCCListingScreenState();
@@ -29,10 +27,12 @@ class cmcCCListingScreen extends StatefulWidget {
 
 class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
   List<CmcCCResponseModel> cmcCCData = [];
+  List<CmcCCResponseModel> filterCCdata = [];
+  List<CmcCCResponseModel> usynchedList = [];
+  List<CmcCCResponseModel> allList = [];
   List<Translation> translats = [];
   String lng = 'en';
-
-
+  bool isOnlyUnsyched = false;
 
   @override
   void initState() {
@@ -59,7 +59,9 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
       CustomText.ExitTime,
       CustomText.Creche,
       CustomText.datevisit,
-      CustomText.VisitNotes
+      CustomText.VisitNotes,
+      CustomText.all,
+      CustomText.usynchedAndDraft
     ];
 
     await TranslationDataHelper()
@@ -74,6 +76,10 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
   Future<void> fetchCmcCCRecords() async {
     cmcCCData = await CmcCCTabResponseHelper()
         .childALMChild(Global.stringToInt(widget.creche_id));
+    usynchedList =
+        cmcCCData.where((element) => element.is_edited == 1 || element.is_edited == 2).toList();
+    allList = cmcCCData;
+    filterCCdata = isOnlyUnsyched ? usynchedList : allList;
     setState(() {});
   }
 
@@ -91,7 +97,7 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
                       crecheName: widget.crecheName,
                       creche_id: Global.stringToInt(widget.creche_id),
                       isEdit: false,
-                  isViewScreen: false,
+                      isViewScreen: false,
                     )));
 
             if (refStatus == 'itemRefresh') {
@@ -111,37 +117,57 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
         onTap: () => Navigator.pop(context, 'itemRefresh'),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
+        padding: EdgeInsets.only(left: 20.w,right: 20.w, bottom:10.h),
         child: Column(children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              AnimatedRollingSwitch(
+                title1: Global.returnTrLable(translats, CustomText.all, lng),
+                title2: Global.returnTrLable(translats, CustomText.usynchedAndDraft, lng),
+                isOnlyUnsynched: isOnlyUnsyched,
+                onChange: (value) async {
+                  setState(() {
+                    isOnlyUnsyched = value;
+                  });
+                  await fetchCmcCCRecords();
+                },
+              )
+            ],
+          ),
           Expanded(
-            child: (cmcCCData.length > 0)
+            child: (filterCCdata.length > 0)
                 ? ListView.builder(
-                    itemCount: cmcCCData.length,
+                    itemCount: filterCCdata.length,
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                          var ccGuid = cmcCCData[index].cmc_cc_guid;
+                          var ccGuid = filterCCdata[index].cmc_cc_guid;
                           if (Global.validString(ccGuid)) {
-                            var created_at = DateTime.parse(cmcCCData[index].created_at.toString());
-                            var date  = DateTime(created_at.year,created_at.month,created_at.day);
-                            bool isViewScreen = date.add(Duration(days: 7)).isBefore(DateTime.parse(Validate().currentDate()));
+                            var created_at = DateTime.parse(
+                                filterCCdata[index].created_at.toString());
+                            var date = DateTime(created_at.year,
+                                created_at.month, created_at.day);
+                            bool isViewScreen = date
+                                .add(Duration(days: 7))
+                                .isBefore(
+                                    DateTime.parse(Validate().currentDate()));
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
                                         CmcCCTabSCreen(
-                                          cmc_cc_guid: ccGuid!,
-                                          crecheName: widget.crecheName,
-                                          creche_id: Global.stringToInt(
-                                              widget.creche_id),
-                                          isEdit: false,
+                                            cmc_cc_guid: ccGuid!,
+                                            crecheName: widget.crecheName,
+                                            creche_id: Global.stringToInt(
+                                                widget.creche_id),
+                                            isEdit: false,
                                             isViewScreen: isViewScreen,
                                             date_of_visit: Global.getItemValues(
-                                                cmcCCData[index].responces!,
-                                                'date_of_visit')
-                                        )));
+                                                filterCCdata[index].responces!,
+                                                'date_of_visit'))));
 
                             if (refStatus == 'itemRefresh') {
                               await fetchCmcCCRecords();
@@ -178,10 +204,10 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          '${Global.returnTrLable(translats, CustomText.Creche, lng).trim()} : ',
-                                          style: Styles.black104,
-                                        ),
+                                        // Text(
+                                        //   '${Global.returnTrLable(translats, CustomText.Creche, lng).trim()} : ',
+                                        //   style: Styles.black104,
+                                        // ),
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.datevisit, lng).trim()} : ',
                                           style: Styles.black104,
@@ -204,31 +230,44 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            widget.creche_id!,
-                                            style: Styles.blue125,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+                                          // Text(
+                                          //   widget.creche_id!,
+                                          //   style: Styles.blue125,
+                                          //   overflow: TextOverflow.ellipsis,
+                                          // ),
                                           Text(
                                             Global.getItemValues(
-                                                cmcCCData[index].responces!,
+                                                filterCCdata[index].responces!,
                                                 'date_of_visit'),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ],
                                       ),
                                     ),
                                     SizedBox(width: 5),
-                                    (cmcCCData[index].is_edited==0 && cmcCCData[index].is_uploaded==1)?
-                                    Image.asset(
-                                      "assets/sync.png",
-                                      scale: 1.5,
-                                    ):
-                                    Image.asset(
-                                      "assets/sync_gray.png",
-                                      scale: 1.5,
-                                    )
+                                    (filterCCdata[index].is_edited == 0 &&
+                                          filterCCdata[index].is_uploaded == 1)
+                                      ? Image.asset(
+                                          "assets/sync.png",
+                                          scale: 1.5,
+                                        )
+                                      : (filterCCdata[index].is_edited == 1 &&
+                                              filterCCdata[index].is_uploaded == 0)
+                                          ? Image.asset(
+                                              "assets/sync_gray.png",
+                                              scale: 1.5,
+                                            )
+                                          : Icon(
+                                              Icons.error_outline_outlined,
+                                              color: Colors.red.shade700,
+                                              shadows: [
+                                                BoxShadow(
+                                                    spreadRadius: 2,
+                                                    blurRadius: 4,
+                                                    color: Colors.red.shade200)
+                                              ],
+                                            )
                                   ]),
                             ),
                           ),

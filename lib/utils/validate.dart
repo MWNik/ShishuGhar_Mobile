@@ -1,17 +1,22 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
+import 'package:share_plus/share_plus.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shishughar/utils/constants.dart';
+import 'package:shishughar/utils/secure_storage.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../custom_widget/single_poup_dailog.dart';
-
-
 
 class Validate {
   static String userName = 'name';
@@ -28,6 +33,9 @@ class Validate {
   static String districtID = 'districtID';
   static String blockID = 'blockID';
   static String gramPanchayatID = 'gramPanchayatID';
+  static String latitude = 'latitude';
+  static String longitude = 'longitude';
+  static String address = 'address';
 
   static String village = 'Village';
   static String villageId = 'villageId';
@@ -65,15 +73,16 @@ class Validate {
   // static String cmcCBMMetaUpdatedate = 'cmcCBMMetaUpdatedate';
   // static String cmcALMMetaUpdatedate = 'cmcALMMetaUpdatedate';
   // static String cmcCCMetaUpdatedate = 'cmcCCMetaUpdatedate';
-  static String cashbookExpencesMetaUpdateDate = 'cashbookExpencesMetaUpdateDate';
+  static String cashbookExpencesMetaUpdateDate =
+      'cashbookExpencesMetaUpdateDate';
   static String cashbookRecieptMetaUpdateDate = 'cashbookRecieptMetaUpdateDate';
   static String villageProfileUpdateDate = 'villageProfile';
   static String chechInUpdateDate = 'ChechInUpdateDate';
+  static String stockmetaUpdateDate = "stockmetaUpdateDate";
+  static String requisitionMetaUpdateDate = "requisitionMetaUpdateDate";
 
 //
-//Live
-  static String BASE_URL = 'oxygengrid.in';
-  static String SSL = 'https://';
+
   static String qizeFilterComon = '@#@';
 
   validateemail(String? value) {
@@ -165,7 +174,7 @@ class Validate {
     String rnNumber = String.fromCharCodes(
         Iterable.generate(24, (_) => ch.codeUnitAt(r.nextInt(ch.length))));
     rnNumber = rnNumber + (DateTime.now().millisecondsSinceEpoch).toString();
-   print("created $rnNumber");
+    print("created $rnNumber");
     return rnNumber;
   }
 
@@ -176,14 +185,13 @@ class Validate {
   }
 
   String createAtToCurrentDate(String? date) {
-    if(date!=null) {
+    if (date != null) {
       DateTime parsedDate = DateFormat('yyyy-MM-dd HH:mm:ss').parse(date);
       var formatter = new DateFormat('yyyy-MM-dd');
-      DateTime item = DateTime(parsedDate.year, parsedDate.month, DateTime
-          .now()
-          .day);
+      DateTime item =
+          DateTime(parsedDate.year, parsedDate.month, DateTime.now().day);
       return formatter.format(item);
-    }else{
+    } else {
       var formatter = new DateFormat('yyyy-MM-dd');
       return formatter.format(DateTime.now());
     }
@@ -213,22 +221,15 @@ class Validate {
   }
 
   Future<bool> checkNetworkConnection() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
-
-    if (connectivityResult == ConnectivityResult.mobile ||
-        connectivityResult == ConnectivityResult.wifi) {
-      // The device is connected to the internet
-      return true;
-    } else {
-      // The device is not connected to the internet
-      return false;
-    }
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    return (connectivityResult.contains(ConnectivityResult.mobile) ||
+        connectivityResult.contains(ConnectivityResult.wifi));
   }
 
-  Future<bool> checkInternetConnectivity() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
-    return connectivityResult != ConnectivityResult.none;
-  }
+  // Future<bool> checkInternetConnectivity() async {
+  //   var connectivityResult = await Connectivity().checkConnectivity();
+  //   return connectivityResult != ConnectivityResult.none;
+  // }
 
   // void showNoInternetAlert() {
   //   Fluttertoast.showToast(
@@ -242,13 +243,13 @@ class Validate {
   //   );
   // }
 
-  void singleButtonPopup(String msg,String button, bool isBack, BuildContext context) async {
+  void singleButtonPopup(
+      String msg, String button, bool isBack, BuildContext context) async {
     bool shouldProceed = await showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) {
-        return SingleButtonPopupDialog(
-          message: msg,button: button
-        );
+        return SingleButtonPopupDialog(message: msg, button: button);
       },
     );
     if (isBack) {
@@ -258,24 +259,24 @@ class Validate {
     }
   }
 
-
-  Map<String, dynamic> keyesFromResponce(Map<String, dynamic> responce){
-    List<String> removedItem=[];
+  Map<String, dynamic> keyesFromResponce(Map<String, dynamic> responce) {
+    List<String> removedItem = [];
     removedItem.add('docstatus');
     removedItem.add('doctype');
     removedItem.add('idx');
     removedItem.add('modified');
     removedItem.add('modified_by');
     removedItem.add('creation');
+    removedItem.add('owner');
     removedItem.forEach((element) {
-      if(responce[element]!=null){
+      if (responce[element] != null) {
         responce.remove(element);
       }
     });
     return responce;
-
   }
-  Map<String, dynamic> detailFromResponse(Map<String, dynamic> response){
+
+  Map<String, dynamic> detailFromResponse(Map<String, dynamic> response) {
     List<String> removedItem = [];
     removedItem.add('creche_id');
     removedItem.add('date_of_enrollment');
@@ -283,17 +284,24 @@ class Validate {
     removedItem.add('name');
     removedItem.add('weight');
     removedItem.add('childenrollguid');
-    removedItem.forEach((element) { 
-      if(response[element]!= null){
+    removedItem.forEach((element) {
+      if (response[element] != null) {
         response.remove(element);
       }
     });
-   return response;
+    return response;
   }
-  Map<String, dynamic> addCrecheInfor(Map<String, dynamic> response){
-    List<String> locationItem = ['state_id','district_id','block_id','gp_id','village_id'];
+
+  Map<String, dynamic> addCrecheInfor(Map<String, dynamic> response) {
+    List<String> locationItem = [
+      'state_id',
+      'district_id',
+      'block_id',
+      'gp_id',
+      'village_id'
+    ];
     response.forEach((key, value) {
-      if(!locationItem.contains(key)){
+      if (!locationItem.contains(key)) {
         response.remove(key);
       }
     });
@@ -321,38 +329,42 @@ class Validate {
     return newFormat;
   }
 
-  String displeDateFormate(String inputDate) {
-    DateTime originalFormat = DateFormat('yyyy-MM-dd').parse(inputDate);
-    String newFormat = DateFormat('dd-MMM-yyyy').format(originalFormat);
-    return newFormat;
+  String displeDateFormate(String? inputDate) {
+    String result = '';
+    if (inputDate != null) {
+      DateTime originalFormat = DateFormat('yyyy-MM-dd').parse(inputDate);
+      String newFormat = DateFormat('dd-MMM-yyyy').format(originalFormat);
+      result = newFormat;
+    }
+    return result;
   }
 
   String displeDateFormateMobileDateTimeFormate(String inputDate) {
-    DateTime originalFormat = DateFormat('yyyy-MM-dd HH:mm:ss').parse(inputDate);
-    String newFormat = DateFormat('dd-MMM-yyyy HH:mm:ss').format(originalFormat);
+    DateTime originalFormat =
+        DateFormat('yyyy-MM-dd HH:mm:ss').parse(inputDate);
+    String newFormat =
+        DateFormat('dd-MMM-yyyy HH:mm:ss').format(originalFormat);
     return newFormat;
   }
 
   DateTime stringToDate(String inputDate) {
-    DateTime dateTime=DateTime.now();
-    try{
+    DateTime dateTime = DateTime.now();
+    try {
       DateFormat originalFormat = DateFormat('yyyy-MM-dd');
-
-       dateTime = originalFormat.parse(inputDate);
-    }catch(e){
+      dateTime = originalFormat.parse(inputDate);
+    } catch (e) {
       print(e);
     }
-
 
     return dateTime;
   }
 
   DateTime? stringToDateNull(String inputDate) {
     DateTime? dateTime;
-    try{
+    try {
       DateFormat originalFormat = DateFormat('yyyy-MM-dd');
       dateTime = originalFormat.parse(inputDate);
-    }catch(e){
+    } catch (e) {
       print(e);
     }
     return dateTime;
@@ -372,14 +384,18 @@ class Validate {
 
   int calculateAgeInMonths(DateTime birthDate) {
     final now = DateTime.now();
-    int ageInMonths = (now.year - birthDate.year) * 12 + now.month - birthDate.month;
+    int ageInMonths =
+        (now.year - birthDate.year) * 12 + now.month - birthDate.month;
     if (now.day < birthDate.day) {
       ageInMonths--;
     }
     return ageInMonths;
   }
-  int calculateAgeInMonthsDepenExp(DateTime birthDate,DateTime conmarDate) {
-    int ageInMonths = (conmarDate.year - birthDate.year) * 12 + conmarDate.month - birthDate.month;
+
+  int calculateAgeInMonthsDepenExp(DateTime birthDate, DateTime conmarDate) {
+    int ageInMonths = (conmarDate.year - birthDate.year) * 12 +
+        conmarDate.month -
+        birthDate.month;
     if (conmarDate.day < birthDate.day) {
       ageInMonths--;
     }
@@ -388,7 +404,8 @@ class Validate {
 
   int calculateAgeInMonthEnrolled(DateTime birthDate) {
     final now = DateTime.now();
-    int ageInMonths = (now.year - birthDate.year) * 12 + now.month - birthDate.month;
+    int ageInMonths =
+        (now.year - birthDate.year) * 12 + now.month - birthDate.month;
     // if (now.day > birthDate.day) {
     //   ageInMonths++;
     // }
@@ -398,14 +415,18 @@ class Validate {
   int calculateAgeInYear(DateTime birthDate) {
     final now = DateTime.now();
     int ageInYears = now.year - birthDate.year;
-    if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
+    if (now.month < birthDate.month ||
+        (now.month == birthDate.month && now.day < birthDate.day)) {
       ageInYears--;
     }
     return ageInYears;
   }
-  int calculateAgeInYearDepenExp(DateTime birthDate,DateTime conmarDate) {
+
+  int calculateAgeInYearDepenExp(DateTime birthDate, DateTime conmarDate) {
     int ageInYears = conmarDate.year - birthDate.year;
-    if (conmarDate.month < birthDate.month || (conmarDate.month == birthDate.month && conmarDate.day < birthDate.day)) {
+    if (conmarDate.month < birthDate.month ||
+        (conmarDate.month == birthDate.month &&
+            conmarDate.day < birthDate.day)) {
       ageInYears--;
     }
     return ageInYears;
@@ -418,12 +439,19 @@ class Validate {
     return ageInDays;
   }
 
-  int calculateAgeInDaysEx(DateTime birthDate,DateTime conmarDate) {
+  int calculateAgeInDaysEx(DateTime birthDate, DateTime conmarDate) {
     final difference = conmarDate.difference(birthDate);
     final ageInDays = difference.inDays;
     return ageInDays;
   }
 
+  int calculateAgeInMonthsFromdays(num? age_in_days) {
+    var age_months = 0;
+    if (age_in_days != null) {
+      age_months = (age_in_days / 30).round();
+    }
+    return age_months;
+  }
 
   Future<String> imageFileToBase64(String imagePath) async {
     File imageFile = File(imagePath);
@@ -434,25 +462,25 @@ class Validate {
 
   Future<Uint8List> imageFileToUint8List(String imagePath) async {
     File imageFile = File(imagePath);
-    return  await imageFile.readAsBytes();
+    return await imageFile.readAsBytes();
     // String base64Image = base64Encode(imageBytes);
     // return base64Image;
   }
 
-
   Future<Uint8List> imageBase64Toimage(String imagePath) async {
-  Uint8List bytes = base64Decode(imagePath);
-  return bytes;
+    Uint8List bytes = base64Decode(imagePath);
+    return bytes;
   }
-
 
   Future<String> getAddressFromLatLng(double latitude, double longitude) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
       Placemark place = placemarks.first;
       print(place);
       // You can access various properties of the Placemark object to get address details
-      print('Address: ${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}');
+      print(
+          'Address: ${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}');
       return '${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}';
     } catch (e) {
       print('Error: $e');
@@ -460,7 +488,7 @@ class Validate {
     }
   }
 
-  int calculateDaysInMonths(DateTime currentDate,int months) {
+  int calculateDaysInMonths(DateTime currentDate, int months) {
     // DateTime currentDate=DateTime.now();
     int year = currentDate.year;
     int month = currentDate.month;
@@ -474,7 +502,7 @@ class Validate {
       month++;
       if (month > 12) {
         month = 1; // Reset to January
-        year++;    // Move to the next year
+        year++; // Move to the next year
       }
     }
 
@@ -496,14 +524,100 @@ class Validate {
     }
   }
 
-  TimeOfDay? stringToTimeOfDay(String? time){
-    if(time!=null){
+  TimeOfDay? stringToTimeOfDay(String? time) {
+    if (time != null) {
       DateTime parsedTime = DateFormat.jm().parse(time);
       return TimeOfDay.fromDateTime(parsedTime);
       // return TimeOfDay(hour:int.parse(time.split(":")[0]),minute: int.parse(time.split(":")[1]));
-    }else TimeOfDay.now();
-
-
+    } else
+      TimeOfDay.now();
   }
 
+  Future<void> shareFile(File filePath) async {
+    try {
+      // Ensure the file exists
+      if (await filePath.exists()) {
+        // Share the image file using share_plus
+        await Share.shareXFiles([XFile('${filePath.path}')],
+            text:
+                'Database Db ${Validate().currentDateTime()}' // You can specify the mime type if needed
+            );
+      } else {
+        print('file file not found at $filePath');
+      }
+    } catch (e) {
+      print('file sharing image: ${e.toString()}');
+    }
+  }
+
+  Future<void> createDbBackup() async {
+    try {
+      // Get the path to the database
+      String databasePath = join(await getDatabasesPath(), 'sishughar.db');
+
+      // Get the directory where you want to store the backup
+      Directory databaseDir = Directory(Constants.databaseFile);
+
+      // Check if the directory exists, if not, create it
+      if (!await databaseDir.exists()) {
+        await databaseDir.create(recursive: true);
+      }
+
+      // Construct the backup file path inside the directory
+      String backupFilePath = join(databaseDir.path, 'sishughar.db');
+
+      // Create the backup by copying the database file
+      File databaseFile = File(databasePath);
+
+      if (await databaseFile.exists()) {
+        await databaseFile.copy(backupFilePath);
+        print('Backup created and saved successfully at $backupFilePath');
+        shareFile(File(
+            backupFilePath)); // Assuming shareFile is your method to share the file
+      } else {
+        print('Database file not found at $databasePath');
+      }
+    } catch (e) {
+      print('Error creating backup: ${e.toString()}');
+    }
+  }
+
+  Future<void> createUploadedJson(String testData) async {
+    try {
+      var databaseDir = Directory('${Constants.uploadeJsonFile}');
+
+      // Ensure the directory exists
+      if (!await databaseDir.exists()) {
+        await databaseDir.create(recursive: true);
+      }
+
+      // Generate the file path
+      String dataFilePath = join(databaseDir.path, 'json_.txt');
+
+      // Create the file and write data to it
+      File file = File(dataFilePath);
+      await file.writeAsString(testData);
+
+      if (await file.exists()) {
+        print('File created and JSON data written successfully at $file');
+        // shareFile(file);
+      } else {
+        print('File file not found at $file');
+      }
+    } catch (e) {
+      print('Error creating backup: ${e.toString()}');
+    }
+  }
+
+  /*Future openUrlInBrowser(String url) async {
+    Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication, // Opens the URL in the browser
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
+  }*/
 }

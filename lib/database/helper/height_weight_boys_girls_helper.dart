@@ -52,6 +52,22 @@ class HeightWeightBoysGirlsHelper {
     return tabWeightforAgeBoys;
   }
 
+  Future<List<TabWeightforageBoysModel>> callWeightforAgeBoysIn(List<int> items) async {
+    String itemDays=List.filled(items.length, '?').join(',');
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery('SELECT * FROM tabWeightforAgeBoys WHERE  (age_in_days % 30 = 0 or age_in_days in ($itemDays)) and age_in_days > (3*12*30)',
+       );
+
+    List<TabWeightforageBoysModel> tabWeightforAgeBoys = [];
+
+    for (var element in result) {
+      TabWeightforageBoysModel item =
+          TabWeightforageBoysModel.fromJson(element);
+      tabWeightforAgeBoys.add(item);
+    }
+    return tabWeightforAgeBoys;
+  }
+
   Future<List<TabWeightforageGirlsModel>> callWeightforAgeGirls() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!
         .query('tabWeightforAgeGirls');
@@ -61,6 +77,22 @@ class HeightWeightBoysGirlsHelper {
     for (var element in result) {
       TabWeightforageGirlsModel item =
           TabWeightforageGirlsModel.fromJson(element);
+      tabWeightforAgeGirls.add(item);
+    }
+    return tabWeightforAgeGirls;
+  }
+
+  Future<List<TabWeightforageGirlsModel>> callWeightforAgeGirlsIn(List<int> items) async {
+    String itemDays=List.filled(items.length, '?').join(',');
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery('SELECT * FROM tabWeightforAgeGirls WHERE  (age_in_days % 30 = 0 or age_in_days in ($itemDays)) and age_in_days > (3*12*30)',
+    );
+
+    List<TabWeightforageGirlsModel> tabWeightforAgeGirls = [];
+
+    for (var element in result) {
+      TabWeightforageGirlsModel item =
+      TabWeightforageGirlsModel.fromJson(element);
       tabWeightforAgeGirls.add(item);
     }
     return tabWeightforAgeGirls;

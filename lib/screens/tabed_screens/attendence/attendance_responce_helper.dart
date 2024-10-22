@@ -62,7 +62,7 @@ class AttendanceResponnceHelper {
   }
 
   Future<List<ChildAttendanceResponceModel>> callChildAttendences(int creche_id) async {
-    var query = 'select * from child_attendance_responce WHERE creche_id=?';
+    var query = 'select * from child_attendance_responce WHERE creche_id=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
 
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.rawQuery(query,[creche_id]);
@@ -87,6 +87,7 @@ class AttendanceResponnceHelper {
       var appcreated_by = ACData['app_created_by'];
       var app_updated_by = ACData['app_updated_by'];
       var app_updated_on = ACData['app_updated_on'];
+      var date_of_attendance = ACData['date_of_attendance'];
       var finalHHData = Validate().keyesFromResponce(ACData);
       List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(ACData['childattendancelist']);
       ACData.remove('childattendancelist');
@@ -102,7 +103,9 @@ class AttendanceResponnceHelper {
           update_at: app_updated_on,
           updated_by: app_updated_by,
           created_by: appcreated_by,
-          created_at: appCreatedOn);
+          created_at: appCreatedOn,
+          date_of_attendance: date_of_attendance
+      );
       await inserts(items);
       children.forEach((element) async {
         var ChildAttenGUID = element['childattenguid'];

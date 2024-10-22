@@ -25,6 +25,7 @@ class CustomDatepickerDynamic extends StatefulWidget {
   final int? isRequred;
   final bool? isVisible;
   final bool? readable;
+  final FocusNode? focusNode;
 
   CustomDatepickerDynamic(
       {this.hintText,
@@ -41,7 +42,8 @@ class CustomDatepickerDynamic extends StatefulWidget {
         this.isRequred,
         this.fieldName,
         this.isVisible,
-        this.readable});
+        this.readable,
+        this.focusNode});
 
   @override
   State<CustomDatepickerDynamic> createState() => _CustomDatepickerState();
@@ -79,6 +81,7 @@ class _CustomDatepickerState extends State<CustomDatepickerDynamic> {
   @override
   void initState() {
     super.initState();
+    print(widget.minDate);
     print('caenders ${widget.calenderValidate}');
     if (widget.fieldName == 'date_of_visit' || widget.fieldName == 'date_of_attendance' ||
         widget.fieldName == 'date_of_enrollment'||

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/custom_btn.dart';
@@ -36,12 +37,16 @@ class ChildGrievancesListing extends StatefulWidget {
 class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
   List<ChildGrievancesResponceModel> childGirevData = [];
   List<ChildGrievancesResponceModel> filtredGirevData = [];
+  List<ChildGrievancesResponceModel> usynchedList = [];
+  List<ChildGrievancesResponceModel> allList = [];
   List<Translation> translats = [];
   String lng = 'en';
   List<OptionsModel> grSubjects = [];
   List<OptionsModel> grStatus = [];
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String? selectedStatus;
+  bool isOnlyUnsyched = false;
+  String? role;
 
   void initState() {
     super.initState();
@@ -49,6 +54,7 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
   }
 
   Future<void> initializeData() async {
+    role = (await Validate().readString(Validate.role))!;
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -66,321 +72,348 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
       CustomText.Village,
       CustomText.GrievanceCategory,
       CustomText.Status,
-      CustomText.Description
+      CustomText.Description,
+      CustomText.all,
+      CustomText.unsynched
     ];
     await callmstCommons();
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
-    fetchChildgrievance();
+    await fetchChildgrievance();
     setState(() {});
   }
 
   Future<void> fetchChildgrievance() async {
     childGirevData = await ChildGrievancesTabResponceHelper()
         .childGravienceByCreche(widget.creche_id);
-    filtredGirevData=childGirevData;
+    usynchedList =
+        childGirevData.where((element) => element.is_edited == 1).toList();
+    allList = childGirevData;
+    filtredGirevData = isOnlyUnsyched ? usynchedList : allList;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      floatingActionButton: InkWell(
-        onTap: () async {
-          String child_grievances_guid = '';
-          if (!(Global.validString(child_grievances_guid))) {
-            child_grievances_guid = Validate().randomGuid();
-            var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => ChildGrievancesDetailScreen(
-                      child_grievances_guid: child_grievances_guid,
-                      // enName: widget.enName!,
-                      creche_id: widget.creche_id,
-                      // chilenrolledGUID: widget.chilenrolledGUID,
-                    )));
-            if (refStatus == 'itemRefresh') {
-              fetchChildgrievance();
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context, 'itemRefresh');
+        return false;
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        floatingActionButton: InkWell(
+          onTap: () async {
+            String child_grievances_guid = '';
+            if (!(Global.validString(child_grievances_guid))) {
+              child_grievances_guid = Validate().randomGuid();
+              var refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => ChildGrievancesDetailScreen(
+                        child_grievances_guid: child_grievances_guid,
+                        // enName: widget.enName!,
+                        creche_id: widget.creche_id,
+                        // chilenrolledGUID: widget.chilenrolledGUID,
+                      )));
+              if (refStatus == 'itemRefresh') {
+                fetchChildgrievance();
+              }
             }
-          }
-        },
-        child: Image.asset(
-          "assets/add_btn.png",
-          scale: 2.7,
-          color: Color(0xff5979AA),
-        ),
-      ),
-      appBar: CustomAppbar(
-        text: Global.returnTrLable(translats, CustomText.ChildGrievances, lng),
-        subTitle: widget.crecheName,
-        onTap: () => Navigator.pop(context, 'itemRefresh'),
-      ),
-      endDrawer: SafeArea(
-        child: Drawer(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(),
-            ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 30),
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            "assets/filter_icon.png",
-                            scale: 2.4,
-                          ),
-                          SizedBox(
-                            width: 10.w,
-                          ),
-                          Text(
-                            CustomText.Filter,
-                            style: Styles.labelcontrollerfont,
-                          ),
-                          Spacer(),
-                          InkWell(
-                              onTap: () async {
-                                _scaffoldKey.currentState!.closeEndDrawer();
-                                // cleaAllFilter();
-                              },
-                              child: Image.asset(
-                                'assets/cross.png',
-                                color: Colors.grey,
-                                scale: 4,
-                              )),
-                        ],
-                      ),
-                    ),
-                    SizedBox(),
-                    DynamicCustomDropdownField(
-                      hintText: Global.returnTrLable(
-                          translats, CustomText.Status, lng),
-                      items: grStatus,
-                      selectedItem: selectedStatus,
-                      onChanged: (value) {
-                        selectedStatus = value?.name;
-                      },
-                    ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(3.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Expanded(
-                            child: CElevatedButton(
-                              text: Global.returnTrLable(
-                                  translats, 'Clear', lng!),
-                              color: Color(0xffF26BA3),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                               selectedStatus=null;
-                              },
-                            ),
-                          ),
-                          // Spacer(),
-                          SizedBox(width: 4.w),
-                          Expanded(
-                            child: CElevatedButton(
-                              text: Global.returnTrLable(
-                                  translats, 'Search', lng!),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                filteredGetData(context);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ]),
-            )),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        child: Column(children: [
-          Row(
-            children: [
-              Expanded(
-                  child: SizedBox(),),
-              SizedBox(
-                width: 10.w,
-              ),
-              GestureDetector(
-                onTap: () {
-                  _scaffoldKey.currentState!.openEndDrawer();
-                },
-                child: Image.asset(
-                  "assets/filter_icon.png",
-                  scale: 2.4,
-                ),
-              )
-            ],
+          },
+          child: Image.asset(
+            "assets/add_btn.png",
+            scale: 2.7,
+            color: Color(0xff5979AA),
           ),
-          Expanded(
-            child: (filtredGirevData.length > 0)
-                ? ListView.builder(
-                    itemCount: filtredGirevData.length,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () async {
-                          var refStatus = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      ChildGrievancesDetailScreen(
-                                        child_grievances_guid:
-                                        filtredGirevData[index]
-                                                .grievance_guid,
-                                        // enName: widget.enName!,
-                                        creche_id: widget.creche_id,
-                                        // chilenrolledGUID:
-                                            // widget.chilenrolledGUID,
-                                      )));
-                          if (refStatus == 'itemRefresh') {
-                            await fetchChildgrievance();
-                          }
+        ),
+        appBar: CustomAppbar(
+          text: Global.returnTrLable(translats, CustomText.ChildGrievances, lng),
+          subTitle: widget.crecheName,
+          onTap: () => Navigator.pop(context, 'itemRefresh'),
+        ),
+        endDrawer: SafeArea(
+          child: Drawer(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 30),
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              "assets/filter_icon.png",
+                              scale: 2.4,
+                            ),
+                            SizedBox(
+                              width: 10.w,
+                            ),
+                            Text(
+                              CustomText.Filter,
+                              style: Styles.labelcontrollerfont,
+                            ),
+                            Spacer(),
+                            InkWell(
+                                onTap: () async {
+                                  _scaffoldKey.currentState!.closeEndDrawer();
+                                  // cleaAllFilter();
+                                },
+                                child: Image.asset(
+                                  'assets/cross.png',
+                                  color: Colors.grey,
+                                  scale: 4,
+                                )),
+                          ],
+                        ),
+                      ),
+                      SizedBox(),
+                      DynamicCustomDropdownField(
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.Status, lng),
+                        items: grStatus,
+                        selectedItem: selectedStatus,
+                        onChanged: (value) {
+                          selectedStatus = value?.name;
                         },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff5A5A5A).withOpacity(
-                                        0.2), // Shadow color with opacity
-                                    offset: Offset(0,
-                                        3), // Horizontal and vertical offset
-                                    blurRadius: 6, // Blur radius
-                                    spreadRadius: 0, // Spread radius
-                                  ),
-                                ],
-                                color: Colors.white,
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 8.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.GrievanceCategory, lng).trim()} : ',
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.Description, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.Status, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
-                                      ),
-                                      // Text(
-                                      //   '${Global.returnTrLable(translats, 'Child Age (In Months)', lng).trim()} : ',
-                                      //   style: Styles.black104,
-                                      //   strutStyle: StrutStyle(height: 1),
-                                      // ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10),
-                                  SizedBox(
-                                    height: 10.h,
-                                    width: 2,
-                                    child: VerticalDivider(
-                                      color: Color(0xffE6E6E6),
+                      ),
+                      SizedBox(
+                        height: 10.h,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(3.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Expanded(
+                              child: CElevatedButton(
+                                text: Global.returnTrLable(
+                                    translats, 'Clear', lng!),
+                                color: Color(0xffF26BA3),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  clearData();
+                                },
+                              ),
+                            ),
+                            // Spacer(),
+                            SizedBox(width: 4.w),
+                            Expanded(
+                              child: CElevatedButton(
+                                text: Global.returnTrLable(
+                                    translats, 'Search', lng!),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  filteredGetData(context);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 25),
+                        child: AnimatedRollingSwitch(
+                          title1: Global.returnTrLable(translats, CustomText.all, lng),
+                          title2: Global.returnTrLable(translats, CustomText.unsynched, lng),
+                          isOnlyUnsynched: isOnlyUnsyched,
+                          onChange: (value) async {
+                            setState(() {
+                              isOnlyUnsyched = value;
+                            });
+                            await fetchChildgrievance();
+                          },
+                        ),
+                      )
+                    ]),
+              )),
+        ),
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          child: Column(children: [
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(),
+                ),
+                SizedBox(
+                  width: 10.w,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _scaffoldKey.currentState!.openEndDrawer();
+                  },
+                  child: Image.asset(
+                    "assets/filter_icon.png",
+                    scale: 2.4,
+                  ),
+                )
+              ],
+            ),
+            Expanded(
+              child: (filtredGirevData.length > 0)
+                  ? ListView.builder(
+                      itemCount: filtredGirevData.length,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () async {
+                            var refStatus = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        ChildGrievancesDetailScreen(
+                                          child_grievances_guid:
+                                              filtredGirevData[index]
+                                                  .grievance_guid,
+                                          // enName: widget.enName!,
+                                          creche_id: widget.creche_id,
+                                          // chilenrolledGUID:
+                                          // widget.chilenrolledGUID,
+                                        )));
+                            if (refStatus == 'itemRefresh') {
+                              await fetchChildgrievance();
+                            }
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff5A5A5A).withOpacity(
+                                          0.2), // Shadow color with opacity
+                                      offset: Offset(
+                                          0, 3), // Horizontal and vertical offset
+                                      blurRadius: 6, // Blur radius
+                                      spreadRadius: 0, // Spread radius
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
+                                  ],
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xffE7F0FF)),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w, vertical: 8.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          callGravienceSubject(Global.getItemValues(
-                                              filtredGirevData[index]
-                                                          .responces!,
-                                                      'title')),
-                                          style: Styles.blue125,
-                                          overflow: TextOverflow.ellipsis,
+                                          '${Global.returnTrLable(translats, CustomText.GrievanceCategory, lng).trim()} : ',
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Global.getItemValues(
-                                              filtredGirevData[index]
-                                                  .responces!,
-                                              'description'),
-                                          style: Styles.blue125,
-                                          maxLines: 1,
-                                          strutStyle: StrutStyle(height: .5),
-                                          overflow: TextOverflow.ellipsis,
+                                          '${Global.returnTrLable(translats, CustomText.Description, lng).trim()} : ',
+                                          style: Styles.black104,
+                                          strutStyle: StrutStyle(height: 1.2),
                                         ),
                                         Text(
-                                          callGravienceStatus(Global.getItemValues(
-                                              filtredGirevData[index]
-                                                  .responces!,
-                                              'status')),
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
-                                          overflow: TextOverflow.ellipsis,
+                                          '${Global.returnTrLable(translats, CustomText.Status, lng).trim()} : ',
+                                          style: Styles.black104,
+                                          strutStyle: StrutStyle(height: 1.2),
                                         ),
+                                        // Text(
+                                        //   '${Global.returnTrLable(translats, 'Child Age (In Months)', lng).trim()} : ',
+                                        //   style: Styles.black104,
+                                        //   strutStyle: StrutStyle(height: 1),
+                                        // ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(width: 5),
-                                  (filtredGirevData[index].is_edited==0 && filtredGirevData[index].is_uploaded==1)?
-                                  Image.asset(
-                                    "assets/sync.png",
-                                    scale: 1.5,
-                                  ):
-                                  Image.asset(
-                                    "assets/sync_gray.png",
-                                    scale: 1.5,
-                                  )
-                                ],
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 10.h,
+                                      width: 2,
+                                      child: VerticalDivider(
+                                        color: Color(0xffE6E6E6),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            callGravienceSubject(
+                                                Global.getItemValues(
+                                                    filtredGirevData[index]
+                                                        .responces!,
+                                                    'title')),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.getItemValues(
+                                                filtredGirevData[index]
+                                                    .responces!,
+                                                'description'),
+                                            style: Styles.cardBlue10,
+                                            maxLines: 1,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            callGravienceStatus(
+                                                Global.getItemValues(
+                                                    filtredGirevData[index]
+                                                        .responces!,
+                                                    'status')),
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    (filtredGirevData[index].is_edited == 0 &&
+                                            filtredGirevData[index].is_uploaded ==
+                                                1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : Image.asset(
+                                            "assets/sync_gray.png",
+                                            scale: 1.5,
+                                          )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    })
-                : Center(
-                    child: Text(Global.returnTrLable(
-                        translats, CustomText.NorecordAvailable, lng)),
-                  ),
-          ),
-        ]),
+                        );
+                      })
+                  : Center(
+                      child: Text(Global.returnTrLable(
+                          translats, CustomText.NorecordAvailable, lng)),
+                    ),
+            ),
+          ]),
+        ),
       ),
     );
-
-
   }
 
   String callGravienceStatus(String id) {
     String returnValue = "Open";
 
     if (Global.validString(id)) {
-      var items =
-      grStatus.where((element) => element.name == id).toList();
+      var items = grStatus.where((element) => element.name == id).toList();
       if (items.length > 0) {
         returnValue = items[0].values!;
       }
@@ -393,8 +426,7 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
     String returnValue = "";
 
     if (Global.validString(id)) {
-      var items =
-      grSubjects.where((element) => element.name == id).toList();
+      var items = grSubjects.where((element) => element.name == id).toList();
       if (items.length > 0) {
         returnValue = items[0].values!;
       }
@@ -402,19 +434,31 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
 
     return returnValue;
   }
+
   Future callmstCommons() async {
-    grSubjects=await OptionsModelHelper().callDayOfWeekMstCommonOptions('Grievance Subject',lng);
-    grStatus=await OptionsModelHelper().callDayOfWeekMstCommonOptions('Grievance Status',lng);
+    grSubjects = await OptionsModelHelper()
+        .callDayOfWeekMstCommonOptions('Grievance Subject', lng);
+    grStatus = await OptionsModelHelper()
+        .callDayOfWeekMstCommonOptions('Grievance Status', lng);
+  }
+
+  void clearData() {
+    filtredGirevData = isOnlyUnsyched ? usynchedList : allList;
+    selectedStatus = null;
+    setState(() {});
   }
 
   void filteredGetData(BuildContext context) {
-    if(selectedStatus!=null){
-     filtredGirevData= childGirevData.where((element) =>
-     Global.getItemValues(element.responces, 'status')==selectedStatus).toList();
+    var filterList = isOnlyUnsyched ? usynchedList : allList;
+    if (selectedStatus != null) {
+      filtredGirevData = filterList
+          .where((element) =>
+              Global.getItemValues(element.responces, 'status') ==
+              selectedStatus)
+          .toList();
+    } else {
+      filtredGirevData = filterList;
     }
     setState(() {});
-
   }
 }
-
-

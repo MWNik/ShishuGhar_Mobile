@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import '../utils/constants.dart';
+import '../utils/validate.dart';
 
 class VillageProfileMetaApi {
   Future<Response> callVillageProfileMeta(
@@ -36,6 +39,25 @@ class VillageProfileMetaApi {
     }
   }
 
+  Future<Response> VillageProfileDownloadApiCC(
+      String villageId,String username, String pwd, String token) async {
+    var url = Uri.parse('${Constants.baseUrl}method/village_profile_data_village');
+    var headers = {'Authorization': token, 'Content-Type': 'application/json'};
+    List<int> integerList = villageId.split(',').map(int.parse).toList();
+    Map<String, dynamic> parameters = {
+      "village_id": integerList,
+      "usr": username,
+      "pwd": pwd
+    };
+    try {
+      var responce = await http.post(url, headers: headers, body: jsonEncode(parameters));
+      print(responce.body);
+      return responce;
+    } catch (e) {
+      return Response('Internal server error - $e', 500);
+    }
+  }
+
   Future<http.Response> callVillageUploadUdate(
       String token, String responce, int? name) async {
     var url = Uri.parse('${Constants.baseUrl}resource/Village/$name');
@@ -45,6 +67,7 @@ class VillageProfileMetaApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
+      await Validate().createUploadedJson("Token $token\n\n$responce");
       var response = await http.put(url, body: responce, headers: headers);
       return response;
     } catch (e) {
@@ -62,6 +85,7 @@ class VillageProfileMetaApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
+      await Validate().createUploadedJson("Token $token\n\n$responce");
       var response = await http.put(url, body: responce, headers: headers);
       return response;
     } catch (e) {

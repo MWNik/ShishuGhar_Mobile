@@ -18,8 +18,10 @@ import '../../../../style/styles.dart';
 
 class DemograficalListingScreen extends StatefulWidget {
   final int vName;
+  final bool isEditable;
 
-  const DemograficalListingScreen({super.key, required this.vName});
+  const DemograficalListingScreen(
+      {super.key, required this.vName, required this.isEditable});
 
   @override
   State<DemograficalListingScreen> createState() =>
@@ -60,11 +62,11 @@ class _DemograficalListingScreenState extends State<DemograficalListingScreen> {
       CustomText.year,
       CustomText.population,
       CustomText.quarter
-      
     ];
-    yearOptions = await OptionsModelHelper().getMstCommonOptions(CustomText.year,lng);
+    yearOptions =
+        await OptionsModelHelper().getMstCommonOptions(CustomText.year, lng);
     detailOption =
-        await OptionsModelHelper().getMstCommonOptions('Demographic data',lng);
+        await OptionsModelHelper().getMstCommonOptions('Demographic data', lng);
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
@@ -88,29 +90,33 @@ class _DemograficalListingScreenState extends State<DemograficalListingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: InkWell(
-        onTap: () async {
-          String dGuid = '';
-          if (!Global.validString(dGuid)) {
-            Map<String, dynamic> emptyMap = {};
-            dGuid = Validate().randomGuid();
-            var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => DemograficalDetailsScreen(
-                      vName: widget.vName,
-                      dGuid: dGuid,
-                      demoRec: emptyMap,
-                    )));
-            if (refStatus == CustomText.itemRefresh) {
-              await fetchDemoList();
-            }
-          }
-        },
-        child: Image.asset(
-          "assets/add_btn.png",
-          scale: 2.7,
-          color: Color(0xff5979AA),
-        ),
-      ),
+      floatingActionButton: widget.isEditable
+          ? InkWell(
+              onTap: () async {
+                String dGuid = '';
+                if (!Global.validString(dGuid)) {
+                  Map<String, dynamic> emptyMap = {};
+                  dGuid = Validate().randomGuid();
+                  var refStatus = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              DemograficalDetailsScreen(
+                                  vName: widget.vName,
+                                  dGuid: dGuid,
+                                  demoRec: emptyMap,
+                                  isEditable: widget.isEditable)));
+                  if (refStatus == CustomText.itemRefresh) {
+                    await fetchDemoList();
+                  }
+                }
+              },
+              child: Image.asset(
+                "assets/add_btn.png",
+                scale: 2.7,
+                color: Color(0xff5979AA),
+              ),
+            )
+          : null,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         child: Column(children: [
@@ -125,8 +131,8 @@ class _DemograficalListingScreenState extends State<DemograficalListingScreen> {
                       return GestureDetector(
                         onTap: () async {
                           // var lstDate=await callDatesAlredDateList(Global.getItemValues(childEventData[index].responces!, 'date'));
-                          var refStatus = await Navigator.of(context)
-                              .push(MaterialPageRoute(
+                          var refStatus = await Navigator.of(context).push(
+                              MaterialPageRoute(
                                   builder: (BuildContext context) =>
                                       // EnrolledChildDetailsSccreen(
                                       //   childEventGuid: childEventData[index]
@@ -140,10 +146,11 @@ class _DemograficalListingScreenState extends State<DemograficalListingScreen> {
                                       //   childName: widget.childName,
                                       // )
                                       DemograficalDetailsScreen(
-                                        vName: widget.vName,
-                                        dGuid: demoListMap[index]['demo_guid'],
-                                        demoRec: demoListMap[index],
-                                      )));
+                                          vName: widget.vName,
+                                          dGuid: demoListMap[index]
+                                              ['demo_guid'],
+                                          demoRec: demoListMap[index],
+                                          isEditable: widget.isEditable)));
                           if (refStatus == CustomText.itemRefresh) {
                             await fetchDemoList();
                           }
@@ -184,17 +191,21 @@ class _DemograficalListingScreenState extends State<DemograficalListingScreen> {
                                       Text(
                                         '${Global.returnTrLable(translats, '${CustomText.population}(${CustomText.quarter} 1)', lng).trim()} : ',
                                         style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         '${Global.returnTrLable(translats, '${CustomText.population}(${CustomText.quarter} 2)', lng).trim()} : ',
+                                        strutStyle: StrutStyle(height: 1.2),
                                         style: Styles.black104,
                                       ),
                                       Text(
                                         '${Global.returnTrLable(translats, '${CustomText.population}(${CustomText.quarter} 3)', lng).trim()} : ',
+                                        strutStyle: StrutStyle(height: 1.2),
                                         style: Styles.black104,
                                       ),
                                       Text(
                                         '${Global.returnTrLable(translats, '${CustomText.population}(${CustomText.quarter} 4)', lng).trim()} : ',
+                                        strutStyle: StrutStyle(height: 1.2),
                                         style: Styles.black104,
                                       ),
                                     ],
@@ -220,39 +231,47 @@ class _DemograficalListingScreenState extends State<DemograficalListingScreen> {
                                               demoListMap[index]['year_id'],
                                               yearOptions),
                                           maxLines: 1,
-                                          style: Styles.blue125,
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          Global.validToString(demoListMap[index]
-                                          ['population_q1']
-                                              .toString()),
+                                          Global.validToString(
+                                              demoListMap[index]
+                                                      ['population_q1']
+                                                  .toString()),
                                           maxLines: 1,
-                                          style: Styles.blue125,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          Global.validToString(demoListMap[index]
-                                          ['population_q2']
-                                              .toString()),
+                                          Global.validToString(
+                                              demoListMap[index]
+                                                      ['population_q2']
+                                                  .toString()),
                                           maxLines: 1,
-                                          style: Styles.blue125,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          Global.validToString(demoListMap[index]
-                                          ['population_q3']
-                                              .toString()),
+                                          Global.validToString(
+                                              demoListMap[index]
+                                                      ['population_q3']
+                                                  .toString()),
                                           maxLines: 1,
-                                          style: Styles.blue125,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          Global.validToString(demoListMap[index]
-                                          ['population_q4']
-                                              .toString()),
+                                          Global.validToString(
+                                              demoListMap[index]
+                                                      ['population_q4']
+                                                  .toString()),
                                           maxLines: 1,
-                                          style: Styles.blue125,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ],

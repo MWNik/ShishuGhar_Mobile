@@ -120,22 +120,22 @@ class _EnrolledChilrenTabState extends State<EnrolledChilrenTab>
               Text(''),
             ],
           ),
-          actions: [
-            (role == 'Cluster Coordinator')
-                ? GestureDetector(
-                    onTap: () async {
-                      await updateVerificationStatus(context);
-                    },
-                    child: Image.asset(
-                      "assets/verify_icon.png",
-                      scale: 1.5,
-                    ),
-                  )
-                : SizedBox(),
-            SizedBox(
-              width: 10,
-            )
-          ],
+          // actions: [
+          //   (role == 'Cluster Coordinator')
+          //       ? GestureDetector(
+          //           onTap: () async {
+          //             await updateVerificationStatus(context);
+          //           },
+          //           child: Image.asset(
+          //             "assets/verify_icon.png",
+          //             scale: 1.5,
+          //           ),
+          //         )
+          //       : SizedBox(),
+          //   SizedBox(
+          //     width: 10,
+          //   )
+          // ],
           centerTitle: true,
           bottom: TabBar(
             indicatorColor: Colors.white,
@@ -175,6 +175,7 @@ class _EnrolledChilrenTabState extends State<EnrolledChilrenTab>
       if (tabBreakItems[i].parent == 'Child Profile') {
         tabItem.add(EnrolledChilrenTabItem(
             isEditable: widget.isEditable,
+            EnrolledChilGUID: widget.EnrolledChilGUID,
             HHGUID: 'Not',
             cHHGuid: widget.CHHGUID,
             isImageUpdate: widget.isImageUpdate,

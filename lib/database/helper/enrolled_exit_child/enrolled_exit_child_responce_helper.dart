@@ -70,6 +70,16 @@ class EnrolledExitChilrenResponceHelper {
     return items;
   }
 
+  Future<void> updateEditFlag(String CHHGUID, int creche_id) async {
+    try {
+      await DatabaseHelper.database!.rawUpdate(
+          'Update enrollred_exit_child_responce set is_edited = ? where creche_id=? and CHHGUID=?',
+          [1, creche_id, CHHGUID]);
+    } catch (e) {
+      print("Error update table: $e");
+    }
+  }
+
   Future<String?> maxDateOfExit(String CHHGUID) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'SELECT MAX(date_of_exit) as date_of_exit FROM enrollred_exit_child_responce WHERE CHHGUID = ?',
@@ -81,6 +91,7 @@ class EnrolledExitChilrenResponceHelper {
       return null;
     }
   }
+
   Future<String?> getRecordByCHHGUID(String CHHGUID) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'SELECT * FROM enrollred_exit_child_responce WHERE CHHGUID = ? AND date_of_exit NOTNULL',
@@ -110,6 +121,31 @@ class EnrolledExitChilrenResponceHelper {
   Future<List<EnrolledExitChildResponceModel>> callChildrenForUpload() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'select * from enrollred_exit_child_responce where is_edited=1');
+    List<EnrolledExitChildResponceModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(EnrolledExitChildResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
+  Future<List<EnrolledExitChildResponceModel>> callChildrenForUploadDarftEdited() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from enrollred_exit_child_responce where is_edited=1 or is_edited=2');
+    List<EnrolledExitChildResponceModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(EnrolledExitChildResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
+  Future<List<EnrolledExitChildResponceModel>>
+      callChildrenForUploadOnly() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from enrollred_exit_child_responce where is_edited=1 and name is null');
     List<EnrolledExitChildResponceModel> items = [];
 
     result.forEach((itemMap) {
@@ -152,20 +188,21 @@ class EnrolledExitChilrenResponceHelper {
 
   Future<List<Map<String, dynamic>>> callEnrollChildren(int creche_id) async {
     var query =
-        'Select * from (select * from enrollred_exit_child_responce WHERE CHHGUID in(Select CHHGUID from house_hold_children) and creche_id=? and date_of_exit isnull) ens left join (select hhRes.HHGUID,hhRes.responces as hhResponce,chre.CHHGUID from house_hold_responce hhRes INNER join house_hold_children as  chre on hhRes.HHGUID=chre.HHGUID) as hhs on hhs.CHHGUID=ens.CHHGUID ORDER BY CASE  WHEN ens.update_at IS NOT NULL AND length(RTRIM(LTRIM(ens.update_at))) > 0 THEN ens.update_at ELSE ens.created_at END DESC';
+        'Select * from (select * from enrollred_exit_child_responce WHERE CHHGUID in(Select CHHGUID from house_hold_children) and creche_id=? and (date_of_exit isnull or length(RTRIM(LTRIM(date_of_exit))) == 0)) ens left join (select hhRes.HHGUID,hhRes.responces as hhResponce,chre.CHHGUID from house_hold_responce hhRes INNER join house_hold_children as  chre on hhRes.HHGUID=chre.HHGUID) as hhs on hhs.CHHGUID=ens.CHHGUID  ORDER BY LOWER( SUBSTR(ens.responces, INSTR(ens.responces, ?) + LENGTH(?))) Asc';
 
     List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery(query, [creche_id]);
+        await DatabaseHelper.database!.rawQuery(query, [creche_id,'child_name":"','child_name":"']);
 
     return result;
   }
 
   Future<List<Map<String, dynamic>>> callEnrollChildrenAll() async {
     var query =
-        'Select * from (select * from enrollred_exit_child_responce WHERE CHHGUID in(Select CHHGUID from house_hold_children) and date_of_exit isnull ) ens left join (select hhRes.HHGUID,hhRes.responces as hhResponce,chre.CHHGUID from house_hold_responce hhRes INNER join house_hold_children as  chre on hhRes.HHGUID=chre.HHGUID) as hhs on hhs.CHHGUID=ens.CHHGUID ORDER BY CASE  WHEN ens.update_at IS NOT NULL AND length(RTRIM(LTRIM(ens.update_at))) > 0 THEN ens.update_at ELSE ens.created_at END DESC';
+        'Select * from (select * from enrollred_exit_child_responce WHERE CHHGUID in(Select CHHGUID from house_hold_children) and date_of_exit isnull ) ens left join (select hhRes.HHGUID,hhRes.responces as hhResponce,chre.CHHGUID from house_hold_responce hhRes INNER join house_hold_children as  chre on hhRes.HHGUID=chre.HHGUID) as hhs on hhs.CHHGUID=ens.CHHGUID ORDER BY LOWER(SUBSTR(ens.responces, INSTR(ens.responces, ?) + LENGTH(?))) asc';
 
     List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery(query);
+    await DatabaseHelper.database!.rawQuery(query,['child_name":"','child_name":"']);
+
 
     return result;
   }
@@ -173,10 +210,26 @@ class EnrolledExitChilrenResponceHelper {
   Future<List<EnrolledExitChildResponceModel>> enrolledChildByCreche(
       int crecheIdName) async {
     var query =
-        'Select * from  enrollred_exit_child_responce where creche_id=? and date_of_exit ISNULL ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
+        'Select * from  enrollred_exit_child_responce where creche_id=? and (date_of_exit isnull or length(RTRIM(LTRIM(date_of_exit))) == 0) ORDER BY LOWER(SUBSTR(responces, INSTR(responces, ?) + LENGTH(?))) asc';
 
     List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery(query, [crecheIdName]);
+        await DatabaseHelper.database!.rawQuery(query, [crecheIdName,'child_name":"','child_name":"']);
+
+    List<EnrolledExitChildResponceModel> items = [];
+    result.forEach((itemMap) {
+      items.add(EnrolledExitChildResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
+  Future<List<EnrolledExitChildResponceModel>> enrolledChildByCrecheWithDateOfExit(
+      int crecheIdName,String attendeceDate) async {
+    var query =
+        'SELECT *FROM enrollred_exit_child_responce WHERE creche_id = ? AND (date_of_exit > ? OR date_of_exit IS NULL or length(RTRIM(LTRIM(date_of_exit))) == 0) ORDER BY LOWER(SUBSTR(responces, INSTR(responces, ?) + LENGTH(?))) asc';
+
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery(query, [crecheIdName,attendeceDate,'child_name":"','child_name":"']);
 
     List<EnrolledExitChildResponceModel> items = [];
     result.forEach((itemMap) {
@@ -189,12 +242,28 @@ class EnrolledExitChilrenResponceHelper {
   Future<List<EnrolledExitChildResponceModel>> enrolledChildByEnrolledGUID(
       List<String> filterItems, int creche_id) async {
     String questionMarks = List.filled(filterItems.length, '?').join(',');
-    List<dynamic> parameters = List.from(filterItems)..add(creche_id);
+    List<dynamic> parameters = List.from(filterItems)..add(creche_id)..add('child_name":"')..add('child_name":"');
     var query =
-        'Select * from  enrollred_exit_child_responce where ChildEnrollGUID IN ($questionMarks) and creche_id=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
+        'Select * from  enrollred_exit_child_responce where ChildEnrollGUID IN ($questionMarks) and creche_id=? ORDER BY LOWER(SUBSTR(responces, INSTR(responces, ?) + LENGTH(?))) asc';
 
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.rawQuery(query, parameters);
+
+    List<EnrolledExitChildResponceModel> items = [];
+    result.forEach((itemMap) {
+      items.add(EnrolledExitChildResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
+  Future<List<EnrolledExitChildResponceModel>> enrolledChildByCHHGUID(
+      String CHHGUID) async {
+    var query =
+        'select * from enrollred_exit_child_responce where CHHGUID=? AND (date_of_exit isnull or length(RTRIM(LTRIM(date_of_exit))) == 0)';
+
+    List<Map<String, dynamic>> result =
+    await DatabaseHelper.database!.rawQuery(query, [CHHGUID]);
 
     List<EnrolledExitChildResponceModel> items = [];
     result.forEach((itemMap) {
@@ -208,10 +277,10 @@ class EnrolledExitChilrenResponceHelper {
       enrolledChildByCrecheByAttendeGUID(
           String childattenguid, int crech_id) async {
     var query =
-        'select * from enrollred_exit_child_responce  where ChildEnrollGUID in (select childenrolledguid  from child_attendence where childattenguid=?) and creche_id=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
+        'select * from enrollred_exit_child_responce  where ChildEnrollGUID in (select childenrolledguid  from child_attendence where childattenguid=?) and creche_id=? ORDER BY LOWER(SUBSTR(responces, INSTR(responces, ?) + LENGTH(?))) asc';
 
     List<Map<String, dynamic>> result = await DatabaseHelper.database!
-        .rawQuery(query, [childattenguid, crech_id]);
+        .rawQuery(query, [childattenguid, crech_id,'child_name":"','child_name":"']);
 
     List<EnrolledExitChildResponceModel> items = [];
     result.forEach((itemMap) {
@@ -250,17 +319,16 @@ class EnrolledExitChilrenResponceHelper {
   Future<List<Map<String, dynamic>>> getNotEnrollChildren(
       String villageId) async {
     var query =
-        'select chs.*,hh.responces as hhResponce from house_hold_children chs INNER join house_hold_responce as hh on hh. HHGUID=chs.HHGUID where chs.CHHGUID not in (select ens.CHHGUID from enrollred_exit_child_responce ens INNER  join house_hold_children as hhChildren on ens.CHHGUID=hhChildren.CHHGUID  where ens.date_of_exit isnull) ORDER BY CASE  WHEN chs.update_at IS NOT NULL AND length(RTRIM(LTRIM(chs.update_at))) > 0 THEN chs.update_at ELSE chs.created_at END DESC';
+        'select chs.*,hh.responces as hhResponce from house_hold_children chs INNER join house_hold_responce as hh on hh. HHGUID=chs.HHGUID where SUBSTR( hh.responces,  INSTR( hh.responces, ?) + LENGTH(?), INSTR(SUBSTR( hh.responces, INSTR( hh.responces, ?) + LENGTH(?)), ?) - 1 ) !=? and chs.CHHGUID  not in (select ens.CHHGUID from enrollred_exit_child_responce ens INNER  join house_hold_children as hhChildren on ens.CHHGUID=hhChildren.CHHGUID  where (ens.date_of_exit isnull or length(RTRIM(LTRIM(ens.date_of_exit))) == 0)) ORDER BY LOWER( SUBSTR(chs.responces, INSTR(chs.responces, ?) + LENGTH(?) ) ) asc';
     List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery(query);
+        await DatabaseHelper.database!.rawQuery(query,['"verification_status":"','"verification_status":"','"verification_status":"','"verification_status":"','"','1','child_name":"','child_name":"']);
     result = result
         .where((element) =>
             // Global.getItemValues(
             //         element['hhResponce'], 'verification_status') ==
             //     "4"
             //     &&
-            (filterDataForEnrolledChild(element) >= 7 &&
-                filterDataForEnrolledChild(element) <= 36) &&
+
             (Global.getItemValues(element['hhResponce'], 'village_id') ==
                 villageId.toString()))
         .toList();
@@ -293,6 +361,8 @@ class EnrolledExitChilrenResponceHelper {
     var cProfileItm = item['data'];
     var name = cProfileItm['name'];
     var ChildEnrollGUID = cProfileItm['childenrollguid'];
+    var update_at = cProfileItm['app_updated_on'];
+    var updated_by = cProfileItm['app_updated_by'];
     var itemChildEnRoll = await callChildrenResponce(ChildEnrollGUID);
     if (itemChildEnRoll.length > 0) {
       var chilResItem = jsonDecode(itemChildEnRoll.first.responces!);
@@ -301,8 +371,8 @@ class EnrolledExitChilrenResponceHelper {
       var itemRespJso = jsonEncode(chilResItem);
 
       await DatabaseHelper.database!.rawQuery(
-          'UPDATE enrollred_exit_child_responce SET name = ?,responces = ?  , is_uploaded=1 , is_edited=0 where ChildEnrollGUID=?',
-          [name, itemRespJso, ChildEnrollGUID]);
+          'UPDATE enrollred_exit_child_responce SET name = ?,responces = ?  , is_uploaded=1 , is_edited=0,update_at=?,updated_by=? where ChildEnrollGUID=?',
+          [name, itemRespJso, update_at, updated_by, ChildEnrollGUID]);
 
       var eventItem = await ChildEventTabResponceHelper()
           .callEventsEnrolledChildGUID(ChildEnrollGUID);
@@ -552,7 +622,7 @@ class EnrolledExitChilrenResponceHelper {
     String questionMarks = List.filled(enrollGuides.length, '?').join(',');
     List<dynamic> parameters = [...enrollGuides];
     var query =
-        'select * from enrollred_exit_child_responce where ChildEnrollGUID in($questionMarks) ';
+        'select * from enrollred_exit_child_responce where ChildEnrollGUID in($questionMarks)';
 
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.rawQuery(query, parameters);
@@ -562,5 +632,41 @@ class EnrolledExitChilrenResponceHelper {
     });
 
     return items;
+  }
+
+
+
+  Future<List<Map<String, dynamic>>> enrolledChildByCrecheWithProfile(
+      int crecheIdName) async {
+    var query =
+        'Select exr.*,ecr.responces as pResponces from  enrollred_exit_child_responce exr left join enrollred_chilren_responce as ecr on ecr.CHHGUID=exr.CHHGUID where exr.creche_id=? and (exr.date_of_exit isnull or length(RTRIM(LTRIM(exr.date_of_exit))) == 0) ORDER BY LOWER(SUBSTR(exr.responces, INSTR(exr.responces, ?) + LENGTH(?))) asc';
+
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery(query, [crecheIdName,'child_name":"','child_name":"']);
+
+    return result;
+  }
+
+  Future<void> isUpdateEdit(String EnrolledChilGUID, String responces) async {
+    var res = jsonDecode(responces);
+
+    var result = await callChildrenResponce(EnrolledChilGUID);
+
+    if (result.length > 0) {
+      var response = jsonDecode(result[0].responces!);
+
+      response['gender_id'] = res['gender_id'];
+
+      var resp = jsonEncode(response);
+      print("success");
+
+      await DatabaseHelper.database!.rawQuery(
+          'update enrollred_exit_child_responce set responces=? , is_edited=1 where ChildEnrollGUID=? ',
+          [resp, EnrolledChilGUID]);
+
+
+    }
+
+
   }
 }

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/database/helper/creche_monitoring/creche_monitoring_response_helper.dart';
+import 'package:shishughar/database/helper/translation_language_helper.dart';
+import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitor/creche_monitor_tab.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -13,7 +16,9 @@ class CrecheMonitorListingScreen extends StatefulWidget {
   final String? crecheId;
   final String crecheName;
 
-   CrecheMonitorListingScreen({super.key, required this.crecheId,
+  CrecheMonitorListingScreen({
+    super.key,
+    required this.crecheId,
     required this.crecheName,
   });
 
@@ -24,25 +29,58 @@ class CrecheMonitorListingScreen extends StatefulWidget {
 
 class _CrecheMonitorListingScreenState
     extends State<CrecheMonitorListingScreen> {
-  List<CrecheMonitorResponseModel> crecheMonitorData=[];
+  List<CrecheMonitorResponseModel> crecheMonitorData = [];
+  List<CrecheMonitorResponseModel> filterData = [];
+  List<CrecheMonitorResponseModel> unsynchedList = [];
+  List<CrecheMonitorResponseModel> allList = [];
+  String lng = 'en';
+  List<Translation> translats = [];
+  bool isOnlyUnsynched = false;
 
   @override
   void initState() {
     super.initState();
-     initializeData();
+    initializeData();
   }
 
   Future<void> initializeData() async {
+    lng = (await Validate().readString(Validate.sLanguage))!;
+    List<String> valueNames = [
+      CustomText.VisitNotes,
+      CustomText.Creches,
+      CustomText.datevisit,
+      CustomText.entryTime,
+      CustomText.exitTime,
+      CustomText.Search,
+      CustomText.clear,
+      CustomText.NorecordAvailable,
+      CustomText.all,
+      CustomText.usynchedAndDraft
+    ];
+
+    await TranslationDataHelper()
+        .callTranslateString(valueNames)
+        .then((value) => translats.addAll(value));
     print(widget.crecheId);
-    crecheMonitorData = await CrecheMonitorResponseHelper()
-        .getCrecheResponseWithCrecheId(widget.crecheId);
+    await fetchCmcData();
 
     setState(() {});
+  }
 
+  Future<void> fetchCmcData() async {
+    crecheMonitorData = await CrecheMonitorResponseHelper()
+        .getCrecheResponseWithCrecheId(widget.crecheId);
+    unsynchedList = crecheMonitorData
+        .where((element) => element.is_edited == 1 || element.is_edited == 2)
+        .toList();
+    allList = crecheMonitorData;
+    filterData = isOnlyUnsynched ? unsynchedList : allList;
+    setState(() {});
   }
 
   /// Navigate to Form Screen
-  Future<void> _navigateToFormPage(String? cmgUid,String? dateOfVisit,bool isEdit,bool isViewScreen) async {
+  Future<void> _navigateToFormPage(String? cmgUid, String? dateOfVisit,
+      bool isEdit, bool isViewScreen) async {
     // get allowRefresh
     final allowRefresh = await Navigator.of(context).push(
       MaterialPageRoute(
@@ -69,7 +107,7 @@ class _CrecheMonitorListingScreenState
           String cmgUid = '';
           if (!(Global.validString(cmgUid))) {
             cmgUid = Validate().randomGuid();
-            _navigateToFormPage(cmgUid,null,false,false);
+            _navigateToFormPage(cmgUid, null, false, false);
           }
         },
         child: Image.asset(
@@ -88,123 +126,159 @@ class _CrecheMonitorListingScreenState
 
       // body
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
         child: Column(children: [
-        Expanded(
-        child:crecheMonitorData.length>0?
-        ListView.builder(
-        itemCount: crecheMonitorData.length,
-        shrinkWrap: true,
-        physics: BouncingScrollPhysics(),
-        scrollDirection: Axis.vertical,
-        itemBuilder: (BuildContext context, int index) {
-          final responce = crecheMonitorData[index].responces;
-
-          return GestureDetector(
-            onTap: () async {
-              var created_at = DateTime.parse(crecheMonitorData[index].created_at.toString());
-              var date  = DateTime(created_at.year,created_at.month,created_at.day);
-              bool isViewScreen = date.add(Duration(days: 7)).isBefore(DateTime.parse(Validate().currentDate()));
-              final cmgUid = crecheMonitorData[index].cmguid;
-              await _navigateToFormPage(cmgUid,Global.getItemValues(responce!, 'date_of_visit'),true,isViewScreen);
-            },
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 5.h),
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border:
-                    Border.all(color: Color(0xffE7F0FF)),
-                    borderRadius:
-                    BorderRadius.circular(10.r)),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 10.w, vertical: 8.h),
-                  child: Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.start,
-                    crossAxisAlignment:
-                    CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        mainAxisAlignment:
-                        MainAxisAlignment.start,
-                        children: [
-                          // Text(
-                          //   '${CustomText.Creches} : ',
-                          //   style: Styles.black104,
-                          //   strutStyle: StrutStyle(height: 1),
-                          // ),
-                          Text(
-                            '${CustomText.datevisit} : ',
-                            style: Styles.black104,
-                          ),
-
-                         
-                        ],
-                      ),
-                      SizedBox(width: 10),
-                      SizedBox(
-                        height: 20.h,
-                        width: 2,
-                        child: VerticalDivider(
-                          color: Color(0xffE6E6E6),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          mainAxisAlignment:
-                          MainAxisAlignment.start,
-                          children: [
-                            // Text(
-                            //   widget.crecheName,
-                            //   style: Styles.blue125,
-                            //   overflow: TextOverflow.ellipsis,
-                            // ),
-                            Text(
-                              Global.validString(Global.getItemValues(responce!, 'date_of_visit'))?Validate().displeDateFormate(Global.getItemValues(responce!, 'date_of_visit')):'',
-                              style: Styles.blue125,
-                              strutStyle:
-                              StrutStyle(height: .5),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            // Text(
-                            //   Global.getItemValues(responce, 'exit_time'),
-                            //   style: Styles.blue125,
-                            //   strutStyle:
-                            //   StrutStyle(height: .5),
-                            //   overflow: TextOverflow.ellipsis,
-                            // ),
-
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                      (crecheMonitorData[index].is_edited==0 && crecheMonitorData[index].is_uploaded==1)?
-                      Image.asset(
-                        "assets/sync.png",
-                        scale: 1.5,
-                      ):
-                      Image.asset(
-                        "assets/sync_gray.png",
-                        scale: 1.5,
-                      )
-                    ],
-                  ),
-                ),
-              ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: AnimatedRollingSwitch(
+              title1: Global.returnTrLable(translats, CustomText.all, lng),
+              title2: Global.returnTrLable(
+                  translats, CustomText.usynchedAndDraft, lng),
+              isOnlyUnsynched: isOnlyUnsynched ?? false,
+              onChange: (value) async {
+                setState(() {
+                  isOnlyUnsynched = value;
+                });
+                await fetchCmcData();
+              },
             ),
-          );
-        },
-      )
-              : Center(
-          child: Text( CustomText.NorecordAvailable)),
-        ),
+          ),
+          Expanded(
+            child: filterData.length > 0
+                ? ListView.builder(
+                    itemCount: filterData.length,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      final responce = filterData[index].responces;
+                      var selectedItem = filterData[index];
+
+                      return GestureDetector(
+                        onTap: () async {
+                          var created_at = DateTime.parse(
+                              selectedItem.created_at.toString());
+                          var date = DateTime(created_at.year, created_at.month,
+                              created_at.day);
+                          bool isViewScreen = date
+                              .add(Duration(days: 7))
+                              .isBefore(
+                                  DateTime.parse(Validate().currentDate()));
+                          final cmgUid = selectedItem.cmguid;
+                          await _navigateToFormPage(
+                              cmgUid,
+                              Global.getItemValues(responce!, 'date_of_visit'),
+                              true,
+                              isViewScreen);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.h),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: Color(0xffE7F0FF)),
+                                borderRadius: BorderRadius.circular(10.r)),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w, vertical: 8.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      // Text(
+                                      //   '${CustomText.Creches} : ',
+                                      //   style: Styles.black104,
+                                      //   strutStyle: StrutStyle(height: 1),
+                                      // ),
+                                      Text(
+                                        '${CustomText.datevisit} : ',
+                                        style: Styles.black104,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 10),
+                                  SizedBox(
+                                    height: 20.h,
+                                    width: 2,
+                                    child: VerticalDivider(
+                                      color: Color(0xffE6E6E6),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        // Text(
+                                        //   widget.crecheName,
+                                        //   style: Styles.blue125,
+                                        //   overflow: TextOverflow.ellipsis,
+                                        // ),
+                                        Text(
+                                          Global.validString(
+                                                  Global.getItemValues(
+                                                      responce!,
+                                                      'date_of_visit'))
+                                              ? Validate().displeDateFormate(
+                                                  Global.getItemValues(
+                                                      responce!,
+                                                      'date_of_visit'))
+                                              : '',
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: .5),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        // Text(
+                                        //   Global.getItemValues(responce, 'exit_time'),
+                                        //   style: Styles.blue125,
+                                        //   strutStyle:
+                                        //   StrutStyle(height: .5),
+                                        //   overflow: TextOverflow.ellipsis,
+                                        // ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: 5),
+                                  (selectedItem.is_edited == 0 &&
+                                          selectedItem.is_uploaded == 1)
+                                      ? Image.asset(
+                                          "assets/sync.png",
+                                          scale: 1.5,
+                                        )
+                                      : (selectedItem.is_edited == 1 &&
+                                              selectedItem.is_uploaded == 0)
+                                          ? Image.asset(
+                                              "assets/sync_gray.png",
+                                              scale: 1.5,
+                                            )
+                                          : Icon(
+                                              Icons.error_outline_outlined,
+                                              color: Colors.red.shade700,
+                                              shadows: [
+                                                BoxShadow(
+                                                    spreadRadius: 2,
+                                                    blurRadius: 4,
+                                                    color: Colors.red.shade200)
+                                              ],
+                                            )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Center(child: Text(CustomText.NorecordAvailable)),
+          ),
         ]),
       ),
     );

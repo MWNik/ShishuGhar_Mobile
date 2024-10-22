@@ -149,7 +149,6 @@ class _ChildReferralListingScreenState
       var filterItem=reffrelChildrenList.where((element) =>
       (element.childenrolledguid==enrolledGUID && element.cgmguid==cgmguid)).toList();
       if(filterItem.length>0){
-        // var keyItem= Global.splitData(key, '#!');
         tempFoeRemove.add(key);
       }else{
         var extedItem=enrolledChildrenList.where((element) =>
@@ -172,7 +171,7 @@ class _ChildReferralListingScreenState
 
 
   Future<void> fetchAllAnthroRecords() async {
-    childAnthro = await ChildGrowthResponseHelper().allAnthormentry();
+    childAnthro = await ChildGrowthResponseHelper().allAnthormentryDisableOCT();
     crecheData = await CrecheDataHelper().getCrecheResponce();
     if(childAnthro.length>0) {
       allChildWithlatest(childAnthro);
@@ -437,14 +436,17 @@ class _ChildReferralListingScreenState
                                         ),
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
                                           style: Styles.black104,
                                         ),
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.Creche_Name, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
                                           style: Styles.black104,
                                         ),
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.schduleDate, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
                                           style: Styles.black104,
                                         ),
                                       ],
@@ -468,25 +470,28 @@ class _ChildReferralListingScreenState
                                           Text(
                                          callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],'child_name')
                                             ,
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
                                             callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
                                                 'child_id'),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
                                             callCrecheNameName(
                                                 callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
                                                     'creche_id')),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
                                             Validate().displeDateFormate(filteredGrowthGuidByDate.keys.toList()[index]),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ],

@@ -47,8 +47,7 @@ class ChildReferralTabScreen extends StatefulWidget {
       required this.isDischarge,
       required this.minDate,
       required this.scheduleDate,
-      required this.isEditable
-      });
+      required this.isEditable});
 
   @override
   State<ChildReferralTabScreen> createState() => _ChildReferralTabScreenState();
@@ -124,10 +123,6 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
             title: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  Global.returnTrLable(translatsLabel, widget.tabTitle, lng),
-                  style: Styles.white145,
-                ),
                 RichText(
                   maxLines: 2,
                   textAlign: TextAlign.center,
@@ -135,7 +130,7 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
                     WidgetSpan(
                       child: Text(
                         '${widget.childName} ',
-                        style: Styles.white126P,
+                        style: Styles.white145,
                         textAlign: TextAlign.center,
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
@@ -144,16 +139,19 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
                     WidgetSpan(
                       child: Text(
                         '-${widget.childId}',
-                        style: Styles.white126P,
+                        style: Styles.white145,
                         textAlign: TextAlign.center,
                         softWrap: true,
                         // overflow: TextOverflow.ellipsis,
                       ),
                     )
                   ]),
-                )
+                ),
+                Text(
+                  Global.returnTrLable(translatsLabel, widget.tabTitle, lng),
+                  style: Styles.white126P,
+                ),
               ],
-
             ),
             centerTitle: true,
             bottom: _isLoading
@@ -164,7 +162,7 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
                     unselectedLabelStyle: Styles.white124P,
                     labelColor: Colors.white,
                     controller: _tabController,
-                    isScrollable: true,
+                    isScrollable: false,
                     tabs: tabController(),
                     onTap: (index) {
                       if (_tabController.indexIsChanging) {
@@ -265,7 +263,8 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
       tabBreakItems = allItems
           .where((element) =>
               element.fieldtype == CustomText.tabBreak &&
-              element.fieldname != 'hidden_tab' && element.fieldname != 'creche_info')
+              element.fieldname != 'hidden_tab' &&
+              element.fieldname != 'creche_info')
           .toList();
     });
 
@@ -292,11 +291,13 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     List<String> tabLabelItems = [];
     tabBreakItems.forEach((element) {
-     if(Global.validString(element.label)){
-      tabLabelItems.add(element.label!);
-     }
+      if (Global.validString(element.label)) {
+        tabLabelItems.add(element.label!);
+      }
     });
-    await TranslationDataHelper().callTranslateString(tabLabelItems).then((value) => translatsLabel.addAll(value));
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelItems)
+        .then((value) => translatsLabel.addAll(value));
     setState(() {
       _isLoading = false;
     });
@@ -312,35 +313,37 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
     List<Widget> tabItem = [];
     for (int i = 0; i < tabBreakItems.length; i++) {
       if (tabBreakItems[i].parent == 'Child Referral') {
-        tabItem.add(widget.isEditable?ChildReferralTabItemsScreen(
-            enrollDate: widget.enrollDate,
-            GrowthMonitoringGUID: widget.GrowthMonitoringGUID,
-            ChildDOB: widget.ChildDOB,
-            enrolChildGuid: widget.enrolChildGuid,
-            creche_id: widget.creche_id,
-            child_id: widget.child_id,
-            child_referral_guid: widget.child_referral_guid,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            isDischarge: widget.isDischarge,
-            tabIndex: i,
-            totalTab: tabBreakItems.length,
-            scheduleDate: widget.scheduleDate,
-            minDate:widget.minDate):ChildReferralTabItemsViewScreen(
-            scheduleDate: widget.scheduleDate,
-            enrollDate: widget.enrollDate,
-            GrowthMonitoringGUID: widget.GrowthMonitoringGUID,
-            ChildDOB: widget.ChildDOB,
-            enrolChildGuid: widget.enrolChildGuid,
-            creche_id: widget.creche_id,
-            child_id: widget.child_id,
-            child_referral_guid: widget.child_referral_guid,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            tabIndex: i,
-            totalTab: tabBreakItems.length));
+        tabItem.add(widget.isEditable
+            ? ChildReferralTabItemsScreen(
+                enrollDate: widget.enrollDate,
+                GrowthMonitoringGUID: widget.GrowthMonitoringGUID,
+                ChildDOB: widget.ChildDOB,
+                enrolChildGuid: widget.enrolChildGuid,
+                creche_id: widget.creche_id,
+                child_id: widget.child_id,
+                child_referral_guid: widget.child_referral_guid,
+                tabBreakItem: tabBreakItems[i],
+                screenItem: expendedItems,
+                changeTab: changeTab,
+                isDischarge: widget.isDischarge,
+                tabIndex: i,
+                totalTab: tabBreakItems.length,
+                scheduleDate: widget.scheduleDate,
+                minDate: widget.minDate)
+            : ChildReferralTabItemsViewScreen(
+                scheduleDate: widget.scheduleDate,
+                enrollDate: widget.enrollDate,
+                GrowthMonitoringGUID: widget.GrowthMonitoringGUID,
+                ChildDOB: widget.ChildDOB,
+                enrolChildGuid: widget.enrolChildGuid,
+                creche_id: widget.creche_id,
+                child_id: widget.child_id,
+                child_referral_guid: widget.child_referral_guid,
+                tabBreakItem: tabBreakItems[i],
+                screenItem: expendedItems,
+                changeTab: changeTab,
+                tabIndex: i,
+                totalTab: tabBreakItems.length));
       }
     }
 

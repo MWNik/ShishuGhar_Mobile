@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shishughar/api/child_enrolled_exit_api.dart';
+import 'package:shishughar/api/requisition_api.dart';
+import 'package:shishughar/api/stock_api.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:http/src/response.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
-
+import 'package:shishughar/database/helper/requisition/requisition_response_helper.dart';
+import 'package:shishughar/database/helper/stock/stock_response_helper.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
-
 import '../api/cashBook_expenses_api.dart';
 import '../api/cashbook_receipt_api.dart';
 import '../api/child_attendance_upload_api.dart';
@@ -87,6 +90,11 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
   List<Translation> locationControlls = [];
   List<Future<void> Function(BuildContext)> methods = [];
   List<Future<void> Function(BuildContext)> UploadAll = [];
+  String loadingText = "";
+  String loadingTextUpdatedText = "";
+  String loadingTextUpdatedCount = "";
+  late StateSetter dialogSetState;
+  bool isUnsynched = false;
 
   @override
   Widget build(BuildContext context) {
@@ -110,18 +118,46 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           body: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                syncCount > 0
-                    ? DynamicCustomCheckboxWithLabel(
-                        label: CustomText.selectAllForUpload,
-                        initialValue: selectAllOpt,
-                        onChanged: (value) {
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    syncCount > 0
+                        ? Flexible(
+                            child: DynamicCustomCheckboxWithLabel(
+                              label: CustomText.selectAllForUpload,
+                              initialValue: selectAllOpt,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectAllOpt = value;
+                                });
+                              },
+                            ),
+                          )
+                        : SizedBox(
+                            width: 20,
+                          ),
+                    // Spacer(),
+                    Flexible(
+                      flex: syncCount > 0 ? 1 : 2,
+                      child: AnimatedRollingSwitch(
+                        isOnlyUnsynched: isUnsynched,
+                        title1: Global.returnTrLable(
+                            locationControlls, CustomText.all, lng!),
+                        title2: Global.returnTrLable(
+                            locationControlls, CustomText.unsynched, lng!),
+                        onChange: (value) async {
                           setState(() {
-                            selectAllOpt = value;
+                            isUnsynched = value;
                           });
+                          await callUploadData();
                         },
-                      )
-                    : SizedBox(),
+                      ),
+                    )
+                  ],
+                ),
                 SizedBox(
                   height: 10.h,
                 ),
@@ -132,87 +168,235 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                       physics: BouncingScrollPhysics(),
                       scrollDirection: Axis.vertical,
                       itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () async {
-                            if (userRole == 'Creche Supervisor') {
-                              if (selectAllOpt == 0) {
-                                if (index > 0 && index < 11)
-                                  await uploadDataSequence1(context, index);
-                                else
-                                  await methods[index](context);
-                              }
-                            } else {
-                              await methods[index](context);
-                            }
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5.h),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(
-                                          0.2), // Shadow color with opacity
-                                      offset: Offset(0,
-                                          3), // Horizontal and vertical offset
-                                      blurRadius: 6, // Blur radius
-                                      spreadRadius: 0, // Spread radius
-                                    ),
-                                  ],
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              height: 42.h,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w, vertical: 8.h),
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        // Content (RichText)
-                                        Expanded(
-                                          child: RichText(
-                                            strutStyle: StrutStyle(height: 1.h),
-                                            overflow: TextOverflow.ellipsis,
-                                            text: TextSpan(
-                                              text:
-                                                  "${syncInfo.keys.toList()[index]} : ",
-                                              style: Styles.urbanblack157,
-                                              children: parseBoldText(
-                                                syncInfo[syncInfo.keys
-                                                        .toList()[index]] ??
-                                                    '',
-                                                Styles.blue125,
-                                                Styles.black144.copyWith(
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                        return isUnsynched
+                            ? (unsyncCount(
+                                      syncInfo[syncInfo.keys.toList()[index]] ??
+                                          '',
+                                    ) >
+                                    0
+                                ? GestureDetector(
+                                    onTap: () async {
+                                      var checkInte = await Validate()
+                                          .checkNetworkConnection();
+                                      if (checkInte) {
+                                        if (userRole == 'Creche Supervisor') {
+                                          if (selectAllOpt == 0) {
+                                            if (index > 0 && index < 9)
+                                              await uploadDataSequence1(
+                                                  context, index);
+                                            else
+                                              await methods[index](context);
+                                          }
+                                        } else {
+                                          await methods[index](context);
+                                        }
+                                      } else
+                                        Validate().singleButtonPopup(
+                                            Global.returnTrLable(
+                                                locationControlls,
+                                                CustomText
+                                                    .nointernetconnectionavailable,
+                                                lng!),
+                                            Global.returnTrLable(
+                                                locationControlls,
+                                                CustomText.ok,
+                                                lng!),
+                                            true,
+                                            context);
+                                    },
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 5.h),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Color(0xff5A5A5A)
+                                                    .withOpacity(
+                                                        0.2), // Shadow color with opacity
+                                                offset: Offset(0,
+                                                    3), // Horizontal and vertical offset
+                                                blurRadius: 6, // Blur radius
+                                                spreadRadius:
+                                                    0, // Spread radius
                                               ),
-                                            ),
+                                            ],
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                color: Color(0xffE7F0FF)),
+                                            borderRadius:
+                                                BorderRadius.circular(10.r)),
+                                        height: 42.h,
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 10.w, vertical: 8.h),
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  // Content (RichText)
+                                                  Expanded(
+                                                    child: RichText(
+                                                      strutStyle: StrutStyle(
+                                                          height: 1.h),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      text: TextSpan(
+                                                        text:
+                                                            "${syncInfo.keys.toList()[index]} : ",
+                                                        style: Styles
+                                                            .urbanblack157,
+                                                        children: parseBoldText(
+                                                            syncInfo[syncInfo
+                                                                        .keys
+                                                                        .toList()[
+                                                                    index]] ??
+                                                                '',
+                                                            Styles.blue125,
+                                                            Styles.black144.copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                            Styles.red185.copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  selectAllOpt == 1
+                                                      ? Image.asset(
+                                                          checkAllForUpload(
+                                                              syncInfo
+                                                                      .keys
+                                                                      .toList()[
+                                                                  index]),
+                                                          scale: 4.4,
+                                                          color: Colors.grey,
+                                                        )
+                                                      : Image.asset(
+                                                          "assets/sync_icon.png",
+                                                          scale: 4.4,
+                                                          color: Colors.grey,
+                                                        ),
+                                                ],
+                                              ),
+                                              // Image to the right
+                                            ],
                                           ),
                                         ),
-                                        selectAllOpt == 1
-                                            ? Image.asset(
-                                                checkAllForUpload(syncInfo.keys
-                                                    .toList()[index]),
-                                                scale: 4.4,
-                                                color: Colors.grey,
-                                              )
-                                            : Image.asset(
-                                                "assets/sync_icon.png",
-                                                scale: 4.4,
-                                                color: Colors.grey,
-                                              ),
-                                      ],
+                                      ),
                                     ),
-                                    // Image to the right
-                                  ],
+                                  )
+                                : SizedBox())
+                            : GestureDetector(
+                                onTap: () async {
+                                  var checkInte =
+                                      await Validate().checkNetworkConnection();
+                                  if (checkInte) {
+                                    if (userRole == 'Creche Supervisor') {
+                                      if (selectAllOpt == 0) {
+                                        if (index > 0 && index < 9)
+                                          await uploadDataSequence1(
+                                              context, index);
+                                        else
+                                          await methods[index](context);
+                                      }
+                                    } else {
+                                      await methods[index](context);
+                                    }
+                                  } else
+                                    Validate().singleButtonPopup(
+                                        Global.returnTrLable(
+                                            locationControlls,
+                                            CustomText
+                                                .nointernetconnectionavailable,
+                                            lng!),
+                                        Global.returnTrLable(locationControlls,
+                                            CustomText.ok, lng!),
+                                        true,
+                                        context);
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 5.h),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xff5A5A5A).withOpacity(
+                                                0.2), // Shadow color with opacity
+                                            offset: Offset(0,
+                                                3), // Horizontal and vertical offset
+                                            blurRadius: 6, // Blur radius
+                                            spreadRadius: 0, // Spread radius
+                                          ),
+                                        ],
+                                        color: Colors.white,
+                                        border: Border.all(
+                                            color: Color(0xffE7F0FF)),
+                                        borderRadius:
+                                            BorderRadius.circular(10.r)),
+                                    height: 42.h,
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w, vertical: 8.h),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              // Content (RichText)
+                                              Expanded(
+                                                child: RichText(
+                                                  strutStyle:
+                                                      StrutStyle(height: 1.h),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  text: TextSpan(
+                                                    text:
+                                                        "${syncInfo.keys.toList()[index]} : ",
+                                                    style: Styles.urbanblack157,
+                                                    children: parseBoldText(
+                                                        syncInfo[syncInfo.keys
+                                                                    .toList()[
+                                                                index]] ??
+                                                            '',
+                                                        Styles.blue125,
+                                                        Styles.black144
+                                                            .copyWith(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                        Styles.red185.copyWith(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
+                                                  ),
+                                                ),
+                                              ),
+                                              selectAllOpt == 1
+                                                  ? Image.asset(
+                                                      checkAllForUpload(syncInfo
+                                                          .keys
+                                                          .toList()[index]),
+                                                      scale: 4.4,
+                                                      color: Colors.grey,
+                                                    )
+                                                  : Image.asset(
+                                                      "assets/sync_icon.png",
+                                                      scale: 4.4,
+                                                      color: Colors.grey,
+                                                    ),
+                                            ],
+                                          ),
+                                          // Image to the right
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        );
+                              );
                       }),
                 ),
                 SizedBox(
@@ -224,7 +408,21 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                             text: CustomText.uploadAll,
                             color: Color(0xff369A8D),
                             onPressed: () async {
-                              await uploadDataSequence1(context, 5);
+                              var checkInte =
+                                  await Validate().checkNetworkConnection();
+                              if (checkInte) {
+                                await uploadDataSequence1(context, 5);
+                              } else
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(
+                                        locationControlls,
+                                        CustomText
+                                            .nointernetconnectionavailable,
+                                        lng!),
+                                    Global.returnTrLable(
+                                        locationControlls, CustomText.ok, lng!),
+                                    true,
+                                    context);
                             },
                           )
                         : SizedBox()
@@ -249,6 +447,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     if (userRole == 'Creche Supervisor') {
       var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
       syncCount = await callCountForUpload();
+      //    syncCount = 1;
       hhItems = hhItems
           .where((element) =>
               Global.stringToInt(Global.getItemValues(
@@ -372,7 +571,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       } else {
         syncInfo[Global.returnTrLable(
                 locationControlls, CustomText.childAttendence, lng!)] =
-            '[b]${chilAttendence.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+            '[b]${chilAttendence.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
       }
       syncInfoCount[Global.returnTrLable(
               locationControlls, CustomText.childAttendence, lng!)] =
@@ -544,6 +743,37 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               locationControlls, CustomText.villageProfile, lng!)] =
           villageProfiles.length;
 
+      var stockData = await StockResponseHelper().getStockForUpload();
+      if (stockData.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.Stock, lng!)] =
+            '[b]${stockData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.Stock, lng!)] =
+            '[b]${stockData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[
+              Global.returnTrLable(locationControlls, CustomText.Stock, lng!)] =
+          stockData.length;
+
+      var requisitionData =
+          await RequisitionResponseHelper().getRequisitonsForUpload();
+      if (requisitionData.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.requisition, lng!)] =
+            '[b]${requisitionData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.requisition, lng!)] =
+            '[b]${requisitionData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[Global.returnTrLable(
+              locationControlls, CustomText.requisition, lng!)] =
+          requisitionData.length;
+
       var imageData = await ImageFileTabHelper().getImageForUpload();
       if (imageData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -557,24 +787,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-
-      //       var childEnrollExitData =
-      //     await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
-      // if (childEnrollExitData.length > 1) {
-      //   syncInfo[Global.returnTrLable(
-      //           locationControlls, CustomText.enrollExitChild, lng!)] =
-      //       '[b]${childEnrollExitData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
-      // } else {
-      //   syncInfo[Global.returnTrLable(
-      //           locationControlls, CustomText.enrollExitChild, lng!)] =
-      //       '[b]${childEnrollExitData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
-      // }
-
-      // syncInfoCount[Global.returnTrLable(
-      //         locationControlls, CustomText.enrollExitChild, lng!)] =
-      //     childEnrollExitData.length;
     } else if (userRole == 'Cluster Coordinator') {
-      var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
+      /* var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
       if (hhItems.length > 1) {
         syncInfo[Global.returnTrLable(
                 locationControlls, CustomText.HHListing, lng!)] =
@@ -585,7 +799,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             '[b]${hhItems.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
       }
       syncInfoCount[Global.returnTrLable(
-          locationControlls, CustomText.HHListing, lng!)] = hhItems.length;
+          locationControlls, CustomText.HHListing, lng!)] = hhItems.length;*/
 
       var cmcCCData = await CmcCCTabResponseHelper().getCcForUpload();
       if (cmcCCData.length > 1) {
@@ -599,6 +813,47 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       }
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.VisitNotes, lng!)] = cmcCCData.length;
+
+      var grievanceData =
+          await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
+      if (grievanceData.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.ChildGrievances, lng!)] =
+            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.ChildGrievances, lng!)] =
+            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      syncInfoCount[Global.returnTrLable(
+              locationControlls, CustomText.ChildGrievances, lng!)] =
+          grievanceData.length;
+
+      var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
+      if (checkins.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.checkIns, lng!)] =
+            '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.checkIns, lng!)] =
+            '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.checkIns, lng!)] = checkins.length;
+      var imageData = await ImageFileTabHelper().getImageForUpload();
+      if (imageData.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.imageFiles, lng!)] =
+            '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.imageFiles, lng!)] =
+            '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
     } else if (userRole == 'Accounts and Logistics Manager') {
       var cmcALMData = await CmcALMTabResponseHelper().getAlmForUpload();
       if (cmcALMData.length > 1) {
@@ -612,6 +867,47 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       }
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.VisitNotes, lng!)] = cmcALMData.length;
+
+      var grievanceData =
+          await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
+      if (grievanceData.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.ChildGrievances, lng!)] =
+            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.ChildGrievances, lng!)] =
+            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      syncInfoCount[Global.returnTrLable(
+              locationControlls, CustomText.ChildGrievances, lng!)] =
+          grievanceData.length;
+
+      var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
+      if (checkins.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.checkIns, lng!)] =
+            '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.checkIns, lng!)] =
+            '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.checkIns, lng!)] = checkins.length;
+      var imageData = await ImageFileTabHelper().getImageForUpload();
+      if (imageData.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.imageFiles, lng!)] =
+            '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.imageFiles, lng!)] =
+            '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
     } else if (userRole == 'Capacity and Building Manager') {
       var cmcCBMData = await CmcCBMTabResponseHelper().getCBMForUpload();
       if (cmcCBMData.length > 1) {
@@ -625,6 +921,47 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       }
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.VisitNotes, lng!)] = cmcCBMData.length;
+
+      var grievanceData =
+          await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
+      if (grievanceData.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.ChildGrievances, lng!)] =
+            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.ChildGrievances, lng!)] =
+            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      syncInfoCount[Global.returnTrLable(
+              locationControlls, CustomText.ChildGrievances, lng!)] =
+          grievanceData.length;
+
+      var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
+      if (checkins.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.checkIns, lng!)] =
+            '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.checkIns, lng!)] =
+            '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.checkIns, lng!)] = checkins.length;
+      var imageData = await ImageFileTabHelper().getImageForUpload();
+      if (imageData.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.imageFiles, lng!)] =
+            '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.imageFiles, lng!)] =
+            '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
     }
 
     setState(() {
@@ -641,8 +978,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             1)
         .toList();
     if (hhItems.length > 0) {
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.HHListing, lng!);
+      int currentItem = 1;
+      var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
       showLoaderDialog(context);
-      hhItems.forEach((element) async {
+      for (int i = 0; i < hhItems.length; i++) {
+        var element = hhItems[i];
         var cItems = await HouseHoldChildrenHelperHelper()
             .getResponceHouseHoldChildren(element
                 .HHGUID!); //"{"name":684,"parent":413,"hhguid":"q9bYVpayHGNzNwlQbnCdlOzQ1714538085360","hhcguid":"BWJpZLlBtZO3B7v1K2tcc6QG1714538201579","app…"
@@ -661,7 +1008,6 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         }
         resultMap['verification_status'] = "3";
 
-        var token = await Validate().readString(Validate.appToken);
         if (element.name != null) {
           var responce = await HHDataUploadApi().uploadHHDataUpdate(
               token!, element.name!, resultMap, childrensList);
@@ -676,6 +1022,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -722,6 +1076,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -755,7 +1117,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       Validate().singleButtonPopup(
           Global.returnTrLable(
@@ -766,122 +1128,132 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     }
   }
 
-  Future<void> uploadChildProfile(BuildContext mContext) async {
-    var chilProfiles =
-        await EnrolledChilrenResponceHelper().callChildrenForUpload();
-    if (chilProfiles.length > 0) {
-      showLoaderDialog(context);
-      chilProfiles.forEach((element) async {
-        var token = await Validate().readString(Validate.appToken);
-        Map<String, dynamic> resultMap = jsonDecode(element.responces!);
-        resultMap['status'] = '1';
-        var itemResponce = jsonEncode(resultMap);
-        if (element.name != null) {
-          var responce = await EnrolledChildProfileUploadApi()
-              .enrolledChildProfileUploadUpdate(
-                  token!, itemResponce, element.name);
-          if (responce.statusCode == 200) {
-            Validate().saveString(
-                Validate.dataUploadDateTime, Validate().currentDateTime());
-            await updateResponcesChildProfile(responce);
-            if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
-              Navigator.pop(mContext);
-              Validate().singleButtonPopup(
-                  Global.returnTrLable(locationControlls,
-                      CustomText.data_upload_success_msg, lng!),
-                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                  false,
-                  context);
-            }
-          } else if (responce.statusCode == 401) {
-            Navigator.pop(mContext);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Validate.Password);
-            ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(
-                  content: Text(Global.returnTrLable(
-                      locationControlls, CustomText.token_expired, lng!))),
-            );
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (mContext) => LoginScreen(),
-                ));
-            // Validate().singleButtonPopup(
-            //     Global.returnTrLable(locationControlls,
-            //         CustomText.token_expired, lng!),
-            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!), false, context);
-          } else {
-            Navigator.pop(mContext);
-            await callUploadData();
-            Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
-
-            return;
-          }
-        } else {
-          var responce = await EnrolledChildProfileUploadApi()
-              .enrolledChildProfileUpload(token!, itemResponce);
-          if (responce.statusCode == 200) {
-            await updateResponcesChildProfile(responce);
-            if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
-              Navigator.pop(mContext);
-              Validate().singleButtonPopup(
-                  Global.returnTrLable(locationControlls,
-                      CustomText.data_upload_success_msg, lng!),
-                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                  false,
-                  context);
-            }
-          } else if (responce.statusCode == 401) {
-            Navigator.pop(mContext);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Validate.Password);
-            ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(
-                  content: Text(Global.returnTrLable(
-                      locationControlls, CustomText.token_expired, lng!))),
-            );
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (mContext) => LoginScreen(),
-                ));
-            // Validate().singleButtonPopup(
-            //     Global.returnTrLable(locationControlls,
-            //         CustomText.token_expired, lng!),
-            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!), false, context);
-          } else {
-            Navigator.pop(mContext);
-            await callUploadData();
-            Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
-
-            return;
-          }
-        }
-      });
-    } else {
-      Validate().singleButtonPopup(
-          Global.returnTrLable(
-              locationControlls, CustomText.nothing_for_upload_msg, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-          false,
-          mContext);
-    }
-  }
+  // Future<void> uploadChildProfile(BuildContext mContext) async {
+  //   var chilProfiles =
+  //       await EnrolledChilrenResponceHelper().callChildrenForUpload();
+  //   if (chilProfiles.length > 0) {
+  //     showLoaderDialog(context);
+  //     chilProfiles.forEach((element) async {
+  //       var token = await Validate().readString(Validate.appToken);
+  //       Map<String, dynamic> resultMap = jsonDecode(element.responces!);
+  //       resultMap['status'] = '1';
+  //       var itemResponce = jsonEncode(resultMap);
+  //       if (element.name != null) {
+  //         var responce = await EnrolledChildProfileUploadApi()
+  //             .enrolledChildProfileUploadUpdate(
+  //                 token!, itemResponce, element.name);
+  //         if (responce.statusCode == 200) {
+  //           Validate().saveString(
+  //               Validate.dataUploadDateTime, Validate().currentDateTime());
+  //           await updateResponcesChildProfile(responce);
+  //           if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
+  //             Navigator.pop(mContext);
+  //             Validate().singleButtonPopup(
+  //                 Global.returnTrLable(locationControlls,
+  //                     CustomText.data_upload_success_msg, lng!),
+  //                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //                 false,
+  //                 context);
+  //           }
+  //         } else if (responce.statusCode == 401) {
+  //           Navigator.pop(mContext);
+  //           SharedPreferences prefs = await SharedPreferences.getInstance();
+  //           await prefs.remove(Validate.Password);
+  //           ScaffoldMessenger.of(mContext).showSnackBar(
+  //             SnackBar(
+  //                 content: Text(Global.returnTrLable(
+  //                     locationControlls, CustomText.token_expired, lng!))),
+  //           );
+  //           Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (mContext) => LoginScreen(),
+  //               ));
+  //           // Validate().singleButtonPopup(
+  //           //     Global.returnTrLable(locationControlls,
+  //           //         CustomText.token_expired, lng!),
+  //           //     Global.returnTrLable(locationControlls, CustomText.ok, lng!), false, context);
+  //         } else {
+  //           Navigator.pop(mContext);
+  //           await callUploadData();
+  //           Validate().singleButtonPopup(
+  //               Global.errorBodyToStringFromList(responce.body),
+  //               Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //               false,
+  //               context);
+  //
+  //           return;
+  //         }
+  //       } else {
+  //         var responce = await EnrolledChildProfileUploadApi()
+  //             .enrolledChildProfileUpload(token!, itemResponce);
+  //         if (responce.statusCode == 200) {
+  //           await updateResponcesChildProfile(responce);
+  //           if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
+  //             Navigator.pop(mContext);
+  //             Validate().singleButtonPopup(
+  //                 Global.returnTrLable(locationControlls,
+  //                     CustomText.data_upload_success_msg, lng!),
+  //                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //                 false,
+  //                 context);
+  //           }
+  //         } else if (responce.statusCode == 401) {
+  //           Navigator.pop(mContext);
+  //           SharedPreferences prefs = await SharedPreferences.getInstance();
+  //           await prefs.remove(Validate.Password);
+  //           ScaffoldMessenger.of(mContext).showSnackBar(
+  //             SnackBar(
+  //                 content: Text(Global.returnTrLable(
+  //                     locationControlls, CustomText.token_expired, lng!))),
+  //           );
+  //           Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (mContext) => LoginScreen(),
+  //               ));
+  //           // Validate().singleButtonPopup(
+  //           //     Global.returnTrLable(locationControlls,
+  //           //         CustomText.token_expired, lng!),
+  //           //     Global.returnTrLable(locationControlls, CustomText.ok, lng!), false, context);
+  //         } else {
+  //           Navigator.pop(mContext);
+  //           await callUploadData();
+  //           Validate().singleButtonPopup(
+  //               Global.errorBodyToStringFromList(responce.body),
+  //               Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //               false,
+  //               context);
+  //
+  //           return;
+  //         }
+  //       }
+  //     });
+  //   } else {
+  //     Validate().singleButtonPopup(
+  //         Global.returnTrLable(
+  //             locationControlls, CustomText.nothing_for_upload_msg, lng!),
+  //         Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+  //         false,
+  //         mContext);
+  //   }
+  // }
 
   Future<void> uploadCreCheProfile(BuildContext mContext) async {
     var crecheProfiles = await CrecheDataHelper().callCrecheForUpload();
     if (crecheProfiles.length > 0) {
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.CrecheProfileView, lng!);
+      int currentItem = 1;
+      var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '$currentItem/${crecheProfiles.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
       showLoaderDialog(context);
-      crecheProfiles.forEach((element) async {
+      for (int i = 0; i < crecheProfiles.length; i++) {
+        var element = crecheProfiles[i];
         var cItems =
             await CrecheCareGiverHelper().callCareGiverUpload(element.name!);
         Map<String, dynamic> resultMap = jsonDecode(element.responces!);
@@ -894,7 +1266,6 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           resultMap['creche_caregiver_table'] = childrensList;
         }
 
-        var token = await Validate().readString(Validate.appToken);
         if (element.name != null) {
           var responce =
               await CrecheDataResponceUploadApi().crecheCareGiverUploadUpdate(
@@ -920,6 +1291,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${crecheProfiles.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -969,6 +1348,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${crecheProfiles.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -1000,7 +1387,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 10;
@@ -1096,9 +1483,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var chilAttendence =
         await ChildAttendanceResponceHelper().callChildAttendencesAllForUpoad();
     if (chilAttendence.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.childAttendence, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      chilAttendence.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < chilAttendence.length; i++) {
+        var element = chilAttendence[i];
         var cItems = await ChildAttendenceHelper()
             .callChildAttendencesForUpload(element.childattenguid,
                 Global.getItemValues(element.responces!, 'date_of_attendance'));
@@ -1134,6 +1530,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -1185,6 +1589,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -1218,7 +1630,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 6;
@@ -1249,12 +1661,28 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var crecheCheckIn =
         await CheckInResponseHelper().callCrecheCheckInResponses();
     if (crecheCheckIn.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.checkIns, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      // crecheCheckIn.forEach((element) async {
-      for (var element in crecheCheckIn) {
+      loadingTextUpdatedCount = '$currentItem/${crecheCheckIn.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < crecheCheckIn.length; i++) {
+        var element = crecheCheckIn[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
-
+        if (!Global.validString(jsonBody['checkin_location'])) {
+          if (Global.validString(jsonBody['latitude']) &&
+              Global.validString(jsonBody['longitude'])) {
+            var latitude = Global.stringToDouble(jsonBody['latitude']);
+            var longitude = Global.stringToDouble(jsonBody['longitude']);
+            jsonBody['checkin_location'] =
+                await Validate().getAddressFromLatLng(latitude, longitude);
+          }
+        }
         if (element.name == null) {
           var responce = await CrecheCheckInApi()
               .checkInUpload(token!, jsonEncode(jsonBody));
@@ -1276,6 +1704,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${crecheCheckIn.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -1425,25 +1861,47 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: () async => false,
-          child: AlertDialog(
-            content: Column(
+          child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            dialogSetState = setState;
+            return AlertDialog(
+                content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const CircularProgressIndicator(),
                 SizedBox(height: 10.h),
-                Text(Global.returnTrLable(
-                    locationControlls, CustomText.uploadingPleaseWait, lng!)),
+                Text(loadingText),
               ],
-            ),
-          ),
+            ));
+          }),
         );
       },
     );
+    // showDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return StatefulBuilder(
+    //       builder: (BuildContext context, StateSetter setState) {
+    //         dialogSetState = setState; // Capture StateSetter
+    //         return AlertDialog(
+    //           content: Column(
+    //             mainAxisSize: MainAxisSize.min,
+    //             children: [
+    //               const CircularProgressIndicator(),
+    //               Text(loadingText), // Text that will be updated
+    //             ],
+    //           ),
+    //         );
+    //       },
+    //     );
+    //   },
+    // );
   }
 
   Future<void> initializeData() async {
     lng = await Validate().readString(Validate.sLanguage);
     userRole = await Validate().readString(Validate.role);
+    showLoaderDialog(context);
     List<String> valueNames = [
       CustomText.recordAvailable,
       CustomText.HHListing,
@@ -1456,56 +1914,115 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       CustomText.token_expired,
       CustomText.ChildProfile,
       CustomText.CrecheProfileView,
-      CustomText.fllowUp
+      CustomText.fllowUp,
+      CustomText.nointernetconnectionavailable,
+      CustomText.uploading,
+      CustomText.recordsAvailable,
+      CustomText.childGrowthMonitoring,
+      CustomText.AnthroData,
+      CustomText.creche,
+      CustomText.crceheCaregiver,
+      CustomText.village,
+      CustomText.demographicalDetail,
+      CustomText.cashbookReceipt,
+      CustomText.crecheStock,
+      CustomText.formLogic,
+      CustomText.crecheRequisiton,
+      CustomText.childProfileDoctype,
+      CustomText.requisitionChildTable,
+      CustomText.cmcCCDoctype,
+      CustomText.childEnrollExit,
+      CustomText.grievienceDoctype,
+      CustomText.cmcCBMDoxtype,
+      CustomText.cmcDoctype,
+      CustomText.crecheMeeting,
+      CustomText.cmcALMDoctype,
+      CustomText.childAttendance,
+      CustomText.cashbook,
+      CustomText.childFollowUp,
+      CustomText.childExit,
+      CustomText.childreferralDoctype,
+      CustomText.childHealthDoctype,
+      CustomText.houseHoldChildForm,
+      CustomText.houseHoldForm,
+      CustomText.childEventDoctype,
+      CustomText.childImmunization,
+      CustomText.anyMedical,
+      CustomText.crceheCheckIn,
+      CustomText.visitPurpose,
+      CustomText.disability,
     ];
     if (userRole == 'Creche Supervisor') {
       methods = [
-        uploadData,
-        uploadChildEnrolledExit,
-        uploadChildGrowthData,
-        uploadChildReferralData,
-        uploadChildFollowUpData,
-        uploadAttendance,
-        uploadChildEventData,
-        uploadChildHealthData,
-        uploadChildImmunizationData,
-        uploadCreCheProfile,
-        uploadCheckInData,
-        uploadChildGrievanceData,
-        uploadCrecheMonitorData,
-        uploadCrecheCommittieData,
-        uploadCashbookData,
-        uploadCashbookReceiptData,
-        uploadVillageProfile,
-        uploadImageFile,
+        uploadData, //0
+        uploadChildEnrolledExit, //1
+        uploadChildGrowthData, //2
+        uploadChildReferralData, //3
+        uploadChildFollowUpData, //4
+        uploadAttendance, //5
+        uploadChildEventData, //6
+        uploadChildHealthData, //7
+        uploadChildImmunizationData, //8
+        uploadCreCheProfile, //9
+        uploadCheckInData, //10
+        uploadChildGrievanceData, //11
+        uploadCrecheMonitorData, //12
+        uploadCrecheCommittieData, //13
+        uploadCashbookData, //14
+        uploadCashbookReceiptData, //15
+        uploadVillageProfile, //16
+        uploadStock, //17
+        uploadRequisition, //18
+        uploadImageFile, //19
       ];
     } else if (userRole == 'Cluster Coordinator') {
-      methods = [uploadDataCoordinator, uploadcmcCCData];
+      methods = [
+        uploadcmcCCData,
+        uploadChildGrievanceData,
+        uploadCheckInData,
+        uploadImageFile
+      ];
     } else if (userRole == 'Accounts and Logistics Manager') {
       methods = [
         uploadcmcALMData,
+        uploadChildGrievanceData,
+        uploadCheckInData,
+        uploadImageFile
       ];
     } else if (userRole == 'Capacity and Building Manager') {
       methods = [
         uploadcmcCBMData,
+        uploadChildGrievanceData,
+        uploadCheckInData,
+        uploadImageFile
       ];
     }
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
         .then((value) => locationControlls = value);
-    await callUploadData();
 
-    setState(() {});
+    Navigator.pop(context);
+
+    await callUploadData();
   }
 
   Future<void> uploadChildGrowthData(BuildContext mContext) async {
     var anthropomertydata =
         await ChildGrowthResponseHelper().callChildGrowthResponses();
     if (anthropomertydata.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.enrollExitChild, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      anthropomertydata.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${anthropomertydata.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < anthropomertydata.length; i++) {
+        var element = anthropomertydata[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
         if (element.name != null) {
@@ -1606,7 +2123,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       Validate().singleButtonPopup(
           Global.returnTrLable(
@@ -1634,9 +2151,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var childeventdata =
         await ChildEventTabResponceHelper().getEditedChildEventsForUpload();
     if (childeventdata.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.ChildEvents, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      childeventdata.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${childeventdata.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < childeventdata.length; i++) {
+        var element = childeventdata[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
         if (element.name != null) {
@@ -1660,6 +2186,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${childeventdata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -1713,6 +2247,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${childeventdata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -1746,7 +2288,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 7;
@@ -1776,9 +2318,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var childhealthdata =
         await ChildHealthTabResponceHelper().getChildHealthForUpload();
     if (childhealthdata.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.ChildHealth, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      childhealthdata.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${childhealthdata.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < childhealthdata.length; i++) {
+        var element = childhealthdata[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
         if (element.name != null) {
@@ -1802,6 +2353,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${childhealthdata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -1855,6 +2415,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${childhealthdata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -1888,7 +2457,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 8;
@@ -1918,9 +2487,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var childimmunizationdata =
         await ChildImmunizationResponseHelper().getChildImmunizationForUpload();
     if (childimmunizationdata.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.ChildImmunization, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      childimmunizationdata.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${childimmunizationdata.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < childimmunizationdata.length; i++) {
+        var element = childimmunizationdata[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
         if (element.name != null) {
@@ -1945,6 +2523,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${childimmunizationdata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -1998,6 +2585,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${childimmunizationdata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2031,7 +2627,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 9;
@@ -2189,9 +2785,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var grievancedata =
         await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
     if (grievancedata.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.ChildGrievances, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      grievancedata.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${grievancedata.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < grievancedata.length; i++) {
+        var element = grievancedata[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
         jsonBody['status'] = '1';
         var itemResponce = jsonEncode(jsonBody);
@@ -2217,6 +2822,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${grievancedata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2270,6 +2883,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${grievancedata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2303,7 +2924,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 12;
@@ -2333,11 +2954,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     final crecheData =
         await CrecheMonitorResponseHelper().getCrecheResponseForUpload();
     if (crecheData.isNotEmpty) {
-      showLoaderDialog(mContext);
-
-      final token = await Validate().readString(Validate.appToken);
-
-      crecheData.forEach((element) async {
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.VisitNotes, lng!);
+      int currentItem = 1;
+      var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '$currentItem/${crecheData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < crecheData.length; i++) {
+        var element = crecheData[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
         final itemResponse = jsonEncode(jsonBody);
@@ -2365,6 +2993,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${crecheData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (response.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2414,6 +3050,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${crecheData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (response.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2441,7 +3085,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 13;
@@ -2471,9 +3115,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var referralData =
         await ChildReferralTabResponseHelper().getChildReferralForUpload();
     if (referralData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.childReferral, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      referralData.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < referralData.length; i++) {
+        var element = referralData[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
         jsonBody['status'] = '1';
         var itemResponce = jsonEncode(jsonBody);
@@ -2492,6 +3145,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2539,6 +3200,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2572,7 +3241,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       Validate().singleButtonPopup(
           Global.returnTrLable(
@@ -2598,9 +3267,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var followUpData =
         await ChildFollowUpTabResponseHelper().getChildFollowUpForUpload();
     if (followUpData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.fllowUp, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      followUpData.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < followUpData.length; i++) {
+        var element = followUpData[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
         jsonBody['status'] = '1';
         var itemResponce = jsonEncode(jsonBody);
@@ -2619,6 +3297,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2666,6 +3352,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2699,7 +3393,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       Validate().singleButtonPopup(
           Global.returnTrLable(
@@ -2725,9 +3419,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var ccmData =
         await CrecheCommittieResponnseHelper().getCrecheCommittieForUpload();
     if (ccmData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.CrecheCommitte, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      ccmData.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${ccmData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < ccmData.length; i++) {
+        var element = ccmData[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
         jsonBody['status'] = '1';
         var itemResponce = jsonEncode(jsonBody);
@@ -2752,6 +3455,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${ccmData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2805,6 +3516,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${ccmData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2838,7 +3557,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 14;
@@ -2879,9 +3598,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var casgBookdata = await CashBookResponseExpencesHelper()
         .getEditedCashBookForExpenceUpload();
     if (casgBookdata.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.CashBookExpences, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      casgBookdata.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${casgBookdata.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < casgBookdata.length; i++) {
+        var element = casgBookdata[i];
         if (element.name != null) {
           var responce = await CashBookExpensesApi()
               .cashBookExpnesesUploadUdate(
@@ -2903,6 +3631,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${casgBookdata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2949,6 +3685,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${casgBookdata.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -2976,7 +3720,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 15;
@@ -3006,12 +3750,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var cashbookReceiptData = await CashBookReceiptResponseHelper()
         .getEditedCashBookReceiptForUpload();
     if (cashbookReceiptData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.CashBookReceipt, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      cashbookReceiptData.forEach((element) async {
-        // Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
-        // jsonBody['status'] = '1';
-        // var itemResponce = jsonEncode(jsonBody);
+      loadingTextUpdatedCount = '$currentItem/${cashbookReceiptData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < cashbookReceiptData.length; i++) {
+        var element = cashbookReceiptData[i];
         if (element.name != null) {
           var responce = await CashBookReceiptApi().cashBookReceiptUploadUdate(
               token!, element.responces!, element.name);
@@ -3033,6 +3783,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${cashbookReceiptData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3080,6 +3839,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${cashbookReceiptData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3107,7 +3875,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         currentUploadStatus = 16;
@@ -3136,8 +3904,16 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
   Future<void> uploadcmcALMData(BuildContext mContext) async {
     var cmcALMData = await CmcALMTabResponseHelper().getAlmForUpload();
     if (cmcALMData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.VisitNotes, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '$currentItem/${cmcALMData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(mContext);
       cmcALMData.forEach((element) async {
         if (element.name != null) {
           var responce = await CrecheMonetringCheckListALMApi()
@@ -3154,6 +3930,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${cmcALMData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3195,6 +3979,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${cmcALMData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3247,8 +4039,16 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
   Future<void> uploadcmcCBMData(BuildContext mContext) async {
     var cmcCBMData = await CmcCBMTabResponseHelper().getCBMForUpload();
     if (cmcCBMData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.VisitNotes, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '$currentItem/${cmcCBMData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(mContext);
       cmcCBMData.forEach((element) async {
         if (element.name != null) {
           var responce = await CrecheMonetringCheckListCBMApi()
@@ -3265,6 +4065,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${cmcCBMData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3306,6 +4114,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${cmcCBMData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3358,8 +4174,16 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
   Future<void> uploadcmcCCData(BuildContext mContext) async {
     var cmcCCData = await CmcCCTabResponseHelper().getCcForUpload();
     if (cmcCCData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.VisitNotes, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '$currentItem/${cmcCCData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(mContext);
       cmcCCData.forEach((element) async {
         // Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
         // jsonBody['status'] = '1';
@@ -3379,6 +4203,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${cmcCCData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3420,6 +4252,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                   false,
                   context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${cmcCCData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3480,8 +4320,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     return screenImage;
   }
 
-  List<TextSpan> parseBoldText(
-      String text, TextStyle normalStyle, TextStyle boldStyle) {
+  List<TextSpan> parseBoldText(String text, TextStyle normalStyle,
+      TextStyle boldStyle, TextStyle redboldStyle) {
     final RegExp boldTagRegExp = RegExp(r'\[b\](.*?)\[/b\]');
     final List<TextSpan> spans = [];
     int start = 0;
@@ -3493,7 +4333,11 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           spans.add(TextSpan(
               text: text.substring(start, match.start), style: normalStyle));
         }
-        spans.add(TextSpan(text: match.group(1), style: boldStyle));
+        spans.add(TextSpan(
+            text: match.group(1),
+            style: Global.stringToInt(match.group(1)) > 0
+                ? redboldStyle
+                : boldStyle));
         start = match.end;
         return '';
       },
@@ -3506,6 +4350,23 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     return spans;
   }
 
+  int unsyncCount(String text) {
+    final RegExp boldTagRegExp = RegExp(r'\[b\](.*?)\[/b\]');
+    final List<TextSpan> spans = [];
+    int unsycCount = 0;
+
+    text.splitMapJoin(
+      boldTagRegExp,
+      onMatch: (Match match) {
+        unsycCount =
+            Global.stringToInt(Global.validToString(match.group(1)).trim());
+        return '';
+      },
+    );
+
+    return unsycCount;
+  }
+
   Future<void> uploadDataSequence1(
       BuildContext mContext, int methodeIndex) async {
     var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
@@ -3516,8 +4377,17 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             1)
         .toList();
     if (hhItems.length > 0) {
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.HHListing, lng!);
+      int currentItem = 1;
+      loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
       showLoaderDialog(context);
-      hhItems.forEach((element) async {
+      for (int i = 0; i < hhItems.length; i++) {
+        var element = hhItems[i];
         var cItems = await HouseHoldChildrenHelperHelper()
             .getResponceHouseHoldChildren(element
                 .HHGUID!); //"{"name":684,"parent":413,"hhguid":"q9bYVpayHGNzNwlQbnCdlOzQ1714538085360","hhcguid":"BWJpZLlBtZO3B7v1K2tcc6QG1714538201579","app…"
@@ -3526,8 +4396,10 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         List<dynamic> childrensList = [];
 
         for (var cItem in cItems) {
+          Map<String,dynamic> map = jsonDecode(cItem);
+          map.remove('owner');
           childrensList
-              .add(jsonDecode(cItem)); //Added to the List in JSON format
+              .add(map); //Added to the List in JSON format
         }
         if (element.name == null) {
           if (childrensList.length > 0) {
@@ -3535,9 +4407,9 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           }
         }
         // if(resultMap['verification_status']!='4') {
-        //   resultMap['verification_status'] = "3";
+        resultMap['verification_status'] = "3";
         // }
-
+        resultMap.remove('owner');
         var token = await Validate().readString(Validate.appToken);
         if (element.name != null) {
           var responce = await HHDataUploadApi().uploadHHDataUpdate(
@@ -3548,6 +4420,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             if ((hhItems.indexOf(element)) == (hhItems.length - 1)) {
               Navigator.pop(mContext);
               uploadChildProfileSequence2(mContext, methodeIndex);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3583,6 +4463,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             if ((hhItems.indexOf(element)) == (hhItems.length - 1)) {
               Navigator.pop(mContext);
               uploadChildProfileSequence2(mContext, methodeIndex);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3610,28 +4498,39 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       // Navigator.pop(mContext);
       uploadChildProfileSequence2(mContext, methodeIndex);
     }
   }
 
-  Future<void> uploadChildProfileSequence2(BuildContext mContext,
-      int methodeIndex) async {
-    var chilProfiles = await EnrolledChilrenResponceHelper()
-        .callChildrenForUpload();
+  Future<void> uploadChildProfileSequence2(
+      BuildContext mContext, int methodeIndex) async {
+    var chilProfiles =
+        await EnrolledChilrenResponceHelper().callChildrenForUpload();
     if (chilProfiles.length > 0) {
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.ChildProfile, lng!);
+      int currentItem = 1;
+      loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
       showLoaderDialog(context);
-      chilProfiles.forEach((element) async {
+      for (int i = 0; i < chilProfiles.length; i++) {
+        var element = chilProfiles[i];
         var token = await Validate().readString(Validate.appToken);
         Map<String, dynamic> resultMap = jsonDecode(element.responces!);
         resultMap['status'] = '1';
+        resultMap.remove('owner');
         var itemResponce = jsonEncode(resultMap);
+        
         if (element.name != null) {
           var responce = await EnrolledChildProfileUploadApi()
               .enrolledChildProfileUploadUpdate(
-              token!, itemResponce, element.name);
+                  token!, itemResponce, element.name);
           if (responce.statusCode == 200) {
             Validate().saveString(
                 Validate.dataUploadDateTime, Validate().currentDateTime());
@@ -3639,15 +4538,23 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
               Navigator.pop(mContext);
               uploadChildProfileSequence3(mContext, methodeIndex);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
             SharedPreferences prefs = await SharedPreferences.getInstance();
             await prefs.remove(Validate.Password);
             ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(content:
-              Text(Global.returnTrLable(
-                  locationControlls, CustomText.token_expired, lng!))),
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
             );
             Navigator.pushReplacement(
                 context,
@@ -3664,29 +4571,36 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             Validate().singleButtonPopup(
                 Global.errorBodyToStringFromList(responce.body),
                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false, context);
+                false,
+                context);
 
             return;
           }
-        }
-        else {
-          var responce =
-          await EnrolledChildProfileUploadApi().enrolledChildProfileUpload(
-              token!, itemResponce);
+        } else {
+          var responce = await EnrolledChildProfileUploadApi()
+              .enrolledChildProfileUpload(token!, itemResponce);
           if (responce.statusCode == 200) {
             await updateResponcesChildProfile(responce);
             if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
               Navigator.pop(mContext);
               uploadChildProfileSequence3(mContext, methodeIndex);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
             SharedPreferences prefs = await SharedPreferences.getInstance();
             await prefs.remove(Validate.Password);
             ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(content:
-              Text(Global.returnTrLable(
-                  locationControlls, CustomText.token_expired, lng!))),
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
             );
             Navigator.pushReplacement(
                 context,
@@ -3703,12 +4617,13 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             Validate().singleButtonPopup(
                 Global.errorBodyToStringFromList(responce.body),
                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false, context);
+                false,
+                context);
 
             return;
           }
         }
-      });
+      }
     } else {
       uploadChildProfileSequence3(mContext, methodeIndex);
     }
@@ -3719,11 +4634,21 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var chilProfiles =
         await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
     if (chilProfiles.length > 0) {
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.enrollExitChild, lng!);
+      int currentItem = 1;
+      var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
       showLoaderDialog(context);
-      chilProfiles.forEach((element) async {
-        var token = await Validate().readString(Validate.appToken);
+      for (int i = 0; i < chilProfiles.length; i++) {
+        var element = chilProfiles[i];
         Map<String, dynamic> resultMap = jsonDecode(element.responces!);
         resultMap['status'] = '1';
+        resultMap.remove('owner');
         var itemResponce = jsonEncode(resultMap);
         if (element.name != null) {
           var responce = await ChildEnrolledExitApi()
@@ -3735,6 +4660,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
               Navigator.pop(mContext);
               uploadChildGrowthDataSeq1(mContext, methodeIndex);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3773,6 +4706,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
               Navigator.pop(mContext);
               uploadChildGrowthDataSeq1(mContext, methodeIndex);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -3804,7 +4745,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       uploadChildGrowthDataSeq1(mContext, methodeIndex);
     }
@@ -3950,9 +4891,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var anthropomertydata =
         await ChildGrowthResponseHelper().callChildGrowthResponses();
     if (anthropomertydata.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.enrollExitChild, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      anthropomertydata.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${anthropomertydata.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < anthropomertydata.length; i++) {
+        var element = anthropomertydata[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
         if (element.name != null) {
@@ -4043,7 +4993,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       uploadChildReferralDataSeq2(mContext, methodeIndex);
     }
@@ -4054,9 +5004,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var referralData =
         await ChildReferralTabResponseHelper().getChildReferralForUpload();
     if (referralData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.childReferral, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      referralData.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < referralData.length; i++) {
+        var element = referralData[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
         jsonBody['status'] = '1';
         var itemResponce = jsonEncode(jsonBody);
@@ -4070,6 +5029,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             if ((referralData.indexOf(element)) == (referralData.length - 1)) {
               Navigator.pop(mContext);
               uploadChildFollowUpDataSeq3(mContext, methodeIndex);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -4112,6 +5079,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             if ((referralData.indexOf(element)) == (referralData.length - 1)) {
               Navigator.pop(mContext);
               uploadChildFollowUpDataSeq3(mContext, methodeIndex);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -4145,7 +5120,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       uploadChildFollowUpDataSeq3(mContext, methodeIndex);
     }
@@ -4156,9 +5131,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var followUpData =
         await ChildFollowUpTabResponseHelper().getChildFollowUpForUpload();
     if (followUpData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.fllowUp, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      followUpData.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < followUpData.length; i++) {
+        var element = followUpData[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
         jsonBody['status'] = '1';
         var itemResponce = jsonEncode(jsonBody);
@@ -4181,6 +5165,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     mContext);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -4232,6 +5224,14 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     mContext);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -4265,7 +5265,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else {
       if (methodeIndex > 4) {
         await methods[methodeIndex](context);
@@ -4283,9 +5283,18 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     var villageProfileData =
         await VillageProfileResponseHelper().getVillageProfileforUpload();
     if (villageProfileData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.villageProfile, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      villageProfileData.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${villageProfileData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < villageProfileData.length; i++) {
+        var element = villageProfileData[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
         if (element.name != null) {
@@ -4311,6 +5320,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${villageProfileData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -4359,6 +5377,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                         locationControlls, CustomText.ok, lng!),
                     false,
                     context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${villageProfileData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
             }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
@@ -4386,7 +5413,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
+      }
     } else if (selectAllOpt == 1) {
       currentUploadStatus = 17;
       await methods[currentUploadStatus](context);
@@ -4413,13 +5440,23 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
   Future<void> uploadImageFile(BuildContext mContext) async {
     var ImageFileData = await ImageFileTabHelper().getImageForUpload();
     if (ImageFileData.length > 0) {
-      showLoaderDialog(mContext);
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.imageFiles, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      ImageFileData.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${ImageFileData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < ImageFileData.length; i++) {
+        var element = ImageFileData[i];
         var responce = await ImageFileApi().ImageFileUpload(token!, element);
         if (responce.statusCode == 200) {
           Validate().saveString(
               Validate.dataUploadDateTime, Validate().currentDateTime());
+          await updateImageResponse(responce);
           if ((ImageFileData.indexOf(element)) == (ImageFileData.length - 1)) {
             Navigator.pop(mContext);
             Validate().singleButtonPopup(
@@ -4428,8 +5465,15 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                 false,
                 context);
+          } else {
+            currentItem = currentItem + 1;
+            loadingTextUpdatedCount = '$currentItem/${ImageFileData.length}';
+            loadingText = Global.returnTrLable(
+                locationControlls, CustomText.uploading, lng!);
+            loadingText =
+                '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+            updateLoadingText(dialogSetState, loadingText);
           }
-          await updateImageResponse(responce);
         } else if (responce.statusCode == 401) {
           Navigator.pop(mContext);
           SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -4455,7 +5499,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
           return;
         }
-      });
+      }
     } else {
       if (selectAllOpt == 1) {
         selectAllOpt = 0;
@@ -4487,38 +5531,199 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
   }
 
   Future<void> uploadChildEnrolledExit(BuildContext mContext) async {
-    var enrollExitData =
+    var chilProfiles =
         await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
-    if (enrollExitData.length > 0) {
-      showLoaderDialog(mContext);
+    if (chilProfiles.length > 0) {
+      loadingTextUpdatedText = Global.returnTrLable(
+          locationControlls, CustomText.enrollExitChild, lng!);
+      int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      enrollExitData.forEach((element) async {
+      loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < chilProfiles.length; i++) {
+        var element = chilProfiles[i];
+        Map<String, dynamic> resultMap = jsonDecode(element.responces!);
+        resultMap['status'] = '1';
+        var itemResponce = jsonEncode(resultMap);
+        if (element.name != null) {
+          var responce = await ChildEnrolledExitApi()
+              .enrollExitChildUpdate(token!, itemResponce, element.name);
+          if (responce.statusCode == 200) {
+            Validate().saveString(
+                Validate.dataUploadDateTime, Validate().currentDateTime());
+            await updateChildEnrollExitResponse(responce);
+            if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
+              Navigator.pop(mContext);
+              Validate().singleButtonPopup(
+                  Global.returnTrLable(locationControlls,
+                      CustomText.data_upload_success_msg, lng!),
+                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                  false,
+                  mContext);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
+            }
+          } else if (responce.statusCode == 401) {
+            Navigator.pop(mContext);
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.remove(Validate.Password);
+            ScaffoldMessenger.of(mContext).showSnackBar(
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
+            );
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (mContext) => LoginScreen(),
+                ));
+            // Validate().singleButtonPopup(
+            //     Global.returnTrLable(locationControlls,
+            //         CustomText.token_expired, lng!),
+            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!), false, context);
+          } else {
+            Navigator.pop(mContext);
+            await callUploadData();
+            Validate().singleButtonPopup(
+                Global.errorBodyToStringFromList(responce.body),
+                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                false,
+                context);
+
+            return;
+          }
+        } else {
+          var responce = await ChildEnrolledExitApi()
+              .enrollExitChildUpload(token!, itemResponce);
+          if (responce.statusCode == 200) {
+            await updateChildEnrollExitResponse(responce);
+            if ((chilProfiles.indexOf(element)) == (chilProfiles.length - 1)) {
+              Navigator.pop(mContext);
+              Validate().singleButtonPopup(
+                  Global.returnTrLable(locationControlls,
+                      CustomText.data_upload_success_msg, lng!),
+                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                  false,
+                  mContext);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
+            }
+          } else if (responce.statusCode == 401) {
+            Navigator.pop(mContext);
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.remove(Validate.Password);
+            ScaffoldMessenger.of(mContext).showSnackBar(
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
+            );
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (mContext) => LoginScreen(),
+                ));
+            // Validate().singleButtonPopup(
+            //     Global.returnTrLable(locationControlls,
+            //         CustomText.token_expired, lng!),
+            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!), false, context);
+          } else {
+            Navigator.pop(mContext);
+            await callUploadData();
+            Validate().singleButtonPopup(
+                Global.errorBodyToStringFromList(responce.body),
+                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                false,
+                context);
+
+            return;
+          }
+        }
+      }
+    } else
+      Validate().singleButtonPopup(
+          Global.returnTrLable(
+              locationControlls, CustomText.nothing_for_upload_msg, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          false,
+          mContext);
+  }
+
+  Future<void> updateChildEnrollExitResponse(Response value) async {
+    try {
+      Map<String, dynamic> resultMap = jsonDecode(value.body);
+      print(" responce $resultMap");
+      await EnrolledExitChilrenResponceHelper()
+          .updateUploadedChildProfileItem(resultMap);
+      await callUploadData();
+    } catch (e) {
+      print("exp ${e.toString()}");
+    }
+  }
+
+  Future<void> uploadStock(BuildContext mContext) async {
+    var stockData = await StockResponseHelper().getStockForUpload();
+    if (stockData.length > 0) {
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.Stock, lng!);
+      int currentItem = 1;
+      var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '$currentItem/${stockData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < stockData.length; i++) {
+        var element = stockData[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
         if (element.name == null) {
-          var responce = await ChildEnrolledExitApi()
-              .enrollExitChildUpload(token!, jsonEncode(jsonBody));
+          var responce =
+              await StockApi().stockUploadApi(token!, jsonEncode(jsonBody));
           if (responce.statusCode == 200) {
             Validate().saveString(
                 Validate.dataUploadDateTime, Validate().currentDateTime());
 
-            await updateChildEnrollExitResponse(responce);
+            await updateStockResponse(responce);
 
-            // if ((enrollExitData.indexOf(element)) ==
-            //     (enrollExitData.length - 1)) {
-            Navigator.pop(mContext);
-            //   if (selectAllOpt == 1) {
-            //     currentUploadStatus = 18;
-            //     await methods[currentUploadStatus](context);
-            //   }
-            // else
-            Validate().singleButtonPopup(
-                Global.returnTrLable(locationControlls,
-                    CustomText.data_upload_success_msg, lng!),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
-            // }
+            if ((stockData.indexOf(element)) == (stockData.length - 1)) {
+              Navigator.pop(mContext);
+              if (selectAllOpt == 1) {
+                currentUploadStatus = 18;
+                await methods[currentUploadStatus](context);
+              } else
+                Validate().singleButtonPopup(
+                    Global.returnTrLable(locationControlls,
+                        CustomText.data_upload_success_msg, lng!),
+                    Global.returnTrLable(
+                        locationControlls, CustomText.ok, lng!),
+                    false,
+                    context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${stockData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
+            }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
             SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -4545,29 +5750,36 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         } else {
-          var responce = await ChildEnrolledExitApi().enrollExitChildUpdate(
-              token!, jsonEncode(jsonBody), element.name);
+          var responce = await StockApi()
+              .stockUpdateApi(token!, jsonEncode(jsonBody), element.name);
           if (responce.statusCode == 200) {
             Validate().saveString(
                 Validate.dataUploadDateTime, Validate().currentDateTime());
 
-            await updateChildEnrollExitResponse(responce);
+            await updateStockResponse(responce);
 
-            // if ((enrollExitData.indexOf(element)) ==
-            //     (enrollExitData.length - 1)) {
-            Navigator.pop(mContext);
-            //   if (selectAllOpt == 1) {
-            //     currentUploadStatus = 18;
-            //     await methods[currentUploadStatus](context);
-            //   }
-            // else
-            Validate().singleButtonPopup(
-                Global.returnTrLable(locationControlls,
-                    CustomText.data_upload_success_msg, lng!),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
-            // }
+            if ((stockData.indexOf(element)) == (stockData.length - 1)) {
+              Navigator.pop(mContext);
+              if (selectAllOpt == 1) {
+                currentUploadStatus = 18;
+                await methods[currentUploadStatus](context);
+              } else
+                Validate().singleButtonPopup(
+                    Global.returnTrLable(locationControlls,
+                        CustomText.data_upload_success_msg, lng!),
+                    Global.returnTrLable(
+                        locationControlls, CustomText.ok, lng!),
+                    false,
+                    context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '$currentItem/${stockData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
+            }
           } else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
             SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -4594,13 +5806,11 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           }
         }
-      });
-    }
-    // else if(selectAllOpt==1){
-    //   currentUploadStatus=18;
-    //   await methods[currentUploadStatus](context);
-    // }
-    else
+      }
+    } else if (selectAllOpt == 1) {
+      currentUploadStatus = 18;
+      await methods[currentUploadStatus](context);
+    } else
       Validate().singleButtonPopup(
           Global.returnTrLable(
               locationControlls, CustomText.nothing_for_upload_msg, lng!),
@@ -4609,12 +5819,170 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           mContext);
   }
 
-  Future<void> updateChildEnrollExitResponse(Response value) async {
+  Future<void> updateStockResponse(Response value) async {
     try {
       Map<String, dynamic> resultMap = jsonDecode(value.body);
       print(" responce $resultMap");
-      await EnrolledExitChilrenResponceHelper()
-          .updateUploadedChildProfileItem(resultMap);
+      await StockResponseHelper().updateUploadedItem(resultMap);
+      await callUploadData();
+    } catch (e) {
+      print("exp ${e.toString()}");
+    }
+  }
+
+  Future<void> uploadRequisition(BuildContext mContext) async {
+    var requisitionData =
+        await RequisitionResponseHelper().getRequisitonsForUpload();
+    if (requisitionData.length > 0) {
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.requisition, lng!);
+      int currentItem = 1;
+      var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '$currentItem/${requisitionData.length}';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+          '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(context);
+      for (int i = 0; i < requisitionData.length; i++) {
+        var element = requisitionData[i];
+        Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
+
+        if (element.name == null) {
+          var responce = await RequisitionApi()
+              .requisitionUploadApi(token!, jsonEncode(jsonBody));
+          if (responce.statusCode == 200) {
+            Validate().saveString(
+                Validate.dataUploadDateTime, Validate().currentDateTime());
+
+            await updateRequisitionData(responce);
+
+            if ((requisitionData.indexOf(element)) ==
+                (requisitionData.length - 1)) {
+              Navigator.pop(mContext);
+              if (selectAllOpt == 1) {
+                currentUploadStatus = 19;
+                await methods[currentUploadStatus](context);
+              } else
+                Validate().singleButtonPopup(
+                    Global.returnTrLable(locationControlls,
+                        CustomText.data_upload_success_msg, lng!),
+                    Global.returnTrLable(
+                        locationControlls, CustomText.ok, lng!),
+                    false,
+                    context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${requisitionData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
+            }
+          } else if (responce.statusCode == 401) {
+            Navigator.pop(mContext);
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.remove(Validate.Password);
+            ScaffoldMessenger.of(mContext).showSnackBar(
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
+            );
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (mContext) => LoginScreen(),
+                ));
+          } else {
+            Navigator.pop(mContext);
+            await callUploadData();
+            Validate().singleButtonPopup(
+                Global.errorBodyToStringFromList(responce.body),
+                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                false,
+                context);
+
+            return;
+          }
+        } else {
+          var responce = await RequisitionApi()
+              .requisitionUpdateApi(token!, jsonEncode(jsonBody), element.name);
+          if (responce.statusCode == 200) {
+            Validate().saveString(
+                Validate.dataUploadDateTime, Validate().currentDateTime());
+
+            await updateRequisitionData(responce);
+
+            if ((requisitionData.indexOf(element)) ==
+                (requisitionData.length - 1)) {
+              Navigator.pop(mContext);
+              if (selectAllOpt == 1) {
+                currentUploadStatus = 19;
+                await methods[currentUploadStatus](context);
+              } else
+                Validate().singleButtonPopup(
+                    Global.returnTrLable(locationControlls,
+                        CustomText.data_upload_success_msg, lng!),
+                    Global.returnTrLable(
+                        locationControlls, CustomText.ok, lng!),
+                    false,
+                    context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount =
+                  '$currentItem/${requisitionData.length}';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
+            }
+          } else if (responce.statusCode == 401) {
+            Navigator.pop(mContext);
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.remove(Validate.Password);
+            ScaffoldMessenger.of(mContext).showSnackBar(
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
+            );
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (mContext) => LoginScreen(),
+                ));
+          } else {
+            Navigator.pop(mContext);
+            await callUploadData();
+            Validate().singleButtonPopup(
+                Global.errorBodyToStringFromList(responce.body),
+                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                false,
+                context);
+
+            return;
+          }
+        }
+      }
+    } else if (selectAllOpt == 1) {
+      currentUploadStatus = 19;
+      await methods[currentUploadStatus](context);
+    } else
+      Validate().singleButtonPopup(
+          Global.returnTrLable(
+              locationControlls, CustomText.nothing_for_upload_msg, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          false,
+          mContext);
+  }
+
+  Future<void> updateRequisitionData(Response value) async {
+    try {
+      Map<String, dynamic> resultMap = jsonDecode(value.body);
+      print(" responce $resultMap");
+      await RequisitionResponseHelper().updateUploadedItem(resultMap);
       await callUploadData();
     } catch (e) {
       print("exp ${e.toString()}");
@@ -4622,7 +5990,6 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
   }
 
   Future<int> callCountForUpload() async {
-    showLoaderDialog(context);
     var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
     var chilProfiles =
         await EnrolledChilrenResponceHelper().callChildrenForUpload();
@@ -4662,6 +6029,9 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         await VillageProfileResponseHelper().getVillageProfileforUpload();
     var childEnrollExitData =
         await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
+    var stockData = await StockResponseHelper().getStockForUpload();
+    var requisitionData =
+        await RequisitionResponseHelper().getRequisitonsForUpload();
 
     hhItems = hhItems
         .where((element) =>
@@ -4670,7 +6040,6 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             1)
         .toList();
 
-    Navigator.pop(context);
     int totalPendingCount = hhItems.length +
         // chilProfiles.length +
         crecheProfile.length +
@@ -4690,8 +6059,17 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         villageProfiles.length +
         ImageFileData.length +
         cashBookDataReciept.length +
-        childEnrollExitData.length;
+        childEnrollExitData.length +
+        stockData.length +
+        requisitionData.length;
 
     return totalPendingCount;
+  }
+
+  void updateLoadingText(StateSetter setState, String newText) {
+    print(newText);
+    setState(() {
+      loadingText = newText;
+    });
   }
 }

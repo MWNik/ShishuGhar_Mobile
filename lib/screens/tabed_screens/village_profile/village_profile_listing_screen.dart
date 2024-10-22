@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_string_dropdown.dart';
+import 'package:shishughar/custom_widget/custom_textfield.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/database/helper/village_profile/village_profile_response_helper.dart';
 import 'package:shishughar/model/dynamic_screen_model/village_profile_response_model.dart';
 import 'package:shishughar/screens/tabed_screens/village_profile/village_profile_tab_screen.dart';
@@ -28,6 +32,12 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
   TextEditingController Searchcontroller = TextEditingController();
   List<Translation> translatsLabel = [];
   List<VillageProfileResponseModel> villageProfileList = [];
+  List<VillageProfileResponseModel> filteredList = [];
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isOnlyUnsynched = false;
+  List<VillageProfileResponseModel> unsynchedList = [];
+  List<VillageProfileResponseModel> allList = [];
+  String? selectedVillage;
   String lng = 'en';
   String role = '';
 
@@ -66,6 +76,8 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
       CustomText.villageCode,
       CustomText.villageName,
       CustomText.ok,
+      CustomText.all,
+      CustomText.unsynched
     ];
     // await fetchStateList();
     await TranslationDataHelper()
@@ -78,7 +90,26 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
   Future<void> fetchVillageProfileRecords() async {
     villageProfileList =
         await VillageProfileResponseHelper().getAllVillageProfilerecords();
+    unsynchedList =
+        villageProfileList.where((element) => element.is_edited == 1).toList();
+    allList = villageProfileList;
+    filteredList = isOnlyUnsynched ? unsynchedList : allList;
     setState(() {});
+  }
+
+  filterDataQu(String entry) {
+    var filterList = isOnlyUnsynched ? unsynchedList : allList;
+    if (entry.length > 0) {
+      filteredList = filterList
+          .where((element) => element.village_name
+              .toString()
+              .toLowerCase()
+              .startsWith(entry.toLowerCase()))
+          .toList();
+    } else
+      filteredList = filterList;
+    setState(() {});
+    print('dd ${filteredList.length}');
   }
 
   @override
@@ -90,21 +121,61 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
       },
       child: Scaffold(
         appBar: CustomAppbar(
-          text: Global.returnTrLable(translatsLabel, CustomText.villageList, lng),
+          text:
+              Global.returnTrLable(translatsLabel, CustomText.villageList, lng),
           onTap: () {
             Navigator.pop(context, 'itemRefresh');
           },
         ),
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
           child: Column(children: [
             // SizedBox(
             //   height: MediaQuery.of(context).size.height * 0.09,
             // ),
-            (villageProfileList.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 2),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomTextFieldRow(
+                      controller: Searchcontroller,
+                      onChanged: (value) {
+                        print(value);
+                        filterDataQu(value);
+                      },
+                      hintText: (lng != null)
+                          ? Global.returnTrLable(translatsLabel, 'Search', lng!)
+                          : '',
+                      prefixIcon: Image.asset(
+                        "assets/search.png",
+                        scale: 2.4,
+                      ),
+                    ),
+                  ),
+                  role == CustomText.crecheSupervisor
+                      ? AnimatedRollingSwitch(
+                          title1: Global.returnTrLable(
+                              translatsLabel, CustomText.all, lng),
+                          title2: Global.returnTrLable(
+                              translatsLabel, CustomText.unsynched, lng),
+                          isOnlyUnsynched: isOnlyUnsynched ?? false,
+                          onChange: (value) async {
+                            setState(() {
+                              isOnlyUnsynched = value;
+                            });
+                            await fetchVillageProfileRecords();
+                          },
+                        )
+                      : SizedBox(),
+                ],
+              ),
+            ),
+
+            (filteredList.isNotEmpty)
                 ? Expanded(
                     child: ListView.builder(
-                      itemCount: villageProfileList.length,
+                      itemCount: filteredList.length,
                       shrinkWrap: true,
                       physics: BouncingScrollPhysics(),
                       scrollDirection: Axis.vertical,
@@ -115,8 +186,10 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
                                         VillageProfileTabScreen(
-                                            name: villageProfileList[index]
-                                                .name!)));
+                                            name: filteredList[index].name!,
+                                            isEditable: role ==
+                                                CustomText.crecheSupervisor
+                                                    .trim())));
                             if (refStatus == 'itemRefresh') {
                               await fetchVillageProfileRecords();
                             }
@@ -152,18 +225,13 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          Global.returnTrLable(translatsLabel,
-                                                  CustomText.villageCode, lng)
-                                              .trim(),
+                                          '${Global.returnTrLable(translatsLabel, CustomText.villageCode, lng).trim()} :',
                                           style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1.3),
                                         ),
                                         Text(
-                                          Global.returnTrLable(translatsLabel,
-                                                  CustomText.villageName, lng)
-                                              .trim(),
+                                          '${Global.returnTrLable(translatsLabel, CustomText.villageName, lng).trim()} :',
                                           style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1.3),
+                                          strutStyle: StrutStyle(height: 1.2),
                                         ),
                                         // Text(
                                         //   Global.returnTrLable(translatsLabel,
@@ -193,34 +261,34 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                              villageProfileList[index]
+                                              filteredList[index]
                                                       .village_code ??
                                                   '',
-                                              style: Styles.blue125,
-                                              strutStyle:
-                                                  StrutStyle(height: 1.2),
+                                              style: Styles.cardBlue10,
                                               overflow: TextOverflow.ellipsis),
                                           Text(
-                                              villageProfileList[index]
+                                              filteredList[index]
                                                       .village_name ??
                                                   '',
-                                              style: Styles.blue125,
+                                              style: Styles.cardBlue10,
                                               strutStyle:
-                                                  StrutStyle(height: 1.4),
+                                                  StrutStyle(height: 1.2),
                                               overflow: TextOverflow.ellipsis),
                                         ],
                                       ),
                                     ),
                                     SizedBox(height: 5),
-                                    (villageProfileList[index].is_edited==0 && villageProfileList[index].is_uploaded==1)?
-                                    Image.asset(
-                                      "assets/sync.png",
-                                      scale: 1.5,
-                                    ):
-                                    Image.asset(
-                                      "assets/sync_gray.png",
-                                      scale: 1.5,
-                                    )
+                                    (filteredList[index].is_edited == 0 &&
+                                            filteredList[index].is_uploaded ==
+                                                1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : Image.asset(
+                                            "assets/sync_gray.png",
+                                            scale: 1.5,
+                                          )
                                   ],
                                 ),
                               ),

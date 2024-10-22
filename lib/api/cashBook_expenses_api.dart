@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import '../utils/constants.dart';
+import '../utils/validate.dart';
 
 class CashBookExpensesApi {
   Future<Response> callCashBookExpensesMeta(
@@ -36,6 +39,25 @@ class CashBookExpensesApi {
     }
   }
 
+  Future<Response> cashbookExpensesDownloadApiCC(
+      String blockId,String username, String pwd, String token) async {
+    var url = Uri.parse('${Constants.baseUrl}method/cashbook_expense_filter_data_village');
+    var headers = {'Authorization': token, 'Content-Type': 'application/json'};
+    List<int> integerList = blockId.split(',').map(int.parse).toList();
+    Map<String, dynamic> parameters = {
+      "village_id": integerList,
+      "usr": username,
+      "pwd": pwd
+    };
+    try {
+      var responce = await http.post(url, headers: headers, body: jsonEncode(parameters));
+      print(responce.body);
+      return responce;
+    } catch (e) {
+      return Response('Internal server error - $e', 500);
+    }
+  }
+
   Future<http.Response> cashBookExpensesUpload(
       String token, String responce) async {
     var url = Uri.parse('${Constants.baseUrl}resource/Cashbook');
@@ -45,6 +67,7 @@ class CashBookExpensesApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
+      await Validate().createUploadedJson("Token $token\n\n$responce");
       var response = await http.post(url, body: responce, headers: headers);
       return response;
     } catch (e) {
@@ -61,6 +84,7 @@ class CashBookExpensesApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
+      await Validate().createUploadedJson("Token $token\n\n$responce");
       var response = await http.put(url, body: responce, headers: headers);
       return response;
     } catch (e) {

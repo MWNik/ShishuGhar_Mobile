@@ -79,6 +79,7 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
   }
 
   Future<void> initializeData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     userName = (await Validate().readString(Validate.userName))!;
     List<String> valueNames = [
@@ -659,7 +660,7 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
+    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;

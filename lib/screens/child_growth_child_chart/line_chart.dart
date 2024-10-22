@@ -258,7 +258,7 @@ class _MultiLineChartState extends State<MultiLineChart> {
             minX: 0,
             maxX: widget.maxX,
             minY: 0,
-            maxY: widget.maxY,
+            maxY: Global.roundToNearest(widget.maxY),
             borderData: FlBorderData(
               show: true,
               border: Border.all(color: const Color(0xff37434d), width: 1),
@@ -282,7 +282,7 @@ class _MultiLineChartState extends State<MultiLineChart> {
                         ),
                       );
                     },
-                    interval: 10,
+                    interval: widget.bottomName=='Age'?400:10,
                     reservedSize: 18,
                   )),
               leftTitles: AxisTitles(
@@ -295,7 +295,8 @@ class _MultiLineChartState extends State<MultiLineChart> {
                     showTitles: true,
                     getTitlesWidget: (value, meta) {
                       return Text(
-                        (value + 0.5).toDouble().toString(),
+                        // (value + 0.5).toDouble().toString(),
+                        (value).toDouble().toString(),
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 10,
@@ -312,7 +313,8 @@ class _MultiLineChartState extends State<MultiLineChart> {
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
                         return Text(
-                          (value + 0.5).toDouble().toString(),
+                          // (value + 0.5).toDouble().toString(),
+                          (value ).toDouble().toString(),
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 10,

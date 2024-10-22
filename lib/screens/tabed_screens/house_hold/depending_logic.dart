@@ -23,6 +23,8 @@ class DependingLogic {
             (element.type_of_logic_id == '1' ||
                 element.type_of_logic_id == '3' ||
                 element.type_of_logic_id == '12' ||
+                element.type_of_logic_id == '24' ||
+                element.type_of_logic_id == '25' ||
                 element.type_of_logic_id == '18'))
         .toList();
     if (parentQlogic.length > 0) {
@@ -64,6 +66,25 @@ class DependingLogic {
               dependingAns = true;
               break;
             }
+          }
+        } else if (element.type_of_logic_id == '24') {
+          if (element.dependentControls == element.parentControl) {
+            var dependVAlu = answred[element.dependentControls];
+            if ((!Global.validString(element.algorithmExpression)) &&
+                dependVAlu != null) {
+              dependingAns = true;
+            }
+          } else {
+            var dependVAlu = answred[element.dependentControls];
+            if ((!Global.validString(element.algorithmExpression)) &&
+                dependVAlu != null) {
+              dependingAns = true;
+            }
+          }
+        } else if (element.type_of_logic_id == '25') {
+          if (element.dependentControls == element.parentControl) {
+            dependingAns = false;
+            break;
           }
         }
       }
@@ -125,12 +146,17 @@ class DependingLogic {
           if (dependVAlu != null) {
             var date = Validate().stringToDate(dependVAlu);
             int? calucalteDate;
-            if (element.algorithmExpression.toLowerCase() == 'm')
+            if (Global.validToString(element.algorithmExpression)
+                    .toLowerCase() ==
+                'm')
               calucalteDate = Validate().calculateAgeInMonths(date);
-            else if (element.algorithmExpression.toLowerCase() == 'y')
+            else if (Global.validToString(element.algorithmExpression)
+                    .toLowerCase() ==
+                'y')
               calucalteDate = Validate().calculateAgeInYear(date);
-            else if (element.algorithmExpression.toLowerCase() == 'd')
-              calucalteDate = Validate().calculateAgeInDays(date);
+            else if (Global.validToString(element.algorithmExpression)
+                    .toLowerCase() ==
+                'd') calucalteDate = Validate().calculateAgeInDays(date);
 
             item[element.parentControl] = calucalteDate;
             break;
@@ -191,11 +217,9 @@ class DependingLogic {
     var parentQlogic = logics
         .where((element) =>
             element.dependentControls.contains(parentItem.fieldname!) &&
-            (element.type_of_logic_id == '4'))
+            (element.type_of_logic_id == '4' ||
+                element.type_of_logic_id == '22'))
         .toList();
-    //   var items= logics.where((element) => element.parentControl.contains(parentItem.fieldname!) &&(element.type_of_logic_id=='20')
-    // ).toList();
-    // parentQlogic.addAll(items);
     if (parentQlogic.length > 0) {
       for (int i = 0; i < parentQlogic.length; i++) {
         var element = parentQlogic[i];
@@ -214,15 +238,61 @@ class DependingLogic {
             }
           }
         }
-        // else if(element.type_of_logic_id=='20'){
-        //   var dependVAlu=answred[element.dependentControls];
-        //   var algo=Global.splitData(element.algorithmExpression,'');
-        //   if(dependVAlu!=null && algo.length==2){
-        //     if(dependVAlu==algo[0]){
-        //
-        //     }
-        //   }
-        // }
+        if (element.type_of_logic_id == '22') {
+          var dependVAlu = Global.splitData(element.dependentControls, ':');
+          if (dependVAlu.length > 0) {
+            double? fiValue1;
+            dependVAlu.forEach((depV) {
+              if (depV.contains('+')) {
+                double? temp;
+                var depenItem = Global.splitData(depV, '+');
+                depenItem.forEach((action) {
+                  if (temp != null) {
+                    temp = temp! +
+                        Global.stringToDouble(
+                            answred[action.toString().trim()].toString());
+                  } else
+                    temp = Global.stringToDouble(
+                        answred[action.toString().trim()].toString());
+                });
+                if (fiValue1 != null && temp != null) {
+                  if (element.algorithmExpression == '-') {
+                    fiValue1 = (fiValue1! - temp!);
+                  } else if (element.algorithmExpression == '+') {
+                    fiValue1 = (fiValue1! + temp!);
+                  }
+                } else {
+                  fiValue1 = temp;
+                }
+              } else if (depV.contains('-')) {
+                double? temp;
+                var depenItem = Global.splitData(depV, '-');
+                depenItem.forEach((action) {
+                  if (temp != null) {
+                    temp = temp! -
+                        Global.stringToDouble(
+                            answred[action.toString().trim()].toString());
+                  } else
+                    temp = Global.stringToDouble(
+                        answred[action.toString().trim()].toString());
+                });
+
+                if (fiValue1 != null && temp != null) {
+                  if (element.algorithmExpression == '-') {
+                    fiValue1 = (fiValue1! - temp!);
+                  } else if (element.algorithmExpression == '+') {
+                    fiValue1 = (fiValue1! + temp!);
+                  }
+                } else {
+                  fiValue1 = temp;
+                }
+              }
+            });
+            if (fiValue1 != null) {
+              item[element.parentControl] = fiValue1;
+            }
+          }
+        }
       }
     }
 
@@ -255,7 +325,8 @@ class DependingLogic {
         } else if (parentQlogic[i].type_of_logic_id == '16') {
           var parentDate = answred[parentQlogic[i].parentControl];
           if (parentDate != null) {
-            items.add(parentQlogic[i].algorithmExpression);
+            items
+                .add(Global.validToString(parentQlogic[i].algorithmExpression));
             print("object,${parentDate.split('-').map(int.parse).toList()}");
             if (parentQlogic[i].algorithmExpression == '<') {
               List<dynamic> dateParts =
@@ -317,17 +388,19 @@ class DependingLogic {
     //     .toList();
     var logicdependControl = logics
         .where((element) =>
-    element.parentControl.contains(parentItem.fieldname!) &&
-        (element.type_of_logic_id == '1' ||
-            element.type_of_logic_id == '3' ||
-            element.type_of_logic_id == '7' ||
-            element.type_of_logic_id == '9' ||
-            element.type_of_logic_id == '17' ||
-            element.type_of_logic_id == '19' ||
-            element.type_of_logic_id == '12' ||
-            element.type_of_logic_id == '18' ||
-            element.type_of_logic_id == '6' ||
-            element.type_of_logic_id == '16'))
+            element.parentControl.contains(parentItem.fieldname!) &&
+            (element.type_of_logic_id == '1' ||
+                element.type_of_logic_id == '3' ||
+                element.type_of_logic_id == '7' ||
+                element.type_of_logic_id == '9' ||
+                element.type_of_logic_id == '17' ||
+                element.type_of_logic_id == '19' ||
+                element.type_of_logic_id == '12' ||
+                element.type_of_logic_id == '18' ||
+                element.type_of_logic_id == '6' ||
+                element.type_of_logic_id == '16' ||
+                element.type_of_logic_id == '23' ||
+                element.type_of_logic_id == '24'))
         .toList();
 
     // parentQlogic.addAll(logicdependControl);
@@ -344,33 +417,33 @@ class DependingLogic {
               if (Global.validString(
                   answred[element.dependentControls].toString())) {
                 if (exp[1] == '<=') {
-                  if (!(dependVAlu <= validValu)) {
+                  if (!(dependVAlu < validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be less than Or equal to $validValu";
+                        "Value of ${parentItem.label} must be less than Or equal to $validValu";
                     break;
                   }
                 } else if (exp[1] == '<') {
                   if (!(dependVAlu < validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be less than $validValu";
+                        "Value of ${parentItem.label} must be less than $validValu";
                     break;
                   }
                 } else if (exp[1] == '>=') {
                   if (!(dependVAlu >= validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be greater than Or equal to $validValu";
+                        "Value of ${parentItem.label} must be greater than Or equal to $validValu";
                     break;
                   }
                 } else if (exp[1] == '>') {
                   if (!(dependVAlu > validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be greater than $validValu";
+                        "Value of ${parentItem.label} must be greater than $validValu";
                     break;
                   }
                 } else if (exp[1] == '==') {
                   if (!(dependVAlu == validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be equal to $validValu";
+                        "Value of ${parentItem.label} must be equal to $validValu";
                     break;
                   }
                 }
@@ -385,34 +458,54 @@ class DependingLogic {
               if (element.algorithmExpression == '<=') {
                 if (!(parrentValue <= dependVAlu)) {
                   retuenValu =
-                  "Value of ${parentItem.label} must be less than Or equal to $dependVAlu";
+                      "Value of ${parentItem.label} must be less than Or equal to $dependVAlu";
                   break;
                 }
               } else if (element.algorithmExpression == '<') {
                 if (!(parrentValue < dependVAlu)) {
                   retuenValu =
-                  "Value of ${parentItem.label} must be less than $dependVAlu";
+                      "Value of ${parentItem.label} must be less than $dependVAlu";
                   break;
                 }
               } else if (element.algorithmExpression == '>=') {
                 if (!(parrentValue >= dependVAlu)) {
                   retuenValu =
-                  "Value of ${parentItem.label} must be greater than Or equal to $dependVAlu";
+                      "Value of ${parentItem.label} must be greater than Or equal to $dependVAlu";
                   break;
                 }
               } else if (element.algorithmExpression == '>') {
                 if (!(parrentValue > dependVAlu)) {
                   retuenValu =
-                  "Value of ${parentItem.label} must be greater than $dependVAlu";
+                      "Value of ${parentItem.label} must be greater than $dependVAlu";
                   break;
                 }
               } else if (element.algorithmExpression == '==') {
-                if (!(parrentValue==dependVAlu)) {
+                if (!(parrentValue == dependVAlu)) {
                   retuenValu =
-                  "Value of ${parentItem.label} must be equal to $dependVAlu";
+                      "Value of ${parentItem.label} must be equal to $dependVAlu";
                   break;
                 }
               }
+            }
+          }
+        } else if (element.type_of_logic_id == '24') {
+          if (element.dependentControls == element.parentControl) {
+            var dependVAlu = answred[element.dependentControls];
+            if ((!Global.validString(element.algorithmExpression)) &&
+                dependVAlu != null &&
+                !Global.validString(
+                    answred[element.parentControl].toString())) {
+              retuenValu = "Please enter ${parentItem.label} ";
+              break;
+            }
+          } else {
+            var dependVAlu = answred[element.dependentControls];
+            if ((!Global.validString(element.algorithmExpression)) &&
+                dependVAlu != null &&
+                !Global.validString(
+                    answred[element.parentControl].toString())) {
+              retuenValu = "Please enter ${parentItem.label} ";
+              break;
             }
           }
         } else if (element.type_of_logic_id == '1' ||
@@ -422,9 +515,12 @@ class DependingLogic {
             if (dependVAlu == element.algorithmExpression.toString()) {
               var parentValu = answred[element.parentControl].toString();
               if (!(Global.validString(parentValu))) {
-                if(parentItem.fieldtype=='Data' || parentItem.fieldtype=='Int' || parentItem.fieldtype=='Float')
+                if (parentItem.fieldtype == 'Data' ||
+                    parentItem.fieldtype == 'Int' ||
+                    parentItem.fieldtype == 'Float')
                   retuenValu = "Please fill ${parentItem.label}";
-                else  retuenValu = "Please select ${parentItem.label}";
+                else
+                  retuenValu = "Please select ${parentItem.label}";
                 break;
               }
             }
@@ -433,9 +529,12 @@ class DependingLogic {
             if (dependVAlu == element.algorithmExpression.toString()) {
               var parentValu = answred[element.parentControl].toString();
               if (!(Global.validString(parentValu))) {
-                if(parentItem.fieldtype=='Data' || parentItem.fieldtype=='Int' || parentItem.fieldtype=='Float')
-                retuenValu = "Please fill ${parentItem.label}";
-                else  retuenValu = "Please select ${parentItem.label}";
+                if (parentItem.fieldtype == 'Data' ||
+                    parentItem.fieldtype == 'Int' ||
+                    parentItem.fieldtype == 'Float')
+                  retuenValu = "Please fill ${parentItem.label}";
+                else
+                  retuenValu = "Please select ${parentItem.label}";
                 break;
               }
             }
@@ -493,19 +592,19 @@ class DependingLogic {
                 if (exp[1] == '<=') {
                   if (!(dependVAlu <= validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} length must be less than Or equal to $validValu";
+                        "Value of ${parentItem.label} length must be less than Or equal to $validValu";
                     break;
                   }
                 } else if (exp[1] == '>=') {
                   if (!(dependVAlu >= validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} length must be greater than Or equal to $validValu";
+                        "Value of ${parentItem.label} length must be greater than Or equal to $validValu";
                     break;
                   }
                 } else if (exp[1] == '==') {
                   if (!(dependVAlu == validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} length must be equal to $validValu";
+                        "Value of ${parentItem.label} length must be equal to $validValu";
                     break;
                   }
                 }
@@ -525,31 +624,31 @@ class DependingLogic {
                   if (exp[1] == '<=') {
                     if (!(dependVAlu <= validValu)) {
                       retuenValu =
-                      "Value of ${parentItem.label} must be less than Or equal to $validValu";
+                          "Value of ${parentItem.label} must be less than Or equal to $validValu";
                       break;
                     }
                   } else if (exp[1] == '<') {
                     if (!(dependVAlu < validValu)) {
                       retuenValu =
-                      "Value of ${parentItem.label} must be less than $validValu";
+                          "Value of ${parentItem.label} must be less than $validValu";
                       break;
                     }
                   } else if (exp[1] == '>=') {
                     if (!(dependVAlu >= validValu)) {
                       retuenValu =
-                      "Value of ${parentItem.label} must be greater than Or equal to $validValu";
+                          "Value of ${parentItem.label} must be greater than Or equal to $validValu";
                       break;
                     }
                   } else if (exp[1] == '>') {
                     if (!(dependVAlu > validValu)) {
                       retuenValu =
-                      "Value of ${parentItem.label} must be greater than $validValu";
+                          "Value of ${parentItem.label} must be greater than $validValu";
                       break;
                     }
                   } else if (exp[1] == '==') {
                     if (!(dependVAlu == validValu)) {
                       retuenValu =
-                      "Value of ${parentItem.label} must be equal to $validValu";
+                          "Value of ${parentItem.label} must be equal to $validValu";
                       break;
                     }
                   }
@@ -560,33 +659,142 @@ class DependingLogic {
                 if (exp[1] == '<=') {
                   if (!(dependVAlu <= validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be less than Or equal to $validValu";
+                        "Value of ${parentItem.label} must be less than Or equal to $validValu";
                     break;
                   }
                 } else if (exp[1] == '<') {
                   if (!(dependVAlu < validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be less than $validValu";
+                        "Value of ${parentItem.label} must be less than $validValu";
                     break;
                   }
                 } else if (exp[1] == '>=') {
                   if (!(dependVAlu >= validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be greater than Or equal to $validValu";
+                        "Value of ${parentItem.label} must be greater than Or equal to $validValu";
                     break;
                   }
                 } else if (exp[1] == '>') {
                   if (!(dependVAlu > validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be greater than $validValu";
+                        "Value of ${parentItem.label} must be greater than $validValu";
                     break;
                   }
                 } else if (exp[1] == '==') {
                   if (!(dependVAlu == validValu)) {
                     retuenValu =
-                    "Value of ${parentItem.label} must be equal to $validValu";
+                        "Value of ${parentItem.label} must be equal to $validValu";
                     break;
                   }
+                }
+              }
+            }
+          } else {
+            var parrentValue = Global.stringToDouble(
+                answred[element.parentControl].toString());
+            var dependVAlu = Global.stringToDouble(
+                answred[element.dependentControls].toString());
+            if (answred[element.parentControl] != null &&
+                answred[element.dependentControls] != null) {
+              if (element.algorithmExpression == '<=') {
+                if (!(parrentValue <= dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be less than Or equal to $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '<') {
+                if (!(parrentValue < dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be less than $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '>=') {
+                if (!(parrentValue >= dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be greater than Or equal to $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '>') {
+                if (!(parrentValue > dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be greater than $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '==') {
+                if (!(parrentValue == dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be equal to $dependVAlu";
+                  break;
+                }
+              }
+            }
+            if (parentItem.reqd == 1) {
+              if (Global.validString(
+                  answred[element.dependentControls].toString())) {
+                if (element.algorithmExpression == '<=') {
+                  if (!(dependVAlu <= parrentValue)) {
+                    retuenValu =
+                        "Value of ${parentItem.label} must be less than Or equal to $parrentValue";
+                    break;
+                  }
+                } else if (element.algorithmExpression == '<') {
+                  if (!(dependVAlu < parrentValue)) {
+                    retuenValu =
+                        "Value of ${parentItem.label} must be less than $parrentValue";
+                    break;
+                  }
+                } else if (element.algorithmExpression == '>=') {
+                  if (!(dependVAlu >= parrentValue)) {
+                    retuenValu =
+                        "Value of ${parentItem.label} must be greater than Or equal to $parrentValue";
+                    break;
+                  }
+                } else if (element.algorithmExpression == '>') {
+                  if (!(dependVAlu > parrentValue)) {
+                    retuenValu =
+                        "Value of ${parentItem.label} must be greater than $parrentValue";
+                    break;
+                  }
+                } else if (element.algorithmExpression == '==') {
+                  if (!(dependVAlu == parrentValue)) {
+                    retuenValu =
+                        "Value of ${parentItem.label} must be equal to $parrentValue";
+                    break;
+                  }
+                }
+              } else
+                'Please enter value in ${parentItem.label}';
+            } else if (Global.validString(
+                answred[element.dependentControls].toString())) {
+              if (element.algorithmExpression == '<=') {
+                if (!(parrentValue <= dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be less than Or equal to $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '<') {
+                if (!(parrentValue < dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be less than $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '>=') {
+                if (!(parrentValue >= dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be greater than Or equal to $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '>') {
+                if (!(parrentValue > dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be greater than $dependVAlu";
+                  break;
+                }
+              } else if (element.algorithmExpression == '==') {
+                if (!(parrentValue == dependVAlu)) {
+                  retuenValu =
+                      "Value of ${parentItem.label} must be equal to $dependVAlu";
+                  break;
                 }
               }
             }
@@ -594,16 +802,19 @@ class DependingLogic {
         } else if (element.type_of_logic_id == '12') {
           var dependVAlu = answred[element.dependentControls];
           var elgoFieldName =
-          Global.splitData(element.algorithmExpression.toString(), ',');
+              Global.splitData(element.algorithmExpression.toString(), ',');
           if (dependVAlu != null) {
             dependVAlu.forEach((depItem) {
               if (depItem[elgoFieldName[0]].toString() == elgoFieldName[1]) {
                 var parentControlValue =
-                answred[element.parentControl].toString();
+                    answred[element.parentControl].toString();
                 if (!Global.validString(parentControlValue)) {
-                  if(parentItem.fieldtype=='Data' || parentItem.fieldtype=='Int' || parentItem.fieldtype=='Float')
+                  if (parentItem.fieldtype == 'Data' ||
+                      parentItem.fieldtype == 'Int' ||
+                      parentItem.fieldtype == 'Float')
                     retuenValu = "Please enter ${parentItem.label}";
-                  else  retuenValu = "Please select ${parentItem.label}";
+                  else
+                    retuenValu = "Please select ${parentItem.label}";
                 }
               }
             });
@@ -616,9 +827,12 @@ class DependingLogic {
             if (multiItems.contains(element.algorithmExpression.toString())) {
               var parentControlValue = answred[element.parentControl];
               if (!Global.validString(parentControlValue)) {
-                if(parentItem.fieldtype=='Data' || parentItem.fieldtype=='Int' || parentItem.fieldtype=='Float')
+                if (parentItem.fieldtype == 'Data' ||
+                    parentItem.fieldtype == 'Int' ||
+                    parentItem.fieldtype == 'Float')
                   retuenValu = "Please enter ${parentItem.label}";
-                else  retuenValu = "Please select ${parentItem.label}";
+                else
+                  retuenValu = "Please select ${parentItem.label}";
               }
               break;
             }
@@ -628,25 +842,120 @@ class DependingLogic {
           var parentVAlu = answred[element.parentControl];
           if (dependVAlu != null && parentVAlu != null) {
             List<dynamic> dependParts =
-            dependVAlu.split('-').map(int.parse).toList();
+                dependVAlu.split('-').map(int.parse).toList();
             var dependDate =
-            DateTime(dependParts[0], dependParts[1], dependParts[2]);
+                DateTime(dependParts[0], dependParts[1], dependParts[2]);
             List<dynamic> parentParts =
-            parentVAlu.split('-').map(int.parse).toList();
+                parentVAlu.split('-').map(int.parse).toList();
             var parentDate =
-            DateTime(parentParts[0], parentParts[1], parentParts[2]);
+                DateTime(parentParts[0], parentParts[1], parentParts[2]);
             if (element.algorithmExpression == '<') {
               if (dependDate.isBefore(parentDate)) {
                 retuenValu =
-                "Please enter After ${parentItem.label} to $parentVAlu";
+                    "Please enter After ${parentItem.label} to $parentVAlu";
                 break;
               }
             } else if (element.algorithmExpression == '>') {
               if (dependDate.isAfter(parentDate)) {
                 retuenValu =
-                "Please enter Before ${parentItem.label} to $parentVAlu";
+                    "Please enter Before ${parentItem.label} to $parentVAlu";
                 break;
               }
+            }
+          }
+        } else if (element.type_of_logic_id == '23') {
+          var parentVAlu = answred[element.parentControl];
+          if (parentVAlu != null) {
+            var dependVAlu = Global.splitData(element.dependentControls, ':');
+            if (dependVAlu.length > 0) {
+              double? fiValue1;
+              dependVAlu.forEach((depV) {
+                if (depV.contains('+')) {
+                  double? temp;
+                  var depenItem = Global.splitData(depV, '+');
+                  depenItem.forEach((action) {
+                    if (temp != null) {
+                      temp = temp! +
+                          Global.stringToDouble(
+                              answred[action.toString().trim()].toString());
+                    } else
+                      temp = Global.stringToDouble(
+                          answred[action.toString().trim()].toString());
+                  });
+                  if (fiValue1 != null && temp != null) {
+                    if (element.algorithmExpression == '<=') {
+                      if ((temp! < fiValue1!)) {
+                        retuenValu =
+                            // "Value of ${parentItem.label} must be less than Or equal to $temp";
+                            "Sum of Usage and Wastage cannot be more than the sum of Quantity Received and Opening Stock :$temp";
+                      }
+                    } else if (element.algorithmExpression == '<') {
+                      if ((temp! < fiValue1!)) {
+                        retuenValu =
+                            "Value of ${parentItem.label} must be less than $temp";
+                      }
+                    } else if (element.algorithmExpression == '>=') {
+                      if ((temp! >= fiValue1!)) {
+                        retuenValu =
+                            "Value of ${parentItem.label} must be greater than Or equal to $temp";
+                      }
+                    } else if (element.algorithmExpression == '>') {
+                      if ((temp! > fiValue1!)) {
+                        retuenValu =
+                            "Value of ${parentItem.label} must be greater than $temp";
+                      }
+                    } else if (element.algorithmExpression == '==') {
+                      if ((temp == fiValue1)) {
+                        retuenValu =
+                            "Value of ${parentItem.label} must be equal to $temp";
+                      }
+                    }
+                  } else
+                    fiValue1 = temp;
+                } else if (depV.contains('-')) {
+                  double? temp;
+                  var depenItem = Global.splitData(depV, '-');
+                  depenItem.forEach((action) {
+                    if (temp != null) {
+                      temp = temp! -
+                          Global.stringToDouble(
+                              answred[action.toString().trim()].toString());
+                    } else
+                      temp = Global.stringToDouble(
+                          answred[action.toString().trim()].toString());
+                  });
+
+                  if (fiValue1 != null && temp != null) {
+                    if (element.algorithmExpression == '<=') {
+                      if ((temp! <= fiValue1!)) {
+                        retuenValu =
+                            "Value of ${parentItem.label} must be less than Or equal to $temp";
+                      }
+                    } else if (element.algorithmExpression == '<') {
+                      if ((temp! < fiValue1!)) {
+                        retuenValu =
+                            "Value of ${parentItem.label} must be less than $temp";
+                      }
+                    } else if (element.algorithmExpression == '>=') {
+                      if ((temp! >= fiValue1!)) {
+                        retuenValu =
+                            "Value of ${parentItem.label} must be greater than Or equal to $temp";
+                      }
+                    } else if (element.algorithmExpression == '>') {
+                      if ((temp! > fiValue1!)) {
+                        retuenValu =
+                            "Value of ${parentItem.label} must be greater than $temp";
+                      }
+                    } else if (element.algorithmExpression == '==') {
+                      if ((temp == fiValue1)) {
+                        retuenValu =
+                            "Value of ${parentItem.label} must be equal to $temp";
+                      }
+                    }
+                  } else
+                    fiValue1 = temp;
+                }
+              });
             }
           }
         }
@@ -665,99 +974,113 @@ class DependingLogic {
       List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls,
       String fieldname,
       String gender,
-      Map<String, dynamic> cWidgetDatamap) {
+      Map<String, dynamic> cWidgetDatamap)
+  {
     int retuenValu = 0;
 
     if (fieldname == 'weight_for_age') {
       var age = cWidgetDatamap['age_months'];
       var weight = cWidgetDatamap['weight'];
+
       if (age != null && weight != null) {
         if (gender == '1') {
           var filtredItem = tabWeightforageBoys
-              .where((element) => element.age_in_months == age)
+              .where((element) =>
+                  Global.retrunValidNum(element.age_in_days) ==
+                  age)
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
               retuenValu = 1;
             } else if (Global.validNum(weight.toString()) <=
                     filtredItem[0].yellow_max! &&
-                Global.validNum(weight.toString()) >=
+                Global.validNum(weight.toString()) >
                     filtredItem[0].yellow_min!) {
               retuenValu = 2;
-            } else if (Global.validNum(weight.toString()) >=
+            } else if (Global.validNum(weight.toString()) >
                 filtredItem[0].green!) {
               retuenValu = 3;
             }
           }
-        } else if (gender == '2' || gender == '3') {
+        }
+        else if (gender == '2' || gender == '3') {
           var filtredItem = tabWeightforageGirls
-              .where((element) => element.age_in_months == age)
+              .where((element) =>
+          Global.retrunValidNum(element.age_in_days) ==
+                  age)
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
               retuenValu = 1;
             } else if (Global.validNum(weight.toString()) <=
                     filtredItem[0].yellow_max! &&
-                Global.validNum(weight.toString()) >=
+                Global.validNum(weight.toString()) >
                     filtredItem[0].yellow_min!) {
               retuenValu = 2;
-            } else if (Global.validNum(weight.toString()) >=
+            } else if (Global.validNum(weight.toString()) >
                 filtredItem[0].green!) {
               retuenValu = 3;
             }
           }
         }
       }
-    } else if (fieldname == 'height_for_age') {
+    }
+    else if (fieldname == 'height_for_age') {
       var age = cWidgetDatamap['age_months'];
       var height = cWidgetDatamap['height'];
       var measurement_equipment = cWidgetDatamap['measurement_equipment'];
 
       if (age != null && height != null) {
-        if (age < 25 && height > 0 && measurement_equipment == '1') {
+        if (age < (25*30) && height > 0 && measurement_equipment == '1') {
           ///Stediometer
           height = Global.stringToDouble(height.toString()) + 0.7;
-        } else if (age > 24 && height > 0 && measurement_equipment == '2') {
+        } else if (age > (24*30) && height > 0 && measurement_equipment == '2') {
           ///Infantometer
           height = Global.stringToDouble(height.toString()) - 0.7;
         }
         if (gender == '1') {
           var filtredItem = tabHeightforageBoys
-              .where((element) => element.age_in_months == age)
+              .where((element) =>
+          Global.retrunValidNum(element.age_in_days) ==
+                  age)
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
               retuenValu = 1;
             } else if (Global.validNum(height.toString()) <=
                     filtredItem[0].yellow_max! &&
-                Global.validNum(height.toString()) >=
+                Global.validNum(height.toString()) >
                     filtredItem[0].yellow_min!) {
               retuenValu = 2;
-            } else if (Global.validNum(height.toString()) >=
+            } else if (Global.validNum(height.toString()) >
                 filtredItem[0].green!) {
               retuenValu = 3;
             }
           }
-        } else if (gender == '2' || gender == '3') {
+        }
+        else if (gender == '2' || gender == '3') {
           var filtredItem = tHeightforageGirls
-              .where((element) => element.age_in_months == age)
+              .where((element) =>
+          Global.retrunValidNum(element.age_in_days) ==
+                  age)
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
               retuenValu = 1;
             } else if (Global.validNum(height.toString()) <=
                     filtredItem[0].yellow_max! &&
-                Global.validNum(height.toString()) >=
+                Global.validNum(height.toString()) >
                     filtredItem[0].yellow_min!) {
               retuenValu = 2;
-            } else if (Global.validNum(height.toString()) >=
+            } else if (Global.validNum(height.toString()) >
                 filtredItem[0].green!) {
               retuenValu = 3;
             }
           }
         }
       }
-    } else if (fieldname == 'weight_for_height') {
+    }
+    else if (fieldname == 'weight_for_height') {
       var weight = cWidgetDatamap['weight'];
       var height = cWidgetDatamap['height'];
       var measurement_equipment = cWidgetDatamap['measurement_equipment'];
@@ -774,36 +1097,37 @@ class DependingLogic {
           var filtredItem = tabWeightToHeightBoys
               .where((element) =>
                   element.length ==
-                  Global.roundToNearestHalf(Global.validNum(height.toString())))
+                  Global.roundToNearest(Global.validNum(height.toString())))
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
               retuenValu = 1;
             } else if (Global.validNum(weight.toString()) <=
                     filtredItem[0].yellow_max! &&
-                Global.validNum(weight.toString()) >=
+                Global.validNum(weight.toString()) >
                     filtredItem[0].yellow_min!) {
               retuenValu = 2;
-            } else if (Global.validNum(weight.toString()) >=
+            } else if (Global.validNum(weight.toString()) >
                 filtredItem[0].green!) {
               retuenValu = 3;
             }
           }
-        } else if (gender == '2' || gender == '3') {
+        }
+        else if (gender == '2' || gender == '3') {
           var filtredItem = tabWeightToHeightGirls
               .where((element) =>
                   element.length ==
-                  Global.roundToNearestHalf(Global.validNum(height.toString())))
+                  Global.roundToNearest(Global.validNum(height.toString())))
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
               retuenValu = 1;
             } else if (Global.validNum(weight.toString()) <=
                     filtredItem[0].yellow_max! &&
-                Global.validNum(weight.toString()) >=
+                Global.validNum(weight.toString()) >
                     filtredItem[0].yellow_min!) {
               retuenValu = 2;
-            } else if (Global.validNum(weight.toString()) >=
+            } else if (Global.validNum(weight.toString()) >
                 filtredItem[0].green!) {
               retuenValu = 3;
             }
@@ -824,103 +1148,117 @@ class DependingLogic {
       List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls,
       String fieldname,
       String gender,
-      Map<String, dynamic> cWidgetDatamap) {
+      Map<String, dynamic> cWidgetDatamap)
+  {
     String growthValue = '';
 
     if (fieldname == 'weight_for_age') {
       var age = cWidgetDatamap['age_months'];
       var weight = cWidgetDatamap['weight'];
+
       if (age != null && weight != null) {
         if (gender == '1') {
           var filtredItem = tabWeightforageBoys
-              .where((element) => element.age_in_months == age)
+              .where((element) =>
+          Global.retrunValidNum(element.age_in_days) ==
+              age)
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-              growthValue = "=>${filtredItem[0].red!}";
+              growthValue = "<=${filtredItem[0].red!}";
             } else if (Global.validNum(weight.toString()) <=
-                    filtredItem[0].yellow_max! &&
-                Global.validNum(weight.toString()) >=
+                filtredItem[0].yellow_max! &&
+                Global.validNum(weight.toString()) >
                     filtredItem[0].yellow_min!) {
               growthValue =
-                  "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
-            } else if (Global.validNum(weight.toString()) >=
+              ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
+            } else if (Global.validNum(weight.toString()) >
                 filtredItem[0].green!) {
-              growthValue = ">=${filtredItem[0].green!}";
+                  growthValue = ">${filtredItem[0].green!}";
             }
           }
-        } else if (gender == '2' || gender == '3') {
+        }
+        else if (gender == '2' || gender == '3') {
           var filtredItem = tabWeightforageGirls
-              .where((element) => element.age_in_months == age)
+              .where((element) =>
+          Global.retrunValidNum(element.age_in_days) ==
+              age)
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-              growthValue = "=>${filtredItem[0].red!}";
+              growthValue = "<=${filtredItem[0].red!}";
             } else if (Global.validNum(weight.toString()) <=
-                    filtredItem[0].yellow_max! &&
-                Global.validNum(weight.toString()) >=
+                filtredItem[0].yellow_max! &&
+                Global.validNum(weight.toString()) >
                     filtredItem[0].yellow_min!) {
               growthValue =
-                  "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
-            } else if (Global.validNum(weight.toString()) >=
+              ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
+            } else if (Global.validNum(weight.toString()) >
                 filtredItem[0].green!) {
-              growthValue = ">=${filtredItem[0].green!}";
+              growthValue = ">${filtredItem[0].green!}";
             }
           }
         }
       }
-    } else if (fieldname == 'height_for_age') {
+    }
+    else if (fieldname == 'height_for_age') {
       var age = cWidgetDatamap['age_months'];
       var height = cWidgetDatamap['height'];
       var measurement_equipment = cWidgetDatamap['measurement_equipment'];
 
       if (age != null && height != null) {
-        if (age < 25 && height > 0 && measurement_equipment == '1') {
+        if (age < (25*30) && height > 0 && measurement_equipment == '1') {
           ///Stediometer
           height = Global.stringToDouble(height.toString()) + 0.7;
-        } else if (age > 24 && height > 0 && measurement_equipment == '2') {
+        } else if (age > (24*30) && height > 0 && measurement_equipment == '2') {
           ///Infantometer
           height = Global.stringToDouble(height.toString()) - 0.7;
         }
         if (gender == '1') {
           var filtredItem = tabHeightforageBoys
-              .where((element) => element.age_in_months == age)
+              .where((element) =>
+          Global.retrunValidNum(element.age_in_days) ==
+              age)
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
-              growthValue = "=>${filtredItem[0].red!}";
+              growthValue = "<=${filtredItem[0].red!}";
             } else if (Global.validNum(height.toString()) <=
-                    filtredItem[0].yellow_max! &&
-                Global.validNum(height.toString()) >=
+                filtredItem[0].yellow_max! &&
+                Global.validNum(height.toString()) >
                     filtredItem[0].yellow_min!) {
               growthValue =
-                  "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
-            } else if (Global.validNum(height.toString()) >=
+              ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
+            } else if (Global.validNum(height.toString()) >
                 filtredItem[0].green!) {
-              growthValue = ">=${filtredItem[0].green!}";
+              growthValue = ">${filtredItem[0].green!}";
             }
           }
-        } else if (gender == '2' || gender == '3') {
+        }
+        else if (gender == '2' || gender == '3') {
           var filtredItem = tHeightforageGirls
-              .where((element) => element.age_in_months == age)
+              .where((element) =>
+          Global.retrunValidNum(element.age_in_days) ==
+              age)
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
-              growthValue = "=>${filtredItem[0].red!}";
+              growthValue = "<=${filtredItem[0].red!}";
             } else if (Global.validNum(height.toString()) <=
-                    filtredItem[0].yellow_max! &&
-                Global.validNum(height.toString()) >=
+                filtredItem[0].yellow_max! &&
+                Global.validNum(height.toString()) >
                     filtredItem[0].yellow_min!) {
               growthValue =
-                  "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
-            } else if (Global.validNum(height.toString()) >=
+              ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
+            } else if (Global.validNum(height.toString()) >
                 filtredItem[0].green!) {
-              growthValue = ">=${filtredItem[0].green!}";
+              growthValue = ">${filtredItem[0].green!}";
             }
           }
         }
       }
-    } else if (fieldname == 'weight_for_height') {
+    }
+    else if (fieldname == 'weight_for_height') {
       var weight = cWidgetDatamap['weight'];
       var height = cWidgetDatamap['height'];
       var measurement_equipment = cWidgetDatamap['measurement_equipment'];
@@ -936,41 +1274,42 @@ class DependingLogic {
         if (gender == '1') {
           var filtredItem = tabWeightToHeightBoys
               .where((element) =>
-                  element.length ==
-                  Global.roundToNearestHalf(Global.validNum(height.toString())))
+          element.length ==
+              Global.roundToNearest(Global.validNum(height.toString())))
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-              growthValue = "=>${filtredItem[0].red!}";
+              growthValue = "<=${filtredItem[0].red!}";
             } else if (Global.validNum(weight.toString()) <=
-                    filtredItem[0].yellow_max! &&
-                Global.validNum(weight.toString()) >=
+                filtredItem[0].yellow_max! &&
+                Global.validNum(weight.toString()) >
                     filtredItem[0].yellow_min!) {
               growthValue =
-                  "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
-            } else if (Global.validNum(weight.toString()) >=
+              ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
+            } else if (Global.validNum(weight.toString()) >
                 filtredItem[0].green!) {
-              growthValue = ">=${filtredItem[0].green!}";
+              growthValue = ">${filtredItem[0].green!}";
             }
           }
-        } else if (gender == '2' || gender == '3') {
+        }
+        else if (gender == '2' || gender == '3') {
           var filtredItem = tabWeightToHeightGirls
               .where((element) =>
-                  element.length ==
-                  Global.roundToNearestHalf(Global.validNum(height.toString())))
+          element.length ==
+              Global.roundToNearest(Global.validNum(height.toString())))
               .toList();
           if (filtredItem.length > 0) {
             if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-              growthValue = "=>${filtredItem[0].red!}";
+              growthValue = "<=${filtredItem[0].red!}";
             } else if (Global.validNum(weight.toString()) <=
-                    filtredItem[0].yellow_max! &&
-                Global.validNum(weight.toString()) >=
+                filtredItem[0].yellow_max! &&
+                Global.validNum(weight.toString()) >
                     filtredItem[0].yellow_min!) {
               growthValue =
-                  "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
-            } else if (Global.validNum(weight.toString()) >=
+              ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
+            } else if (Global.validNum(weight.toString()) >
                 filtredItem[0].green!) {
-              growthValue = ">=${filtredItem[0].green!}";
+              growthValue = ">${filtredItem[0].green!}";
             }
           }
         }
@@ -979,6 +1318,181 @@ class DependingLogic {
 
     return growthValue;
   }
+
+  // String AutoColorCreateByHeightWightString(
+  //     List<TabHeightforageBoysModel> tabHeightforageBoys,
+  //     List<TabHeightforageGirlsModel> tHeightforageGirls,
+  //     List<TabWeightforageBoysModel> tabWeightforageBoys,
+  //     List<TabWeightforageGirlsModel> tabWeightforageGirls,
+  //     List<TabWeightToHeightBoysModel> tabWeightToHeightBoys,
+  //     List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls,
+  //     String fieldname,
+  //     String gender,
+  //     Map<String, dynamic> cWidgetDatamap)
+  // {
+  //   String growthValue = '';
+  //
+  //   if (fieldname == 'weight_for_age') {
+  //     var age = cWidgetDatamap['age_months'];
+  //     var weight = cWidgetDatamap['weight'];
+  //     if (age != null && weight != null) {
+  //       if (gender == '1') {
+  //         var filtredItem = tabWeightforageBoys
+  //             .where((element) =>
+  //         Global.retrunValidNum(element.age_in_days) ==
+  //                 age)
+  //             .toList();
+  //         if (filtredItem.length > 0) {
+  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
+  //             growthValue = "<=${filtredItem[0].red!}";
+  //           } else if (Global.validNum(weight.toString()) <=
+  //                   filtredItem[0].yellow_max! &&
+  //               Global.validNum(weight.toString()) >=
+  //                   filtredItem[0].yellow_min!) {
+  //             growthValue =
+  //                 "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
+  //           } else if (Global.validNum(weight.toString()) >=
+  //               filtredItem[0].green!) {
+  //             growthValue = ">=${filtredItem[0].green!}";
+  //           }
+  //         }
+  //       } else if (gender == '2' || gender == '3') {
+  //         var filtredItem = tabWeightforageGirls
+  //             .where((element) =>
+  //         Global.retrunValidNum(element.age_in_days) ==
+  //                 age)
+  //             .toList();
+  //         if (filtredItem.length > 0) {
+  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
+  //             growthValue = "<=${filtredItem[0].red!}";
+  //           } else if (Global.validNum(weight.toString()) <=
+  //                   filtredItem[0].yellow_max! &&
+  //               Global.validNum(weight.toString()) >=
+  //                   filtredItem[0].yellow_min!) {
+  //             growthValue =
+  //                 "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
+  //           } else if (Global.validNum(weight.toString()) >=
+  //               filtredItem[0].green!) {
+  //             growthValue = ">=${filtredItem[0].green!}";
+  //           }
+  //         }
+  //       }
+  //     }
+  //   } else if (fieldname == 'height_for_age') {
+  //     var age = cWidgetDatamap['age_months'];
+  //     var height = cWidgetDatamap['height'];
+  //     var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+  //
+  //     if (age != null && height != null) {
+  //       if (age < (25*30) && height > 0 && measurement_equipment == '1') {
+  //         ///Stediometer
+  //         height = Global.stringToDouble(height.toString()) + 0.7;
+  //       } else if (age > (24*30) && height > 0 && measurement_equipment == '2') {
+  //         ///Infantometer
+  //         height = Global.stringToDouble(height.toString()) - 0.7;
+  //       }
+  //       if (gender == '1') {
+  //         var filtredItem = tabHeightforageBoys
+  //             .where((element) =>
+  //         Global.retrunValidNum(element.age_in_days) ==
+  //                 age)
+  //             .toList();
+  //         if (filtredItem.length > 0) {
+  //           if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
+  //             growthValue = "<=${filtredItem[0].red!}";
+  //           } else if (Global.validNum(height.toString()) <=
+  //                   filtredItem[0].yellow_max! &&
+  //               Global.validNum(height.toString()) >=
+  //                   filtredItem[0].yellow_min!) {
+  //             growthValue =
+  //                 "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
+  //           } else if (Global.validNum(height.toString()) >=
+  //               filtredItem[0].green!) {
+  //             growthValue = ">=${filtredItem[0].green!}";
+  //           }
+  //         }
+  //       }
+  //       else if (gender == '2' || gender == '3') {
+  //         var filtredItem = tHeightforageGirls
+  //             .where((element) =>
+  //         Global.retrunValidNum(element.age_in_days) ==
+  //                 age)
+  //             .toList();
+  //         if (filtredItem.length > 0) {
+  //           if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
+  //             growthValue = "<=${filtredItem[0].red!}";
+  //           } else if (Global.validNum(height.toString()) <=
+  //                   filtredItem[0].yellow_max! &&
+  //               Global.validNum(height.toString()) >=
+  //                   filtredItem[0].yellow_min!) {
+  //             growthValue =
+  //                 "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
+  //           } else if (Global.validNum(height.toString()) >=
+  //               filtredItem[0].green!) {
+  //             growthValue = ">=${filtredItem[0].green!}";
+  //           }
+  //         }
+  //       }
+  //     }
+  //   } else if (fieldname == 'weight_for_height') {
+  //     var weight = cWidgetDatamap['weight'];
+  //     var height = cWidgetDatamap['height'];
+  //     var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+  //
+  //     if (weight != null && height != null) {
+  //       if (height > 0 && measurement_equipment == '1') {
+  //         ///Stediometer
+  //         height = Global.stringToDouble(height.toString()) + 0.7;
+  //       } else if (height > 0 && measurement_equipment == '2') {
+  //         ///Infantometer
+  //         height = Global.stringToDouble(height.toString()) - 0.7;
+  //       }
+  //       if (gender == '1') {
+  //         var filtredItem = tabWeightToHeightBoys
+  //             .where((element) =>
+  //                 element.length ==
+  //                 Global.roundToNearestHalf(Global.validNum(height.toString())))
+  //             .toList();
+  //         if (filtredItem.length > 0) {
+  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
+  //             growthValue = "<=${filtredItem[0].red!}";
+  //           } else if (Global.validNum(weight.toString()) <=
+  //                   filtredItem[0].yellow_max! &&
+  //               Global.validNum(weight.toString()) >=
+  //                   filtredItem[0].yellow_min!) {
+  //             growthValue =
+  //                 "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
+  //           } else if (Global.validNum(weight.toString()) >=
+  //               filtredItem[0].green!) {
+  //             growthValue = ">=${filtredItem[0].green!}";
+  //           }
+  //         }
+  //       } else if (gender == '2' || gender == '3') {
+  //         var filtredItem = tabWeightToHeightGirls
+  //             .where((element) =>
+  //                 element.length ==
+  //                 Global.roundToNearestHalf(Global.validNum(height.toString())))
+  //             .toList();
+  //         if (filtredItem.length > 0) {
+  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
+  //             growthValue = "<=${filtredItem[0].red!}";
+  //           } else if (Global.validNum(weight.toString()) <=
+  //                   filtredItem[0].yellow_max! &&
+  //               Global.validNum(weight.toString()) >=
+  //                   filtredItem[0].yellow_min!) {
+  //             growthValue =
+  //                 "${filtredItem[0].yellow_min!}-${filtredItem[0].yellow_max!}";
+  //           } else if (Global.validNum(weight.toString()) >=
+  //               filtredItem[0].green!) {
+  //             growthValue = ">=${filtredItem[0].green!}";
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //
+  //   return growthValue;
+  // }
 
   TabFormsLogic? keyBoardLogic(String fieldName, List<TabFormsLogic> logics) {
     TabFormsLogic? keyLogic;
@@ -1002,7 +1516,8 @@ class DependingLogic {
             (element.type_of_logic_id == '1' ||
                 element.type_of_logic_id == '3' ||
                 element.type_of_logic_id == '12' ||
-                element.type_of_logic_id == '18'))
+                element.type_of_logic_id == '18' ||
+                element.type_of_logic_id == '24'))
         .toList();
 
     if (parentQlogic.length > 0) {

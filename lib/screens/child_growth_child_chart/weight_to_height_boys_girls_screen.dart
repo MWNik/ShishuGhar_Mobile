@@ -112,7 +112,8 @@ class _WeightToHeightBoysGirlsScreenState
       }).toList();
 
       child!.addAll(children.map((data) {
-        double x = (data['height'] as num).toDouble();
+        var height = Global.validString(data['height'].toString())?data['height']:0.0;
+        double x = (height as num).toDouble();
         (x > length!.last) ? maxX = x : maxX = length!.last;
         // (x < length!.first) ? minX = x : minX = length!.first;
 

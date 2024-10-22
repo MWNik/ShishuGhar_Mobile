@@ -47,7 +47,8 @@ class CustomText {
   static String typehere = "Type here";
   static String Home = "Home";
   static String DetailsChild = "Details of Child";
-  static String attenAlredyExist = "An attendance already exists for the selected Date";
+  static String attenAlredyExist =
+      "An attendance already exists for the selected Date";
   static String BasicInformation = "Basic Information";
   static String VisitInformation = "Visit Information";
   static String ForgotPassword = "Forgot your Password?";
@@ -76,8 +77,8 @@ class CustomText {
   static String Districts = "District : ";
   static String Blocks = "Block : ";
   static String GramPanchayat = "Gram Panchayat";
-  static String   Village = "Village";
-  static String   BalanceAmount = "Balance amount";
+  static String Village = "Village";
+  static String BalanceAmount = "Balance amount";
   static String HamletPadanearest = "Hamlet/Padanearest";
   static String Landmark = "Landmark";
   static String NameofRespondent = "Name of Respondent";
@@ -186,7 +187,7 @@ class CustomText {
   static String MotherName = "Mother Name : ";
   static String Age = "Age : ";
   static String Genderdot = "Gender : ";
-  static String CrecheName = "Creche Name : ";
+  static String CrecheName = "Creche Name";
   static String ChildNo = "Child No : ";
   static String CrecheProfileView = "Creche Profile";
   static String childAttendence = "Child Attendance";
@@ -204,26 +205,31 @@ class CustomText {
 
   static String hh_detail = "HH Detail";
   static String ok = "Ok";
-  static String pleaseSelectChildrenForAttendence = "Please Select Children For Attendance";
-  static String nointernetconnectionavailable = "No internet connection available";
+  static String PrivacyPolicy = "Privacy Policy";
+  static String PrivacyPolicyDescription = "Privacy Policy Description";
+  static String pleaseSelectChildrenForAttendence =
+      "Please Select Children For Attendance";
+  static String nointernetconnectionavailable =
+      "No internet connection available";
   static String datevisit = "Date of visit";
   static String dateCheckin = "Date of Check In";
   static String DateofAttendance = "Date of Attendance";
   static String relationshipwithchild = "Relationship with child : ";
   static String ageInMonth = "Child age (In Months)";
   static String Pendingsync = "Pending sync";
-  static String sta_tus   = "Status : ";
-  static String imageFiles   = "Image file";
-  static String hhName   = "House hold name : ";
-  static String hhNameS   = "HH name";
-  static String NorecordAvailable   = "No record available";
-  static String recordAvailable   = "record available for upload";
-  static String recordsAvailable   = "records available for upload";
-  static String HHListing   = "HH Listing";
-  static String SelectVillage   = "Select Village";
-  static String geoWiDownDwnload   = "Geography wise Download data";
-  static String downloadData   = "Download data";
+  static String sta_tus = "Status : ";
+  static String imageFiles = "Image file";
+  static String hhName = "House hold name : ";
+  static String hhNameS = "HH name";
+  static String NorecordAvailable = "No record available";
+  static String recordAvailable = "record available for upload";
+  static String recordsAvailable = "records available for upload";
+  static String HHListing = "HH Listing";
+  static String SelectVillage = "Select Village";
+  static String geoWiDownDwnload = "Geography wise Download data";
+  static String downloadData = "Download data";
   static String Cancel = "Cancel";
+  static String IAgree = "I Agree";
   static String StartDate = "Start Date";
   static String EndDate = "End Date";
   static String plSelect_state = "Please select state";
@@ -240,6 +246,12 @@ class CustomText {
   static String data_upload_success_msg = "Data Uploaded Successfully";
   static String nothing_for_upload_msg = "Nothing for upload";
   static String pleaseUploadDataFirst = "Please upload pending data first.";
+  static String darftDataForComplete =
+      "You have uncompleted data in your device, please complete and upload first and then try to download data.";
+
+  static String darftDataForLogoyt =
+      "You have draft data in your device, please complete and upload first then try to logout.";
+
   static String change_language_text = "Change Language";
   static String moneyRecevied = "Money Received by Creche Caregiver?";
   static String Generalfilter = "General Filter";
@@ -281,12 +293,13 @@ class CustomText {
   static String selectVerifyStatus = 'Select Verify status';
   static String statusUpdateSuccssFully = 'Status Update SuccessFully';
   static String EmailAddress = "Email Address";
-  static String Newemailmustbeunique = "Enter Your Email-Address and received an link for reset password.";
+  static String Newemailmustbeunique =
+      "Enter Your Email-Address and received an link for reset password.";
   static String logoutMsg = "Are you sure you want to logout?";
   static String endDateMsg = "End date should be after start date.";
   static String startDateMsg = "Start date should be before end date.";
   static String error = "Error";
-  static String pleaseWait = "Please wait...";
+  static String pleaseWait = "Please wait..";
   static String uploadingPleaseWait = "Uploading please wait";
   static String pleaseSelectStartDate = "Please select start date";
   static String token_expired = "Token expired. Please logout & login again.";
@@ -326,17 +339,18 @@ class CustomText {
   static String Plsselecimgoption = "Please select an option";
   static String Add_Attendance = 'Add Attendance';
   static String Attendance_Children = 'Attendance Children';
-  static String childrenCountVallidattion = 'No. of children cannot not be greater than the children present';
+  static String childrenCountVallidattion =
+      'No. of children cannot not be greater than the children present';
   static String age = 'Age';
-  static String   ageInMonthEn = 'Age (In Months)';
-  static String   DontHaveChildrenForAttender = 'Please enroll child first';
-  static String   DontHaveChildrenForAnthropometry = 'Please enroll child first';
+  static String ageInMonthEn = 'Age (In Months)';
+  static String DontHaveChildrenForAttender = 'Please enroll child first';
+  static String DontHaveChildrenForAnthropometry = 'Please enroll child first';
   static String ChildEnrollsuccess = "Child enrolled successfully";
   static String zScrore = "Z - Score";
   // static String Attendance = "Attendance";
 
-
-  static String eventALredyExistd = "An event already exists for the selected Date";
+  static String eventALredyExistd =
+      "An event already exists for the selected Date";
   static String detail = "Detail";
   static String WeightforHeight = 'Weight for height';
   static String Moderate = '(Moderate)';
@@ -367,13 +381,15 @@ class CustomText {
   static String complted = "Completed";
   static String upcomming = "Upcoming";
   static String childAgeInDays = "Child age in days";
+  static String childAgeInDaysbrac = "Child age (in days)";
   static String vaccinationDate = "Vaccination Date";
   static String Vaccinated = "Vaccinated";
   static String vaccine = "Vaccine";
   static String sideForVaccination = "Site for vaccination";
   static String selectVacinationDate = "Select vaccination date.";
   static String selectVaccinated = "Please select vaccinated?";
-  static String logoutPendingDataMsg = "You have un-synced data in your device, please upload first and then try to logout.";
+  static String logoutPendingDataMsg =
+      "You have un-synced data in your device, please upload first and then try to logout.";
   static String CrecheMonitor = "Creche Monitor";
   static String CrecheMonitoring = "Creche Monitoring";
   static String CrecheMonitorList = "Creche Monitor List";
@@ -391,7 +407,7 @@ class CustomText {
   static String SubOn = "Submitted on";
   static String schduleed = 'Scheduled';
   static String followup_visit_date = 'Followup Visit Date';
-  static String TotalChildren = 'Total Children';
+  static String TotalChildren = 'Total Child';
   static String MeasuredChildren = 'Measured Children';
   static String PresChild = "Present Children";
   static String measurment = 'Measurement';
@@ -412,9 +428,10 @@ class CustomText {
   static String Receipt = "Receipt";
   static String CashBookDeat = "CashBook Detail";
   static String CashbookList = "Cashbooks List";
-  static String languages = "Languages";
+  static String languages = "Language";
   static String userMannual = "User Manual";
   static String appInfo = "App Info";
+  static String ticketSupport = "Ticket Support";
   static String clear = "Clear";
   static String select_here = "Select Here";
   static String entryTime = "Entry Time";
@@ -439,6 +456,70 @@ class CustomText {
   static String boy = "Boy";
   static String girl = "Girl";
   static String other = "Other";
-  static String visitNoteAlrdyExists = "A Visit Note already exists for the selected Date";
+  static String visitNoteAlrdyExists =
+      "A Visit Note already exists for the selected Date";
   static String enrollExitChild = "Child Enrollment and Exit";
+  static String requisition = "Requisition";
+  static String stockDetails = "Stock Detail";
+  static String requiDetails = "Requisition Detail";
+  static String stockList = "Stock List";
+  static String requiList = "Requisition List";
+  static String addAttendance = "Please add attendance for the month first";
+  static String noItemsAvail = "No Items Available";
+  static String dbBackup = "Database Backup";
+  static String childExited = "Child Exited Successfully";
+  static String unsynched = "Unsynched";
+  static String childCount = 'Total Child';
+  static String attendanceCount = "Total Attendance";
+  static String childPresent = "Child Present";
+  static String exitedChildCount = "Exited Child Count";
+  static String crecheSupervisor = "Creche Supervisor";
+  static String clusterCoordinator = "Cluster Coordinator";
+  static String alm = "Accounts and Logistics Manager";
+  static String cbm = "Capacity and Building Manager";
+  static String uploading = "Uploading";
+  static String noEnrolledChild = "No enrolled child available for this date";
+  static String all = "All";
+
+  static String usynchedAndDraft = "Unsynched and Draft";
+  static String selectItemForAdd = "Please select an item";
+
+  static String ageInDays = "Child age (In Days)";
+  static String geoGraphyIsNotAssign =
+      "Geography is not assigned. Contact your system administrator.";
+  /* DOCTYPE LIST*/
+  static String childGrowthMonitoring = "Child Growth Monitoring"; //0
+  static String AnthroData = "Anthropromatic Data"; //1
+  static String creche = "Creche"; //2
+  static String crceheCaregiver = "Creche Caregiver"; //3
+  static String village = "Village"; //4
+  static String demographicalDetail = "Demographic Details"; //5
+  static String cashbookReceipt = "Cashbook Receipt"; //6
+  static String crecheStock = "Creche Stock"; //7
+  static String formLogic = "Forms Logic"; //8
+  static String crecheRequisiton = "Creche Requisition"; //9
+  static String childProfileDoctype = "Child Profile"; //10
+  static String requisitionChildTable = "Requisition Child table"; //11
+  static String cmcCCDoctype = "Creche Monitoring Checklist CC"; //12
+  static String childEnrollExit = "Child Enrollment and Exit"; //13
+  static String grievienceDoctype = "Grievance"; //14
+  static String cmcCBMDoxtype = "Creche Monitoring Checklist CBM"; //15
+  static String cmcDoctype = "Creche Monitoring Checklist"; //16
+  static String crecheMeeting = "Creche Committee Meeting"; //17
+  static String cmcALMDoctype = "Creche Monitoring Checklist ALM"; //18
+  static String childAttendance = "Child Attendance"; //19
+  static String cashbook = "Cashbook"; //20
+  static String childFollowUp = "Child Follow up"; //21
+  static String childExit = "Child Exit"; //22
+  static String childreferralDoctype = "Child Referral"; //23
+  static String childHealthDoctype = "Child Health"; //24
+  static String houseHoldChildForm = "Household Child Form"; //25
+  static String houseHoldForm = "Household Form"; //26
+  static String childEventDoctype = "Child Event"; //27
+  static String childImmunization = "Child Immunization"; //28
+  static String anyMedical = "Any Medical Compliction"; //29
+  static String crceheCheckIn = "Creche Check In"; //30
+  static String visitPurpose = "Visit Purpose child table"; //31
+  static String disability = "Disability"; //32
+  /* DOCTYLE LIST END */
 }

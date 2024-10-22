@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/screens/tabed_screens/child_gravience/graviences_tabs_screen.dart';
 import 'package:shishughar/utils/validate.dart';
 
@@ -19,9 +20,7 @@ import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import 'greviences_home_detail.screen.dart';
 
-
 class GrievanceHomeListing extends StatefulWidget {
-
   const GrievanceHomeListing({
     super.key,
   });
@@ -41,6 +40,10 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
   String? selectedStatus;
   String? selectedCreche;
   List<OptionsModel> creches = [];
+  bool isOnlyUnsynched = false;
+  List<ChildGrievancesResponceModel> unsynchedList = [];
+  List<ChildGrievancesResponceModel> allList = [];
+  String? role;
 
   void initState() {
     super.initState();
@@ -48,6 +51,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
   }
 
   Future<void> initializeData() async {
+    role = (await Validate().readString(Validate.role))!;
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -65,7 +69,9 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
       CustomText.Village,
       CustomText.GrievanceCategory,
       CustomText.Status,
-      CustomText.Description
+      CustomText.Description,
+      CustomText.all,
+      CustomText.unsynched
     ];
 
     creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
@@ -73,14 +79,17 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
-    fetchChildgrievance();
+    await fetchChildgrievance();
     setState(() {});
   }
 
   Future<void> fetchChildgrievance() async {
     childGirevData =
         await ChildGrievancesTabResponceHelper().getAllChildGrievance();
-    filtredGirevData = childGirevData;
+    unsynchedList =
+        childGirevData.where((element) => element.is_edited == 1).toList();
+    allList = childGirevData;
+    filtredGirevData = isOnlyUnsynched ? unsynchedList : allList;
     setState(() {});
   }
 
@@ -95,9 +104,8 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
             child_grievances_guid = Validate().randomGuid();
             var refStatus = await Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => GrieviencesHomeDetailScreen(
-                      child_grievances_guid: child_grievances_guid,
-                    isNew:true
-                    )));
+                    child_grievances_guid: child_grievances_guid,
+                    isNew: true)));
             if (refStatus == 'itemRefresh') {
               fetchChildgrievance();
             }
@@ -208,6 +216,22 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                         ],
                       ),
                     ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 25),
+                      child: AnimatedRollingSwitch(
+                        title1: Global.returnTrLable(
+                            translats, CustomText.all, lng),
+                        title2: Global.returnTrLable(
+                            translats, CustomText.unsynched, lng),
+                        isOnlyUnsynched: isOnlyUnsynched ?? false,
+                        onChange: (value) async {
+                          setState(() {
+                            isOnlyUnsynched = value;
+                          });
+                          await fetchChildgrievance();
+                        },
+                      ),
+                    )
                   ]),
             )),
       ),
@@ -247,11 +271,10 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                               MaterialPageRoute(
                                   builder: (BuildContext context) =>
                                       GrieviencesHomeDetailScreen(
-                                        child_grievances_guid:
-                                            filtredGirevData[index]
-                                                .grievance_guid!,
-                                          isNew:false
-                                      )));
+                                          child_grievances_guid:
+                                              filtredGirevData[index]
+                                                  .grievance_guid!,
+                                          isNew: false)));
                           if (refStatus == 'itemRefresh') {
                             await fetchChildgrievance();
                           }
@@ -292,12 +315,12 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.Description, lng).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.Status, lng).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                     ],
                                   ),
@@ -323,7 +346,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                                                   filtredGirevData[index]
                                                       .responces!,
                                                   'title')),
-                                          style: Styles.blue125,
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
@@ -331,9 +354,9 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                                               filtredGirevData[index]
                                                   .responces!,
                                               'description'),
-                                          style: Styles.blue125,
+                                          style: Styles.cardBlue10,
                                           maxLines: 1,
-                                          strutStyle: StrutStyle(height: .5),
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
@@ -342,22 +365,24 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                                                   filtredGirevData[index]
                                                       .responces!,
                                                   'status')),
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),
                                   ),
-                                  (filtredGirevData[index].is_edited==0 && filtredGirevData[index].is_uploaded==1)?
-                                  Image.asset(
-                                    "assets/sync.png",
-                                    scale: 1.5,
-                                  ):
-                                  Image.asset(
-                                    "assets/sync_gray.png",
-                                    scale: 1.5,
-                                  )
+                                  (filtredGirevData[index].is_edited == 0 &&
+                                          filtredGirevData[index].is_uploaded ==
+                                              1)
+                                      ? Image.asset(
+                                          "assets/sync.png",
+                                          scale: 1.5,
+                                        )
+                                      : Image.asset(
+                                          "assets/sync_gray.png",
+                                          scale: 1.5,
+                                        )
                                 ],
                               ),
                             ),
@@ -403,40 +428,40 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
 
   Future callmstCommons() async {
     grSubjects = await OptionsModelHelper()
-        .callDayOfWeekMstCommonOptions('Grievance Subject',lng);
+        .callDayOfWeekMstCommonOptions('Grievance Subject', lng);
     grStatus = await OptionsModelHelper()
-        .callDayOfWeekMstCommonOptions('Grievance Status',lng);
+        .callDayOfWeekMstCommonOptions('Grievance Status', lng);
   }
 
   void clearData() {
-    filtredGirevData = childGirevData;
+    filtredGirevData = isOnlyUnsynched ? unsynchedList : allList;
     selectedCreche = null;
     selectedStatus = null;
     setState(() {});
   }
 
   void filteredGetData(BuildContext context) {
+    var filterList = isOnlyUnsynched ? unsynchedList : allList;
     if (selectedStatus != null && selectedCreche != null) {
-      filtredGirevData = childGirevData
+      filtredGirevData = filterList
           .where((element) =>
               Global.getItemValues(element.responces, 'status') ==
                   selectedStatus &&
               element.creche_id == Global.stringToInt(selectedCreche))
           .toList();
-    }
-    if (selectedCreche != null && selectedStatus == null) {
-      filtredGirevData = childGirevData
+    } else if (selectedCreche != null && selectedStatus == null) {
+      filtredGirevData = filterList
           .where((element) =>
               element.creche_id == Global.stringToInt(selectedCreche))
           .toList();
-    }
-    if (selectedCreche == null && selectedStatus != null) {
-      filtredGirevData = childGirevData
+    } else if (selectedCreche == null && selectedStatus != null) {
+      filtredGirevData = filterList
           .where((element) =>
               Global.getItemValues(element.responces, 'status') ==
               selectedStatus)
           .toList();
-    }
+    } else
+      filtredGirevData = filterList;
     setState(() {});
   }
 }

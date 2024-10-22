@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
 
 import '../../../custom_widget/custom_btn.dart';
@@ -47,19 +48,19 @@ class AttendanceTabItems extends StatefulWidget {
   final int totalTab;
   final List<String> existingDates;
 
-  const AttendanceTabItems(
-      {super.key,
-      required this.creche_nameId,
-      required this.isEdit,
-      required this.creche_name,
-      required this.ChildAttenGUID,
-      required this.tabBreakItem,
-      required this.screenItem,
-      required this.changeTab,
-      required this.tabIndex,
-      required this.totalTab,
-      required this.existingDates,
-      });
+  const AttendanceTabItems({
+    super.key,
+    required this.creche_nameId,
+    required this.isEdit,
+    required this.creche_name,
+    required this.ChildAttenGUID,
+    required this.tabBreakItem,
+    required this.screenItem,
+    required this.changeTab,
+    required this.tabIndex,
+    required this.totalTab,
+    required this.existingDates,
+  });
 
   @override
   State<AttendanceTabItems> createState() => _AttendanceTabItemsState();
@@ -86,11 +87,31 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
   List<ChildForAttendenceModel> attendecedRecord = [];
   DateTime? defaultMinDate;
   List<DateTime> dateList = [];
+  int? existingIsEditValue;
+  bool? wasShishuGharClosed;
+  Map<String, FocusNode> _focusNode = {};
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     initializeData();
+    var items = widget.screenItem[widget.tabBreakItem.name]!;
+    for (var elements in items) {
+      _focusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
+    }
+    _scrollController.addListener(() {
+      if (_scrollController.position.isScrollingNotifier.value) {
+        _focusNode.forEach((_, focusNode) => focusNode.unfocus());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.forEach((_, focusNode) => focusNode.dispose());
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> initializeData() async {
@@ -99,13 +120,15 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       CustomText.Creches,
       CustomText.Next,
       CustomText.back,
-      CustomText.ok, CustomText.childrenCountVallidattion,
+      CustomText.ok,
+      CustomText.childrenCountVallidattion,
       CustomText.Selecthere,
       CustomText.Save,
       CustomText.typehere,
       CustomText.Submit,
       CustomText.dataSaveSuc,
       CustomText.attenAlredyExist,
+      CustomText.noEnrolledChild
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -121,8 +144,6 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
 
     attendecedRecord = await ChildAttendenceHelper()
         .callChildAttendencesByGuid(widget.ChildAttenGUID);
-
-
 
     await callScrenControllers();
     if (widget.tabIndex == (widget.totalTab - 1)) {
@@ -151,6 +172,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.w, vertical: 10.h),
                         child: SingleChildScrollView(
+                          controller: _scrollController,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: cWidget(widget.tabBreakItem.name!),
@@ -244,10 +266,12 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-         
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
           isVisible:
@@ -262,17 +286,23 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         );
       case 'Date':
         return CustomDatepickerDynamic(
-          calenderValidate:[],
+          focusNode: _focusNode[quesItem.fieldname],
+
+          calenderValidate: [],
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          readable: quesItem.fieldname=='date_of_attendance'?widget.isEdit:null,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          minDate: AddAttendanceScreenFormTab.maxDate!=null?((quesItem.fieldname == 'date_of_attendance')
-              ? AddAttendanceScreenFormTab.maxDate
-              : defaultMinDate):defaultMinDate,
-          maxDate: AddAttendanceScreenFormTab.minDate!=null?((quesItem.fieldname == 'date_of_attendance')
-              ? AddAttendanceScreenFormTab.minDate
-              : defaultMinDate):defaultMinDate,
+          readable:
+              quesItem.fieldname == 'date_of_attendance' ? widget.isEdit : null,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          
+          minDate: defaultMinDate,
+          maxDate: AddAttendanceScreenFormTab.minDate != null
+              ? ((quesItem.fieldname == 'date_of_attendance')
+                  ? AddAttendanceScreenFormTab.minDate
+                  : defaultMinDate)
+              : defaultMinDate,
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
             var logData = DependingLogic()
@@ -281,7 +311,6 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
               if (logData.keys.length > 0) {
                 myMap.addEntries(
                     [MapEntry(logData.keys.first, logData.values.first)]);
-
               }
             }
             setState(() {});
@@ -291,12 +320,15 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-           isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!,logics),
+          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
           readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -311,8 +343,11 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
@@ -353,16 +388,20 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       //   );
       case 'Check':
         return DynamicCustomYesNoCheckboxWithLabel(
-          label: Global.returnTrLable(
-              translats, quesItem.label!.trim(), lng),
+          label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: myMap[quesItem.fieldname],
-          labelControlls:translats,
+          labelControlls: translats,
           lng: lng,
-          isRequred: (quesItem.fieldname=='is_shishu_ghar_is_closed_for_the_day')?1:quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: DependingLogic()
-        .callReadableLogic(logics, myMap, quesItem),
-          isVisible: DependingLogic()
-              .callDependingLogic(logics, myMap, quesItem),
+          isRequred:
+              (quesItem.fieldname == 'is_shishu_ghar_is_closed_for_the_day')
+                  ? 1
+                  : quesItem.reqd == 1
+                      ? quesItem.reqd
+                      : DependingLogic()
+                          .dependeOnMendotory(logics, myMap, quesItem),
+          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -371,17 +410,20 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         );
       case 'Long Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           maxline: 3,
-          titleText: Global.returnTrLable(
-              translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          titleText:
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          hintText: Global.returnTrLable(
-              translats, quesItem.label!.trim(), lng),
+          hintText:
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -391,8 +433,11 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
@@ -412,9 +457,12 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         );
       case 'Small Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
@@ -432,7 +480,9 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         return CustomTimepickerDynamic(
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
@@ -468,7 +518,6 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
   }
 
   Future<void> callScrenControllers() async {
-
     var alredRecord =
         await CrecheDataHelper().getCrecheResponceItem(widget.creche_nameId!);
     Map<String, dynamic> responseData = {};
@@ -506,7 +555,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
             } //else updateLocationDropDown(items[i]);
             else {
               await OptionsModelHelper()
-                  .getLocationData(items[i].options!.trim(), responseData,lng)
+                  .getLocationData(items[i].options!.trim(), responseData, lng)
                   .then((data) {
                 options.addAll(data);
               });
@@ -523,12 +572,11 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       }
       logicFields.add(items[i].fieldname!);
     }
-   
 
     await updateHiddenValue();
     // await callDatesList();
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng)
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });
@@ -555,12 +603,43 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
 
   nextTab(int type, BuildContext mContext) async {
     if (type == 1) {
-      if (_checkValidation( mContext)) {
-        if (widget.tabIndex < (widget.totalTab - 1)) {
-          var stats = await saveDataInData();
+      if (_checkValidation(mContext)) {
+        if (widget.tabIndex == 0 &&
+            myMap['is_shishu_ghar_is_closed_for_the_day'] == 0) {
+          var childHHData = await EnrolledExitChilrenResponceHelper()
+              .enrolledChildByCrecheWithDateOfExit(
+                  widget.creche_nameId!, myMap['date_of_attendance']);
+
+          DateTime? dateOfMesurement =
+              Validate().stringToDateNull(myMap['date_of_attendance']!);
+          childHHData = childHHData.where((element) {
+            DateTime? enrolledDate = Validate().stringToDateNull(
+                Global.getItemValues(element.responces, 'date_of_enrollment'));
+            if (dateOfMesurement != null && enrolledDate != null) {
+              if (dateOfMesurement.isAfter(enrolledDate) ||
+                  dateOfMesurement == (enrolledDate)) return true;
+            }
+            return false;
+          }).toList();
+          if (childHHData.isNotEmpty) {
+            await saveDataInData(false);
+
+            widget.changeTab(type);
+          } else {
+            Validate().singleButtonPopup(
+                '${Global.returnTrLable(translats, CustomText.noEnrolledChild, lng)} - ${Validate().displeDateFormate(myMap['date_of_attendance'])}',
+                Global.returnTrLable(translats, CustomText.ok, lng),
+                false,
+                context);
+          }
+        }
+        if (widget.tabIndex < (widget.totalTab - 1) &&
+            myMap['is_shishu_ghar_is_closed_for_the_day'] == 1) {
+          var stats = await saveDataInData(false);
           if (stats) {
             bool shouldProceed = await showDialog(
               context: context,
+              barrierDismissible: true,
               builder: (context) {
                 return SingleButtonPopupDialog(
                     message: Global.returnTrLable(
@@ -576,19 +655,21 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
                 Navigator.pop(context, 'itemRefresh');
               }
             }
+          } else {
+            widget.changeTab(type);
           }
-        }
-        else if (widget.tabIndex == (widget.totalTab - 1)) {
-          await saveDataInData();
+        } else if (widget.tabIndex == (widget.totalTab - 1)) {
+          await saveDataInData(true);
           bool shouldProceed = await showDialog(
             context: context,
+            barrierDismissible: true,
             builder: (context) {
               return SingleButtonPopupDialog(
                   message: Global.returnTrLable(
                       translats, CustomText.dataSaveSuc, lng),
                   button: Global.returnTrLable(translats, CustomText.ok, lng));
             },
-          );
+          ) as bool;
           if (shouldProceed) {
             if (shouldProceed == true) {
               Navigator.pop(context, 'itemRefresh');
@@ -596,7 +677,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           }
           // return;
         }
-        widget.changeTab(type);
+        // widget.changeTab(type);
         setState(() {});
       }
     } else {
@@ -611,61 +692,115 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
   saveOnly(int type, BuildContext mContext) async {
     if (type == 1) {
       if (_checkValidation(mContext)) {
-        bool status = false;
-        var widgets = widget.screenItem[widget.tabBreakItem.name];
-        List<TabFormsLogic> exitlogic = [];
-        if (widgets != null) {
-          Map<String, dynamic> responces = {};
-          widgets.forEach((element) async {
-            if (myMap[element.fieldname] != null) {
-              responces[element.fieldname!] = myMap[element.fieldname];
+        if (widget.tabIndex == 0 &&
+            myMap['is_shishu_ghar_is_closed_for_the_day'] == 0 &&
+            Global.validString(myMap['date_of_attendance'])) {
+          var childHHData = await EnrolledExitChilrenResponceHelper()
+              .enrolledChildByCrecheWithDateOfExit(
+                  widget.creche_nameId!, myMap['date_of_attendance']);
+
+          DateTime? dateOfMesurement =
+              Validate().stringToDateNull(myMap['date_of_attendance']!);
+          childHHData = childHHData.where((element) {
+            DateTime? enrolledDate = Validate().stringToDateNull(
+                Global.getItemValues(element.responces, 'date_of_enrollment'));
+            if (dateOfMesurement != null && enrolledDate != null) {
+              if (dateOfMesurement.isAfter(enrolledDate) ||
+                  dateOfMesurement == (enrolledDate)) return true;
             }
-            exitlogic.addAll(logics
-                .where((logElement) =>
-            logElement.parentControl == element.fieldname &&
-                logElement.type_of_logic_id == '11')
-                .toList());
-          });
-          var responcesJs = jsonEncode(myMap);
-          var name = myMap['name'];
-          var creche_id = Global.stringToInt(myMap['creche_id'].toString());
-          print(responcesJs);
-          var item = ChildAttendanceResponceModel(
+            return false;
+          }).toList();
+          if (childHHData.isEmpty) {
+            Validate().singleButtonPopup(
+                '${Global.returnTrLable(translats, CustomText.noEnrolledChild, lng)} - ${Validate().displeDateFormate(myMap['date_of_attendance'])}',
+                Global.returnTrLable(translats, CustomText.ok, lng),
+                false,
+                context);
+          } else {
+            var responcesJs = jsonEncode(myMap);
+            var name = myMap['name'];
+            var creche_id = Global.stringToInt(myMap['creche_id'].toString());
+            print(responcesJs);
+            var item = ChildAttendanceResponceModel(
               creche_id: creche_id,
               childattenguid: widget.ChildAttenGUID,
               name: name,
-              is_uploaded: recrdedUpload ? 1 : 0,
+              is_uploaded: 0,
               responces: responcesJs,
-              is_edited: 1,
+              is_edited:
+                  widget.isEdit ? (recrdedUpload ? 1 : existingIsEditValue) : 2,
               is_deleted: 0,
               created_at: myMap['app_created_on'],
               created_by: myMap['app_created_by'],
               update_at: myMap['app_updated_on'],
-              updated_by: myMap['app_updated_by']);
-          await AttendanceResponnceHelper().inserts(item);
-          await ChildAttendenceHelper().updateAttendenceHelper(widget.ChildAttenGUID,myMap['date_of_attendance']);
+              updated_by: myMap['app_updated_by'],
+              date_of_attendance: myMap['date_of_attendance'],
+            );
+            await AttendanceResponnceHelper().inserts(item);
+            await ChildAttendenceHelper().updateAttendenceHelper(
+                widget.ChildAttenGUID, myMap['date_of_attendance']);
+          }
+        } else if (widget.tabIndex == 0 &&
+            myMap['is_shishu_ghar_is_closed_for_the_day'] == 1 &&
+            Global.validString(myMap['date_of_attendance'])) {
+          bool status = false;
+          var widgets = widget.screenItem[widget.tabBreakItem.name];
+          List<TabFormsLogic> exitlogic = [];
+          if (widgets != null) {
+            Map<String, dynamic> responces = {};
+            widgets.forEach((element) async {
+              if (myMap[element.fieldname] != null) {
+                responces[element.fieldname!] = myMap[element.fieldname];
+              }
+              exitlogic.addAll(logics
+                  .where((logElement) =>
+                      logElement.parentControl == element.fieldname &&
+                      logElement.type_of_logic_id == '11')
+                  .toList());
+            });
+            var responcesJs = jsonEncode(myMap);
+            var name = myMap['name'];
+            var creche_id = Global.stringToInt(myMap['creche_id'].toString());
+            print(responcesJs);
+            var item = ChildAttendanceResponceModel(
+              creche_id: creche_id,
+              childattenguid: widget.ChildAttenGUID,
+              name: name,
+              is_uploaded: 0,
+              responces: responcesJs,
+              is_edited:
+                  widget.isEdit ? (recrdedUpload ? 1 : existingIsEditValue) : 2,
+              is_deleted: 0,
+              created_at: myMap['app_created_on'],
+              created_by: myMap['app_created_by'],
+              update_at: myMap['app_updated_on'],
+              updated_by: myMap['app_updated_by'],
+              date_of_attendance: myMap['date_of_attendance'],
+            );
+            await AttendanceResponnceHelper().inserts(item);
+            await ChildAttendenceHelper().updateAttendenceHelper(
+                widget.ChildAttenGUID, myMap['date_of_attendance']);
+          }
 
-        }
-
-        if (exitlogic.length > 0) {
-          for (int i = 0; i < exitlogic.length; i++) {
-            var element = exitlogic[i];
-            if (element.type_of_logic_id == '11') {
-              if (element.parentControl == element.dependentControls) {
-                var validValu = Global.validNum(element.algorithmExpression);
-                var parentValue = myMap[element.dependentControls];
-                if ((Global.validNum(parentValue.toString()) == validValu)) {
-                  status = true;
-                  break;
+          if (exitlogic.length > 0) {
+            for (int i = 0; i < exitlogic.length; i++) {
+              var element = exitlogic[i];
+              if (element.type_of_logic_id == '11') {
+                if (element.parentControl == element.dependentControls) {
+                  var validValu = Global.validNum(element.algorithmExpression);
+                  var parentValue = myMap[element.dependentControls];
+                  if ((Global.validNum(parentValue.toString()) == validValu)) {
+                    status = true;
+                    break;
+                  }
                 }
               }
             }
           }
-        }
-        if(status){
-          await saveDataForExit(
-              myMap, widget.screenItem[widget.tabBreakItem.name]!);
-        }
+          if (status) {
+            await saveDataForExit(
+                myMap, widget.screenItem[widget.tabBreakItem.name]!);
+          }
           bool shouldProceed = await showDialog(
             context: context,
             builder: (context) {
@@ -675,12 +810,12 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
                   button: Global.returnTrLable(translats, CustomText.ok, lng));
             },
           );
-        if (shouldProceed&&status) {
-          if (shouldProceed == true) {
-            Navigator.pop(context, 'itemRefresh');
+          if (shouldProceed && status) {
+            if (shouldProceed == true) {
+              Navigator.pop(context, 'itemRefresh');
+            }
           }
         }
-
       }
     } else {
       if (widget.tabIndex == 0) {
@@ -691,7 +826,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
     }
   }
 
-  Future<bool> saveDataInData() async {
+  Future<bool> saveDataInData(bool isLastTab) async {
     bool status = false;
     var widgets = widget.screenItem[widget.tabBreakItem.name];
     List<TabFormsLogic> exitlogic = [];
@@ -707,41 +842,52 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
                 logElement.type_of_logic_id == '11')
             .toList());
       });
+      if (exitlogic.length > 0) {
+        for (int i = 0; i < exitlogic.length; i++) {
+          var element = exitlogic[i];
+          if (element.type_of_logic_id == '11') {
+            if (element.parentControl == element.dependentControls) {
+              var validValu = Global.validNum(element.algorithmExpression);
+              var parentValue = myMap[element.dependentControls];
+              if ((Global.validNum(parentValue.toString()) == validValu)) {
+                status = true;
+                break;
+              }
+            }
+          }
+        }
+      }
       var responcesJs = jsonEncode(myMap);
       var name = myMap['name'];
       var creche_id = Global.stringToInt(myMap['creche_id'].toString());
       print(responcesJs);
       var item = ChildAttendanceResponceModel(
-          creche_id: creche_id,
-          childattenguid: widget.ChildAttenGUID,
-          name: name,
-          is_uploaded: recrdedUpload ? 1 : 0,
-          responces: responcesJs,
-          is_edited: 1,
-          is_deleted: 0,
-          created_at: myMap['app_created_on'],
-          created_by: myMap['app_created_by'],
-          update_at: myMap['app_updated_on'],
-          updated_by: myMap['app_updated_by']);
+        creche_id: creche_id,
+        childattenguid: widget.ChildAttenGUID,
+        name: name,
+        is_uploaded: 0,
+        responces: responcesJs,
+        is_edited: isLastTab
+            ? 1
+            : (status
+                ? 1
+                : (!widget.isEdit
+                    ? 2
+                    : !recrdedUpload
+                        ? wasShishuGharClosed ?? false
+                            ? 2
+                            : existingIsEditValue
+                        : 1)),
+        is_deleted: 0,
+        created_at: myMap['app_created_on'],
+        created_by: myMap['app_created_by'],
+        update_at: myMap['app_updated_on'],
+        updated_by: myMap['app_updated_by'],
+        date_of_attendance: myMap['date_of_attendance'],
+      );
       await AttendanceResponnceHelper().inserts(item);
-      await ChildAttendenceHelper().updateAttendenceHelper(widget.ChildAttenGUID,myMap['date_of_attendance']);
-
-    }
-
-    if (exitlogic.length > 0) {
-      for (int i = 0; i < exitlogic.length; i++) {
-        var element = exitlogic[i];
-        if (element.type_of_logic_id == '11') {
-          if (element.parentControl == element.dependentControls) {
-            var validValu = Global.validNum(element.algorithmExpression);
-            var parentValue = myMap[element.dependentControls];
-            if ((Global.validNum(parentValue.toString()) == validValu)) {
-              status = true;
-              break;
-            }
-          }
-        }
-      }
+      await ChildAttendenceHelper().updateAttendenceHelper(
+          widget.ChildAttenGUID, myMap['date_of_attendance']);
     }
 
     return status;
@@ -752,7 +898,8 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
     Map<String, dynamic> attemptAnsForExit = {};
     items.forEach((element) {
       if (currentAnswerd[element.fieldname] != null) {
-        attemptAnsForExit[element.fieldname!] = currentAnswerd[element.fieldname];
+        attemptAnsForExit[element.fieldname!] =
+            currentAnswerd[element.fieldname];
       }
     });
     List<String> remItem = [
@@ -778,7 +925,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
     attemptAnsForExit['app_updated_on'] = currentAnswerd['app_updated_on'];
     attemptAnsForExit['app_updated_by'] = currentAnswerd['app_updated_by'];
 
-   var date_of_attendance = currentAnswerd['date_of_attendance'];
+    var date_of_attendance = currentAnswerd['date_of_attendance'];
     var name = currentAnswerd['name'];
     var creche_id = currentAnswerd['creche_id'];
     if (name != null) {
@@ -787,19 +934,22 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
     var responcesJs = jsonEncode(attemptAnsForExit);
     print(responcesJs);
     var item = ChildAttendanceResponceModel(
-        creche_id: Global.stringToInt(creche_id.toString()),
-        childattenguid: widget.ChildAttenGUID,
-        name: name,
-        is_uploaded: recrdedUpload ? 1 : 0,
-        responces: responcesJs,
-        is_edited: 1,
-        is_deleted: 0,
-        created_at: currentAnswerd['app_created_on'],
-        created_by: currentAnswerd['app_created_by'],
-        update_at: currentAnswerd['app_updated_on'],
-        updated_by: currentAnswerd['app_updated_by']);
+      creche_id: Global.stringToInt(creche_id.toString()),
+      childattenguid: widget.ChildAttenGUID,
+      name: name,
+      is_uploaded: 0,
+      responces: responcesJs,
+      is_edited: 1,
+      is_deleted: 0,
+      created_at: currentAnswerd['app_created_on'],
+      created_by: currentAnswerd['app_created_by'],
+      update_at: currentAnswerd['app_updated_on'],
+      updated_by: currentAnswerd['app_updated_by'],
+      date_of_attendance: currentAnswerd['date_of_attendance'],
+    );
     await AttendanceResponnceHelper().inserts(item);
-    await ChildAttendenceHelper().deleteAttendeceBYGUID(widget.ChildAttenGUID,date_of_attendance);
+    await ChildAttendenceHelper()
+        .deleteAttendeceBYGUID(widget.ChildAttenGUID, date_of_attendance);
   }
 
   bool _checkValidation(BuildContext mContext) {
@@ -808,15 +958,18 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
     if (items != null) {
       for (int i = 0; i < items.length; i++) {
         var element = items[i];
-        if (element.reqd == 1||element.fieldname=='is_shishu_ghar_is_closed_for_the_day') {
+        if (element.reqd == 1 ||
+            element.fieldname == 'is_shishu_ghar_is_closed_for_the_day') {
           var valuees = myMap[element.fieldname];
           if (!Global.validString(valuees.toString().trim())) {
-            Validate().singleButtonPopup(Global.returnTrLable(
-                      translats, CustomText.plsFilManForm,lng), CustomText.ok, false, mContext);
+            Validate().singleButtonPopup(
+                Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
+                CustomText.ok,
+                false,
+                mContext);
             validStatus = false;
             break;
-          }
-          else if (element.fieldname == 'date_of_attendance') {
+          } else if (element.fieldname == 'date_of_attendance') {
             if (widget.existingDates.contains(valuees)) {
               myMap.remove(element.fieldname);
               setState(() {});
@@ -831,12 +984,16 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           }
         }
         var validationMsgother = otherTableDependCotrol(logics, myMap, element);
-        var validationMsg = DependingLogic().validationMessge(logics, myMap, element);
-        if (Global.validString(validationMsg) || Global.validString(validationMsgother)) {
+        var validationMsg =
+            DependingLogic().validationMessge(logics, myMap, element);
+        if (Global.validString(validationMsg) ||
+            Global.validString(validationMsgother)) {
           if (Global.validString(validationMsg)) {
-            Validate().singleButtonPopup(validationMsg!, CustomText.ok, false, mContext);
+            Validate().singleButtonPopup(
+                validationMsg!, CustomText.ok, false, mContext);
           } else {
-            Validate().singleButtonPopup(validationMsgother!, CustomText.ok, false, mContext);
+            Validate().singleButtonPopup(
+                validationMsgother!, CustomText.ok, false, mContext);
           }
           validStatus = false;
           break;
@@ -846,6 +1003,11 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
     } else {
       print("selected items is null");
     }
+    // if(validStatus && Global.stringToInt(myMap['is_shishu_ghar_is_closed_for_the_day']) == 1) {
+    //    var childHHData = await EnrolledExitChilrenResponceHelper()
+    //           .enrolledChildByCrecheWithDateOfExit(
+    //               widget.creche_nameId!, myMap['date_of_attendance']!);
+    // }
 
     return validStatus;
   }
@@ -868,9 +1030,20 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       if (alredRecord[0].is_uploaded == 1) {
         recrdedUpload = true;
       }
+      if (widget.tabIndex == 0) {
+        wasShishuGharClosed = Global.stringToInt(Global.getItemValues(
+                    alredRecord.first.responces,
+                    'is_shishu_ghar_is_closed_for_the_day')) ==
+                1
+            ? true
+            : false;
+        print(
+            "Was shishu ghar closed for the day? ====> ${wasShishuGharClosed! ? CustomText.Yes : CustomText.No} ");
+      }
+      existingIsEditValue = alredRecord.first.is_edited;
     } else {
       var creCheDetails =
-      await CrecheDataHelper().getCrecheResponceItem(widget.creche_nameId!);
+          await CrecheDataHelper().getCrecheResponceItem(widget.creche_nameId!);
       // List<HouseHoldFielItemdModel> items =
       //     widget.screenItem[widget.tabBreakItem.name!]!;
       // var checkItem =
@@ -880,7 +1053,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       // });
       myMap['app_created_by'] = userName;
       myMap['app_created_on'] = Validate().currentDateTime();
-      if(creCheDetails.length>0) {
+      if (creCheDetails.length > 0) {
         myMap['childattenguid'] = widget.ChildAttenGUID;
         myMap['creche_id'] = widget.creche_nameId;
         myMap['partner_id'] =
@@ -898,7 +1071,6 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         myMap['date_of_attendance'] = Global.initCurrentDate();
       }
     }
-
   }
 
   String? otherTableDependCotrol(List<TabFormsLogic> logics,
@@ -910,7 +1082,8 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
             (element.type_of_logic_id == '10'))
         .toList();
 
-    var attendeceChild=attendecedRecord.where((element) => element.attendance==1).toList();
+    var attendeceChild =
+        attendecedRecord.where((element) => element.attendance == 1).toList();
 
     if (parentQlogic.length > 0) {
       for (int i = 0; i < parentQlogic.length; i++) {
@@ -925,9 +1098,8 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
                 if (dependValu != null) {
                   if (!(Global.validNum(dependValu.toString()) <=
                       attendeceChild.length)) {
-                    retuenValu =
-                        Global.returnTrLable(
-                            translats, CustomText.childrenCountVallidattion, lng);
+                    retuenValu = Global.returnTrLable(
+                        translats, CustomText.childrenCountVallidattion, lng);
                     break;
                   }
                 }
@@ -940,7 +1112,6 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
 
     return retuenValu;
   }
-
 
   // Future<void> callDatesList() async {
   //   var cItem = myMap['date_of_attendance'];
@@ -972,10 +1143,4 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
   //   print(maDateString);
   //   setState(() {});
   // }
-
-
-
-
-
-
 }

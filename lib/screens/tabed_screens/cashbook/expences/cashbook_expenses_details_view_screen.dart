@@ -74,6 +74,7 @@ class _CashbookExpensesDetailsViewScreenState
   }
 
   Future<void> initializedData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     lng = (await Validate().readString(Validate.sLanguage))!;
     translats.clear();
     List<String> valueNames = [
@@ -364,7 +365,7 @@ class _CashbookExpensesDetailsViewScreenState
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
+    
     lng = (await Validate().readString(Validate.sLanguage))!;
     await CashbookExpencesMetaFieldsHelper()
         .getCashbookMetaFieldsbyScreenType(screen_type)

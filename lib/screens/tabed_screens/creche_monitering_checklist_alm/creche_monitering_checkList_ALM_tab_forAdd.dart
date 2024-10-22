@@ -26,14 +26,13 @@ class CmcALMTabSCreenForAdd extends StatefulWidget {
   final bool isEdit;
   final bool isViewScreen;
 
-  CmcALMTabSCreenForAdd({
-    super.key,
-    //  this.crecheName ,
-    required this.almguid,
-     this.date_of_visit,
-    required this.isEdit,
-    required this.isViewScreen
-  });
+  CmcALMTabSCreenForAdd(
+      {super.key,
+      //  this.crecheName ,
+      required this.almguid,
+      this.date_of_visit,
+      required this.isEdit,
+      required this.isViewScreen});
 
   @override
   State<CmcALMTabSCreenForAdd> createState() => _CmcALMTabSCreenForAddState();
@@ -54,7 +53,7 @@ class _CmcALMTabSCreenForAddState extends State<CmcALMTabSCreenForAdd>
   List<Translation> translatsLabel = [];
   void Function()? ontap;
   String lng = "en";
-  List<String> unpicableDates= [];
+  List<String> unpicableDates = [];
   bool isView = false;
   @override
   void initState() {
@@ -178,21 +177,21 @@ class _CmcALMTabSCreenForAddState extends State<CmcALMTabSCreenForAdd>
       if (tabBreakItems[i].parent == 'Creche Monitoring Checklist ALM') {
         tabItem.add(widget.isViewScreen
             ? CmcALMTabItemSCreenViewForAdd(
-            almguid: widget.almguid,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            tabIndex: i,
-            totalTab: tabBreakItems.length)
-            :CmcALMTabItemSCreenForAdd(
-            almguid: widget.almguid,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            tabIndex: i,
-            date_of_visit:widget.date_of_visit,
-            isEdit:widget.isEdit,
-            totalTab: tabBreakItems.length));
+                almguid: widget.almguid,
+                tabBreakItem: tabBreakItems[i],
+                screenItem: expendedItems,
+                changeTab: changeTab,
+                tabIndex: i,
+                totalTab: tabBreakItems.length)
+            : CmcALMTabItemSCreenForAdd(
+                almguid: widget.almguid,
+                tabBreakItem: tabBreakItems[i],
+                screenItem: expendedItems,
+                changeTab: changeTab,
+                tabIndex: i,
+                date_of_visit: widget.date_of_visit,
+                isEdit: widget.isEdit,
+                totalTab: tabBreakItems.length));
       }
     }
 
@@ -240,14 +239,16 @@ class _CmcALMTabSCreenForAddState extends State<CmcALMTabSCreenForAdd>
           }
         }
       }
-      if(Global.validString(responseData['creche_id']) && unpicableDates.length==0){
-        unpicableDates = await fetchDatesList(responseData['creche_id']);
-      }
-      if(Global.validString(responseData['date_of_visit'])){
-        if (unpicableDates.contains(responseData['date_of_visit'])){
-          returnStatus = false;
+      if (widget.isEdit == false) {
+        if (Global.validString(responseData['creche_id']) &&
+            unpicableDates.length == 0) {
+          unpicableDates = await fetchDatesList(responseData['creche_id']);
         }
-
+        if (Global.validString(responseData['date_of_visit'])) {
+          if (unpicableDates.contains(responseData['date_of_visit'])) {
+            returnStatus = false;
+          }
+        }
       }
     }
     // Return false if conditions are not met
@@ -299,15 +300,17 @@ class _CmcALMTabSCreenForAddState extends State<CmcALMTabSCreenForAdd>
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     List<String> tabLabelItems = [];
-    tabBreakItems.forEach((element) { 
-      if(Global.validString(element.label)){
+    tabBreakItems.forEach((element) {
+      if (Global.validString(element.label)) {
         tabLabelItems.add(element.label!);
       }
     });
-    await TranslationDataHelper().callTranslateString(tabLabelItems).then((value) => translatsLabel.addAll(value));
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelItems)
+        .then((value) => translatsLabel.addAll(value));
     if (Global.validString(widget.date_of_visit)) {
       List<int> parts =
-      widget.date_of_visit.toString().split('-').map(int.parse).toList();
+          widget.date_of_visit.toString().split('-').map(int.parse).toList();
       var dov = DateTime(parts[0], parts[1], parts[2]);
       if (dov
           .add(Duration(days: 7))
@@ -367,8 +370,7 @@ class _CmcALMTabSCreenForAddState extends State<CmcALMTabSCreenForAdd>
   }
 
   Future<List<String>> fetchDatesList(String creche_id) async {
-    List<CmcALMResponseModel> cmcRespose =
-    await CmcALMTabResponseHelper()
+    List<CmcALMResponseModel> cmcRespose = await CmcALMTabResponseHelper()
         .childALMChild(Global.stringToInt(creche_id));
     List<String> visitdatesListString = [];
     cmcRespose.forEach((element) {

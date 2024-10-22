@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
@@ -35,13 +35,17 @@ class EnrolledChilrenTabItemView extends StatefulWidget {
   final String cHHGuid;
   final int HHname;
   final int crecheId;
+  final String? childName;
+  final String? childId;
 
   const EnrolledChilrenTabItemView(
       {super.key,
       required this.EnrolledChilGUID,
       required this.cHHGuid,
       required this.HHname,
-      required this.crecheId});
+      required this.crecheId,
+      this.childId,
+      this.childName});
 
   @override
   _EnrolledChilrenTabItemViewState createState() =>
@@ -63,7 +67,6 @@ class _EnrolledChilrenTabItemViewState
   String? responce;
   String? role;
   String lng = 'eng';
-  String childDOB = '';
   Map<String, List<HouseHoldFielItemdModel>>? screenItem = {};
 
   Map<String, List<HouseHoldFielItemdModel>> expendedItems = {};
@@ -78,6 +81,7 @@ class _EnrolledChilrenTabItemViewState
   }
 
   Future<void> initializeData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     List<String> valueNames = [
       CustomText.Creches,
@@ -93,9 +97,11 @@ class _EnrolledChilrenTabItemViewState
     //     .then((value) async {
     //   itemsList = value;
     // });
-     await EnrolledExitChildrenFieldHelper().callEnrolledExitMeta().then((value) {
+    await EnrolledExitChildrenFieldHelper()
+        .callEnrolledExitMeta()
+        .then((value) {
       itemsList = value;
-     });
+    });
 
     itemsList!.forEach((element) {
       if (Global.validString(element.label)) {
@@ -107,11 +113,10 @@ class _EnrolledChilrenTabItemViewState
         .callTranslateString(valueNames)
         .then((value) => translats = value);
 
-
     multselectItemTab =
         await EnrolledChildrenFieldHelper().callMultiSelectTabItem();
     await updateHiddenValue();
-    await callScrenControllers('Child Profile');
+    await callScrenControllers('Child Enrollment and Exit');
     setState(() {
       _isLoading = false;
     });
@@ -120,9 +125,12 @@ class _EnrolledChilrenTabItemViewState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(text: Global.returnTrLable(translats,
-          CustomText.ChildProfile, lng),
-        onTap: () => Navigator.pop(context, 'itemRefresh'),),
+      appBar: CustomChildAppbar(
+        subTitle1: widget.childName ?? '',
+        subTitle2: widget.childId ?? '',
+        text: Global.returnTrLable(translats, CustomText.ChildProfile, lng),
+        onTap: () => Navigator.pop(context, 'itemRefresh'),
+      ),
       body: WillPopScope(
         onWillPop: () async {
           Navigator.pop(context, 'itemRefresh');
@@ -183,10 +191,11 @@ class _EnrolledChilrenTabItemViewState
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           items: itemsOption,
-          selectedItem: myMap[quesItem.label],
+          selectedItem: myMap[quesItem.fieldname],
           readable: true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: quesItem.fieldname == 'gender_id'
+              ? true
+              : DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value != null) {
               myMap[quesItem.fieldname!] = value.name!;
@@ -238,8 +247,9 @@ class _EnrolledChilrenTabItemViewState
           readable: true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: quesItem.fieldname == 'child_name'
+              ? true
+              : DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -446,7 +456,6 @@ class _EnrolledChilrenTabItemViewState
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -470,19 +479,19 @@ class _EnrolledChilrenTabItemViewState
               itemsList![i].fieldname!, itemsList![i].options!);
         }
       }
-
-      await OptionsModelHelper()
-          .getAllMstCommonNotINOptions(defaultCommon,lng)
-          .then((value) => options.addAll(value));
-
-      await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-        logics.addAll(data);
-      });
-
-      setState(() {
-        _isLoading = false;
-      });
     }
+
+    await OptionsModelHelper()
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
+        .then((value) => options.addAll(value));
+
+    await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
+      logics.addAll(data);
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> updateHiddenValue() async {
@@ -503,27 +512,23 @@ class _EnrolledChilrenTabItemViewState
         myMap['appcreated_by'] = userName;
         myMap['appcreated_on'] = Validate().currentDateTime();
       }
-      childDOB = Global.getItemValues(alredRecord[0].responces, 'child_dob');
       var name = alredRecord[0].name;
       if (name != null) {
         myMap['name'] = name;
       }
-      if( Global.validString(responseData['date_of_enrollment'])){
+      if (Global.validString(responseData['date_of_enrollment'])) {
         DateTime date_of_enrollment =
-        DateTime.parse(responseData['date_of_enrollment']);
+            DateTime.parse(responseData['date_of_enrollment']);
         if (date_of_enrollment
             .add(Duration(days: 30))
             .isBefore(DateTime.parse(Validate().currentDate()))) {
           shouldEditMesure = true;
         }
       }
-
     } else {
       var fromHHInfo = await HouseHoldChildrenHelperHelper()
           .callHouseHoldChildrenItem(widget.cHHGuid);
       Map<String, dynamic> responseData = jsonDecode(fromHHInfo[0].responces!);
-
-      childDOB = Global.getItemValues(fromHHInfo[0].responces, 'child_dob');
 
       responseData.forEach((key, value) {
         if ((key == 'name')) {

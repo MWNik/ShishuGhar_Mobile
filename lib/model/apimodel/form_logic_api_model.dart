@@ -29,14 +29,14 @@ class TabFormsLogic {
   String parentControl;
   String type_of_logic_id;
   String dependentControls;
-  String algorithmExpression;
+  String? algorithmExpression;
 
   TabFormsLogic({
     required this.doc,
     required this.parentControl,
     required this.type_of_logic_id,
     required this.dependentControls,
-    required this.algorithmExpression,
+     this.algorithmExpression,
   });
 
   factory TabFormsLogic.fromJson(Map<String, dynamic> json) => TabFormsLogic(

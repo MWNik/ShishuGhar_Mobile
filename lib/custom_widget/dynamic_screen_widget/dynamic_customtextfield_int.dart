@@ -195,8 +195,10 @@ class DynamicCustomTextFieldInt extends StatefulWidget {
   final int? isRequred;
   final bool? isVisible;
   // final bool? autoFocus;
+  final FocusNode? focusNode;
 
   DynamicCustomTextFieldInt({
+    this.focusNode,
     this.errorText,
     this.readable,
     this.initialvalue,
@@ -293,6 +295,7 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldInt> {
               ),
               child: TextFormField(
                 // focusNode: focusNode,
+                focusNode: widget.focusNode,
                 readOnly: widget.readable ?? false,
                 onTap: widget.onTap,
                 maxLength: widget.maxlength != null && widget.maxlength! > 0

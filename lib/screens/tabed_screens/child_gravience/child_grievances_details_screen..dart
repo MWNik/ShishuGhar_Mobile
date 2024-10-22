@@ -31,10 +31,11 @@ class ChildGrievancesDetailScreen extends StatefulWidget {
   final String? child_grievances_guid;
   final String? creche_id;
 
-  const ChildGrievancesDetailScreen(
-      {super.key,
-      required this.child_grievances_guid,
-      required this.creche_id});
+  const ChildGrievancesDetailScreen({
+    super.key,
+    required this.child_grievances_guid,
+    required this.creche_id,
+  });
 
   @override
   _ChildGrievancesDetailsState createState() => _ChildGrievancesDetailsState();
@@ -51,6 +52,8 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
   String? role;
   String? lng = 'en';
   List<Translation> labelControlls = [];
+  Map<String, FocusNode> _focusNode = {};
+  ScrollController _scrollController = ScrollController();
 
   List<String> hiddens = [
     'partner_id',
@@ -63,6 +66,7 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
   ];
 
   Future<void> initializeData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     lng = (await Validate().readString(Validate.sLanguage))!;
     labelControlls.clear();
@@ -106,12 +110,13 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
                     padding:
                         EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                     child: SingleChildScrollView(
+                        controller: _scrollController,
                         child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: cWidget(),
-                    )),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: cWidget(),
+                        )),
                   )),
-                  role=='Creche Supervisor'?editingRemoved?Padding(
+                  Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                     child: Row(children: [
@@ -124,43 +129,20 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
                         text: Global.returnTrLable(
                             labelControlls, CustomText.back, lng!),
                       )),
-                      SizedBox(width: 10),
-                      Expanded(
-                          child: CElevatedButton(
-                        color: Color(0xff369A8D),
-                        onPressed: () {
-                          nextTab(1, context);
-                        },
-                        text: Global.returnTrLable(
-                            labelControlls, CustomText.Submit, lng!),
-                      ))
+                      editingRemoved ? SizedBox(width: 10) : SizedBox(),
+                      editingRemoved
+                          ? Expanded(
+                              child: CElevatedButton(
+                              color: Color(0xff369A8D),
+                              onPressed: () {
+                                nextTab(1, context);
+                              },
+                              text: Global.returnTrLable(
+                                  labelControlls, CustomText.Submit, lng!),
+                            ))
+                          : SizedBox()
                     ]),
-                  )
-                      :SizedBox():Padding(
-                    padding:
-                    EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: Row(children: [
-                      Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xffF26BA3),
-                            onPressed: () {
-                              nextTab(0, context);
-                            },
-                            text: Global.returnTrLable(
-                                labelControlls, CustomText.back, lng!),
-                          )),
-                      SizedBox(width: 10),
-                      Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xff369A8D),
-                            onPressed: () {
-                              nextTab(1, context);
-                            },
-                            text: Global.returnTrLable(
-                                labelControlls, CustomText.Submit, lng!),
-                          ))
-                    ]),
-                  )
+                  ),
                 ],
               ));
   }
@@ -186,7 +168,10 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-          readable: role=='Creche Supervisor'?!editingRemoved?true:DependingLogic().callReadableLogic(logics, myMap, quesItem):DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          focusNode: _focusNode[quesItem.fieldname],
+          readable: !editingRemoved
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
@@ -206,9 +191,10 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
         );
       case 'Date':
         return CustomDatepickerDynamic(
+          focusNode: _focusNode[quesItem.fieldname],
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          readable: quesItem.fieldname=='grievance_date'?true:false,
+          readable: quesItem.fieldname == 'grievance_date' ? true : false,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
@@ -227,7 +213,6 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
 
                 // }
               }
-
             }
             setState(() {});
           },
@@ -236,6 +221,7 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
@@ -244,7 +230,9 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
-          readable:  role=='Creche Supervisor'?!editingRemoved?true:DependingLogic().callReadableLogic(logics, myMap, quesItem):DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: !editingRemoved
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isVisible:
@@ -258,13 +246,16 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: role=='Creche Supervisor'?!editingRemoved?true:DependingLogic().callReadableLogic(logics, myMap, quesItem):DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: !editingRemoved
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isVisible:
@@ -310,7 +301,9 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: role=='Creche Supervisor'?!editingRemoved?true:DependingLogic().callReadableLogic(logics, myMap, quesItem):DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: !editingRemoved
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
@@ -321,12 +314,15 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
-          readable: role=='Creche Supervisor'?!editingRemoved?true:DependingLogic().callReadableLogic(logics, myMap, quesItem):DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: !editingRemoved
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           initialvalue: myMap[quesItem.fieldname!],
@@ -342,13 +338,16 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
         );
       case 'Small Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
-          readable: role=='Creche Supervisor'?!editingRemoved?true:DependingLogic().callReadableLogic(logics, myMap, quesItem):DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: !editingRemoved
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -360,6 +359,7 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
         );
       case 'Long Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           maxline: 3,
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
@@ -368,7 +368,9 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: role=='Creche Supervisor'?!editingRemoved?true:DependingLogic().callReadableLogic(logics, myMap, quesItem):DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: !editingRemoved
+              ? true
+              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isVisible:
@@ -386,7 +388,6 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -409,13 +410,21 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
         //       .then((value) => options.addAll(value));
         //   defaultDisableDailog(allItems[i].fieldname!, allItems[i].options!);
         // } else {
-          defaultCommon.add('tab${allItems[i].options!.trim()}');
+        defaultCommon.add('tab${allItems[i].options!.trim()}');
         // }
       }
     }
+    for (var elements in allItems) {
+      _focusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
+    }
+    _scrollController.addListener(() {
+      if (_scrollController.position.isScrollingNotifier.value) {
+        _focusNode.forEach((_, focusNode) => focusNode.unfocus());
+      }
+    });
 
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
@@ -557,7 +566,7 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
       if (name != null) {
         myMap['name'] = name;
       }
-      editingRemoved=false;
+      editingRemoved = false;
     } else {
       var creCheDetails = await CrecheDataHelper()
           .getCrecheResponceItem(Global.stringToInt(widget.creche_id));
@@ -579,16 +588,22 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
             Global.getItemValues(creCheDetails[0].responces!, 'village_id');
         myMap['grievance_guid'] = widget.child_grievances_guid;
         myMap['grievance_date'] = Global.initCurrentDate();
-        myMap['priority']='3';
+        myMap['priority'] = '3';
         myMap['status'] = "1";
       }
     }
   }
 
-
   @override
   void initState() {
     super.initState();
     initializeData();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _focusNode.forEach((_, focusNode) => focusNode.dispose());
+    super.dispose();
   }
 }

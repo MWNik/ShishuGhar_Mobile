@@ -9,6 +9,7 @@ import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_chi
 import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
+import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
 import 'package:shishughar/utils/validate.dart';
 
@@ -49,6 +50,7 @@ class EnrolledExitChildTabItem extends StatefulWidget {
   String? minDate;
   final bool isForExit;
   final String screenType;
+  int? isUploaded;
 
   EnrolledExitChildTabItem(
       {super.key,
@@ -66,6 +68,7 @@ class EnrolledExitChildTabItem extends StatefulWidget {
       required this.isEditable,
       required this.screenType,
       this.minDate,
+      this.isUploaded,
       required this.isForExit});
 
   @override
@@ -88,7 +91,10 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
   String lng = 'eng';
   bool isRecordNew = true;
   DateTime? minDateforExit;
+  int? isEditedFromExisting = 0;
   String childDOB = '';
+  String childName = '';
+  String genderId = '';
   List<String> redableItemsData = [
     'child_id',
     'child_name',
@@ -98,13 +104,29 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     'height',
     'weight',
   ];
+  // int? isUploaded = 0;
+  Map<String, FocusNode> _focusNode = {};
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     initializeData();
+    var items = widget.screenItem[widget.tabBreakItem.name]!;
+    for (var element in items) {
+      _focusNode.addEntries([MapEntry(element.fieldname!, FocusNode())]);
+    }
+    _scrollController.addListener(() {
+      if (_scrollController.position.isScrollingNotifier.value) {
+        _focusNode.forEach((_, element) {
+          element.unfocus();
+        });
+      }
+    });
   }
 
   Future<void> initializeData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     List<String> valueNames = [
       CustomText.Creches,
@@ -138,13 +160,20 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         await EnrolledChildrenFieldHelper().callMultiSelectTabItem();
     await updateHiddenValue();
     await callScrenControllers(widget.screenType);
-    // calinitialScreen();
     if (widget.tabIndex == (widget.totalTab - 1)) {
       saveNext = CustomText.Submit;
     }
     setState(() {
       _isLoading = false;
     });
+  }
+
+  @override
+  void dispose() {
+    // Dispose all lazily created FocusNodes
+    _focusNode.forEach((_, focusNode) => focusNode.dispose());
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -165,6 +194,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
                       padding: EdgeInsets.symmetric(
                           horizontal: 20.w, vertical: 10.h),
                       child: SingleChildScrollView(
+                        controller: _scrollController,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: cWidget(widget.tabBreakItem.name!),
@@ -420,17 +450,23 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          focusNode: _focusNode[quesItem.fieldname],
+
           titleText:
-          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              :(quesItem.fieldname == 'reason_for_exit'?1: DependingLogic().dependeOnMendotory(logics, myMap, quesItem)),
+              : (quesItem.fieldname == 'reason_for_exit'
+                  ? 1
+                  : DependingLogic()
+                      .dependeOnMendotory(logics, myMap, quesItem)),
           items: items,
           readable: widget.isEditable == true ? null : true,
           selectedItem: myMap[quesItem.fieldname],
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
+          
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
             else
@@ -440,24 +476,29 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         );
       case 'Date':
         var minDate;
-        if(quesItem.fieldname == 'date_of_enrollment') {
-          if(Global.validString(widget.minDate)){
-            minDate = DateTime.parse(widget.minDate!).subtract(Duration(days: 1));
+        if (quesItem.fieldname == 'date_of_enrollment') {
+          if (Global.validString(widget.minDate)) {
+            minDate =
+                DateTime.parse(widget.minDate!).subtract(Duration(days: 1));
           }
-        } else if (quesItem.fieldname == 'date_of_exit'){
+        } else if (quesItem.fieldname == 'date_of_exit') {
           minDate = minDateforExit;
         }
         return CustomDatepickerDynamic(
-          initialvalue: quesItem.fieldname == 'date_of_enrollment_awc'?(Global.validString(myMap['date_of_enrollment_awc'])?myMap[quesItem.fieldname]:Global.initCurrentDate()):myMap[quesItem.fieldname!],
+          focusNode: _focusNode[quesItem.fieldname],
+          initialvalue: quesItem.fieldname == 'date_of_enrollment_awc'
+              ? (Global.validString(myMap['date_of_enrollment_awc'])
+                  ? myMap[quesItem.fieldname]
+                  : Global.initCurrentDate())
+              : myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           readable: widget.isEditable == true
               ? (widget.isForExit
-              ? (redableItemsDate.contains(quesItem.fieldname)
-              ? true
-              : DependingLogic()
-              .callReadableLogic(logics, myMap, quesItem))
-              : DependingLogic()
-              .callReadableLogic(logics, myMap, quesItem))
+                  ? (redableItemsDate.contains(quesItem.fieldname)
+                      ? true
+                      : DependingLogic()
+                          .callReadableLogic(logics, myMap, quesItem))
+                  : DependingLogic().callReadableLogic(logics, myMap, quesItem))
               : true,
           // minDate: quesItem.fieldname == 'date_of_enrollment'
           //     ? Global.validString(widget.minDate)
@@ -465,12 +506,13 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           //         : null
           //     : null,
           minDate: minDate,
-          isVisible: DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           calenderValidate:
-          DependingLogic().calenderValidation(logics, myMap, quesItem),
+              DependingLogic().calenderValidation(logics, myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
 
@@ -489,17 +531,19 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
             setState(() {});
           },
           titleText:
-          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          initialvalue:myMap[quesItem.fieldname],
-          isVisible: DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          initialvalue: myMap[quesItem.fieldname],
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           maxlength: quesItem.length,
           keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
           readable: widget.isEditable == true
@@ -512,7 +556,6 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
               : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -522,6 +565,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -625,6 +669,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         );
       case 'Long Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           maxline: 3,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -649,6 +694,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -672,6 +718,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         );
       case 'Small Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -692,6 +739,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         );
       case 'Float':
         return DynamicCustomTextFieldFloat(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
@@ -752,7 +800,6 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -787,6 +834,11 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
       logics.addAll(data);
     });
+    await FormLogicDataHelper()
+        .callFormLogic('Child Enrollment and Exit')
+        .then((data) {
+      logics.addAll(data);
+    });
   }
 
   Future<void> calinitialScreen() async {
@@ -808,21 +860,19 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     if (type == 1) {
       if (_checkValidation()) {
         if (widget.tabIndex < (widget.totalTab - 1)) {
-          await saveDataInData();
+          await saveDataInData(false);
         } else if (widget.tabIndex == (widget.totalTab - 1)) {
-          await saveDataInData();
+          await saveDataInData(true);
           String msg = Global.returnTrLable(
               translats, CustomText.ChildEnrollsuccess, lng);
-          if(widget.screenType == 'Child Enrollment and Exit'){
-            msg = Global.returnTrLable(
-                translats, CustomText.dataSaveSuc, lng);
-          }else {
+          if (widget.screenType == 'Child Enrollment and Exit') {
+            msg = Global.returnTrLable(translats, CustomText.dataSaveSuc, lng);
+          } else {
             if (!isRecordNew) {
               msg = Global.returnTrLable(
                   translats, CustomText.childUpdatedSucces, lng);
             }
           }
-
 
           bool shouldProceed = await showDialog(
             context: context,
@@ -854,7 +904,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
   saveOnly(int type, BuildContext mContext) async {
     if (type == 1) {
       if (_checkValidation()) {
-        await saveDataInData();
+        await saveDataInData(false);
         Validate().singleButtonPopup(
             Global.returnTrLable(translats, CustomText.dataSaveSuc, lng),
             Global.returnTrLable(translats, CustomText.ok, lng),
@@ -870,7 +920,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     }
   }
 
-  Future<void> saveDataInData() async {
+  Future<void> saveDataInData(bool islastIndex) async {
     var widgets = widget.screenItem[widget.tabBreakItem.name];
     if (widgets != null) {
       Map<String, dynamic> responces = {};
@@ -883,19 +933,44 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
       var name = myMap['name'];
       EnrolledExitChilrenTab.childName = myMap['child_name'];
       print(responcesJs);
-      await EnrolledExitChilrenResponceHelper().insertUpdate(
-          widget.EnrolledChilGUID,
-          widget.cHHGuid,
-          widget.HHname,
-          Global.stringToIntNull(name.toString()),
-          Global.stringToInt(myMap['creche_id']),
-          responcesJs,
-          myMap['appcreated_on'],
-          myMap['appcreated_by'],
-          myMap['app_updated_on'],
-          myMap['app_updated_by'],
-          myMap['date_of_exit']);
-      if (childDOB != Global.getItemValues(responcesJs, 'child_dob')) {
+      var childItem = EnrolledExitChildResponceModel(
+        name: Global.stringToIntNull(name.toString()),
+        ChildEnrollGUID: widget.EnrolledChilGUID,
+        HHname: widget.HHname,
+        CHHGUID: widget.cHHGuid,
+        creche_id: Global.stringToInt(myMap['creche_id']),
+        responces: responcesJs,
+        created_at: myMap['appcreated_on'],
+        created_by: myMap['appcreated_by'],
+        update_at: myMap['app_updated_on'],
+        updated_by: myMap['app_updated_by'],
+        date_of_exit: myMap['date_of_exit'],
+        is_edited: islastIndex
+            ? 1
+            : (isRecordNew
+                ? 2
+                : (widget.isUploaded == 0)
+                    ? isEditedFromExisting
+                    : 1),
+        is_deleted: 0,
+        is_uploaded: 0,
+      );
+      await EnrolledExitChilrenResponceHelper().inserts(childItem);
+      // await EnrolledExitChilrenResponceHelper().insertUpdate(
+      //     widget.EnrolledChilGUID,
+      //     widget.cHHGuid,
+      //     widget.HHname,
+      //     Global.stringToIntNull(name.toString()),
+      //     Global.stringToInt(myMap['creche_id']),
+      //     responcesJs,
+      //     myMap['appcreated_on'],
+      //     myMap['appcreated_by'],
+      //     myMap['app_updated_on'],
+      //     myMap['app_updated_by'],
+      //     myMap['date_of_exit']);
+      if (childDOB != Global.getItemValues(responcesJs, 'child_dob') ||
+          childName != Global.getItemValues(responcesJs, 'child_name') ||
+          genderId != Global.getItemValues(responcesJs, 'gender_id')) {
         await HouseHoldChildrenHelperHelper()
             .isUpdateEdit(widget.cHHGuid, responcesJs);
       }
@@ -960,34 +1035,43 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
       responseData.forEach((key, value) {
         myMap[key] = value;
       });
-      if(widget.isForExit){
+      isEditedFromExisting = alredRecord.first.is_edited;
+      // isUploaded = alredRecord.first.is_uploaded;
+      if (widget.isForExit) {
         myMap['date_of_exit'] = Validate().currentDate();
-      if (Global.validString(myMap['date_of_exit']) &&
-          Global.validString(myMap['child_dob'])) {
-        var durationInMonths =
-        duration(myMap['date_of_exit'], myMap['child_dob']);
-        myMap['age_of_exit'] = durationInMonths.toInt();
-      }
+        if (Global.validString(myMap['date_of_exit']) &&
+            Global.validString(myMap['child_dob'])) {
+          var durationInMonths =
+              duration(myMap['date_of_exit'], myMap['child_dob']);
+          myMap['age_of_exit'] = durationInMonths.toInt();
+        }
       }
 
-      if (responseData['appcreated_on'] != null || responseData['appcreated_by'] != null) {
+      if (responseData['appcreated_on'] != null ||
+          responseData['appcreated_by'] != null) {
         myMap['app_updated_on'] = Validate().currentDateTime();
         myMap['app_updated_by'] = userName;
       } else {
         myMap['appcreated_on'] = Validate().currentDateTime();
         myMap['appcreated_by'] = userName;
       }
-      if(Global.validString(myMap['date_of_enrollment'])){
-        var parts = myMap['date_of_enrollment'].toString().split('-').map(int.parse).toList();
-        minDateforExit = DateTime(parts[0],parts[1],parts[2]);
+      if (Global.validString(myMap['date_of_enrollment'])) {
+        var parts = myMap['date_of_enrollment']
+            .toString()
+            .split('-')
+            .map(int.parse)
+            .toList();
+        minDateforExit = DateTime(parts[0], parts[1], parts[2]);
       }
-      if(widget.isForExit){
-        if(!Global.validString(myMap['date_of_enrollment_awc'])){
+      if (widget.isForExit) {
+        if (!Global.validString(myMap['date_of_enrollment_awc'])) {
           myMap['date_of_enrollment_awc'] = Global.initCurrentDate();
         }
       }
 
       childDOB = Global.getItemValues(alredRecord[0].responces, 'child_dob');
+      childName = Global.getItemValues(alredRecord[0].responces, 'child_name');
+      genderId = Global.getItemValues(alredRecord[0].responces, 'gender_id');
       var name = alredRecord[0].name;
       if (name != null) {
         myMap['name'] = name;
@@ -1000,25 +1084,25 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           myMap.remove('weight');
         }
       }
-      if(Global.validString(responseData['date_of_enrollment'])){
+      if (Global.validString(responseData['date_of_enrollment'])) {
         DateTime date_of_enrollment =
-        DateTime.parse(responseData['date_of_enrollment']);
+            DateTime.parse(responseData['date_of_enrollment']);
         if (date_of_enrollment
             .add(Duration(days: 30))
             .isBefore(DateTime.parse(Validate().currentDate()))) {
           shouldEditMesure = true;
         }
       }
-
-
     } else {
       var fromHHInfo = await HouseHoldChildrenHelperHelper()
           .callHouseHoldChildrenItem(widget.cHHGuid);
       Map<String, dynamic> responseData = jsonDecode(fromHHInfo[0].responces!);
 
       childDOB = Global.getItemValues(fromHHInfo[0].responces, 'child_dob');
-      myMap['gender_id'] =
-          Global.getItemValues(fromHHInfo[0].responces, 'gender_id');
+      childName = Global.getItemValues(fromHHInfo[0].responces, 'child_name');
+      genderId = Global.getItemValues(fromHHInfo[0].responces, 'gender_id');
+      // myMap['gender_id'] =
+      //     Global.getItemValues(fromHHInfo[0].responces, 'gender_id');
       responseData.forEach((key, value) {
         if (key != 'appcreated_on' && key != 'appcreated_by' && key != 'name')
           myMap[key] = value;
@@ -1044,7 +1128,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
 
       myMap['date_of_enrollment'] = Global.initCurrentDate();
       myMap['appcreated_by'] = userName;
-      myMap['appcreated_on'] = Validate().currentDate();
+      myMap['appcreated_on'] = Validate().currentDateTime();
 
       if (Global.validString(myMap['date_of_enrollment']) &&
           Global.validString(myMap['child_dob'])) {

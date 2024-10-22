@@ -1,8 +1,8 @@
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:path/path.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
@@ -38,17 +38,16 @@ class AddAttendance extends StatefulWidget {
 }
 
 class _AddAttendanceState extends State<AddAttendance> {
-
   String? lng;
   List<Translation> translats = [];
   List<EnrolledExitChildResponceModel> childHHData = [];
   List<ChildForAttendenceModel> attendecedRecord = [];
   int cIndex = 0;
-  String?  attendeceDate;
+  String? attendeceDate;
   Map<String, bool> checkedItem = {};
   Map<String, dynamic> myResponce = {};
   ChildAttendanceResponceModel? attendeceItem;
-  bool _selectAll=true;
+  bool _selectAll = true;
 
   void initState() {
     super.initState();
@@ -75,45 +74,52 @@ class _AddAttendanceState extends State<AddAttendance> {
       CustomText.back,
       CustomText.careGiverName,
       CustomText.markAllPresent,
-      CustomText.DateofAttendance
+      CustomText.DateofAttendance,
+      CustomText.childCount,
+      CustomText.childPresent
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
 
+    var attendenceItem = await ChildAttendanceResponceHelper()
+        .callAttendanceResponce(widget.ChildAttenGUID!);
+    attendecedRecord = await ChildAttendenceHelper()
+        .callChildAttendencesByGuid(widget.ChildAttenGUID!);
 
-    var attendenceItem = await ChildAttendanceResponceHelper().callAttendanceResponce(widget.ChildAttenGUID!);
-    attendecedRecord=await ChildAttendenceHelper().callChildAttendencesByGuid(widget.ChildAttenGUID!);
-
-    if(attendenceItem.length>0){
-      attendeceItem=attendenceItem[0];
-      attendeceDate=Global.getItemValues(attendenceItem[0].responces!, 'date_of_attendance');
+    if (attendenceItem.length > 0) {
+      attendeceItem = attendenceItem[0];
+      attendeceDate = Global.getItemValues(
+          attendenceItem[0].responces!, 'date_of_attendance');
     }
 
     attendecedRecord.forEach((element) {
-      if(element.attendance==1){
-        checkedItem[element.childenrolledguid!]=true;
-      }else {
-         _selectAll=false;
+      if (element.attendance == 1) {
+        checkedItem[element.childenrolledguid!] = true;
+      } else {
+        _selectAll = false;
       }
     });
 
-    if(attendecedRecord.length>0){
-      childHHData = await EnrolledExitChilrenResponceHelper().enrolledChildByCrecheByAttendeGUID(widget.ChildAttenGUID!,widget.crecheId);
-    }else  {
-      _selectAll=false;
-      childHHData = await EnrolledExitChilrenResponceHelper().enrolledChildByCreche(widget.crecheId);
-      if(attendeceDate!=null){}
-      DateTime? dateOfMesurement=Validate().stringToDateNull(attendeceDate!);
-      childHHData=childHHData.where((element) {
-        DateTime? enrolledDate=
-        Validate().stringToDateNull(Global.getItemValues(element.responces, 'date_of_enrollment'));
-        if(dateOfMesurement!=null&&enrolledDate!=null){
-          if(dateOfMesurement.isAfter(enrolledDate) || dateOfMesurement==(enrolledDate))
-            return true;
-        }return false;
-      }
-      ).toList();
+    if (attendecedRecord.length > 0) {
+      childHHData = await EnrolledExitChilrenResponceHelper()
+          .enrolledChildByCrecheByAttendeGUID(
+              widget.ChildAttenGUID!, widget.crecheId);
+    } else {
+      _selectAll = false;
+      childHHData = await EnrolledExitChilrenResponceHelper()
+          .enrolledChildByCrecheWithDateOfExit(widget.crecheId, attendeceDate!);
+      if (attendeceDate != null) {}
+      DateTime? dateOfMesurement = Validate().stringToDateNull(attendeceDate!);
+      childHHData = childHHData.where((element) {
+        DateTime? enrolledDate = Validate().stringToDateNull(
+            Global.getItemValues(element.responces, 'date_of_enrollment'));
+        if (dateOfMesurement != null && enrolledDate != null) {
+          if (dateOfMesurement.isAfter(enrolledDate) ||
+              dateOfMesurement == (enrolledDate)) return true;
+        }
+        return false;
+      }).toList();
     }
 
     // if(_selectAll==null){
@@ -125,36 +131,59 @@ class _AddAttendanceState extends State<AddAttendance> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> childPresent = checkedItem.entries
+        .where((entry) => entry.value == true)
+        .map((entry) => entry.key)
+        .toList();
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         child: Column(children: [
           CustomDatepickerDynamic(
             initialvalue: attendeceDate,
-            calenderValidate:[],
+            calenderValidate: [],
             isRequred: 0,
             readable: true,
-            onChanged: (value) {
-            },
-            titleText:
-            lng!=null?Global.returnTrLable(translats, CustomText.DateofAttendance, lng!):'',
+            onChanged: (value) {},
+            titleText: lng != null
+                ? Global.returnTrLable(
+                    translats, CustomText.DateofAttendance, lng!)
+                : '',
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Checkbox(
-                  value: _selectAll == true,
-                  onChanged: (value) {
-                    childHHData.forEach((element) =>
-                    checkedItem[element.ChildEnrollGUID!] = value!);
-                    setState(() {
-                      _selectAll = !_selectAll;
-                    });
-                  }),
-              SizedBox(width: 5.w),
-              Text(lng != null?Global.returnTrLable(translats, CustomText.markAllPresent, lng!):CustomText.markAllPresent)
-            ],
-          ),
+          lng != null
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Checkbox(
+                        value: _selectAll == true,
+                        onChanged: (value) {
+                          childHHData.forEach((element) =>
+                              checkedItem[element.ChildEnrollGUID!] = value!);
+                          setState(() {
+                            _selectAll = !_selectAll;
+                          });
+                        }),
+                    SizedBox(width: 5.w),
+                    Text(lng != null
+                        ? Global.returnTrLable(
+                            translats, CustomText.markAllPresent, lng!)
+                        : CustomText.markAllPresent),
+                    const Spacer(),
+                    RichText(
+                        text: TextSpan(children: [
+                      TextSpan(
+                          text:
+                              '${Global.returnTrLable(translats, CustomText.childCount, lng!)}: ${childHHData.length}',
+                          style: Styles.black12700),
+                      TextSpan(text: '\n'),
+                      TextSpan(
+                          text:
+                              '${Global.returnTrLable(translats, CustomText.childPresent, lng!)}: ${childPresent.length}',
+                          style: Styles.black12700)
+                    ]))
+                  ],
+                )
+              : SizedBox(),
           Expanded(
             child: (childHHData.length > 0)
                 ? ListView.builder(
@@ -189,8 +218,8 @@ class _AddAttendanceState extends State<AddAttendance> {
                                   BoxShadow(
                                     color: Color(0xff5A5A5A).withOpacity(
                                         0.2), // Shadow color with opacity
-                                    offset: Offset(0,
-                                        3), // Horizontal and vertical offset
+                                    offset: Offset(
+                                        0, 3), // Horizontal and vertical offset
                                     blurRadius: 6, // Blur radius
                                     spreadRadius: 0, // Spread radius
                                   ),
@@ -217,12 +246,12 @@ class _AddAttendanceState extends State<AddAttendance> {
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.careGiverName, lng!).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.ageInMonth, lng!).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                     ],
                                   ),
@@ -246,23 +275,39 @@ class _AddAttendanceState extends State<AddAttendance> {
                                           Global.getItemValues(
                                               childHHData[index].responces!,
                                               'child_name'),
-                                          style: Styles.blue125,
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
                                           Global.getItemValues(
                                               childHHData[index].responces!,
                                               'name_of_primary_caregiver'),
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          Global.getItemValues(
-                                              childHHData[index].responces!,
-                                              'age_at_enrollment_in_months'),
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
+                                          // Global.getItemValues(
+                                          //     childHHData[index].responces!,
+                                          //     'age_at_enrollment_in_months'),
+                                          Global.validString(
+                                                  Global.getItemValues(
+                                                      childHHData[index]
+                                                          .responces,
+                                                      'child_dob'))
+                                              ? Validate()
+                                                  .calculateAgeInMonths(
+                                                      Validate().stringToDate(
+                                                          Global.getItemValues(
+                                                              childHHData[index]
+                                                                  .responces,
+                                                              'child_dob')))
+                                                  .toString()
+                                              : Global.getItemValues(
+                                                  childHHData[index].responces,
+                                                  'age_at_enrollment_in_months'),
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
@@ -270,15 +315,16 @@ class _AddAttendanceState extends State<AddAttendance> {
                                   ),
                                   Checkbox(
                                       value: checkedItem[childHHData[index]
-                                          .ChildEnrollGUID] !=
+                                                  .ChildEnrollGUID] !=
                                               null
                                           ? checkedItem[childHHData[index]
                                               .ChildEnrollGUID]
                                           : false,
                                       onChanged: (newValue) {
                                         setState(() {
-                                          _selectAll=false;
-                                          checkedItem[childHHData[index].ChildEnrollGUID!] = newValue!;
+                                          _selectAll = false;
+                                          checkedItem[childHHData[index]
+                                              .ChildEnrollGUID!] = newValue!;
                                         });
                                       })
                                 ],
@@ -349,8 +395,8 @@ class _AddAttendanceState extends State<AddAttendance> {
   nextTab(int type, BuildContext mContext) async {
     if (type == 1) {
       // if (_checkValidation()) {
-        await saveDataInData();
-        widget.changeTab(type);
+      await saveDataInData();
+      widget.changeTab(type);
       // } else {
       //   Validate().singleButtonPopup(
       //       Global.returnTrLable(translats, CustomText.pleaseSelectChildrenForAttendence, lng!),
@@ -366,12 +412,12 @@ class _AddAttendanceState extends State<AddAttendance> {
   saveOnly(int type, BuildContext mContext) async {
     if (type == 1) {
       // if (_checkValidation()) {
-        await saveDataInData();
-        Validate().singleButtonPopup(
-            Global.returnTrLable(translats, CustomText.dataSaveSuc, lng!),
-            Global.returnTrLable(translats, CustomText.ok, lng!),
-            false,
-            mContext);
+      await saveDataInData();
+      Validate().singleButtonPopup(
+          Global.returnTrLable(translats, CustomText.dataSaveSuc, lng!),
+          Global.returnTrLable(translats, CustomText.ok, lng!),
+          false,
+          mContext);
       // } else {
       //   Validate().singleButtonPopup(
       //       Global.returnTrLable(translats, CustomText.pleaseSelectChildrenForAttendence, lng!),
@@ -395,71 +441,88 @@ class _AddAttendanceState extends State<AddAttendance> {
   }
 
   Future<void> saveDataInData() async {
-    List<ChildForAttendenceModel> selectedItem=[];
+    List<ChildForAttendenceModel> selectedItem = [];
     // if (checkedItem.isNotEmpty) {
 
-      childHHData.forEach((element) {
-        var status=checkedItem[element.ChildEnrollGUID];
-        if(status!=null){
-          if(status){
-            var item=ChildForAttendenceModel(childattenguid:widget.ChildAttenGUID,
-               date_of_attendance:attendeceDate,
-                childenrolledguid:element.ChildEnrollGUID,child_profile_id:element.name,
-                name_of_child:Global.getItemValues(element.responces!, 'child_name'),attendance:1);
-            selectedItem.add(item);
-          }
-          else{
-            var item=ChildForAttendenceModel(childattenguid:widget.ChildAttenGUID,
-               date_of_attendance:attendeceDate,
-                childenrolledguid:element.ChildEnrollGUID,child_profile_id:element.name,
-                name_of_child:Global.getItemValues(element.responces!, 'child_name'),attendance:0);
-            selectedItem.add(item);
-          }
-        } else{
-          var item=ChildForAttendenceModel(childattenguid:widget.ChildAttenGUID,
-              date_of_attendance:attendeceDate,
-              childenrolledguid:element.ChildEnrollGUID,child_profile_id:element.name,
-              name_of_child:Global.getItemValues(element.responces!, 'child_name'),attendance:0);
+    childHHData.forEach((element) {
+      var status = checkedItem[element.ChildEnrollGUID];
+      if (status != null) {
+        if (status) {
+          var item = ChildForAttendenceModel(
+              childattenguid: widget.ChildAttenGUID,
+              date_of_attendance: attendeceDate,
+              childenrolledguid: element.ChildEnrollGUID,
+              child_profile_id: element.name,
+              name_of_child:
+                  Global.getItemValues(element.responces!, 'child_name'),
+              attendance: 1);
+          selectedItem.add(item);
+        } else {
+          var item = ChildForAttendenceModel(
+              childattenguid: widget.ChildAttenGUID,
+              date_of_attendance: attendeceDate,
+              childenrolledguid: element.ChildEnrollGUID,
+              child_profile_id: element.name,
+              name_of_child:
+                  Global.getItemValues(element.responces!, 'child_name'),
+              attendance: 0);
           selectedItem.add(item);
         }
-      });
+      } else {
+        var item = ChildForAttendenceModel(
+            childattenguid: widget.ChildAttenGUID,
+            date_of_attendance: attendeceDate,
+            childenrolledguid: element.ChildEnrollGUID,
+            child_profile_id: element.name,
+            name_of_child:
+                Global.getItemValues(element.responces!, 'child_name'),
+            attendance: 0);
+        selectedItem.add(item);
+      }
+    });
 
     // }
 
-    if(selectedItem.length>0){
+    if (selectedItem.length > 0) {
       await ChildAttendenceHelper().insertAll(selectedItem);
       await updateNoOfServedForm(selectedItem);
-
     }
   }
 
-  Future<void> updateNoOfServedForm(List<ChildForAttendenceModel> selectedItems) async{
-    var attendecedRecordUpdate=selectedItems.where((element) => element.attendance==1).toList();
-    if(attendeceItem!=null) {
-      var brkfast = Global.stringToInt(Global.getItemValues(attendeceItem!.responces!, 'breakfast'));
-      var lunch = Global.stringToInt(Global.getItemValues(attendeceItem!.responces!, 'lunch'));
-      var egg = Global.stringToInt(Global.getItemValues(attendeceItem!.responces!, 'egg'));
-      var eveningSnack = Global.stringToInt(Global.getItemValues(attendeceItem!.responces!, 'evening_snacks'));
+  Future<void> updateNoOfServedForm(
+      List<ChildForAttendenceModel> selectedItems) async {
+    var attendecedRecordUpdate =
+        selectedItems.where((element) => element.attendance == 1).toList();
+    if (attendeceItem != null) {
+      var brkfast = Global.stringToInt(
+          Global.getItemValues(attendeceItem!.responces!, 'breakfast'));
+      var lunch = Global.stringToInt(
+          Global.getItemValues(attendeceItem!.responces!, 'lunch'));
+      var egg = Global.stringToInt(
+          Global.getItemValues(attendeceItem!.responces!, 'egg'));
+      var eveningSnack = Global.stringToInt(
+          Global.getItemValues(attendeceItem!.responces!, 'evening_snacks'));
       Map<String, dynamic> myMap = {};
       Map<String, dynamic> responseData = jsonDecode(attendeceItem!.responces!);
       responseData.forEach((key, value) {
         myMap[key] = value;
       });
 
-      if( (attendecedRecordUpdate.length<brkfast)){
+      if ((attendecedRecordUpdate.length < brkfast)) {
         myMap.remove('breakfast');
       }
-      if((attendecedRecordUpdate.length<lunch)){
+      if ((attendecedRecordUpdate.length < lunch)) {
         myMap.remove('lunch');
       }
-      if((attendecedRecordUpdate.length<egg)){
+      if ((attendecedRecordUpdate.length < egg)) {
         myMap.remove('egg');
       }
-      if((attendecedRecordUpdate.length<eveningSnack)){
+      if ((attendecedRecordUpdate.length < eveningSnack)) {
         myMap.remove('evening_snacks');
       }
       var responcesJs = jsonEncode(myMap);
-      await AttendanceResponnceHelper().callUpdaeAttendesResponce(widget.ChildAttenGUID!,responcesJs);
+      await AttendanceResponnceHelper()
+          .callUpdaeAttendesResponce(widget.ChildAttenGUID!, responcesJs);
     }
   }
 }

@@ -331,14 +331,17 @@ class _ChildFollowUpsListingScreenState
                                     ),
                                     Text(
                                       '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
                                       style: Styles.black104,
                                     ),
                                     Text(
                                       '${Global.returnTrLable(translats, CustomText.Creches, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
                                       style: Styles.black104,
                                     ),
                                     Text(
                                       '${Global.returnTrLable(translats, CustomText.schduleDate, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
                                       style: Styles.black104,
                                     ),
                                     // Text(
@@ -369,12 +372,13 @@ class _ChildFollowUpsListingScreenState
                                     children: [
                                       Text(
                                         Global.getItemValues(filteredFollowUp[index]['enrResponces'], 'child_name'),
-                                        style: Styles.blue125,
+                                        style: Styles.cardBlue10,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
                                         Global.getItemValues(filteredFollowUp[index]['enrResponces'], 'child_id'),
-                                        style: Styles.blue125,
+                                        style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
@@ -382,14 +386,16 @@ class _ChildFollowUpsListingScreenState
                                             Global.getItemValues(
                                                 filteredFollowUp[index]['enrResponces'],
                                                 'creche_id')),
-                                        style: Styles.blue125,
+                                        style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
                                         Validate().displeDateFormate(
                                             filteredFollowUp[index]
                                             ['followup_visit_date']!),
-                                        style: Styles.blue125,
+                                        style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       // Text(

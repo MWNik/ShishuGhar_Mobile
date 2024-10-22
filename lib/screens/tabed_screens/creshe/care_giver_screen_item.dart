@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -68,11 +69,30 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
   String? responce;
   String lng = "en";
   List<Translation> labelControlls = [];
+  String? role;
+  Map<String, FocusNode> _focusNode = {};
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     calinitialScreen();
+    var items = widget.screenItem[widget.tabBreakItem]!;
+    for (var elements in items) {
+      _focusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
+    }
+    _scrollController.addListener(() {
+      if (_scrollController.position.isScrollingNotifier.value) {
+        _focusNode.forEach((_, focusNode) => focusNode.unfocus());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _focusNode.forEach((_, focusNode) => focusNode.dispose());
+    super.dispose();
   }
 
   @override
@@ -88,6 +108,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: cWidget(widget.tabBreakItem),
@@ -112,18 +133,21 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
                           .trim(),
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: CElevatedButton(
-                      color: Color(0xff369A8D),
-                      onPressed: () {
-                        nextTab(1);
-                        // widget.changeTab(1);
-                      },
-                      text: Global.returnTrLable(labelControlls, saveNext, lng)
-                          .trim(),
-                    ),
-                  ),
+                  widget.isEditable ? SizedBox(width: 10) : SizedBox(),
+                  widget.isEditable
+                      ? Expanded(
+                          child: CElevatedButton(
+                            color: Color(0xff369A8D),
+                            onPressed: () {
+                              nextTab(1);
+                              // widget.changeTab(1);
+                            },
+                            text: Global.returnTrLable(
+                                    labelControlls, saveNext, lng)
+                                .trim(),
+                          ),
+                        )
+                      : SizedBox(),
                 ],
               ),
             ),
@@ -166,6 +190,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
             .toList();
 
         return DynamicCustomDropdownField(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -173,8 +198,13 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          readable: quesItem.fieldname=='reason_for_caregiver_exit'?null:widget.isEditable == true ? null : !widget.isEditable,
-          isVisible: DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          readable: quesItem.fieldname == 'reason_for_caregiver_exit'
+              ? null
+              : widget.isEditable == true
+                  ? null
+                  : !widget.isEditable,
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -185,6 +215,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         );
       case 'Date':
         return CustomDatepickerDynamic(
+          focusNode: _focusNode[quesItem.fieldname],
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           readable: widget.isEditable == true
@@ -216,6 +247,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -240,6 +272,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -288,6 +321,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
       //   );
       case 'Long Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           maxline: 3,
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
@@ -319,7 +353,9 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
@@ -333,6 +369,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -356,6 +393,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         );
       case 'Small Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -392,7 +430,6 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
     lng = (await Validate().readString(Validate.sLanguage))!;
     var alredRecord = await CrecheCareGiverHelper()
         .geCareGiverResponceItem(widget.parentName, widget.CGGuid);
@@ -425,7 +462,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               });
             } else {
               await OptionsModelHelper()
-                  .getLocationData(items[i].options!.trim(), responseData,lng)
+                  .getLocationData(items[i].options!.trim(), responseData, lng)
                   .then((data) {
                 options.addAll(data);
               });
@@ -442,13 +479,15 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
     }
     print("item v ${defaultCommon.length}");
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng)
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });
   }
 
   Future<void> calinitialScreen() async {
+    userName = (await Validate().readString(Validate.userName))!;
+    role = (await Validate().readString(Validate.role))!;
     await setLabelTextData();
     await TranslationDataHelper()
         .callCresheTranslate()
@@ -573,6 +612,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         CGGUID: widget.CGGuid,
         parent: widget.parentName,
         responces: responcesJs,
+        is_edited: 1,
         created_at: myMap['appcreated_on'],
         created_by: myMap['appcreated_by'],
         update_at: myMap['app_updated_on'],
@@ -611,7 +651,8 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         myMap['appcreated_on'] = Validate().currentDateTime();
       }
     } else {
-      myMap['caregiver_code'] = Validate().autoCrecheCareGiverCode(widget.crechedCode);
+      myMap['caregiver_code'] =
+          Validate().autoCrecheCareGiverCode(widget.crechedCode);
       myMap['appcreated_by'] = userName;
       myMap['appcreated_on'] = Validate().currentDateTime();
     }

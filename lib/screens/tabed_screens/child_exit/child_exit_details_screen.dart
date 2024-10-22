@@ -81,6 +81,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
   ];
 
   Future<void> initializeData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     lng = (await Validate().readString(Validate.sLanguage))!;
     List<int> dateParts = widget.dateOfEnrolled.split('-').map(int.parse).toList();
     minDate=DateTime(dateParts[0], dateParts[1], dateParts[2]).subtract(Duration(days:1));
@@ -354,7 +355,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
+    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;

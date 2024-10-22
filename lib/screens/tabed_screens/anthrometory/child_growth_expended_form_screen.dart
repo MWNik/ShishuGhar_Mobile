@@ -34,12 +34,12 @@ import '../../../model/apimodel/tabWeight_to_Height_Girls_model.dart';
 import '../../../model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
+import '../../../utils/custom_three_color_circle_image.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
 import '../house_hold/depending_logic.dart';
 
 class ChildGrowthExpendedFormScreen extends StatefulWidget {
-
   final int creche_nameId;
   final String creche_name;
   final String cgmguid;
@@ -70,8 +70,10 @@ class _ChildGrowthExpendedFormState
   HouseHoldFielItemdModel? measurement_date;
   HouseHoldFielItemdModel? measurement_equipment;
   HouseHoldFielItemdModel? do_you_have_height_weight;
+  HouseHoldFielItemdModel? measurement_taken_date;
   bool _isLoading = true;
   List<Translation> translatsLabel = [];
+  List<int> mesureMonths = [1, 4, 7, 10];
   List<String> hiddenItem = [
     'age_months',
     'measurement_date',
@@ -81,7 +83,8 @@ class _ChildGrowthExpendedFormState
     'height',
     'weight',
     'measurement_equipment',
-    'do_you_have_height_weight'
+    'do_you_have_height_weight',
+    'measurement_taken_date'
   ];
   List<String> staticHiddenItem = [
     'partner_id',
@@ -109,7 +112,10 @@ class _ChildGrowthExpendedFormState
   bool recrdedUpload = false;
   String lng = 'en';
   String userName = '';
+  String? role;
   int? expends;
+  // Map<String, Map<String, FocusNode>> _foocusNode = {};
+  // ScrollController _scrollScontroller = ScrollController();
 
   @override
   void initState() {
@@ -117,8 +123,18 @@ class _ChildGrowthExpendedFormState
     initializeData();
   }
 
+  // @override
+  // void dispose() {
+  //   _scrollScontroller.dispose();
+  //   _foocusNode.forEach((_, childMap) {
+  //     childMap.forEach((_, focusNode) => focusNode.dispose());
+  //   });
+  //   super.dispose();
+  // }
+
   Future<void> initializeData() async {
     userName = (await Validate().readString(Validate.userName))!;
+    role = await Validate().readString(Validate.role);
     lng = (await Validate().readString(Validate.sLanguage))!;
     tabHeightforageBoys =
         await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
@@ -132,7 +148,7 @@ class _ChildGrowthExpendedFormState
         await HeightWeightBoysGirlsHelper().callWeightToHeightBoys();
     tabWeightToHeightGirls =
         await HeightWeightBoysGirlsHelper().callWeightToHeightGirls();
-    genders = await OptionsModelHelper().getMstCommonOptions('Gender',lng);
+    genders = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
 
     translatsLabel.clear();
     List<String> valueNames = [
@@ -143,7 +159,8 @@ class _ChildGrowthExpendedFormState
       CustomText.Next,
       CustomText.back,
       CustomText.zScrore,
-      CustomText.Submit
+      CustomText.Submit,
+      CustomText.noEnrolledChild
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -152,23 +169,23 @@ class _ChildGrowthExpendedFormState
         .callAnthropometryByGuid(widget.cgmguid);
 
     if (alredRecord.length > 0) {
-      if(alredRecord.first.responces!=null){
+      if (alredRecord.first.responces != null) {
         List<String> selectedChildItems = [];
-        Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
+        Map<String, dynamic> responseData =
+            jsonDecode(alredRecord[0].responces!);
         var childs = responseData['anthropromatic_details'];
         if (childs != null) {
           List<Map<String, dynamic>> children =
-          List<Map<String, dynamic>>.from(childs);
+              List<Map<String, dynamic>>.from(childs);
           children.forEach((element) {
             selectedChildItems.add(element['childenrollguid']);
           });
         }
         enrolledChild = await EnrolledExitChilrenResponceHelper()
-            .enrolledChildByEnrolledGUID(selectedChildItems,widget.creche_nameId);
+            .enrolledChildByEnrolledGUID(
+                selectedChildItems, widget.creche_nameId);
       }
-
     }
-
 
     await updateHiddenValue();
     await callScreenControler();
@@ -207,8 +224,7 @@ class _ChildGrowthExpendedFormState
                           ),
                         ),
                         Expanded(
-                          child:
-                        RichText(
+                            child: RichText(
                           text: TextSpan(
                             text: CustomText.MeasuredChildren,
                             style: Styles.black124,
@@ -233,8 +249,17 @@ class _ChildGrowthExpendedFormState
                             initialvalue: myMap[measurement_date!.fieldname!],
                             fieldName: measurement_date!.fieldname,
                             isRequred: measurement_date!.reqd,
-                            minDate:callMinMeasurementGrwthDate(myMap[measurement_date!.fieldname!]!=null?myMap[measurement_date!.fieldname!]:Validate().currentDate()),
-                            maxDate: callMaxMeasurementGrwthDate(myMap[measurement_date!.fieldname!]!=null?myMap[measurement_date!.fieldname!]:Validate().currentDate()),//widget.minGrowthDate,
+                            minDate: widget.lastGrowthDate,
+                            maxDate: widget.minGrowthDate,
+                            // minDate: callMinMeasurementGrwthDate(  for back dated entery
+                            //     myMap[measurement_date!.fieldname!] != null
+                            //         ? myMap[measurement_date!.fieldname!]
+                            //         : Validate().currentDate())!.subtract(Duration(days: 1)),
+                            // maxDate: callMaxMeasurementGrwthDate(
+                            //     myMap[measurement_date!.fieldname!] != null
+                            //         ? myMap[measurement_date!.fieldname!]
+                            //         : Validate()
+                            //             .currentDate()), //widget.minGrowthDate,
                             readable: widget.isNew,
                             onChanged: (value) {
                               myMap[measurement_date!.fieldname!] = value;
@@ -247,11 +272,9 @@ class _ChildGrowthExpendedFormState
                                     MapEntry(logData.keys.first,
                                         logData.values.first)
                                   ]);
-
                                 }
                               }
                               callEnrollementChildList(value);
-
                             },
                           ),
                         )
@@ -264,6 +287,7 @@ class _ChildGrowthExpendedFormState
                     padding:
                         EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
                     child: SingleChildScrollView(
+                      // controller: _scrollScontroller,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         // children: cWidget(),
@@ -291,19 +315,23 @@ class _ChildGrowthExpendedFormState
                           ),
                         ),
                         // Row(children: [
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xff369A8D),
-                            onPressed: () {
-                              print('$attepmtChild');
-                              saveMeta(1, context);
-                            },
-                            text: Global.returnTrLable(
-                                    translatsLabel, CustomText.Submit, lng)
-                                .trim(),
-                          ),
-                        ),
+                        role == CustomText.crecheSupervisor
+                            ? SizedBox(width: 10)
+                            : SizedBox(),
+                        role == CustomText.crecheSupervisor
+                            ? Expanded(
+                                child: CElevatedButton(
+                                  color: Color(0xff369A8D),
+                                  onPressed: () {
+                                    print('$attepmtChild');
+                                    saveMeta(1, context);
+                                  },
+                                  text: Global.returnTrLable(translatsLabel,
+                                          CustomText.Submit, lng)
+                                      .trim(),
+                                ),
+                              )
+                            : SizedBox(),
                         // ]
                         // ),
                       ],
@@ -312,7 +340,6 @@ class _ChildGrowthExpendedFormState
                 ],
               ));
   }
-
 
   List<Widget> cWidgetInputType(
       String ChildEnrollGUID, Map<String, dynamic> cWidgetDatamap) {
@@ -325,6 +352,7 @@ class _ChildGrowthExpendedFormState
         .where((element) =>
             element.fieldname == 'height' || element.fieldname == 'weight')
         .toList();
+
     List<Widget> screenItems = [];
     if (inputItem.length > 0) {
       for (int i = 0; i < inputItem.length; i++) {
@@ -387,24 +415,20 @@ class _ChildGrowthExpendedFormState
         if (colorD == 0) {
           itemC = Color(0xffAAAAAA);
           colorName = '';
-        }
-        else if (colorD == 1) {
+        } else if (colorD == 1) {
           itemC = Color(0xffF35858);
           colorName = '(Severe)';
-        }
-        else if (colorD == 2) {
+        } else if (colorD == 2) {
           itemC = Color(0xffF4B81D);
           colorName = '(Moderate)';
-        }
-        else if (colorD == 3) {
+        } else if (colorD == 3) {
           itemC = Color(0xff8BF649);
           colorName = '(Normal)';
         }
         countMesuredChildren();
         cWidgetDatamap[inputItem[i].fieldname!] = colorD;
         if (isvible) {
-          screenItems.add(
-              Column(
+          screenItems.add(Column(
             children: [
               Container(
                 height: 25,
@@ -424,13 +448,14 @@ class _ChildGrowthExpendedFormState
                 colorName,
                 style: Styles.red85,
               ),
-              Global.validString(grothValue)?Text(
-                '($grothValue)',
-                style: Styles.red85,
-              ):SizedBox(),
+              Global.validString(grothValue)
+                  ? Text(
+                      '($grothValue)',
+                      style: Styles.red85,
+                    )
+                  : SizedBox(),
             ],
-          )
-          );
+          ));
         }
         if (!isvible) {
           print('remo4 ${inputItem[i].fieldname}');
@@ -516,33 +541,57 @@ class _ChildGrowthExpendedFormState
     List<Widget> screenItems = [];
     if (enrolledChild.length > 0) {
       for (int i = 0; i < enrolledChild.length; i++) {
+        Map<String, FocusNode> focusMaps = {};
+        for (var elements in formItem) {
+          focusMaps.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
+        }
+        // _foocusNode.addEntries(
+        //     [MapEntry(enrolledChild[i].ChildEnrollGUID!, focusMaps)]);
+        // _scrollScontroller.addListener(() {
+        //   if (_scrollScontroller.position.isScrollingNotifier.value) {
+        //     _foocusNode.forEach((_, childMap) {
+        //       childMap.forEach((_, focusNode) => focusNode.unfocus());
+        //     });
+        //   }
+        // });
         var cWidgetDatamap = attepmtChild[enrolledChild[i].ChildEnrollGUID];
         if (cWidgetDatamap == null) {
-          var date = Validate().stringToDate(Global.getItemValues(enrolledChild[i].responces!, 'child_dob'));
-          int calucalteDate=0;
-         if(myMap['measurement_date']!=null) {
-           var mesurmentDate = Validate().stringToDate(
-               myMap['measurement_date']);
-            calucalteDate = Validate().calculateAgeInMonthsDepenExp(
-               date, mesurmentDate);
-         }else  calucalteDate = Validate().calculateAgeInMonths(
-             date);
+          var date = Validate().stringToDate(
+              Global.getItemValues(enrolledChild[i].responces, 'child_dob'));
+          int calucalteDate = 0;
+          if (myMap['measurement_date'] != null) {
+            var mesurmentDate =
+                Validate().stringToDate(myMap['measurement_date']);
+            calucalteDate =
+                Validate().calculateAgeInDaysEx(date, mesurmentDate);
+          } else
+            calucalteDate = Validate().calculateAgeInDays(date);
           cWidgetDatamap = {};
           cWidgetDatamap['age_months'] = calucalteDate;
-          cWidgetDatamap['do_you_have_height_weight'] = '1';///default value 1
+          cWidgetDatamap['do_you_have_height_weight'] = 1;
+          if (!widget.isNew) {
+            cWidgetDatamap['measurement_taken_date'] =
+                myMap['measurement_date'];
+          }
+
+          ///default value 1
           attepmtChild[enrolledChild[i].ChildEnrollGUID!] = cWidgetDatamap;
-        }
-        else{
-          var date = Validate().stringToDate(Global.getItemValues(enrolledChild[i].responces!, 'child_dob'));
-          int calucalteDate=0;
-          if(myMap['measurement_date']!=null) {
-            var mesurmentDate = Validate().stringToDate(
-                myMap['measurement_date']);
-            calucalteDate = Validate().calculateAgeInMonthsDepenExp(
-                date, mesurmentDate);
-          }else  calucalteDate = Validate().calculateAgeInMonths(
-              date);
+        } else {
+          var date = Validate().stringToDate(
+              Global.getItemValues(enrolledChild[i].responces, 'child_dob'));
+          int calucalteDate = 0;
+          if (cWidgetDatamap['measurement_taken_date'] != null) {
+            var mesurmentDate = Validate()
+                .stringToDate(cWidgetDatamap['measurement_taken_date']);
+            calucalteDate =
+                Validate().calculateAgeInDaysEx(date, mesurmentDate);
+          } else
+            calucalteDate = Validate().calculateAgeInDays(date);
           cWidgetDatamap['age_months'] = calucalteDate;
+          if (!widget.isNew) {
+            cWidgetDatamap['measurement_taken_date'] =
+                myMap['measurement_date'];
+          }
           attepmtChild[enrolledChild[i].ChildEnrollGUID!] = cWidgetDatamap;
         }
 
@@ -577,9 +626,24 @@ class _ChildGrowthExpendedFormState
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.person,
-                          color: Colors.grey,
+                        CustomPaint(
+                          size: Size(100, 100),
+                          painter: StrockColorCirclePainter(
+                              Global.stringToDouble(
+                                  cWidgetDatamap['weight_for_age'].toString()),
+                              Global.stringToDouble(
+                                  cWidgetDatamap['weight_for_height']
+                                      .toString()),
+                              Global.stringToDouble(
+                                  cWidgetDatamap['any_medical_major_illness']
+                                      .toString())),
+                          child: Center(
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.grey,
+                              size: 40,
+                            ),
+                          ),
                         ),
                         SizedBox(
                           width: 10.w,
@@ -593,7 +657,7 @@ class _ChildGrowthExpendedFormState
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
                                       text: '${CustomText.ChildId} : ',
-                                      style: Styles.blue124,
+                                      style: Styles.black124r,
                                       children: [
                                         TextSpan(
                                             text: Global.getItemValues(
@@ -606,11 +670,11 @@ class _ChildGrowthExpendedFormState
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
                                       text: CustomText.Name,
-                                      style: Styles.blue124,
+                                      style: Styles.black124r,
                                       children: [
                                         TextSpan(
                                             text: Global.getItemValues(
-                                                enrolledChild[i].responces!,
+                                                enrolledChild[i].responces,
                                                 'child_name'),
                                             style: Styles.blue126),
                                       ])),
@@ -619,12 +683,12 @@ class _ChildGrowthExpendedFormState
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
                                       text: '${CustomText.Gender} : ',
-                                      style: Styles.blue124,
+                                      style: Styles.black124r,
                                       children: [
                                         TextSpan(
                                             text: callGenderName(
                                                 Global.getItemValues(
-                                                    enrolledChild[i].responces!,
+                                                    enrolledChild[i].responces,
                                                     'gender_id')),
                                             style: Styles.blue126),
                                       ])),
@@ -632,8 +696,8 @@ class _ChildGrowthExpendedFormState
                                   strutStyle: StrutStyle(height: 1.h),
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
-                                      text: '${CustomText.ageInMonth} : ',
-                                      style: Styles.blue124,
+                                      text: '${CustomText.ageInDays} : ',
+                                      style: Styles.black124r,
                                       children: [
                                         TextSpan(
                                             text: cWidgetDatamap[
@@ -675,8 +739,24 @@ class _ChildGrowthExpendedFormState
                             thickness: 1,
                           ),
                         ),
-                        do_you_have_height_weight!=null?widgetTypeWidget(do_you_have_height_weight!,cWidgetDatamap,enrolledChild[i].ChildEnrollGUID!):SizedBox(),
-                        measurement_equipment!=null?widgetTypeWidget(measurement_equipment!,cWidgetDatamap,enrolledChild[i].ChildEnrollGUID!):SizedBox(),
+                        do_you_have_height_weight != null
+                            ? widgetTypeWidget(
+                                do_you_have_height_weight!,
+                                cWidgetDatamap,
+                                enrolledChild[i].ChildEnrollGUID!)
+                            : SizedBox(),
+                        measurement_taken_date != null
+                            ? widgetTypeWidget(
+                                measurement_taken_date!,
+                                cWidgetDatamap,
+                                enrolledChild[i].ChildEnrollGUID!)
+                            : SizedBox(),
+                        measurement_equipment != null
+                            ? widgetTypeWidget(
+                                measurement_equipment!,
+                                cWidgetDatamap,
+                                enrolledChild[i].ChildEnrollGUID!)
+                            : SizedBox(),
                         Row(
                           children: cWidgetInputType(
                               enrolledChild[i].ChildEnrollGUID!,
@@ -685,30 +765,38 @@ class _ChildGrowthExpendedFormState
                         SizedBox(
                           height: 5.h,
                         ),
-                        cWidgetDatamap['do_you_have_height_weight']=='1'?Text(
-                          Global.returnTrLable(
-                              translatsLabel, CustomText.zScrore, lng),
-                          style: Styles.black124,
-                        ):SizedBox(),
-                        cWidgetDatamap['do_you_have_height_weight']=='1'?SizedBox(
-                          height: 5.h,
-                        ):SizedBox(),
-                        cWidgetDatamap['do_you_have_height_weight']=='1'?Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: Color(0xffE0E0E0)),
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: cWidgetRadiomColor(
-                                enrolledChild[i].ChildEnrollGUID!,
-                                cWidgetDatamap,
-                                Global.getItemValues(
-                                    enrolledChild[i].responces!, 'gender_id')),
-                          ),
-                        ):SizedBox(),
+                        cWidgetDatamap['do_you_have_height_weight'] != 0
+                            ? Text(
+                                Global.returnTrLable(
+                                    translatsLabel, CustomText.zScrore, lng),
+                                style: Styles.black124,
+                              )
+                            : SizedBox(),
+                        cWidgetDatamap['do_you_have_height_weight'] != 0
+                            ? SizedBox(
+                                height: 5.h,
+                              )
+                            : SizedBox(),
+                        cWidgetDatamap['do_you_have_height_weight'] != 0
+                            ? Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xffE0E0E0)),
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: cWidgetRadiomColor(
+                                      enrolledChild[i].ChildEnrollGUID!,
+                                      cWidgetDatamap,
+                                      Global.getItemValues(
+                                          enrolledChild[i].responces,
+                                          'gender_id')),
+                                ),
+                              )
+                            : SizedBox(),
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),
                           child: Divider(
@@ -744,25 +832,32 @@ class _ChildGrowthExpendedFormState
   saveMeta(int type, BuildContext mContext) async {
     if (type == 1) {
       if (_checkValidation()) {
-        await saveDataInData();
-        bool shouldProceed = await showDialog(
-          context: context,
-          builder: (context) {
-            return SingleButtonPopupDialog(
-                message: Global.returnTrLable(
-                    translatsLabel, CustomText.dataSaveSuc, lng),
-                button:
-                    Global.returnTrLable(translatsLabel, CustomText.ok, lng));
-          },
-        );
-        if (shouldProceed) {
-          if (shouldProceed == true) {
-            Navigator.pop(context, 'itemRefresh');
+        if (countMesuredChildrenForSave() > 0) {
+          await saveDataInData();
+          bool shouldProceed = await showDialog(
+            context: context,
+            builder: (context) {
+              return SingleButtonPopupDialog(
+                  message: Global.returnTrLable(
+                      translatsLabel, CustomText.dataSaveSuc, lng),
+                  button:
+                      Global.returnTrLable(translatsLabel, CustomText.ok, lng));
+            },
+          );
+          if (shouldProceed) {
+            if (shouldProceed == true) {
+              Navigator.pop(context, 'itemRefresh');
+            }
           }
-        }
-        // return;
+          // return;
 
-        setState(() {});
+          setState(() {});
+        } else
+          Validate().singleButtonPopup(
+              '${Global.returnTrLable(translatsLabel, CustomText.noEnrolledChild, lng)} - ${Validate().displeDateFormate(myMap['measurement_date'])}',
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
       }
     } else {
       Navigator.pop(context, 'itemRefresh');
@@ -786,18 +881,21 @@ class _ChildGrowthExpendedFormState
           item['chhguid'] = element.CHHGUID;
           item['child_id'] = element.name;
           item['cgmguid'] = widget.cgmguid;
-          if ((Global.stringToInt(
-              item['do_you_have_height_weight'].toString()) != 1) ||
-              item['measurement_equipment'] == null ||
-              item['weight'] == null ||
-              item['height'] == null) {
+          if (((Global.stringToInt(
+                          item['do_you_have_height_weight'].toString()) !=
+                      1) ||
+                  item['measurement_equipment'] == null ||
+                  item['weight'] == null ||
+                  item['height'] == null) &&
+              isMesurement(myMap[measurement_date!.fieldname])) {
             item.remove('weight_for_age');
             item.remove('height_for_age');
             item.remove('weight_for_height');
             item.remove('measurement_equipment');
+            item.remove('measurement_taken_date');
             item.remove('height');
             item.remove('weight');
-            item['do_you_have_height_weight'] = '2';
+            item['do_you_have_height_weight'] = 0;
             print(item['height']);
           } else {
             var gender = Global.getItemValues(element.responces, 'gender_id');
@@ -841,101 +939,123 @@ class _ChildGrowthExpendedFormState
         }
       });
       myMap['anthropromatic_details'] = childValues;
-       var measurementDate=myMap['measurement_date'];
-
+      var measurementDate = myMap['measurement_date'];
       var responcesJs = jsonEncode(myMap);
       var name = myMap['name'];
       print("itemsDetails $responcesJs");
-      await ChildGrowthResponseHelper().insertUpdate(widget.cgmguid,measurementDate,
-          name as int?, widget.creche_nameId, responcesJs, userName);
+      await ChildGrowthResponseHelper().insertUpdate(
+          widget.cgmguid,
+          measurementDate,
+          name as int?,
+          widget.creche_nameId,
+          responcesJs,
+          userName,
+          myMap['created_on']);
     }
   }
 
   bool _checkValidation() {
+    // List<int> parts = myMap[measurement_date!.fieldname]
+    //     .toString()
+    //     .split('-')
+    //     .map(int.parse)
+    //     .toList();
+    // var month = parts[1];
+    // List<int> measureMonths = [1, 4, 7, 10];
     var validStatus = true;
     if (formItem.length > 0) {
-      if(myMap['measurement_date']!=null){
-        for (int i = 0; i < enrolledChild.length; i++){
+      if (myMap['measurement_date'] != null) {
+        for (int i = 0; i < enrolledChild.length; i++) {
           var item = attepmtChild[enrolledChild[i].ChildEnrollGUID];
-          for (int i = 0; i < formItem.length; i++){
-            if(item!=null){
+          for (int i = 0; i < formItem.length; i++) {
+            if (item != null) {
               var element = formItem[i];
               var validationMsg =
-              DependingLogic().validationMessge(logics, item, element);
+                  DependingLogic().validationMessge(logics, item, element);
+              if (isMesurement(myMap[measurement_date!.fieldname]) == false &&
+                  (element.fieldname == 'height' ||
+                      element.fieldname == 'measurement_equipment') &&
+                  Global.validString(validationMsg)) {
+                validationMsg = '';
+              }
               if (Global.validString(validationMsg)) {
                 validStatus = false;
                 Validate().singleButtonPopup(
-                    Global.returnTrLable(
-                        translatsLabel, validationMsg, lng),
+                    Global.returnTrLable(translatsLabel, validationMsg, lng),
                     CustomText.ok,
                     false,
                     context);
                 return validStatus;
               }
-              if(validStatus) {
-                if(element.fieldname=='do_you_have_height_weight') {
+              if (validStatus) {
+                if (element.fieldname == 'do_you_have_height_weight') {
                   var elmeItemValue = Global.validToString(
                       item['do_you_have_height_weight'].toString());
                   if (elmeItemValue == '1') {
-                    var elmeItemValue = item['measurement_equipment'];
+                    String? elmeItemValue = item['measurement_equipment'];
                     var height = item['height'];
                     var weight = item['weight'];
-                    if (!Global.validString(elmeItemValue.toString())) {
+                    var measurmenTakenDate = item['measurement_taken_date'];
+
+                    if (!Global.validString(elmeItemValue) &&
+                        Global.stringToDouble(height.toString()) > 0) {
                       validStatus = false;
                       Validate().singleButtonPopup(
-                          Global.returnTrLable(
-                              translatsLabel,
+                          Global.returnTrLable(translatsLabel,
                               "Please select Measurement Equipment!", lng),
                           CustomText.ok,
                           false,
                           context);
                       return validStatus;
-                    }
-                    else if (Global.stringToDouble(height.toString())==0) {
+                    } else if (Global.stringToDouble(height.toString()) == 0) {
+                      if (isMesurement(myMap[measurement_date!.fieldname])) {
+                        validStatus = false;
+                        Validate().singleButtonPopup(
+                            Global.returnTrLable(translatsLabel,
+                                "Please enter measurement height!", lng),
+                            CustomText.ok,
+                            false,
+                            context);
+                        return validStatus;
+                      }
+                    } else if (Global.stringToDouble(weight.toString()) == 0) {
                       validStatus = false;
                       Validate().singleButtonPopup(
-                          Global.returnTrLable(
-                              translatsLabel,
-                              "Please enter measurement height!", lng),
-                          CustomText.ok,
-                          false,
-                          context);
-                      return validStatus;
-                    }
-                    else if (Global.stringToDouble(weight.toString())==0) {
-                      validStatus = false;
-                      Validate().singleButtonPopup(
-                          Global.returnTrLable(
-                              translatsLabel,
+                          Global.returnTrLable(translatsLabel,
                               "Please enter  measurement weight!", lng),
                           CustomText.ok,
                           false,
                           context);
                       return validStatus;
+                    } else if (!Global.validString(measurmenTakenDate)) {
+                      validStatus = false;
+                      Validate().singleButtonPopup(
+                          Global.returnTrLable(translatsLabel,
+                              "Please enter  measurement taken date!", lng),
+                          CustomText.ok,
+                          false,
+                          context);
+                      return validStatus;
                     }
-
-                  }
-                  else if(elmeItemValue == '2'){
+                  } else if (elmeItemValue == '2') {
                     var measurement_reason = item['measurement_reason'];
-                    if(!Global.validString(measurement_reason.toString())){
+                    if (!Global.validString(measurement_reason.toString())) {
                       validStatus = false;
                       Validate().singleButtonPopup(
                           Global.returnTrLable(
-                              translatsLabel,
-                              "Please select Reason!", lng),
+                              translatsLabel, "Please select Reason!", lng),
                           CustomText.ok,
                           false,
                           context);
                       return validStatus;
                     }
                   }
-                }}
+                }
+              }
             }
           }
-
-
         }
-      }else {
+      } else {
         Validate().singleButtonPopup(
             Global.returnTrLable(
                 translatsLabel, CustomText.pleaseFillMeasurementDate, lng),
@@ -977,7 +1097,7 @@ class _ChildGrowthExpendedFormState
       }
     }
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng)
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });
@@ -995,12 +1115,17 @@ class _ChildGrowthExpendedFormState
     var measurementDate = formItem
         .where((element) => element.fieldname == 'measurement_date')
         .toList();
+
+    var measurementTakenDate = formItem
+        .where((element) => element.fieldname == 'measurement_taken_date')
+        .toList();
+
     var haveMesure = formItem
         .where((element) => element.fieldname == 'do_you_have_height_weight')
         .toList();
 
-    if(haveMesure.length>0){
-      do_you_have_height_weight=haveMesure.first;
+    if (haveMesure.length > 0) {
+      do_you_have_height_weight = haveMesure.first;
     }
 
     var measurementEquipment = formItem
@@ -1012,10 +1137,15 @@ class _ChildGrowthExpendedFormState
     if (measurementEquipment.length > 0) {
       measurement_equipment = measurementEquipment.first;
     }
+    if (measurementTakenDate.length > 0) {
+      measurement_taken_date = measurementTakenDate.first;
+    }
 
     List<String> tranlatItems = [];
     formItem.forEach((element) {
-      if(Global.validString(element.label)){ tranlatItems.add(element.label!);}
+      if (Global.validString(element.label)) {
+        tranlatItems.add(element.label!);
+      }
     });
     await TranslationDataHelper()
         .callTranslateString(tranlatItems)
@@ -1033,18 +1163,22 @@ class _ChildGrowthExpendedFormState
         List<OptionsModel> items = options
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
-        // if (quesItem.fieldname == 'do_you_have_height_weight' &&
-        //     Global.stringToInt(
-        //         itemsAnswred['do_you_have_height_weight'].toString()) !=
-        //         1) {
-        //   itemsAnswred['do_you_have_height_weight'] = '2';
-        //   updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-        // }
         return DynamicCustomDropdownField(
+          // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: quesItem.fieldname == 'measurement_equipment'
+              ? isMesurement(myMap[measurement_date!.fieldname])
+                  ? DependingLogic()
+                      .dependeOnMendotory(logics, itemsAnswred, quesItem)
+                  : 0
+              : DependingLogic()
+                  .dependeOnMendotory(logics, itemsAnswred, quesItem),
           items: items,
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic()
+                  .callReadableLogic(logics, itemsAnswred, quesItem)
+              : true,
           selectedItem: itemsAnswred[quesItem.fieldname!],
           isVisible: DependingLogic()
               .callDependingLogic(logics, itemsAnswred, quesItem),
@@ -1061,12 +1195,30 @@ class _ChildGrowthExpendedFormState
         );
       case 'Date':
         return CustomDatepickerDynamic(
+          // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           calenderValidate: [],
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic()
+                  .callReadableLogic(logics, itemsAnswred, quesItem)
+              : true,
+          isVisible: DependingLogic()
+              .callDependingLogic(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
+          maxDate: quesItem.fieldname == 'measurement_taken_date'
+              ? widget.minGrowthDate
+              : null,
+          minDate: quesItem.fieldname == 'measurement_taken_date'
+              ? Validate().stringToDateNull(myMap["measurement_date"]) != null
+                  ? Validate()
+                      .stringToDateNull(myMap["measurement_date"])!
+                      .subtract(Duration(days: 1))
+                  : null
+              : null,
           onChanged: (value) {
             itemsAnswred[quesItem.fieldname!] = value;
             var logData = DependingLogic()
@@ -1077,7 +1229,6 @@ class _ChildGrowthExpendedFormState
                     [MapEntry(logData.keys.first, logData.values.first)]);
 
                 updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-
               }
             }
             setState(() {});
@@ -1085,14 +1236,18 @@ class _ChildGrowthExpendedFormState
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
+          // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic()
+                  .callReadableLogic(logics, itemsAnswred, quesItem)
+              : true,
           initialvalue: itemsAnswred[quesItem.fieldname!],
           keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
           maxlength: quesItem.length,
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
           hintText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           isVisible: DependingLogic()
@@ -1108,14 +1263,18 @@ class _ChildGrowthExpendedFormState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic()
+                  .callReadableLogic(logics, itemsAnswred, quesItem)
+              : true,
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemsAnswred[quesItem.fieldname!],
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
           isVisible: DependingLogic()
               .callDependingLogic(logics, itemsAnswred, quesItem),
           onChanged: (value) {
@@ -1160,34 +1319,43 @@ class _ChildGrowthExpendedFormState
         return DynamicCustomYesNoCheckboxWithLabel(
           label:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          initialValue: itemsAnswred[quesItem.fieldname],
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          initialValue: Global.stringToIntNull(
+              itemsAnswred[quesItem.fieldname].toString()),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           labelControlls: translatsLabel,
           lng: lng,
-          readable: DependingLogic().callReadableLogic(logics, itemsAnswred, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemsAnswred, quesItem),
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic()
+                  .callReadableLogic(logics, itemsAnswred, quesItem)
+              : true,
+          isVisible: DependingLogic()
+              .callDependingLogic(logics, itemsAnswred, quesItem),
           onChanged: (value) {
-            // if (value > 0)
             print('yesNo $value');
-            itemsAnswred[quesItem.fieldname!]=value;
+            itemsAnswred[quesItem.fieldname!] = value;
             updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
             setState(() {});
           },
         );
       case 'Long Text':
         return DynamicCustomTextFieldNew(
+          // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           maxline: 3,
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           initialvalue: itemsAnswred[quesItem.fieldname!],
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic()
+                  .callReadableLogic(logics, itemsAnswred, quesItem)
+              : true,
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, itemsAnswred, quesItem),
           hintText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemsAnswred, quesItem),
+          isVisible: DependingLogic()
+              .callDependingLogic(logics, itemsAnswred, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               itemsAnswred[quesItem.fieldname!] = value;
@@ -1198,14 +1366,18 @@ class _ChildGrowthExpendedFormState
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           maxlength: quesItem.length,
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
           initialvalue: itemsAnswred[quesItem.fieldname!],
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic()
+                  .callReadableLogic(logics, itemsAnswred, quesItem)
+              : true,
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null)
@@ -1220,12 +1392,16 @@ class _ChildGrowthExpendedFormState
         );
       case 'Small Text':
         return DynamicCustomTextFieldNew(
+          // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           maxlength: quesItem.length,
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic()
+                  .callReadableLogic(logics, itemsAnswred, quesItem)
+              : true,
           initialvalue: itemsAnswred[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -1239,14 +1415,23 @@ class _ChildGrowthExpendedFormState
         );
       case 'Float':
         return DynamicCustomTextFieldFloat(
+          // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred:DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: quesItem.fieldname == 'height'
+              ? (isMesurement(myMap[measurement_date!.fieldname])
+                  ? DependingLogic()
+                      .dependeOnMendotory(logics, itemsAnswred, quesItem)
+                  : 0)
+              : DependingLogic()
+                  .dependeOnMendotory(logics, itemsAnswred, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemsAnswred[quesItem.fieldname!],
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
+          readable: role == CustomText.crecheSupervisor
+              ? DependingLogic()
+                  .callReadableLogic(logics, itemsAnswred, quesItem)
+              : true,
           isVisible: DependingLogic()
               .callDependingLogic(logics, itemsAnswred, quesItem),
           fieldName: quesItem.fieldname!,
@@ -1276,6 +1461,16 @@ class _ChildGrowthExpendedFormState
     }
   }
 
+  bool isMesurement(String mesureDate) {
+    bool ismesure = false;
+    List<int> parts = mesureDate.toString().split('-').map(int.parse).toList();
+    var month = parts[1];
+    if (mesureMonths.contains(month)) {
+      ismesure = true;
+    }
+    return ismesure;
+  }
+
   widgetTypeWidgetinlessForMulti(HouseHoldFielItemdModel quesItem,
       Map<String, dynamic> itemsAnswred, String ChildEnrollGUID) {
     switch (quesItem.fieldtype) {
@@ -1289,7 +1484,8 @@ class _ChildGrowthExpendedFormState
             selectedItem: itemsAnswred[quesItem.fieldname],
             titleText: Global.returnTrLable(
                 translatsLabel, quesItem.label!.trim(), lng),
-            isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+            isRequred: DependingLogic()
+                .dependeOnMendotory(logics, itemsAnswred, quesItem),
             onChanged: (value) {
               if (value != null) {
                 itemsAnswred[quesItem.fieldname!] = value;
@@ -1309,7 +1505,8 @@ class _ChildGrowthExpendedFormState
           return DynamicCustomTextFieldNew(
             titleText: Global.returnTrLable(
                 translatsLabel, quesItem.label!.trim(), lng),
-            isRequred:DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+            isRequred: DependingLogic()
+                .dependeOnMendotory(logics, itemsAnswred, quesItem),
             initialvalue: itemsAnswred[quesItem.fieldname!],
             maxlength: quesItem.length,
             readable: DependingLogic()
@@ -1333,10 +1530,10 @@ class _ChildGrowthExpendedFormState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-         
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           items: items,
           selectedItem: itemsAnswred[quesItem.fieldname!],
           isVisible: DependingLogic()
@@ -1358,7 +1555,8 @@ class _ChildGrowthExpendedFormState
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           onChanged: (value) {
             itemsAnswred[quesItem.fieldname!] = value;
             var logData = DependingLogic()
@@ -1369,7 +1567,6 @@ class _ChildGrowthExpendedFormState
                     [MapEntry(logData.keys.first, logData.values.first)]);
 
                 updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-
               }
             }
             setState(() {});
@@ -1381,7 +1578,8 @@ class _ChildGrowthExpendedFormState
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemsAnswred[quesItem.fieldname!],
           readable: DependingLogic()
@@ -1433,12 +1631,13 @@ class _ChildGrowthExpendedFormState
           initialValue: itemsAnswred[quesItem.fieldname],
           labelControlls: translatsLabel,
           lng: lng,
-          readable: DependingLogic().callReadableLogic(logics, itemsAnswred, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemsAnswred, quesItem),
+          readable: DependingLogic()
+              .callReadableLogic(logics, itemsAnswred, quesItem),
+          isVisible: DependingLogic()
+              .callDependingLogic(logics, itemsAnswred, quesItem),
           onChanged: (value) {
             print('yesNo $value');
-            itemsAnswred[quesItem.fieldname!]=value;
+            itemsAnswred[quesItem.fieldname!] = value;
             updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
             setState(() {});
           },
@@ -1448,7 +1647,8 @@ class _ChildGrowthExpendedFormState
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           maxlength: quesItem.length,
           readable: DependingLogic()
               .callReadableLogic(logics, itemsAnswred, quesItem),
@@ -1469,7 +1669,8 @@ class _ChildGrowthExpendedFormState
         return DynamicCustomTextFieldNew(
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           maxlength: quesItem.length,
           readable: DependingLogic()
               .callReadableLogic(logics, itemsAnswred, quesItem),
@@ -1489,7 +1690,8 @@ class _ChildGrowthExpendedFormState
           titleText:
               Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred: DependingLogic().dependeOnMendotory(logics, itemsAnswred, quesItem),
+          isRequred: DependingLogic()
+              .dependeOnMendotory(logics, itemsAnswred, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemsAnswred[quesItem.fieldname!],
           readable: DependingLogic()
@@ -1528,8 +1730,9 @@ class _ChildGrowthExpendedFormState
         .callAnthropometryByGuid(widget.cgmguid);
 
     if (alredRecord.length > 0) {
-      if(alredRecord.first.responces!=null){
-        Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
+      if (alredRecord.first.responces != null) {
+        Map<String, dynamic> responseData =
+            jsonDecode(alredRecord[0].responces!);
         var childs = responseData['anthropromatic_details'];
         if (childs != null) {
           List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
@@ -1544,6 +1747,11 @@ class _ChildGrowthExpendedFormState
                 !(Global.stringToDouble(element['weight'].toString()) > 0)) {
               itmelement.remove('height');
               itmelement.remove('weight');
+            }
+            if (Global.stringToIntNull(
+                    itmelement['do_you_have_height_weight'].toString()) ==
+                2) {
+              itmelement['do_you_have_height_weight'] = 0;
             }
             attepmtChild[element['childenrollguid']] = itmelement;
           });
@@ -1560,14 +1768,13 @@ class _ChildGrowthExpendedFormState
           myMap['created_by'] = userName;
           myMap['created_on'] = Validate().currentDateTime();
           countMesuredChildren();
-      }
-
-      }else{
-        var creCheDetails =
-        await CrecheDataHelper().getCrecheResponceItem(widget.creche_nameId);
+        }
+      } else {
+        var creCheDetails = await CrecheDataHelper()
+            .getCrecheResponceItem(widget.creche_nameId);
         if (creCheDetails.length > 0) {
           myMap['created_by'] = userName;
-          myMap['created_on'] = Validate().currentDateTime();
+          myMap['created_on'] = alredRecord.first.created_at;
           myMap['cgmguid'] = widget.cgmguid;
           myMap['creche_id'] = widget.creche_nameId;
           myMap['partner_id'] =
@@ -1585,10 +1792,9 @@ class _ChildGrowthExpendedFormState
           // myMap['measurement_date'] = Validate().createAtToCurrentDate(widget.createdAt);
         }
       }
-
     } else {
       var creCheDetails =
-      await CrecheDataHelper().getCrecheResponceItem(widget.creche_nameId);
+          await CrecheDataHelper().getCrecheResponceItem(widget.creche_nameId);
       if (creCheDetails.length > 0) {
         myMap['created_by'] = userName;
         myMap['created_on'] = Validate().currentDateTime();
@@ -1608,7 +1814,6 @@ class _ChildGrowthExpendedFormState
             Global.getItemValues(creCheDetails[0].responces!, 'village_id');
         // myMap['measurement_date'] = Validate().createAtToCurrentDate(widget.createdAt);
       }
-
     }
   }
 
@@ -1636,104 +1841,154 @@ class _ChildGrowthExpendedFormState
     return returnValue;
   }
 
-
-  int countMesuredChildren(){
-    int mesuCunt=0;
+  int countMesuredChildren() {
+    int mesuCunt = 0;
     enrolledChild.forEach((element) {
       var item = attepmtChild[element.ChildEnrollGUID];
       if (item != null) {
-        if((Global.stringToDouble(item['height'].toString())>0) &&
-            (Global.stringToDouble(item['weight'].toString())>0)){
-          mesuCunt=mesuCunt+1;
+        if ((Global.validString(item['measurement_taken_date'])) &&
+            (Global.stringToDouble(item['weight'].toString()) > 0)) {
+          mesuCunt = mesuCunt + 1;
         }
       }
     });
     print('mesuCunt $mesuCunt');
     return mesuCunt;
-
   }
 
-
-  DateTime? callMinMeasurementGrwthDate(String? mesurementDate){
-    if(mesurementDate!=null){
-      DateTime todayDate = Validate().stringToDate(Validate().currentDate());
-      var sMesurementDate=Validate().stringToDateNull(mesurementDate);
-      if(sMesurementDate!=null){
-        var mMesureDate=DateTime(sMesurementDate.year,sMesurementDate.month);
-        var sCurenntDate=DateTime(todayDate.year,todayDate.month);
-        if(mMesureDate==sCurenntDate){
-          sMesurementDate=sMesurementDate.subtract(Duration(days: 10));
-          if(sMesurementDate.month!=todayDate.month){
-            return sMesurementDate =DateTime(todayDate.year,todayDate.month,1).subtract(Duration(days:1));
-          }else return sMesurementDate;
-        }else{
-          var sMesureMentDate=sMesurementDate.subtract(Duration(days: 10));
-          if(sMesurementDate.month!=sMesureMentDate.month){
-            return sMesurementDate =DateTime(sMesureMentDate.year,sMesureMentDate.month,1).subtract(Duration(days:1));
-          }else return sMesureMentDate;
+  int countMesuredChildrenForSave() {
+    int mesuCunt = 0;
+    enrolledChild.forEach((element) {
+      var item = attepmtChild[element.ChildEnrollGUID];
+      if (item != null) {
+        if (((Global.validString(item['measurement_taken_date'])) &&
+                (Global.stringToDouble(item['weight'].toString()) > 0)) ||
+            Global.validString(item['measurement_reason'])) {
+          mesuCunt = mesuCunt + 1;
         }
-      }return null;
-    }else return null;
-
+      }
+    });
+    print('mesuCunt $mesuCunt');
+    return mesuCunt;
   }
 
-  DateTime? callMaxMeasurementGrwthDate(String? mesurementDate){
-    if(mesurementDate!=null){
+  DateTime? callMinMeasurementGrwthDate(String? mesurementDate) {
+    if (mesurementDate != null) {
       DateTime todayDate = Validate().stringToDate(Validate().currentDate());
-      var sMesurementDate=Validate().stringToDateNull(mesurementDate);
-      if(sMesurementDate!=null){
-        var mMesureDate=DateTime(sMesurementDate.year,sMesurementDate.month);
-        var sCurenntDate=DateTime(todayDate.year,todayDate.month);
-        if(mMesureDate==sCurenntDate){
-          sMesurementDate=sMesurementDate.add(Duration(days: 10));
-          if(sMesurementDate.month!=todayDate.month){
-            if (sMesurementDate.month > 12) {
-              sMesurementDate = DateTime(sMesurementDate.year + 1, 1);
-            }sMesurementDate =DateTime(todayDate.year,todayDate.month,1);
-          }else {
-            if(sMesurementDate.isAfter(todayDate))
-            return todayDate.add(Duration(days: 1));
-            else return sMesurementDate;
-          }
+      var sMesurementDate = Validate().stringToDateNull(mesurementDate);
+      if (sMesurementDate != null) {
+        var mMesureDate = DateTime(sMesurementDate.year, sMesurementDate.month);
+        var sCurenntDate = DateTime(todayDate.year, todayDate.month);
+        if (mMesureDate == sCurenntDate) {
+          sMesurementDate = sMesurementDate.subtract(Duration(days: 10));
+          if (sMesurementDate.month != todayDate.month) {
+            return sMesurementDate =
+                DateTime(todayDate.year, todayDate.month, 1)
+                    .subtract(Duration(days: 1));
+          } else
+            return sMesurementDate;
+        } else {
+          var sMesureMentDate = sMesurementDate.subtract(Duration(days: 10));
+          if (sMesurementDate.month != sMesureMentDate.month) {
+            return sMesurementDate =
+                DateTime(sMesureMentDate.year, sMesureMentDate.month, 1)
+                    .subtract(Duration(days: 1));
+          } else
+            return sMesureMentDate;
+        }
+      }
+      return null;
+    } else
+      return null;
+  }
 
-        }else{
-          var sMesureMentDate=sMesurementDate.add(Duration(days: 10));
-          if(sMesureMentDate.month!=mMesureDate.month){
+  DateTime? callMinMeasurementGrwthDateTemp(String? mesurementDate) {
+    if (mesurementDate != null) {
+      DateTime todayDate = Validate().stringToDate(Validate().currentDate());
+      var sMesurementDate = Validate().stringToDateNull(mesurementDate);
+      if (sMesurementDate != null) {
+        var mMesureDate = DateTime(sMesurementDate.year, sMesurementDate.month);
+        var sCurenntDate = DateTime(todayDate.year, todayDate.month);
+        if (mMesureDate == sCurenntDate) {
+          sMesurementDate = DateTime(mMesureDate.year, mMesureDate.month, 1);
+          if (sMesurementDate.month != todayDate.month) {
+            return sMesurementDate =
+                DateTime(todayDate.year, todayDate.month, 1)
+                    .subtract(Duration(days: 1));
+          } else
+            return sMesurementDate;
+        } else {
+          var sMesureMentDate = sMesurementDate.subtract(Duration(days: 10));
+          if (sMesurementDate.month != sMesureMentDate.month) {
+            return sMesurementDate =
+                DateTime(sMesureMentDate.year, sMesureMentDate.month, 1)
+                    .subtract(Duration(days: 1));
+          } else
+            return sMesureMentDate;
+        }
+      }
+      return null;
+    } else
+      return null;
+  }
+
+  DateTime? callMaxMeasurementGrwthDate(String? mesurementDate) {
+    if (mesurementDate != null) {
+      DateTime todayDate = Validate().stringToDate(Validate().currentDate());
+      var sMesurementDate = Validate().stringToDateNull(mesurementDate);
+      if (sMesurementDate != null) {
+        var mMesureDate = DateTime(sMesurementDate.year, sMesurementDate.month);
+        var sCurenntDate = DateTime(todayDate.year, todayDate.month);
+        if (mMesureDate == sCurenntDate) {
+          sMesurementDate = sMesurementDate.add(Duration(days: 10));
+          if (sMesurementDate.month != todayDate.month) {
             if (sMesurementDate.month > 12) {
               sMesurementDate = DateTime(sMesurementDate.year + 1, 1);
-            }else sMesurementDate =DateTime(sMesureMentDate.year,sMesureMentDate.month,1);
-          }else{
-            sMesurementDate=sMesureMentDate;
+            }
+            sMesurementDate = DateTime(todayDate.year, todayDate.month, 1);
+          } else {
+            if (sMesurementDate.isAfter(todayDate))
+              return todayDate.add(Duration(days: 1));
+            else
+              return sMesurementDate;
+          }
+        } else {
+          var sMesureMentDate = sMesurementDate.add(Duration(days: 10));
+          if (sMesureMentDate.month != mMesureDate.month) {
+            if (sMesurementDate.month > 12) {
+              sMesurementDate = DateTime(sMesurementDate.year + 1, 1);
+            } else
+              sMesurementDate =
+                  DateTime(sMesureMentDate.year, sMesureMentDate.month, 1);
+          } else {
+            sMesurementDate = sMesureMentDate;
           }
           // else {
           //
-            return sMesurementDate;
+          return sMesurementDate;
           // }
         }
-      }return null;
-    }else return null;
-
+      }
+      return null;
+    } else
+      return null;
   }
-
 
   Future callEnrollementChildList(String selectedDate) async {
-    attepmtChild= {};
+    attepmtChild = {};
     enrolledChild = await EnrolledExitChilrenResponceHelper()
-        .enrolledChildByCreche(widget.creche_nameId);
-    DateTime? dateOfMesurement=Validate().stringToDateNull(selectedDate);
-    enrolledChild=enrolledChild.where((element) {
-      DateTime? enrolledDate=
-      Validate().stringToDateNull(Global.getItemValues(element.responces, 'date_of_enrollment'));
-      if(dateOfMesurement!=null&&enrolledDate!=null){
-        if(dateOfMesurement.isAfter(enrolledDate)|| dateOfMesurement==(enrolledDate))
-          return true;
-      }return false;
-    }
-    ).toList();
+        .enrolledChildByCrecheWithDateOfExit(
+            widget.creche_nameId, selectedDate);
+    DateTime? dateOfMesurement = Validate().stringToDateNull(selectedDate);
+    enrolledChild = enrolledChild.where((element) {
+      DateTime? enrolledDate = Validate().stringToDateNull(
+          Global.getItemValues(element.responces, 'date_of_enrollment'));
+      if (dateOfMesurement != null && enrolledDate != null) {
+        if (dateOfMesurement.isAfter(enrolledDate) ||
+            dateOfMesurement == (enrolledDate)) return true;
+      }
+      return false;
+    }).toList();
     setState(() {});
-
   }
-
-
-
 }

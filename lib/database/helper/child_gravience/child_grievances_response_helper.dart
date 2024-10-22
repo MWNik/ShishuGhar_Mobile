@@ -78,6 +78,19 @@ class ChildGrievancesTabResponceHelper {
     return items;
   }
 
+  Future<List<ChildGrievancesResponceModel>>
+  getChildGrievanceForUploadDarft() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery('select * from grievances_responce where is_edited=1 or is_edited=2');
+    List<ChildGrievancesResponceModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(ChildGrievancesResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<void> updateUploadedItem(Map<String, dynamic> item) async {
     var hhData = item['data'];
     var cename = hhData['name'];
@@ -102,8 +115,8 @@ class ChildGrievancesTabResponceHelper {
       // var chGuid = growthData['childenrolledguid'];
       var creche_id = growthData['creche_id'];
       var child_grievance_guid = growthData['grievance_guid'];
-      var appCreatedOn = growthData['creation'];
-      var appcreated_by = growthData['owner'];
+      var appCreatedOn = growthData['appcreated_on'];
+      var appcreated_by = growthData['appcreated_by'];
       var app_updated_by = growthData['app_updated_by'];
       var app_updated_on = growthData['app_updated_on'];
       var finalHHData = Validate().keyesFromResponce(growthData);

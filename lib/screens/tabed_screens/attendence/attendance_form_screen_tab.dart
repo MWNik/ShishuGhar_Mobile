@@ -62,6 +62,7 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
   void Function()? ontap;
   String lng = "en";
   bool isEditable = true;
+  String? role;
 
   @override
   void initState() {
@@ -70,6 +71,7 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
   }
 
   Future<void> initializeData() async {
+    role = (await Validate().readString(Validate.role))!;
     AddAttendanceScreenFormTab.maxDate = widget.lastGrowthDate;
     AddAttendanceScreenFormTab.minDate = widget.minGrowthDate;
     lng = (await Validate().readString(Validate.sLanguage))!;
@@ -417,9 +419,10 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
       // var dateOfAttendance = DateTime(parts[0], parts[1], parts[2]);
       var created_at = DateTime.parse(record[0].created_at.toString());
       var date = DateTime(created_at.year, created_at.month, created_at.day);
-      isEditable = date
-          .add(Duration(days: 3))
-          .isAfter(DateTime.parse(Validate().currentDate()));
+      // isEditable = role == CustomText.crecheSupervisor.trim()?(date
+      //     .add(Duration(days: 3))
+      //     .isAfter(DateTime.parse(Validate().currentDate()))):false;
+      isEditable = role == CustomText.crecheSupervisor.trim()?true:false;
     }
   }
 }

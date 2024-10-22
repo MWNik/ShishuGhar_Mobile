@@ -9,6 +9,7 @@ import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
+import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import '../../../database/helper/creche_helper/creche_care_giver_helper.dart';
 import '../../../model/apimodel/caregiver_responce_model.dart';
 import 'creche_care_giver_tab.dart';
@@ -30,6 +31,10 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
   List<Translation> translatsLabel = [];
   List<HouseHoldFielItemdModel> allItems = [];
   String lng = 'en';
+  String? role;
+  bool isOnlyUnsynched = false;
+  List<CareGiverResponceModel> unsynchedList = [];
+  List<CareGiverResponceModel> allList = [];
 
   @override
   void initState() {
@@ -38,11 +43,17 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
   }
 
   Future<void> initializeData() async {
+    role = (await Validate().readString(Validate.role))!;
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
     }
-    List<String> valueItems = [CustomText.Search, CustomText.Creches_];
+    List<String> valueItems = [
+      CustomText.Search,
+      CustomText.Creches_,
+      CustomText.all,
+      CustomText.unsynched
+    ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translatsLabel = value);
@@ -55,42 +66,63 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
   Future<void> fetchCrecheDataList() async {
     caregiverData =
         await CrecheCareGiverHelper().getCareGiverResponce(widget.parentName);
-
+    unsynchedList =
+        caregiverData.where((element) => element.is_edited == 1).toList();
+    allList = caregiverData;
+    caregiverData = isOnlyUnsynched ? unsynchedList : allList;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: InkWell(
-        onTap: () async {
-          String hhGuid = '';
-          if (!Global.validString(hhGuid)) {
-            hhGuid = Validate().randomGuid();
-            print("line $hhGuid");
-            var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => CreheCareGiverTab(
-                    isEditable: true,
-                    CGGuid: hhGuid,
-                    crechedCode: widget.crechedCode,
-                    parentName: widget.parentName)));
-            if (refStatus == 'itemRefresh') {
-              await fetchCrecheDataList();
-            }
-          }
-        },
-        child: Image.asset(
-          "assets/add_btn.png",
-          scale: 2.7,
-          color: Color(0xff5979AA),
-        ),
-      ),
+      floatingActionButton: role == CustomText.crecheSupervisor.trim()
+          ? InkWell(
+              onTap: () async {
+                String hhGuid = '';
+                if (!Global.validString(hhGuid)) {
+                  hhGuid = Validate().randomGuid();
+                  print("line $hhGuid");
+                  var refStatus = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => CreheCareGiverTab(
+                              isEditable: true,
+                              CGGuid: hhGuid,
+                              crechedCode: widget.crechedCode,
+                              parentName: widget.parentName)));
+                  if (refStatus == 'itemRefresh') {
+                    await fetchCrecheDataList();
+                  }
+                }
+              },
+              child: Image.asset(
+                "assets/add_btn.png",
+                scale: 2.7,
+                color: Color(0xff5979AA),
+              ),
+            )
+          : SizedBox(),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
         child: Column(children: [
-          SizedBox(
-            height: 10.h,
-          ),
+          role == CustomText.crecheSupervisor
+              ? Align(
+                  alignment: Alignment.topRight,
+                  child: AnimatedRollingSwitch(
+                    title1:
+                        Global.returnTrLable(translats, CustomText.all, lng),
+                    title2: Global.returnTrLable(
+                        translats, CustomText.unsynched, lng),
+                    isOnlyUnsynched: isOnlyUnsynched ?? false,
+                    onChange: (value) async {
+                      setState(() {
+                        isOnlyUnsynched = value;
+                      });
+                      await fetchCrecheDataList();
+                    },
+                  ),
+                )
+              : SizedBox(),
           Expanded(
             child: ListView.builder(
                 itemCount: caregiverData.length,
@@ -109,15 +141,22 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
                       //   hhGuid = Validate().randomGuid();
                       //   print("line $hhGuid");
                       // }
-                      var created_at = DateTime.parse(caregiverData[index].created_at.toString());
-                      var date = DateTime(created_at.year,created_at.month,created_at.day);
-                      bool isEditab = date.add(Duration(days: 8)).isAfter(DateTime.parse(Validate().currentDate()));
+                      var created_at = DateTime.parse(
+                          caregiverData[index].created_at.toString());
+                      var date = DateTime(
+                          created_at.year, created_at.month, created_at.day);
+                      bool isEditab = date
+                          .add(Duration(days: 8))
+                          .isAfter(DateTime.parse(Validate().currentDate()));
 
                       var refStatus = await Navigator.of(context).push(
                           MaterialPageRoute(
                               builder: (BuildContext context) =>
                                   CreheCareGiverTab(
-                                      isEditable: isEditab,
+                                      isEditable: role ==
+                                              CustomText.crecheSupervisor.trim()
+                                          ? true
+                                          : false,
                                       CGGuid: caregiverData[index].CGGUID!,
                                       crechedCode: widget.crechedCode,
                                       parentName:
@@ -194,17 +233,17 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
                                 children: [
                                   Text(
                                     '${Global.returnTrLable(translats, CustomText.Caregiver_Code, lng).trim()} : ',
-                                    style: Styles.Grey85,
+                                    style: Styles.black104,
                                   ),
                                   Text(
                                     '${Global.returnTrLable(translats, CustomText.Caregiver_Name, lng).trim()} : ',
-                                    style: Styles.Grey85,
-                                    strutStyle: StrutStyle(height: 1),
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
                                   ),
                                   Text(
                                     '${Global.returnTrLable(translats, CustomText.MobileNo, lng).trim()} : ',
-                                    style: Styles.Grey85,
-                                    strutStyle: StrutStyle(height: 1),
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
                                   ),
                                 ],
                               ),
@@ -226,23 +265,23 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
                                       Global.getItemValues(
                                           caregiverData[index].responces!,
                                           'caregiver_code'),
-                                      style: Styles.black105P,
+                                      style: Styles.cardBlue10,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
                                       Global.getItemValues(
                                           caregiverData[index].responces!,
                                           'caregiver_name'),
-                                      style: Styles.black105P,
-                                      strutStyle: StrutStyle(height: .5),
+                                      style: Styles.cardBlue10,
+                                      strutStyle: StrutStyle(height: 1.2),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
                                       Global.getItemValues(
                                           caregiverData[index].responces!,
                                           'mobile_no'),
-                                      style: Styles.black105P,
-                                      strutStyle: StrutStyle(height: .5),
+                                      style: Styles.cardBlue10,
+                                      strutStyle: StrutStyle(height: 1.2),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ],

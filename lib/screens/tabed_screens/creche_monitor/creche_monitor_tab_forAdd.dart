@@ -408,22 +408,22 @@ class _CrecheMonitorTabForAddState extends State<CrecheMonitorTabForAdd>
                   .trim(),
               style: Styles.white145,
             ),
-            actions: [
-              (_role == 'Cluster Coordinator')
-                  ? GestureDetector(
-                      onTap: () async {
-                        await updateVerificationStatus(context);
-                      },
-                      child: Image.asset(
-                        "assets/verify_icon.png",
-                        scale: 1.5,
-                      ),
-                    )
-                  : SizedBox(),
-              SizedBox(
-                width: 10,
-              )
-            ],
+            // actions: [
+            //   (_role == 'Cluster Coordinator')
+            //       ? GestureDetector(
+            //           onTap: () async {
+            //             await updateVerificationStatus(context);
+            //           },
+            //           child: Image.asset(
+            //             "assets/verify_icon.png",
+            //             scale: 1.5,
+            //           ),
+            //         )
+            //       : SizedBox(),
+            //   SizedBox(
+            //     width: 10,
+            //   )
+            // ],
 
             /// TabBar
             bottom: TabBar(

@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_appbar_child.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/custom_text.dart';
@@ -24,12 +25,13 @@ class ChildHealthListing extends StatefulWidget {
   final String childId;
 
   const ChildHealthListing(
-      {super.key, required this.enName, required this.creche_id,
-        required this.chilenrolledGUID,
-        required this.dateofEnrollment,
-        required this.childName,
-        required this.childId
-      });
+      {super.key,
+      required this.enName,
+      required this.creche_id,
+      required this.chilenrolledGUID,
+      required this.dateofEnrollment,
+      required this.childName,
+      required this.childId});
 
   @override
   State<ChildHealthListing> createState() => _ChildHealthListingState();
@@ -37,10 +39,15 @@ class ChildHealthListing extends StatefulWidget {
 
 class _ChildHealthListingState extends State<ChildHealthListing> {
   List<ChildHealthResponceModel> childHeathResponce = [];
+  List<ChildHealthResponceModel> filterhealthData = [];
+  List<ChildHealthResponceModel> usynchedList = [];
+  List<ChildHealthResponceModel> allList = [];
   List<Translation> translats = [];
   String lng = 'en';
-  List<String> existingDates=[];
+  List<String> existingDates = [];
   DateTime? lastDate;
+  bool isOnlyUnsyched = false;
+  String? role;
   // DateTime? maxDate;
 
   void initState() {
@@ -49,19 +56,22 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
   }
 
   Future<void> initializeData() async {
+    role = (await Validate().readString(Validate.role))!;
+    List<int> dateParts =
+        widget.dateofEnrollment.split('-').map(int.parse).toList();
+    lastDate = DateTime(dateParts[0], dateParts[1], dateParts[2])
+        .subtract(Duration(days: 1));
 
-    List<int> dateParts = widget.dateofEnrollment.split('-').map(int.parse).toList();
-    lastDate=DateTime(dateParts[0], dateParts[1], dateParts[2]).subtract(Duration(days:1));
-
-    var currDate=Validate().currentDate();
+    var currDate = Validate().currentDate();
     List<int> crrntDateParts = currDate.split('-').map(int.parse).toList();
-    var backDate = DateTime(crrntDateParts[0], crrntDateParts[1], crrntDateParts[2])
-        .subtract(Duration(days: 30));
-    if(lastDate != null){
-      if(lastDate!.isBefore(backDate!)){
+    var backDate =
+        DateTime(crrntDateParts[0], crrntDateParts[1], crrntDateParts[2])
+            .subtract(Duration(days: 30));
+    if (lastDate != null) {
+      if (lastDate!.isBefore(backDate!)) {
         lastDate = backDate;
       }
-    }else if (lastDate == null){
+    } else if (lastDate == null) {
       lastDate = backDate;
     }
 
@@ -83,19 +93,25 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
       CustomText.DateS,
       CustomText.symptoms,
       CustomText.actionTaken,
-      CustomText.ChildHealth
+      CustomText.ChildHealth,
+      CustomText.all,
+      CustomText.unsynched,
+      CustomText.ChildHealthDetail
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
 
-
-   await fetchChildevents();
+    await fetchChildevents();
   }
 
   Future<void> fetchChildevents() async {
-    childHeathResponce =
-    await ChildHealthTabResponceHelper().childEventByChild(widget.creche_id,widget.chilenrolledGUID!);
+    childHeathResponce = await ChildHealthTabResponceHelper()
+        .childEventByChild(widget.creche_id, widget.chilenrolledGUID!);
+    usynchedList =
+        childHeathResponce.where((element) => element.is_edited == 1).toList();
+    allList = childHeathResponce;
+    filterhealthData = isOnlyUnsyched ? usynchedList : allList;
     existingDates.clear();
     childHeathResponce.forEach((element) {
       var date = Global.getItemValues(element.responces, 'date');
@@ -107,86 +123,119 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: InkWell(
-        onTap: () async {
-          String child_health_guid = '';
-          if (!(Global.validString(child_health_guid))) {
-            child_health_guid = Validate().randomGuid();
-            var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => ChildHealthDetailScreen(
-                  child_health_guid: child_health_guid,
-                      enName: widget.enName!,
-                      creche_id: widget.creche_id,
-                      chilenrolledGUID: widget.chilenrolledGUID,
-                      lastDate:lastDate,
-                    childName:widget.childName,
-                    childId:widget.childId,
-                    existingDates:existingDates
-                    )));
-            if (refStatus == 'itemRefresh') {
-              fetchChildevents();
-            }
-          }
-        },
-        child: Image.asset(
-          "assets/add_btn.png",
-          scale: 2.7,
-          color: Color(0xff5979AA),
-        ),
-      ),
+      floatingActionButton: role == CustomText.crecheSupervisor.trim()
+          ? InkWell(
+              onTap: () async {
+                String child_health_guid = '';
+                if (!(Global.validString(child_health_guid))) {
+                  child_health_guid = Validate().randomGuid();
+                  var refStatus = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              ChildHealthDetailScreen(
+                                  child_health_guid: child_health_guid,
+                                  enName: widget.enName!,
+                                  creche_id: widget.creche_id,
+                                  chilenrolledGUID: widget.chilenrolledGUID,
+                                  lastDate: lastDate,
+                                  childName: widget.childName,
+                                  childId: widget.childId,
+                                  existingDates: existingDates)));
+                  if (refStatus == 'itemRefresh') {
+                    fetchChildevents();
+                  }
+                }
+              },
+              child: Image.asset(
+                "assets/add_btn.png",
+                scale: 2.7,
+                color: Color(0xff5979AA),
+              ),
+            )
+          : SizedBox(),
       appBar: CustomChildAppbar(
-        text: Global.returnTrLable(translats, CustomText.ChildHealth, lng),
+        text:
+            Global.returnTrLable(translats, CustomText.ChildHealthDetail, lng),
         subTitle1: widget.childName,
         subTitle2: widget.childId,
         onTap: () => Navigator.pop(context, 'itemRefresh'),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
         child: Column(children: [
+          role == CustomText.crecheSupervisor
+              ? Align(
+                  alignment: Alignment.topRight,
+                  child: AnimatedRollingSwitch(
+                    title1:
+                        Global.returnTrLable(translats, CustomText.all, lng),
+                    title2: Global.returnTrLable(
+                        translats, CustomText.unsynched, lng),
+                    isOnlyUnsynched: isOnlyUnsyched,
+                    onChange: (value) async {
+                      setState(() {
+                        isOnlyUnsyched = value;
+                      });
+                      await fetchChildevents();
+                    },
+                  ),
+                )
+              : SizedBox(),
           Expanded(
-            child: (childHeathResponce.length > 0)
+            child: (filterhealthData.length > 0)
                 ? ListView.builder(
-                    itemCount: childHeathResponce.length,
+                    itemCount: filterhealthData.length,
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                          // var lstDate=await callDatesAlredDateList(Global.getItemValues(childHeathResponce[index].responces!, 'date'));
-                          var created_at = DateTime.parse(childHeathResponce[index].created_at.toString());
-                          var recordDate =
-                          DateTime(created_at.year,created_at.month,created_at.day);
-                          bool isUnEditable = recordDate
-                              .add(Duration(days: 15))
-                              .isBefore(
-                              DateTime.parse(Validate().currentDate()));
+                          // var lstDate=await callDatesAlredDateList(Global.getItemValues(filterhealthData[index].responces!, 'date'));
+                          var created_at = DateTime.parse(
+                              filterhealthData[index].created_at.toString());
+                          var recordDate = DateTime(created_at.year,
+                              created_at.month, created_at.day);
+                          bool isUnEditable =
+                              role == CustomText.crecheSupervisor.trim()
+                                  ? recordDate.add(Duration(days: 15)).isBefore(
+                                      DateTime.parse(Validate().currentDate()))
+                                  : true;
 
-                          if(existingDates.contains(Global.getItemValues(childHeathResponce[index].responces, 'date'))){
-                            var currentRecordDate = Global.getItemValues(childHeathResponce[index].responces, 'date');
+                          if (existingDates.contains(Global.getItemValues(
+                              filterhealthData[index].responces, 'date'))) {
+                            var currentRecordDate = Global.getItemValues(
+                                filterhealthData[index].responces, 'date');
                             existingDates.remove(currentRecordDate);
                           }
                           var refStatus = await Navigator.of(context).push(
                               MaterialPageRoute(
                                   builder: (BuildContext context) =>
-                                      isUnEditable?ChildHealthDetailViewScreen(
-                                          child_health_guid: childHeathResponce[index].child_health_guid,
-                                          enName: widget.enName!,
-                                          creche_id: widget.creche_id,
-                                          chilenrolledGUID: widget.chilenrolledGUID,
-                                          childId:widget.childId,
-                                          childName:widget.childName,
-                                          type:1,
-                                      ):ChildHealthDetailScreen(
-                                        child_health_guid: childHeathResponce[index].child_health_guid,
-                                        enName: widget.enName!,
-                                        creche_id: widget.creche_id,
-                                        chilenrolledGUID: widget.chilenrolledGUID,
-                                          lastDate:lastDate,
-                                          childId:widget.childId,
-                                          childName:widget.childName,
-                                          existingDates:existingDates
-                                      )));
+                                      isUnEditable
+                                          ? ChildHealthDetailViewScreen(
+                                              child_health_guid:
+                                                  filterhealthData[index]
+                                                      .child_health_guid,
+                                              enName: widget.enName!,
+                                              creche_id: widget.creche_id,
+                                              chilenrolledGUID:
+                                                  widget.chilenrolledGUID,
+                                              childId: widget.childId,
+                                              childName: widget.childName,
+                                              type: 1,
+                                            )
+                                          : ChildHealthDetailScreen(
+                                              child_health_guid:
+                                                  filterhealthData[index]
+                                                      .child_health_guid,
+                                              enName: widget.enName!,
+                                              creche_id: widget.creche_id,
+                                              chilenrolledGUID:
+                                                  widget.chilenrolledGUID,
+                                              lastDate: lastDate,
+                                              childId: widget.childId,
+                                              childName: widget.childName,
+                                              existingDates: existingDates)));
                           if (refStatus == 'itemRefresh') {
                             await fetchChildevents();
                           }
@@ -194,14 +243,13 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),
                           child: Container(
-
                             decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
                                     color: Color(0xff5A5A5A).withOpacity(
                                         0.2), // Shadow color with opacity
-                                    offset: Offset(0,
-                                        3), // Horizontal and vertical offset
+                                    offset: Offset(
+                                        0, 3), // Horizontal and vertical offset
                                     blurRadius: 6, // Blur radius
                                     spreadRadius: 0, // Spread radius
                                   ),
@@ -228,12 +276,12 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.symptoms, lng).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.actionTaken, lng).trim()} : ',
                                         style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1),
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       // Text(
                                       //   '${Global.returnTrLable(translats, 'Child Age (In Months)', lng).trim()} : ',
@@ -259,35 +307,39 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          Validate().displeDateFormate(Global.getItemValues(
-                                              childHeathResponce[index].responces!,
-                                              'date')),
-                                          style: Styles.blue125,
+                                          Validate().displeDateFormate(
+                                              Global.getItemValues(
+                                                  filterhealthData[index]
+                                                      .responces!,
+                                                  'date')),
+                                          style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
                                           Global.getItemValues(
-                                              childHeathResponce[index].responces!,
+                                              filterhealthData[index]
+                                                  .responces!,
                                               'symptoms'),
                                           maxLines: 1,
-                                          style: Styles.blue125,
-                                          strutStyle: StrutStyle(height: .5),
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
                                           Global.getItemValues(
-                                              childHeathResponce[index].responces!,
+                                              filterhealthData[index]
+                                                  .responces!,
                                               'action_taken'),
-                                          style: Styles.blue125,
+                                          style: Styles.cardBlue10,
                                           maxLines: 1,
-                                          strutStyle: StrutStyle(height: .5),
+                                          strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         // Text(
                                         //   Global.getItemValues(
                                         //       childHHData[index].responces!,
                                         //       'age_months'),
-                                        //   style: Styles.blue125,
+                                        //   style: Styles.cardBlue10,
                                         //   strutStyle: StrutStyle(height: .5),
                                         //   overflow: TextOverflow.ellipsis,
                                         // ),
@@ -295,15 +347,17 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                                     ),
                                   ),
                                   SizedBox(width: 5),
-                                  (childHeathResponce[index].is_edited==0 && childHeathResponce[index].is_uploaded==1)?
-                                  Image.asset(
-                                    "assets/sync.png",
-                                    scale: 1.5,
-                                  ):
-                                  Image.asset(
-                                    "assets/sync_gray.png",
-                                    scale: 1.5,
-                                  )
+                                  (filterhealthData[index].is_edited == 0 &&
+                                          filterhealthData[index].is_uploaded ==
+                                              1)
+                                      ? Image.asset(
+                                          "assets/sync.png",
+                                          scale: 1.5,
+                                        )
+                                      : Image.asset(
+                                          "assets/sync_gray.png",
+                                          scale: 1.5,
+                                        )
                                 ],
                               ),
                             ),
@@ -326,8 +380,8 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
     List<String> datesListString = [];
     if (childHeathResponce.isNotEmpty) {
       childHeathResponce.forEach((element) {
-        var date=Global.getItemValues(element.responces!, 'date');
-        if(Global.validString(date)) {
+        var date = Global.getItemValues(element.responces!, 'date');
+        if (Global.validString(date)) {
           datesListString.add(date);
         }
       });
@@ -335,23 +389,21 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
         List<int> dateParts = dateString.split('-').map(int.parse).toList();
         return DateTime(dateParts[0], dateParts[1], dateParts[2]);
       }).toList();
-      if(dateList.length>0) {
-        lastDate = dateList
-            .reduce((value, element) => value.isAfter(element) ? value : element);
+      if (dateList.length > 0) {
+        lastDate = dateList.reduce(
+            (value, element) => value.isAfter(element) ? value : element);
         // currentDate =
         //     lastDate == Validate().stringToDate(Validate().currentDate());
       }
-
     }
-
   }
 
   Future<DateTime?> callDatesAlredDateList(String date) async {
-    DateTime?  lastGrowthDateNew;
+    DateTime? lastGrowthDateNew;
     List<String> dateStringData = [];
     childHeathResponce.forEach((element) {
-      var date=Global.getItemValues(element.responces!, 'date');
-      if(Global.validString(date)) {
+      var date = Global.getItemValues(element.responces!, 'date');
+      if (Global.validString(date)) {
         dateStringData.add(date);
       }
     });
@@ -362,33 +414,40 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
 
     List<int> dateCuuten = date.split('-').map(int.parse).toList();
 
-    var selecttedItemDate=DateTime(dateCuuten[0], dateCuuten[1], dateCuuten[2]);
+    var selecttedItemDate =
+        DateTime(dateCuuten[0], dateCuuten[1], dateCuuten[2]);
 
-    if(dateList.length>0) {
-      var maxDateList=dateList.where((element) => (selecttedItemDate.isAfter(element))).toList();
+    if (dateList.length > 0) {
+      var maxDateList = dateList
+          .where((element) => (selecttedItemDate.isAfter(element)))
+          .toList();
       DateTime? greatestDate = maxDateList.isNotEmpty
-          ? maxDateList.reduce((value, element) => value.isAfter(element) ? value : element)
+          ? maxDateList.reduce(
+              (value, element) => value.isAfter(element) ? value : element)
           : null;
       print('max $greatestDate');
       lastGrowthDateNew = greatestDate;
     }
 
-    if(dateList.length>0) {
-      var minDateList=dateList.where((element) => (selecttedItemDate.isBefore(element))).toList();
+    if (dateList.length > 0) {
+      var minDateList = dateList
+          .where((element) => (selecttedItemDate.isBefore(element)))
+          .toList();
       DateTime? lowesttDate = minDateList.isNotEmpty
-          ? minDateList.reduce((value, element) => value.isBefore(element) ? value : element)
+          ? minDateList.reduce(
+              (value, element) => value.isBefore(element) ? value : element)
           : null;
       // maxDate=lowesttDate;
       print('min $lowesttDate');
     }
     // else maxDate=null;
-    if(lastGrowthDateNew==null){
-      List<int> dateParts = widget.dateofEnrollment.split('-').map(int.parse).toList();
-      lastGrowthDateNew=DateTime(dateParts[0], dateParts[1], dateParts[2]).subtract(Duration(days:1));
+    if (lastGrowthDateNew == null) {
+      List<int> dateParts =
+          widget.dateofEnrollment.split('-').map(int.parse).toList();
+      lastGrowthDateNew = DateTime(dateParts[0], dateParts[1], dateParts[2])
+          .subtract(Duration(days: 1));
     }
 
     return lastGrowthDateNew;
   }
-
-
 }

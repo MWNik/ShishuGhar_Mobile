@@ -55,14 +55,11 @@ class _CustomTimepickerState extends State<CustomTimepickerDynamic> {
           ? Validate().stringToTimeOfDay(widget.initialvalue)
           : TimeOfDay.now();
       _currentTime = TimeOfDay.now().format(context);
-      controller = TextEditingController(
-          text: _currentTime);
+      controller = TextEditingController(text: _currentTime);
       widget.onChanged?.call(_currentTime!);
     } else {
       controller = TextEditingController(
-          text: widget.initialvalue != null
-              ? widget.initialvalue
-              : null);
+          text: widget.initialvalue != null ? widget.initialvalue : null);
     }
     // }
   }
@@ -185,6 +182,7 @@ class _CustomTimepickerState extends State<CustomTimepickerDynamic> {
 
   Future<void> _selectTimePicker(BuildContext context) async {
     final pickedTime = await showTimePicker(
+      // initialEntryMode: TimePickerEntryMode.input,
       context: context,
       initialTime: TimeOfDay.now(),
       builder: (BuildContext context, Widget? child) {
@@ -199,10 +197,10 @@ class _CustomTimepickerState extends State<CustomTimepickerDynamic> {
       setState(() {
         currentTime = pickedTime;
         controller!.text =
-        "${pickedTime.hour}:${pickedTime.minute.toString().padLeft(2, '0')}";
+            "${pickedTime.hour}:${pickedTime.minute.toString().padLeft(2, '0')}";
       });
       _currentTime =
-      '${currentTime!.hour}:${currentTime!.minute.toString().padLeft(2, '0')}';
+          '${currentTime!.hour}:${currentTime!.minute.toString().padLeft(2, '0')}';
       widget.onChanged?.call(
           '${currentTime!.hour}:${currentTime!.minute.toString().padLeft(2, '0')}');
     }
@@ -212,9 +210,8 @@ class _CustomTimepickerState extends State<CustomTimepickerDynamic> {
   void didUpdateWidget(covariant CustomTimepickerDynamic oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialvalue != widget.initialvalue) {
-      controller?.text = (widget.initialvalue != null
-          ? widget.initialvalue!
-          : '');
+      controller?.text =
+          (widget.initialvalue != null ? widget.initialvalue! : '');
     }
   }
 
@@ -224,48 +221,39 @@ class _CustomTimepickerState extends State<CustomTimepickerDynamic> {
     super.dispose();
   }
 
-  DateTime? dateinilizataion(String dateType){
+  DateTime? dateinilizataion(String dateType) {
     DateTime? datetime;
-    if(widget.calenderValidate!=null) {
+    if (widget.calenderValidate != null) {
       var item = Global.splitData(widget.calenderValidate, ',');
       if (item[0] == dateType) {
         if (item.length == 3) {
           if (item[2].toLowerCase() == 'd') {
-            datetime = DateTime.now().subtract(
-                Duration(days: Global.stringToInt(item[1])));
-          }
-          else if (item[2].toLowerCase() == 'm') {
+            datetime = DateTime.now()
+                .subtract(Duration(days: Global.stringToInt(item[1])));
+          } else if (item[2].toLowerCase() == 'm') {
             int daysToSubtract = Global.stringToInt(item[1]) * 30;
             datetime = DateTime.now().subtract(Duration(days: daysToSubtract));
-          }
-          else if (item[2].toLowerCase() == 'y') {
+          } else if (item[2].toLowerCase() == 'y') {
             int daysToSubtract = Global.stringToInt(item[1]) * 365;
             datetime = DateTime.now().subtract(Duration(days: daysToSubtract));
-          }
-          else
+          } else
             datetime = DateTime(1990);
-        }
-        else
+        } else
           datetime = DateTime(1990);
-      }
-      else if (item[0] == dateType) {
+      } else if (item[0] == dateType) {
         if (item.length == 3) {
           if (item[2].toLowerCase() == 'd') {
-            datetime = DateTime.now().subtract(
-                Duration(days: Global.stringToInt(item[1])));
-          }
-          else if (item[2].toLowerCase() == 'm') {
+            datetime = DateTime.now()
+                .subtract(Duration(days: Global.stringToInt(item[1])));
+          } else if (item[2].toLowerCase() == 'm') {
             int daysToSubtract = Global.stringToInt(item[1]) * 30;
             datetime = DateTime.now().subtract(Duration(days: daysToSubtract));
-          }
-          else if (item[2].toLowerCase() == 'y') {
+          } else if (item[2].toLowerCase() == 'y') {
             int daysToSubtract = Global.stringToInt(item[1]) * 365;
             datetime = DateTime.now().subtract(Duration(days: daysToSubtract));
-          }
-          else
+          } else
             datetime = DateTime.now();
-        }
-        else
+        } else
           datetime = DateTime.now();
       }
     }

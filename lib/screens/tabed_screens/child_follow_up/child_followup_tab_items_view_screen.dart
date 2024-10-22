@@ -84,7 +84,7 @@ class _ChildFollowupTabItemsViewScreenState
   Future<void> initializeData() async {
     // List<int> dateCuuten = widget.discharge_date.split('-').map(int.parse).toList();
     // childReffrenDate=DateTime(dateCuuten[0], dateCuuten[1], dateCuuten[2]).subtract(Duration(days:1));
-
+   userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     userName = (await Validate().readString(Validate.userName))!;
     List<String> valueNames = [
@@ -606,7 +606,7 @@ class _ChildFollowupTabItemsViewScreenState
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
+    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;

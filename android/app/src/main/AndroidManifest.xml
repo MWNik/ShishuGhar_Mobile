@@ -2,9 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
 <!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />-->
-<!--    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>-->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:label="Shishu Ghar"
         android:name="${applicationName}"
@@ -40,5 +41,13 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
     </application>
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
 </manifest>

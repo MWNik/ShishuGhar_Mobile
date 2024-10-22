@@ -26,13 +26,12 @@ class CmcCCTabSCreenForAdd extends StatefulWidget {
   final bool isEdit;
   final bool isViewScreen;
 
-  CmcCCTabSCreenForAdd({
-    super.key,
-    required this.isViewScreen,
-    required this.cmc_cc_guid,
-    required this.isEdit,
-     this.date_of_visit
-  });
+  CmcCCTabSCreenForAdd(
+      {super.key,
+      required this.isViewScreen,
+      required this.cmc_cc_guid,
+      required this.isEdit,
+      this.date_of_visit});
 
   @override
   State<CmcCCTabSCreenForAdd> createState() => _CmcCCTabSCreenForAddState();
@@ -53,8 +52,8 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
   List<Translation> translatsLabel = [];
   void Function()? ontap;
   String lng = "en";
-  List<String> unpicableDates= [];
-  bool isView=false;
+  List<String> unpicableDates = [];
+  bool isView = false;
 
   @override
   void initState() {
@@ -176,22 +175,23 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
     List<Widget> tabItem = [];
     for (int i = 0; i < tabBreakItems.length; i++) {
       if (tabBreakItems[i].parent == 'Creche Monitoring Checklist CC') {
-        tabItem.add(widget.isViewScreen?CmcCCTabItemSCreenViewForAdd(
-            cmc_cc_guid: widget.cmc_cc_guid,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            tabIndex: i,
-            totalTab: tabBreakItems.length
-        ):CmcCCTabItemSCreenForAdd(
-            cmc_cc_guid: widget.cmc_cc_guid,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            tabIndex: i,
-            date_of_visit: widget.date_of_visit,
-            isEdit: widget.isEdit,
-            totalTab: tabBreakItems.length));
+        tabItem.add(widget.isViewScreen
+            ? CmcCCTabItemSCreenViewForAdd(
+                cmc_cc_guid: widget.cmc_cc_guid,
+                tabBreakItem: tabBreakItems[i],
+                screenItem: expendedItems,
+                changeTab: changeTab,
+                tabIndex: i,
+                totalTab: tabBreakItems.length)
+            : CmcCCTabItemSCreenForAdd(
+                cmc_cc_guid: widget.cmc_cc_guid,
+                tabBreakItem: tabBreakItems[i],
+                screenItem: expendedItems,
+                changeTab: changeTab,
+                tabIndex: i,
+                date_of_visit: widget.date_of_visit,
+                isEdit: widget.isEdit,
+                totalTab: tabBreakItems.length));
       }
     }
 
@@ -239,14 +239,16 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
           }
         }
       }
-      if(Global.validString(responseData['creche_id'])&& unpicableDates.length==0){
-        unpicableDates = await fetchDatesList(responseData['creche_id']);
-      }
-      if(Global.validString(responseData['date_of_visit'])){
-        if (unpicableDates.contains(responseData['date_of_visit'])){
-          returnStatus = false;
+      if (widget.isEdit == false) {
+        if (Global.validString(responseData['creche_id']) &&
+            unpicableDates.length == 0) {
+          unpicableDates = await fetchDatesList(responseData['creche_id']);
         }
-
+        if (Global.validString(responseData['date_of_visit'])) {
+          if (unpicableDates.contains(responseData['date_of_visit'])) {
+            returnStatus = false;
+          }
+        }
       }
     }
     // Return false if conditions are not met
@@ -298,7 +300,7 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     // List<String> tabLabelItems = [];
-    // tabBreakItems.forEach((element) { 
+    // tabBreakItems.forEach((element) {
     //   if(Global.validString(element.label)){
     //     tabLabelItems.add(element.label!);
     //   }
@@ -306,7 +308,7 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
     // await TranslationDataHelper().callTranslateString(tabLabelItems).then((value) => translatsLabel.addAll(value));
     if (Global.validString(widget.date_of_visit)) {
       List<int> parts =
-      widget.date_of_visit.toString().split('-').map(int.parse).toList();
+          widget.date_of_visit.toString().split('-').map(int.parse).toList();
       var dov = DateTime(parts[0], parts[1], parts[2]);
       if (dov
           .add(Duration(days: 7))
@@ -366,8 +368,7 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
   }
 
   Future<List<String>> fetchDatesList(String creche_id) async {
-    List<CmcCCResponseModel> cmcRespose =
-    await CmcCCTabResponseHelper()
+    List<CmcCCResponseModel> cmcRespose = await CmcCCTabResponseHelper()
         .childALMChild(Global.stringToInt(creche_id));
     List<String> visitdatesListString = [];
     cmcRespose.forEach((element) {

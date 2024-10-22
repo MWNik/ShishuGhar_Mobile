@@ -66,6 +66,8 @@ class _CrecheCommettieDetailsScreenState
   String? lng = 'en';
   List<Translation> translats = [];
   // bool isDateReadable = false;
+  Map<String, FocusNode> _foocusNode = {};
+  ScrollController _scrollController = ScrollController();
 
   List<String> hiddens = [
     'partner_id',
@@ -120,10 +122,11 @@ class _CrecheCommettieDetailsScreenState
                     padding:
                         EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                     child: SingleChildScrollView(
+                        controller: _scrollController,
                         child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: cWidget(),
-                    )),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: cWidget(),
+                        )),
                   )),
                   Divider(),
                   Padding(
@@ -176,6 +179,7 @@ class _CrecheCommettieDetailsScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
@@ -195,6 +199,7 @@ class _CrecheCommettieDetailsScreenState
         );
       case 'Date':
         return CustomDatepickerDynamic(
+          focusNode: _foocusNode[quesItem.fieldname],
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           // readable:  quesItem.fieldname=='meeting_date'?isDateReadable:null,
@@ -228,6 +233,7 @@ class _CrecheCommettieDetailsScreenState
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
+          focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
@@ -253,6 +259,7 @@ class _CrecheCommettieDetailsScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
@@ -308,6 +315,7 @@ class _CrecheCommettieDetailsScreenState
         );
       case 'Long Text':
         return DynamicCustomTextFieldNew(
+          focusNode: _foocusNode[quesItem.fieldname],
           maxline: 3,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
@@ -331,6 +339,7 @@ class _CrecheCommettieDetailsScreenState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          focusNode: _foocusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -391,13 +400,13 @@ class _CrecheCommettieDetailsScreenState
         );
       case 'Attach':
         return CustomImageDynamicReplica(
-          isDelitable: widget.isImageUpdate?false:true,
+          isDelitable: widget.isImageUpdate ? false : true,
           docType: CustomText.creche_committee_meeting,
           child_guid: widget.ccGuid,
           assetPath: myMap[quesItem.fieldname!],
           readable: widget.isImageUpdate,
           titleText:
-          Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
@@ -479,6 +488,14 @@ class _CrecheCommettieDetailsScreenState
         labelItems.add(element.label!);
       }
     });
+    for (var elements in allItems) {
+      _foocusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
+    }
+    _scrollController.addListener(() {
+      if (_scrollController.position.isScrollingNotifier.value) {
+        _foocusNode.forEach((_, focusNode) => focusNode.unfocus());
+      }
+    });
     await TranslationDataHelper()
         .callTranslateString(labelItems)
         .then((value) => translats.addAll(value));
@@ -493,6 +510,12 @@ class _CrecheCommettieDetailsScreenState
   //   super.didChangeDependencies();
   //   initializeData();
   // }
+  @override
+  void dispose() {
+    _foocusNode.forEach((_, focusNode) => focusNode.dispose());
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   bool _checkValidation() {
     var validStatus = true;

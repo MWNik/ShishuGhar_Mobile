@@ -21,6 +21,8 @@ class CrecheDataHelper {
 
   Future<void> downloadCrecheData(Map<String, dynamic> item) async {
     List<Map<String, dynamic>> hhData = List<Map<String, dynamic>>.from(item['Data']);
+    await DatabaseHelper.database!.delete('tab_creche_response');
+    await DatabaseHelper.database!.delete('tab_caregiver_response');
     hhData.forEach((element) async {
       var hhData =element['Creche'];
       if(hhData!=null){
@@ -143,7 +145,18 @@ class CrecheDataHelper {
 
   Future<List<CresheDatabaseResponceModel>> callCrecheForUpload() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-        'select * from tab_creche_response where is_edited=1 and is_uploaded=0');
+        'select * from tab_creche_response where is_edited=1');
+    List<CresheDatabaseResponceModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(CresheDatabaseResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+  Future<List<CresheDatabaseResponceModel>> callCrecheForUploadEditDart() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from tab_creche_response where is_edited=1 or is_edited=2');
     List<CresheDatabaseResponceModel> items = [];
 
     result.forEach((itemMap) {

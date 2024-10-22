@@ -1,14 +1,35 @@
+import 'dart:io';
+import 'dart:ui';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:shishughar/firebase_options.dart';
 import 'package:shishughar/screens/splashScreen.dart';
 import 'database/database_helper.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  var dataBaseHelper=DatabaseHelper();
+  var dataBaseHelper = DatabaseHelper();
   await dataBaseHelper.openDb();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
     DeviceOrientation.portraitUp,
@@ -86,12 +107,13 @@ class _UpdateCheckScreenState extends State<UpdateCheckScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _performImmediateUpdate();
+                _navigateToSplashScreen();
               },
               child: Text('Cancel'),
-            ),TextButton(
+            ),
+            TextButton(
               onPressed: () {
-                _navigateToSplashScreen();
+                _performImmediateUpdate();
               },
               child: Text('Update'),
             ),
@@ -120,4 +142,3 @@ class _UpdateCheckScreenState extends State<UpdateCheckScreen> {
     );
   }
 }
-

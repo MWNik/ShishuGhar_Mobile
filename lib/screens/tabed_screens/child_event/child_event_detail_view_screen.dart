@@ -79,6 +79,7 @@ class _EnrolledChildDetailsState extends State<ChildEventDetailsViewScreen> {
     'child_id'];
 
   Future<void> initializeData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     lng = (await Validate().readString(Validate.sLanguage))!;
     labelControlls.clear();
     List<String> valueNames = [
@@ -359,7 +360,7 @@ class _EnrolledChildDetailsState extends State<ChildEventDetailsViewScreen> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
+    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;

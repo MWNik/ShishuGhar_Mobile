@@ -5,6 +5,7 @@ import 'package:shishughar/model/dynamic_screen_model/creche_monitering_checkLis
 import 'package:shishughar/utils/globle_method.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import '../../../database/helper/cmc_cbm/creche_monitering_checklist_CBM_response_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
@@ -27,6 +28,9 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
   List<CmcCBMResponseModel> cmcCBMData = [];
   List<Translation> translats = [];
   String lng = 'en';
+  bool isOnlyUnsyched = false;
+  List<CmcCBMResponseModel> usynchedList = [];
+  List<CmcCBMResponseModel> allList = [];
 
   @override
   void initState() {
@@ -51,6 +55,8 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
       CustomText.Village,
       CustomText.EntryTime,
       CustomText.ExitTime,
+      CustomText.all,
+      CustomText.usynchedAndDraft
     ];
 
     await TranslationDataHelper()
@@ -64,6 +70,10 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
   Future<void> fetchCmcCBMRecords() async {
     cmcCBMData = await CmcCBMTabResponseHelper()
         .childCBMChild(Global.stringToInt(widget.creche_id));
+    usynchedList =
+        cmcCBMData.where((element) => element.is_edited == 1 || element.is_edited == 2).toList();
+    allList = cmcCBMData;
+    cmcCBMData = isOnlyUnsyched ? usynchedList : allList;
     setState(() {});
   }
 
@@ -107,6 +117,22 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
         child: Column(children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              AnimatedRollingSwitch(
+                title1: Global.returnTrLable(translats, CustomText.all, lng),
+                title2: Global.returnTrLable(translats, CustomText.usynchedAndDraft, lng),
+                isOnlyUnsynched: isOnlyUnsyched,
+                onChange: (value) async {
+                  setState(() {
+                    isOnlyUnsyched = value;
+                  });
+                  await fetchCmcCBMRecords();
+                },
+              )
+            ],
+          ),
           Expanded(
             child: (cmcCBMData.length > 0)
                 ? ListView.builder(
@@ -170,10 +196,10 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          '${Global.returnTrLable(translats, CustomText.Creche, lng).trim()} : ',
-                                          style: Styles.black104,
-                                        ),
+                                        // Text(
+                                        //   '${Global.returnTrLable(translats, CustomText.Creche, lng).trim()} : ',
+                                        //   style: Styles.black104,
+                                        // ),
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.datevisit, lng).trim()} : ',
                                           style: Styles.black104,
@@ -196,14 +222,14 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            widget.creche_id!,
-                                            style: Styles.blue125,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+                                          // Text(
+                                          //   widget.creche_id!,
+                                          //   style: Styles.blue125,
+                                          //   overflow: TextOverflow.ellipsis,
+                                          // ),
                                           Text(
                                             Global.getItemValues(cmcCBMData[index].responces!, 'date_of_visit'),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ],

@@ -24,8 +24,12 @@ class ShishuGharDetailsBottomBar extends StatefulWidget {
   bool isUpdateImage;
   int index;
   ShishuGharDetailsBottomBar(
-      {super.key, required this.crecheId, required this.index,
-        required this.crecheName, required this.crecheCode, required this.isUpdateImage});
+      {super.key,
+      required this.crecheId,
+      required this.index,
+      required this.crecheName,
+      required this.crecheCode,
+      required this.isUpdateImage});
 
   @override
   _ShishuGharDetailsBottomBarState createState() =>
@@ -60,7 +64,7 @@ class _ShishuGharDetailsBottomBarState
               unselectedIconTheme: IconThemeData(color: Colors.red),
               currentIndex: widget.index,
               onTap: (index) async {
-                if(index!=2) {
+                if (index != 2) {
                   onclick(index);
                   setState(() {
                     widget.index = index;
@@ -74,16 +78,13 @@ class _ShishuGharDetailsBottomBarState
   }
 
   Future<void> initializeLabel() async {
-
-    pages=[
-      ShishuGharDetailsReplica(crecheId:widget.crecheId),
-      ShishuGharDetailsReplica(crecheId:widget.crecheId),
-      ShishuGharDetailsReplica(crecheId:widget.crecheId),
-      ShishuGharDetailsReplica(crecheId:widget.crecheId),
-      ShishuGharDetailsReplica(crecheId:widget.crecheId),
+    pages = [
+      ShishuGharDetailsReplica(crecheId: widget.crecheId),
+      ShishuGharDetailsReplica(crecheId: widget.crecheId),
+      ShishuGharDetailsReplica(crecheId: widget.crecheId),
+      ShishuGharDetailsReplica(crecheId: widget.crecheId),
+      ShishuGharDetailsReplica(crecheId: widget.crecheId),
     ];
-
-
 
     lng = await Validate().readString(Validate.sLanguage);
 
@@ -130,8 +131,7 @@ class _ShishuGharDetailsBottomBarState
           color: widget.index == 1 ? Color(0xff5979AA) : Color(0xffAAAAAA),
         ),
       ),
-      label: Global.returnTrLable(
-          locationControlls, CustomText.ProfileS, lng!),
+      label: Global.returnTrLable(locationControlls, CustomText.ProfileS, lng!),
     ));
     bottomItem.add(BottomNavigationBarItem(
       icon: Padding(
@@ -183,18 +183,20 @@ class _ShishuGharDetailsBottomBarState
   }
 
   Future<void> onclick(int i) async {
-    String refreshStatus='';
+    String refreshStatus = '';
     if (i == 0) {
-       refreshStatus=await Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => LineholdlistedScreen(crecheId: widget.crecheId,)));
+      refreshStatus = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => LineholdlistedScreen(
+                    crecheId: widget.crecheId,
+                  ))) ??
+          '';
     } else if (i == 1) {
-      refreshStatus=await  Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) =>
-              CresheTabScreen(
+      refreshStatus = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => CresheTabScreen(
                   name: widget.crecheId,
-                  crechedCode: widget.crecheCode
-                  ,isUpdate: widget.isUpdateImage
-              )));
+                  crechedCode: widget.crecheCode,
+                  isUpdate: widget.isUpdateImage))) ??
+          '';
     } else if (i == 2) {
       // Navigator.of(context).push(MaterialPageRoute(
       //     builder: (BuildContext context) => ShishuGharDetailsBottomBar(
@@ -202,17 +204,18 @@ class _ShishuGharDetailsBottomBarState
       //           index: 2,
       //         )));
     } else if (i == 3) {
-      refreshStatus=await Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) => CheckIns(crechId:widget.crecheId)));
+      refreshStatus = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) =>
+                  CheckIns(crechId: widget.crecheId))) ??
+          '';
     } else if (i == 4) {
-      refreshStatus=await  Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => ChildGrievancesListing(
-                creche_id: widget.crecheId.toString(),
-                crecheName: widget.crecheName,
-              )));
-    } else if (i == 5) {
-
-    }
+      refreshStatus = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => ChildGrievancesListing(
+                    creche_id: widget.crecheId.toString(),
+                    crecheName: widget.crecheName,
+                  ))) ??
+          '';
+    } else if (i == 5) {}
 
     if (refreshStatus == 'itemRefresh') {
       setState(() {

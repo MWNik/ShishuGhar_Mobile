@@ -68,8 +68,8 @@ class ChildImmunizationResponseHelper {
       var creche_id = growthData['creche_id'];
       var childenrolledguid = growthData['childenrolledguid'];
       var child_immunization_guid = growthData['child_immunization_guid'];
-      var appCreatedOn = growthData['creation'];
-      var appcreated_by = growthData['owner'];
+      var appCreatedOn = growthData['appcreated_on'];
+      var appcreated_by = growthData['appcreated_by'];
       var app_updated_by = growthData['app_updated_by'];
       var app_updated_on = growthData['app_updated_on'];
       var finalHHData = Validate().keyesFromResponce(growthData);

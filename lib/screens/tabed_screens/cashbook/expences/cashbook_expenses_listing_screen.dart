@@ -9,6 +9,7 @@ import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../../custom_widget/custom_text.dart';
+import '../../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import '../../../../database/helper/cashbook/receipt/cashbook_receipt_response_helper.dart';
 import '../../../../database/helper/translation_language_helper.dart';
 import '../../../../utils/globle_method.dart';
@@ -27,10 +28,14 @@ class _CashBookExpensesListingSCreenState
     extends State<CashBookExpensesListingScreen> {
   List<CashbookExpencesResponseModel> expensesData = [];
   List<CashbookReceiptResponseModel> receiptRecords = [];
+  List<CashbookExpencesResponseModel> unsynchedList = [];
+  List<CashbookExpencesResponseModel> allList = [];
+  bool isOnlyUnsynched = false;
   DateTime? minDate;
   List<Translation> translats = [];
   String lng = 'en';
   double walletToal = 0.0;
+  String? role;
 
   void initState() {
     super.initState();
@@ -38,6 +43,7 @@ class _CashBookExpensesListingSCreenState
   }
 
   Future<void> initializeData() async {
+    role = (await Validate().readString(Validate.role))!;
     translats.clear();
     lng = (await Validate().readString(Validate.sLanguage))!;
     List<String> valueItems = [
@@ -49,6 +55,8 @@ class _CashBookExpensesListingSCreenState
       CustomText.NorecordAvailable,
       CustomText.Search,
       CustomText.Village,
+      CustomText.all,
+      CustomText.unsynched
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -63,62 +71,65 @@ class _CashBookExpensesListingSCreenState
         .cashbookExpencesByCreche(widget.creche_id);
 
     walletToal = await getRecieptTootal();
-
-    print("Calculated mondate: $minDate");
-    print("totalValeW $walletToal");
+    unsynchedList =
+        expensesData.where((element) => element.is_edited == 1).toList();
+    allList = expensesData;
+    expensesData = isOnlyUnsynched ? unsynchedList : allList;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: (walletToal > 0)
-          ? InkWell(
-              onTap: () async {
-                String cashbookGuid = '';
-                if (!Global.validString(cashbookGuid)) {
-                  cashbookGuid = Validate().randomGuid();
-                  var backDate = DateTime.parse(Validate().currentDate())
-                      .subtract(Duration(days: 7));
-                  if (minDate != null) {
-                    if (minDate!.isBefore(backDate)) {
-                      minDate = backDate;
+      floatingActionButton: role == CustomText.crecheSupervisor.trim()
+          ? ((walletToal > 0)
+              ? InkWell(
+                  onTap: () async {
+                    String cashbookGuid = '';
+                    if (!Global.validString(cashbookGuid)) {
+                      cashbookGuid = Validate().randomGuid();
+                      var backDate = DateTime.parse(Validate().currentDate())
+                          .subtract(Duration(days: 7));
+                      if (minDate != null) {
+                        if (minDate!.isBefore(backDate)) {
+                          minDate = backDate;
+                        }
+                      } else if (minDate == null) {
+                        minDate = backDate;
+                      }
+
+                      var refStatus = await Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  CashbookExpensesDetailsScreen(
+                                      creche_id: widget.creche_id,
+                                      cashbook_guid: cashbookGuid,
+                                      minDate: minDate,
+                                      reqAmount: walletToal)));
+
+                      if (refStatus == 'itemRefresh') {
+                        fetchCashbookData();
+                      }
                     }
-                  } else if (minDate == null) {
-                    minDate = backDate;
-                  }
-
-                  var refStatus = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              CashbookExpensesDetailsScreen(
-                                  creche_id: widget.creche_id,
-                                  cashbook_guid: cashbookGuid,
-                                  minDate: minDate,
-                                  reqAmount: walletToal)));
-
-                  if (refStatus == 'itemRefresh') {
-                    fetchCashbookData();
-                  }
-                }
-              },
-              child: Image.asset(
-                "assets/add_btn.png",
-                scale: 2.7,
-                color: Color(0xff5979AA),
-              ),
-            )
-          : null,
+                  },
+                  child: Image.asset(
+                    "assets/add_btn.png",
+                    scale: 2.7,
+                    color: Color(0xff5979AA),
+                  ),
+                )
+              : null)
+          : SizedBox(),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: role == CustomText.crecheSupervisor
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.start,
               children: [
-                SizedBox(width: 10.w),
-                // (walletToal > 0)
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
                   decoration: BoxDecoration(
@@ -135,7 +146,8 @@ class _CashBookExpensesListingSCreenState
                       borderRadius: BorderRadius.circular(5.r)),
                   child: RichText(
                     text: TextSpan(
-                      text:  '${Global.returnTrLable(translats, CustomText.BalanceAmount, lng).trim()}',
+                      text:
+                          '${Global.returnTrLable(translats, CustomText.BalanceAmount, lng).trim()}',
                       style: Styles.black124,
                       children: [
                         TextSpan(
@@ -143,8 +155,25 @@ class _CashBookExpensesListingSCreenState
                       ],
                     ),
                   ),
-                )
-                // : SizedBox(),
+                ),
+                Spacer(),
+                role == CustomText.crecheSupervisor.trim()
+                    ? Expanded(
+                        child: AnimatedRollingSwitch(
+                          title1: Global.returnTrLable(
+                              translats, CustomText.all, lng),
+                          title2: Global.returnTrLable(
+                              translats, CustomText.unsynched, lng),
+                          isOnlyUnsynched: isOnlyUnsynched ?? false,
+                          onChange: (value) async {
+                            setState(() {
+                              isOnlyUnsynched = value;
+                            });
+                            await fetchCashbookData();
+                          },
+                        ),
+                      )
+                    : SizedBox(),
               ],
             ),
             (expensesData.length > 0)
@@ -171,12 +200,17 @@ class _CashBookExpensesListingSCreenState
                               }
                               // minDate=backDate;
 
-                              var created_at = DateTime.parse(expensesData[index].created_at.toString());
-                              var date  = DateTime(created_at.year,created_at.month,created_at.day);
+                              var created_at = DateTime.parse(
+                                  expensesData[index].created_at.toString());
+                              var date = DateTime(created_at.year,
+                                  created_at.month, created_at.day);
                               bool isEditable = date
                                   .add(Duration(days: 8))
                                   .isAfter(
-                                  DateTime.parse(Validate().currentDate()));
+                                      DateTime.parse(Validate().currentDate()));
+                              if (isEditable) {
+                                isEditable = role == CustomText.crecheSupervisor;
+                              }
 
                               var refStatus = await Navigator.of(context).push(
                                   MaterialPageRoute(
@@ -235,13 +269,13 @@ class _CashBookExpensesListingSCreenState
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${Global.returnTrLable(translats, 'Date', lng).trim()}',
+                                            '${Global.returnTrLable(translats, 'Date', lng).trim()} :',
                                             style: Styles.black104,
                                           ),
                                           Text(
-                                            '${Global.returnTrLable(translats, 'Amount', lng).trim()}',
+                                            '${Global.returnTrLable(translats, 'Amount', lng).trim()} :',
                                             style: Styles.black104,
-                                            strutStyle: StrutStyle(height: 1),
+                                            strutStyle: StrutStyle(height: 1.2),
                                           )
                                         ],
                                       ),
@@ -267,16 +301,16 @@ class _CashBookExpensesListingSCreenState
                                                       expensesData[index]
                                                           .responces!,
                                                       'date')),
-                                              style: Styles.blue125,
+                                              style: Styles.cardBlue10,
                                               strutStyle:
                                                   StrutStyle(height: .5),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             Text(
                                               "₹ ${Global.getItemValues(expensesData[index].responces!, 'expense_amount')}",
-                                              style: Styles.blue125,
+                                              style: Styles.cardBlue10,
                                               strutStyle:
-                                                  StrutStyle(height: .5),
+                                                  StrutStyle(height: 1.2),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
@@ -347,8 +381,8 @@ class _CashBookExpensesListingSCreenState
     });
 
     if (dates.length > 0) {
-      minDate = dates
-          .reduce((value, element) => value.isBefore(element) ? value : element);
+      minDate = dates.reduce(
+          (value, element) => value.isBefore(element) ? value : element);
     }
     if (minDate != null) {
       setState(() {

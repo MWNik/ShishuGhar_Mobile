@@ -16,6 +16,9 @@ import 'package:shishughar/database/helper/block_data_helper.dart';
 import 'package:shishughar/database/helper/district_data_helper.dart';
 import 'package:shishughar/database/helper/gram_panchayat_data_helper.dart';
 import 'package:shishughar/database/helper/mapping_login_helper.dart';
+import 'package:shishughar/database/helper/master_stock_helper.dart';
+import 'package:shishughar/database/helper/partner_stock_helper.dart';
+
 import 'package:shishughar/database/helper/state_data_helper.dart';
 import 'package:shishughar/database/helper/village_data_helper.dart';
 import 'package:shishughar/model/databasemodel/auth_model.dart';
@@ -28,6 +31,7 @@ import 'package:shishughar/model/databasemodel/tabstate_model.dart';
 import 'package:shishughar/screens/dashboardscreen.dart';
 import 'package:shishughar/screens/reset_password_screen.dart';
 import 'package:shishughar/style/styles.dart';
+import 'package:shishughar/utils/secure_storage.dart';
 import 'package:shishughar/utils/validate.dart';
 import 'package:toast/toast.dart';
 import '../api/creche_data_api.dart';
@@ -67,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   DateTime pre_backpress = DateTime.now();
   String? savedUsername;
   bool _keyboardVisible = false;
-  String appVersionName='';
+  String appVersionName = '';
 
   @override
   void initState() {
@@ -324,13 +328,21 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                     await Validate().checkNetworkConnection();
                                 if (network) {
                                   if (mobileController.text.isEmpty) {
-                                    Validate().singleButtonPopup('User name required', 'ok', false, context);
+                                    Validate().singleButtonPopup(
+                                        'User name required',
+                                        'ok',
+                                        false,
+                                        context);
                                     // ScaffoldMessenger.of(context).showSnackBar(
                                     //     const SnackBar(
                                     //         content:
                                     //             Text("User name required")));
                                   } else if (passwordcontroller.text.isEmpty) {
-                                    Validate().singleButtonPopup('Password required', 'ok', false, context);
+                                    Validate().singleButtonPopup(
+                                        'Password required',
+                                        'ok',
+                                        false,
+                                        context);
                                     // ScaffoldMessenger.of(context).showSnackBar(
                                     //     const SnackBar(
                                     //         content:
@@ -379,6 +391,13 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                             Validate().saveString(
                                                 Validate.Password,
                                                 passwordcontroller.text.trim());
+                                            print(
+                                                "******PASSWORD IS SAVED *******");
+                                            await SecureStorage
+                                                .writeStringValue(
+                                                    Validate.Password,
+                                                    passwordcontroller.text
+                                                        .trim());
                                             Validate().saveString(
                                                 Validate.appToken, token);
                                             Validate().saveString(Validate.role,
@@ -386,14 +405,14 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                             Navigator.pop(context);
                                             // if (loginApiModel.auth!.role ==
                                             //     'Cluster Coordinator') {
-                                              Navigator.pushReplacement(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (mContext) =>
-                                                        DashboardScreen(
-                                                      index: 0,
-                                                    ),
-                                                  ));
+                                            Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (mContext) =>
+                                                      DashboardScreen(
+                                                    index: 0,
+                                                  ),
+                                                ));
                                             // } else {
                                             //   Navigator.pushReplacement(
                                             //       context,
@@ -403,10 +422,13 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                             //       ));
                                             // }
                                           }
-                                        }
-                                        else {
+                                        } else {
                                           Navigator.pop(context);
-                                          Validate().singleButtonPopup('Internal Server Error!', 'ok', false, context);
+                                          Validate().singleButtonPopup(
+                                              'Internal Server Error!',
+                                              'ok',
+                                              false,
+                                              context);
                                           // ScaffoldMessenger.of(context)
                                           //     .showSnackBar(const SnackBar(
                                           //         content: Text(
@@ -414,9 +436,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                         }
                                       } else {
                                         Navigator.pop(context);
-                                        Validate().singleButtonPopup( Global.errorBodyToString(
-                                            loginResponse.body,
-                                            'message'), 'ok', false, context);
+                                        Validate().singleButtonPopup(
+                                            Global.errorBodyToString(
+                                                loginResponse.body, 'message'),
+                                            'ok',
+                                            false,
+                                            context);
                                         // ScaffoldMessenger.of(context)
                                         //     .showSnackBar(SnackBar(
                                         //         content: Text(
@@ -424,17 +449,13 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                         //                 loginResponse.body,
                                         //                 'message'))));
                                       }
-                                    }
-                                    else {
+                                    } else {
                                       var loginResponse =
                                           await LoginApiService().loginUser(
                                               mobileController.text.trim(),
                                               passwordcontroller.text.trim());
 
                                       if (loginResponse.statusCode == 200) {
-                                        Validate().saveString(
-                                            Validate.loginName,
-                                            mobileController.text.trim());
                                         LoginApiModel loginApiModel =
                                             LoginApiModel.fromJson(json
                                                 .decode(loginResponse.body));
@@ -453,7 +474,11 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                           }
                                         } else {
                                           Navigator.pop(context);
-                                          Validate().singleButtonPopup('Internal Server Error!', 'ok', false, context);
+                                          Validate().singleButtonPopup(
+                                              'Internal Server Error!',
+                                              'ok',
+                                              false,
+                                              context);
                                           // ScaffoldMessenger.of(context)
                                           //     .showSnackBar(const SnackBar(
                                           //         content: Text(
@@ -461,9 +486,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                         }
                                       } else {
                                         Navigator.pop(context);
-                                        Validate().singleButtonPopup( Global.errorBodyToString(
-                                                            loginResponse.body,
-                                                            'message'), 'ok', false, context);
+                                        Validate().singleButtonPopup(
+                                            Global.errorBodyToString(
+                                                loginResponse.body, 'message'),
+                                            'ok',
+                                            false,
+                                            context);
                                         // ScaffoldMessenger.of(context)
                                         //     .showSnackBar(SnackBar(
                                         //         content: Text(
@@ -483,21 +511,54 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                               },
                               text: CustomText.LogIn,
                             ),
-                            SizedBox(height: 10,),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            // Center(
+                            //   child: RichText(
+                            //     text: TextSpan(
+                            //       text: CustomText.Version,
+                            //       style: Styles.black124,
+                            //       children: <TextSpan>[
+                            //         TextSpan(
+                            //             text: "$appVersionName", style: Styles.black126P),
+                            //         Constants.baseUrl=='https://uat.shishughar.in/api/'?
+                            //         TextSpan(text: "  (UAT)", style: Styles.red125)
+                            //             :Constants.baseUrl=='https://shishughar.in/api/'?
+                            //             TextSpan(  text: "  (PROD)", style: Styles.red125) :
+                            //         TextSpan(  text: "  (DEV)", style: Styles.red125),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                             Center(
-                              child: RichText(
-                                text: TextSpan(
-                                  text: CustomText.Version,
-                                  style: Styles.black124,
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: "$appVersionName", style: Styles.black126P),
-                                    Constants.baseUrl=='https://uat.shishughar.in/api/'?
-                                    TextSpan(text: "  (UAT)", style: Styles.red125)
-                                        :Constants.baseUrl=='https://shishughar.in/api/'?
-                                        TextSpan(  text: "  (PROD)", style: Styles.red125) :
-                                    TextSpan(  text: "  (DEV)", style: Styles.red125),
-                                  ],
+                              child: GestureDetector(
+                                onTap: () async {
+                                  await Validate().createDbBackup();
+                                },
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: CustomText.Version,
+                                    style: Styles.black124,
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                          text: "$appVersionName",
+                                          style: Styles.black126P),
+                                      Constants.baseUrl ==
+                                              'https://uat.shishughar.in/api/'
+                                          ? TextSpan(
+                                              text: "  (UAT)",
+                                              style: Styles.red125)
+                                          : Constants.baseUrl ==
+                                                  'https://shishughar.in/api/'
+                                              ? TextSpan(
+                                                  text: "",
+                                                  style: Styles.red125)
+                                              : TextSpan(
+                                                  text: "  (DEV)",
+                                                  style: Styles.red125),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -528,7 +589,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return  WillPopScope(
+        return WillPopScope(
           onWillPop: () async => false,
           child: AlertDialog(
             content: Column(
@@ -568,38 +629,48 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       await GramPanchayatDataHelper()
           .insertMasterGramPanchayat(gramPanchayatList);
 
-      if(master.tabSuperVisor!=null){
+      if (master.tabSuperVisor != null) {
         await MstSuperVisorHelper().inserts(master.tabSuperVisor!);
       }
       /////////Height Weight for age
-      if(master.tabHeightforAgeBoys!=null){
-        await HeightWeightBoysGirlsHelper().insertHeightForAgeBoys(master.tabHeightforAgeBoys!);
+      if (master.tabHeightforAgeBoys != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertHeightForAgeBoys(master.tabHeightforAgeBoys!);
       }
 
-      if(master.tabHeightforAgeGirls!=null){
-        await HeightWeightBoysGirlsHelper().insertHeightForAgeGirls(master.tabHeightforAgeGirls!);
+      if (master.tabHeightforAgeGirls != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertHeightForAgeGirls(master.tabHeightforAgeGirls!);
       }
 
-      if(master.tabWeightforAgeBoys!=null){
-        await HeightWeightBoysGirlsHelper().insertWeightForAgeBoys(master.tabWeightforAgeBoys!);
+      if (master.tabWeightforAgeBoys != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertWeightForAgeBoys(master.tabWeightforAgeBoys!);
       }
 
-      if(master.tabWeightforAgeGirls!=null){
-        await HeightWeightBoysGirlsHelper().insertWeightForAgeGirls(master.tabWeightforAgeGirls!);
+      if (master.tabWeightforAgeGirls != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertWeightForAgeGirls(master.tabWeightforAgeGirls!);
       }
-      if(master.tabWeightToHeightBoys!=null){
-        await HeightWeightBoysGirlsHelper().insertWeightToHeightBoys(master.tabWeightToHeightBoys!);
-      }
-
-      if(master.tabWeightToHeightGirls!=null){
-        await HeightWeightBoysGirlsHelper().insertWeightToHeightGirls(master.tabWeightToHeightGirls!);
+      if (master.tabWeightToHeightBoys != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertWeightToHeightBoys(master.tabWeightToHeightBoys!);
       }
 
-      if(master.tabVaccines!=null){
+      if (master.tabWeightToHeightGirls != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertWeightToHeightGirls(master.tabWeightToHeightGirls!);
+      }
+
+      if (master.tabVaccines != null) {
         await VaccinesDataHelper().insert(master.tabVaccines!);
       }
-
-
+      if (master.tabMasterStock != null) {
+        await MasterStockHelper().insert(master.tabMasterStock!);
+      }
+      if (master.tabPartnerStock != null) {
+        await PartnerStockHelper().insert(master.tabPartnerStock!);
+      }
     }
   }
 
@@ -608,11 +679,9 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     ////master user auth
     if (EnglishType == 'English') {
       Validate().saveString(Validate.sLanguage, 'en');
-    }
-    else if (EnglishType == 'Hindi') {
+    } else if (EnglishType == 'Hindi') {
       Validate().saveString(Validate.sLanguage, 'hi');
-    }
-    else if (EnglishType == 'Odiya') {
+    } else if (EnglishType == 'Odiya') {
       Validate().saveString(Validate.sLanguage, 'od');
     }
     if (loginApiModel.fullName != null) {
@@ -653,9 +722,11 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       await callApiLogicData(mContext, userName, password, token, userRole);
     } else {
       Navigator.pop(mContext);
-      Validate().singleButtonPopup( Global.errorBodyToString(
-          masterOtherDataResponse.body,
-          'message'), 'ok', false, context);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(masterOtherDataResponse.body, 'message'),
+          'ok',
+          false,
+          context);
       // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
       //     content: Text(Global.errorBodyToString(
       //         masterOtherDataResponse.body, 'message'))));
@@ -673,9 +744,11 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       await callApiTranslateData(mContext, userName, password, token, userRole);
     } else {
       Navigator.pop(mContext);
-      Validate().singleButtonPopup( Global.errorBodyToString(
-          logisResponce.body,
-          'message'), 'ok', false, context);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(logisResponce.body, 'message'),
+          'ok',
+          false,
+          context);
       // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
       //     content:
       //         Text(Global.errorBodyToString(logisResponce.body, 'message'))));
@@ -690,12 +763,15 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     if (translateResponce.statusCode == 200) {
       Map<String, dynamic> responseData = json.decode(translateResponce.body);
       await initTranslation(TranslationModel.fromJson(responseData));
-      await getCrecheData(mContext, userName, password, token, userRole);
+      await callMasterData(mContext, userName, password, token, userRole);
+      // await getCrecheData(mContext, userName, password, token, userRole);
     } else {
       Navigator.pop(mContext);
-      Validate().singleButtonPopup( Global.errorBodyToString(
-          translateResponce.body,
-          'message'), 'ok', false, context);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(translateResponce.body, 'message'),
+          'ok',
+          false,
+          context);
       // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
       //     content: Text(
       //         Global.errorBodyToString(translateResponce.body, 'message'))));
@@ -711,32 +787,17 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       MasterDataModel masterDataApiModel =
           MasterDataModel.fromJson(json.decode(msterDataResponse.body));
       await initMasterData(masterDataApiModel);
-      Navigator.pop(mContext);
-      Validate().saveString(Validate.userName, userName);
-      Validate().saveString(Validate.Password, password);
-      Validate().saveString(Validate.appToken, token);
-      Validate().saveString(Validate.msterDownloadDateTime, Validate().currentDateTime());
-      // if (userRole == 'Creche Supervisor') {
-      //   Navigator.pushReplacement(
-      //       mContext,
-      //       MaterialPageRoute(
-      //         builder: (mContext) => LocationScreen(),
-      //       ));
-      // } else {
-        Navigator.pushReplacement(
-            mContext,
-            MaterialPageRoute(
-              builder: (mContext) => DashboardScreen(index: 0),
-            ));
-      // }
+      if (userRole == CustomText.crecheSupervisor)
+        await getCrecheData(mContext, userName, password, token, userRole);
+      else
+        await getCrecheDataCC(mContext, userName, password, token, userRole);
     } else {
       Navigator.pop(mContext);
-      Validate().singleButtonPopup( Global.errorBodyToString(
-          msterDataResponse.body,
-          'message'), 'ok', false, context);
-      // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
-      //     content: Text(
-      //         Global.errorBodyToString(msterDataResponse.body, 'message'))));
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(msterDataResponse.body, 'message'),
+          'ok',
+          false,
+          context);
     }
   }
 
@@ -782,11 +843,34 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     }
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _loadSavedUsername();
-  // }
+  Future<void> getCrecheDataCC(BuildContext mContext, String userName,
+      String password, String appToken, String userRole) async {
+    var villageList = await VillageDataHelper().getTabVillageList();
+    String villageListString = '';
+    villageList.forEach((element) {
+      if (Global.validString(villageListString)) {
+        villageListString = '$villageListString,${element.name}';
+      } else
+        villageListString = '${element.name}';
+    });
+    var response = await CrecehDataDownloadApi().crechedatadownloadapiCC(
+        villageListString, userName, password, appToken);
+    if (response.statusCode == 200) {
+      Map<String, dynamic> resultMap = jsonDecode(response.body);
+      await CrecheDataHelper().downloadCrecheData(resultMap);
+      await callVillageProfiledataCC(
+          mContext, userName, password, appToken, userRole, villageListString);
+    } else {
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(response.body, 'message'),
+          'ok',
+          false,
+          context);
+      // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
+      //     content: Text(Global.errorBodyToString(response.body, 'message'))));
+    }
+  }
 
   Future<void> getCrecheData(BuildContext mContext, String userName,
       String password, String appToken, String userRole) async {
@@ -795,34 +879,48 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     if (response.statusCode == 200) {
       Map<String, dynamic> resultMap = jsonDecode(response.body);
       await CrecheDataHelper().downloadCrecheData(resultMap);
-      await callVillageProfiledata(mContext, userName, password, appToken, userRole);
-
+      await callVillageProfiledata(
+          mContext, userName, password, appToken, userRole);
     } else {
       Navigator.pop(mContext);
-      Validate().singleButtonPopup( Global.errorBodyToString(
-          response.body,
-          'message'), 'ok', false, context);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(response.body, 'message'),
+          'ok',
+          false,
+          context);
       // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
       //     content: Text(Global.errorBodyToString(response.body, 'message'))));
     }
   }
 
-  callVillageProfiledata(BuildContext mContext,String userName,
-  String password, String appToken, String userRole) async {
+  callVillageProfiledata(BuildContext mContext, String userName,
+      String password, String appToken, String userRole) async {
     var network = await Validate().checkNetworkConnection();
     if (network) {
       var response = await VillageProfileMetaApi()
           .VillageProfileDownloadApi(userName, password, appToken);
       if (response.statusCode == 200) {
         await updateVillageProfiledata(response);
-        await callMasterData(mContext, userName, password, appToken, userRole);
+        Navigator.pop(mContext);
+        Validate().saveString(Validate.loginName, mobileController.text.trim());
+        Validate().saveString(Validate.userName, userName);
+        Validate().saveString(Validate.Password, password);
+        SecureStorage.writeStringValue(Validate.Password, password);
+        Validate().saveString(Validate.appToken, appToken);
+        Validate().saveString(
+            Validate.msterDownloadDateTime, Validate().currentDateTime());
+
+        Navigator.pushReplacement(
+            mContext,
+            MaterialPageRoute(
+              builder: (mContext) => DashboardScreen(index: 0),
+            ));
       } else if (response.statusCode == 401) {
         Navigator.pop(mContext);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.remove(Validate.Password);
         ScaffoldMessenger.of(mContext).showSnackBar(
-          SnackBar(
-              content: Text(CustomText.token_expired )),
+          SnackBar(content: Text(CustomText.token_expired)),
         );
         Navigator.pushReplacement(
             context,
@@ -839,11 +937,62 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       }
     } else {
       Navigator.pop(mContext);
-      Validate().singleButtonPopup(
-          CustomText.nointernetconnectionavailable,
-          CustomText.ok,
-          false,
-          mContext);
+      Validate().singleButtonPopup(CustomText.nointernetconnectionavailable,
+          CustomText.ok, false, mContext);
+    }
+  }
+
+  callVillageProfiledataCC(
+      BuildContext mContext,
+      String userName,
+      String password,
+      String appToken,
+      String userRole,
+      String villageListString) async {
+    var network = await Validate().checkNetworkConnection();
+    if (network) {
+      var response = await VillageProfileMetaApi().VillageProfileDownloadApiCC(
+          villageListString, userName, password, appToken);
+      if (response.statusCode == 200) {
+        await updateVillageProfiledata(response);
+        Navigator.pop(mContext);
+        Validate().saveString(Validate.loginName, mobileController.text.trim());
+        Validate().saveString(Validate.userName, userName);
+        Validate().saveString(Validate.Password, password);
+        SecureStorage.writeStringValue(Validate.Password, password);
+        Validate().saveString(Validate.appToken, appToken);
+        Validate().saveString(
+            Validate.msterDownloadDateTime, Validate().currentDateTime());
+
+        Navigator.pushReplacement(
+            mContext,
+            MaterialPageRoute(
+              builder: (mContext) => DashboardScreen(index: 0),
+            ));
+      } else if (response.statusCode == 401) {
+        Navigator.pop(mContext);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.remove(Validate.Password);
+        ScaffoldMessenger.of(mContext).showSnackBar(
+          SnackBar(content: Text(CustomText.token_expired)),
+        );
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (mContext) => LoginScreen(),
+            ));
+      } else {
+        Navigator.pop(mContext);
+        Validate().singleButtonPopup(
+            Global.errorBodyToString(response.body, 'message'),
+            CustomText.ok,
+            false,
+            mContext);
+      }
+    } else {
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(CustomText.nointernetconnectionavailable,
+          CustomText.ok, false, mContext);
     }
   }
 
@@ -857,5 +1006,4 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       print("THE PROBLEM IS HERE: ${e.toString()}");
     }
   }
-
 }

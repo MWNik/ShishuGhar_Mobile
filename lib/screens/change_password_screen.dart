@@ -24,6 +24,7 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+  // FocusNode _focusNode = FocusNode();
   String? lngtr;
   List<Translation> locationControlls = [];
   TextEditingController oldpasswordController = TextEditingController();
@@ -32,11 +33,38 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool isNewPasswordInvalid = false;
   bool isConfirmPasswordDisabled = false;
   bool isConfirmPasswordInvalid = false;
+  bool _keyboardVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeData();
+
+    // WidgetsBinding.instance.addObserver(this);
+  }
+
+  // @override
+  // void dispose() {
+  //   WidgetsBinding.instance.removeObserver(this);
+  //   super.dispose();
+  // }
+
+  // @override
+  // void didChangeMetrics() {
+  //   super.didChangeMetrics();
+  //   final value = WidgetsBinding.instance.window.viewInsets.bottom;
+  //   bool keyBoardValue = value > 0;
+  //   if (_keyboardVisible != keyBoardValue) {
+  //     setState(() {
+  //       _keyboardVisible = value > 0;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       appBar: CustomAppbar(
         text: lngtr != null
             ? Global.returnTrLable(
@@ -46,12 +74,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           Navigator.pop(context);
         },
       ),
+      bottomNavigationBar:
+          SizedBox(child: Image.asset("assets/bottomloginImage.png")),
       body: SafeArea(
         child: lngtr != null
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Spacer(),
+                  // (!_keyboardVisible) ? Spacer() :
+                  // SizedBox(height: 20.h),
+                  // (!_keyboardVisible)
+                  //     ? Padding(padding: EdgeInsets.only(top: 40.h))
+                  //     : SizedBox(height: 10),
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: 20.w,
@@ -71,9 +106,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       style: Styles.black126P,
                     ),
                   ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
+                  // (!_keyboardVisible) ? Spacer() : SizedBox(),
+                  Spacer(),
+                  // (!_keyboardVisible)
+                  //     ? Padding(padding: EdgeInsets.only(bottom: 40.h))
+                  //     : SizedBox(),
                   Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
@@ -143,7 +180,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ],
                     ),
                   ),
+                  // (!_keyboardVisible) ? Spacer() : SizedBox(),
                   Spacer(),
+                  // (!_keyboardVisible)
+                  //     ? Padding(padding: EdgeInsets.only(bottom: 50.h))
+                  //     : SizedBox(),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 20.h),
                     child: CElevatedButton(
@@ -257,11 +298,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             }
                           } else if (responce.statusCode == 401) {
                             Navigator.pop(context);
-                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
                             await prefs.remove(Validate.Password);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content:
-                              Text(Global.returnTrLable(locationControlls, CustomText.token_expired, lngtr!))),
+                              SnackBar(
+                                  content: Text(Global.returnTrLable(
+                                      locationControlls,
+                                      CustomText.token_expired,
+                                      lngtr!))),
                             );
                             Navigator.pushReplacement(
                                 context,
@@ -291,7 +336,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           : "",
                     ),
                   ),
-                  Image.asset("assets/bottomloginImage.png"),
+                  Spacer()
+                  // (!_keyboardVisible)
+                  //     ? Padding(padding: EdgeInsets.only(bottom: 130.h))
+                  //     : Padding(padding: EdgeInsets.only(bottom: 20.h)),
                 ],
               )
             : SizedBox(),
@@ -350,11 +398,5 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         .then((value) => locationControlls = value);
 
     setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    initializeData();
   }
 }

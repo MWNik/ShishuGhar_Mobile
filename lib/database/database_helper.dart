@@ -1,11 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:shishughar/model/apimodel/auth_login_model.dart';
 import 'package:shishughar/model/apimodel/login_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-
 
 class DatabaseHelper {
   static Database? database;
@@ -27,7 +25,7 @@ class DatabaseHelper {
       print("Opening existing database");
     }
     database = await openDatabase(path,
-        version: 1,
+        version: 3,
         onUpgrade: (db, oldVersion, newVersion) =>
             upgradeVersion(db, oldVersion, newVersion));
 
@@ -36,13 +34,117 @@ class DatabaseHelper {
 
   Future<void> upgradeVersion(
       Database db, int oldVersion, int newVersion) async {
-    // This function will be called when the database needs to be upgraded.
-    // You can implement your migration logic here.
-    print("Db version $oldVersion $newVersion");
     if (oldVersion > 0) {
-      if (newVersion == 1) {
-        // await db.execute('ALTER TABLE tbl_disease_wise_patient_occupancy_child ADD COLUMN other_disease_type TEXT');
-        // await db.execute('ALTER TABLE tbl_manage_daily_stock_cylinder_type_child ADD COLUMN is_web_entry INTEGER');
+      if (oldVersion == 1 && newVersion > 1) {
+        try {
+          await db.execute(
+              'ALTER TABLE child_attendance_responce ADD COLUMN date_of_attendance TEXT');
+        } catch (e) {}
+      }
+      if (oldVersion == 2 && newVersion > 2) {
+        try {
+          await db.execute(
+              'ALTER TABLE tabWeightforAgeBoys RENAME COLUMN age_in_months TO age_in_days');
+          await db.execute(
+              'ALTER TABLE tabWeightforAgeGirls RENAME COLUMN age_in_months TO age_in_days');
+          await db.execute(
+              'ALTER TABLE tabHeightforAgeBoys RENAME COLUMN age_in_months TO age_in_days');
+          await db.execute(
+              'ALTER TABLE tabHeightforAgeGirls RENAME COLUMN age_in_months TO age_in_days');
+
+          await db.execute('''CREATE TABLE tabCreche_stock_response (
+          sguid TEXT PRIMARY KEY,
+          name INTEGER,
+          responces TEXT,
+          is_edited INTEGER,
+          is_deleted INTEGER,
+          created_at TEXT,
+          created_by TEXT,
+          update_at TEXT,
+          updated_by TEXT,
+          is_uploaded INTEGER,
+          creche_id INTEGER,
+          month INTEGER,
+          year INTEGER,
+          item_id INTEGER
+          );''');
+
+          await db.execute('''CREATE TABLE tabCreche_requisition_response (
+            rguid TEXT PRIMARY KEY,
+            name INTEGER,
+            responces TEXT,
+            is_edited INTEGER,
+            is_deleted INTEGER,
+            created_at TEXT,
+            created_by TEXT,
+            update_at TEXT,
+            updated_by TEXT,
+            is_uploaded INTEGER,
+            creche_id INTEGER,
+            month INTEGER,
+            year INTEGER,
+            item_id INTEGER
+          );''');
+
+          await db.execute('''CREATE TABLE tabCreche_stock_fields (
+            name TEXT,
+            idx INTEGER,
+            fieldtype TEXT,
+            fieldname TEXT,
+            reqd INTEGER,
+            label TEXT,
+            options TEXT,
+            parent TEXT,
+            hidden INTEGER,
+            length INTEGER,
+            depends_on TEXT,
+            mandatory_depends_on TEXT,
+            read_only_depends_on TEXT,
+            ismultiselect INTEGER,
+            multiselectlink TEXT
+          );''');
+
+          await db.execute('''CREATE TABLE tabCreche_requisition_fields (
+            name TEXT,
+            idx INTEGER,
+            fieldtype TEXT,
+            fieldname TEXT,
+            reqd INTEGER,
+            label TEXT,
+            options TEXT,
+            parent TEXT,
+            hidden INTEGER,
+            length INTEGER,
+            depends_on TEXT,
+            mandatory_depends_on TEXT,
+            read_only_depends_on TEXT,
+            ismultiselect INTEGER,
+            multiselectlink TEXT
+          );''');
+
+          await db.execute('''CREATE TABLE tabPartner_Stock (
+            name INTEGER PRIMARY KEY,
+            items TEXT,
+            odia TEXT,
+            hindi TEXT,
+            stock_type TEXT,
+            partner_id TEXT,
+            item_required_per_child_per_months TEXT,
+            is_active INTEGER,
+            seq_id INTEGER
+          );''');
+
+          await db.execute('''CREATE TABLE tabMaster_Stock (
+            name INTEGER PRIMARY KEY,
+            stock TEXT,
+            odia TEXT,
+            hindi TEXT,
+            is_active INTEGER,
+            seq_id INTEGER
+          );''');
+        } catch (e) {
+          print("$e");
+        }
       }
     }
   }
@@ -64,7 +166,6 @@ class DatabaseHelper {
       return LoginApiModel.fromJson(maps[i]);
     });
   }
-
 
   Future deleteAllRecords() async {
     await openDb();
@@ -141,7 +242,35 @@ class DatabaseHelper {
     await database!.delete('tabVillage_response');
     await database!.delete('enrollred_exit_child_responce');
     await database!.delete('tab_enrolled_exit_meta');
+    await database!.delete('tabCreche_requisition_response');
+    await database!.delete('tabCreche_stock_response');
+    await database!.delete('tabCreche_stock_fields');
+    await database!.delete('tabCreche_requisition_fields');
+    await database!.delete('tabPartner_Stock');
+    await database!.delete('tabMaster_Stock');
+  }
+
+  Future updateColoumnName(Database db,String tableName,String columnName) async{
+    try{
+      var tempTableName='$tableName'+'New';
+      await db.execute('''CREATE TABLE $tempTableName (
+          name INTEGER PRIMARY KEY,
+          $columnName INTEGER,
+          green NUMERIC,
+          red NUMERIC,
+          yellow_max NUMERIC,
+          yellow_min NUMERIC
+          );''');
+
+      await db.execute('INSERT INTO $tempTableName (id, $columnName, green,red,yellow_max,yellow_min) SELECT name, age_in_months, green,red,yellow_max,yellow_min FROM $tableName');
+      await db.execute('DROP TABLE $tableName');
+      await db.execute('ALTER TABLE $tempTableName RENAME TO $tempTableName');
+    }catch(e){
+      print(e);
+    }
+
 
 
   }
+
 }

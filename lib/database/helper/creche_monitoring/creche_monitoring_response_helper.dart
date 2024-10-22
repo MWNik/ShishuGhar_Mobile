@@ -140,6 +140,18 @@ class CrecheMonitorResponseHelper {
     }
   }
 
+  Future<List<CrecheMonitorResponseModel>> getVillageProfileforUploadDarftEdit() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery('select * from tab_creche_monitoring_response where is_edited=1 or is_edited=2');
+    List<CrecheMonitorResponseModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(CrecheMonitorResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   /// Update Uploaded Item
   Future<void> updateUploadedItem(Map<String, dynamic> item) async {
     print(item);

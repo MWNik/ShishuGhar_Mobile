@@ -80,10 +80,6 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenForChild>
             title: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  widget.tabTitle,
-                  style: Styles.white145,
-                ),
                 RichText(
                   maxLines: 2,
                   textAlign: TextAlign.center,
@@ -91,7 +87,7 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenForChild>
                     WidgetSpan(
                       child: Text(
                         '${widget.childName}',
-                        style: Styles.white126P,
+                        style: Styles.white145,
                         textAlign: TextAlign.center,
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
@@ -100,14 +96,18 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenForChild>
                     WidgetSpan(
                       child: Text(
                         '-${widget.childId}',
-                        style: Styles.white126P,
+                        style: Styles.white145,
                         textAlign: TextAlign.center,
                         softWrap: true,
                         // overflow: TextOverflow.ellipsis,
                       ),
                     )
                   ]),
-                )
+                ),
+                Text(
+                  widget.tabTitle,
+                  style: Styles.white126P,
+                ),
               ],
             ),
             centerTitle: true,
@@ -167,23 +167,22 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenForChild>
     List<Widget> tabItem = [];
     for (int i = 0; i < tabCount; i++) {
       if (i == 1) {
-        tabItem.add(
-            CompletedChildFollowUpsForChildListingScreen(
-                tabTitle: widget.tabTitle,
-                childenrollguid: widget.childenrollguid,
-             creche_id:widget.creche_id,
-            childNameId:widget.childNameId,
-            childId:widget.childId,
-              childName:widget.childName,
-            ));
+        tabItem.add(CompletedChildFollowUpsForChildListingScreen(
+          tabTitle: widget.tabTitle,
+          childenrollguid: widget.childenrollguid,
+          creche_id: widget.creche_id,
+          childNameId: widget.childNameId,
+          childId: widget.childId,
+          childName: widget.childName,
+        ));
       } else
         tabItem.add(SchudleFollowUpsForChildListingScreen(
           tabTitle: widget.tabTitle,
           childenrollguid: widget.childenrollguid,
-          creche_id:widget.creche_id,
-          childNameId:widget.childNameId,
-          childId:widget.childId,
-          childName:widget.childName,
+          creche_id: widget.creche_id,
+          childNameId: widget.childNameId,
+          childId: widget.childId,
+          childName: widget.childName,
         ));
     }
     return tabItem;

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
+import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown_for_filter.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
@@ -21,8 +22,13 @@ import 'child_refferal_tab_screen.dart';
 
 class ChildReferralCompletedListingScreen extends StatefulWidget {
   String tabTitle;
-     String? enrolledChildGUID;
-  ChildReferralCompletedListingScreen({super.key,required this.tabTitle, this.enrolledChildGUID});
+  String? enrolledChildGUID;
+  bool isHomeScreen;
+  ChildReferralCompletedListingScreen(
+      {super.key,
+      required this.tabTitle,
+      this.enrolledChildGUID,
+      required this.isHomeScreen});
 
   @override
   State<ChildReferralCompletedListingScreen> createState() =>
@@ -33,7 +39,9 @@ class _ChildReferralListingScreenState
     extends State<ChildReferralCompletedListingScreen> {
   List<Map<String, dynamic>> reffral = [];
   List<Map<String, dynamic>> filteredReferral = [];
-   
+  List<Map<String, dynamic>> usynchedList = [];
+  List<Map<String, dynamic>> allList = [];
+
   List<CresheDatabaseResponceModel> crecheData = [];
   List<Translation> translats = [];
   String lng = 'en';
@@ -42,6 +50,7 @@ class _ChildReferralListingScreenState
   TextEditingController Searchcontroller = TextEditingController();
   List<OptionsModel> creches = [];
   String? selectedCreche;
+  bool isOnlyUnsyched = false;
 
   @override
   void initState() {
@@ -63,7 +72,9 @@ class _ChildReferralListingScreenState
       CustomText.hhNameS,
       CustomText.NorecordAvailable,
       CustomText.Search,
-      CustomText.Village
+      CustomText.Village,
+      CustomText.all,
+      CustomText.unsynched
     ];
 
     await TranslationDataHelper()
@@ -73,47 +84,53 @@ class _ChildReferralListingScreenState
     await fetchCompletedReffral();
   }
 
-
-
   Future<void> fetchCompletedReffral() async {
-    if(Global.validString(widget.enrolledChildGUID))
-      reffral = await ChildReferralTabResponseHelper().callChildReffralsByEnrolledGUID(widget.enrolledChildGUID!);
-    else reffral = await ChildReferralTabResponseHelper().callChildReffrals();
-    filteredReferral = reffral;
+    if (Global.validString(widget.enrolledChildGUID))
+      reffral = await ChildReferralTabResponseHelper()
+          .callChildReffralsByEnrolledGUID(widget.enrolledChildGUID!);
+    else
+      reffral = await ChildReferralTabResponseHelper().callChildReffrals();
+    usynchedList =
+        reffral.where((element) => element['is_edited'] == 1).toList();
+    allList = reffral;
+    filteredReferral = isOnlyUnsyched ? usynchedList : allList;
     crecheData = await CrecheDataHelper().getCrecheResponce();
-     creches =
-    await OptionsModelHelper().callCrechInOptionAll('Creche');
+    creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
     setState(() {});
   }
+
   void cleaAllFilter() {
-    filteredReferral = reffral;
+    filteredReferral = isOnlyUnsyched ? usynchedList : allList;
     selectedCreche = null;
-    
-    setState((){});
+
+    setState(() {});
   }
+
   filteredGetData(BuildContext context) {
+    var filterList = isOnlyUnsyched ? usynchedList : allList;
     if (selectedCreche != null) {
-      filteredReferral = reffral.where((element) {
-        var creche_id = Global.getItemValues(element['enrolledResponce'], 'creche_id');
+      filteredReferral = filterList.where((element) {
+        var creche_id =
+            Global.getItemValues(element['enrolledResponce'], 'creche_id');
         return creche_id.toString() == selectedCreche.toString();
       }).toList();
-      setState(() {
-      
-    });
-
+    } else {
+      filteredReferral = filterList;
     }
-    
+    setState(() {});
   }
+
   filterDataQu(String entry) {
+    var filterList = isOnlyUnsyched ? usynchedList : allList;
     if (entry.length > 0) {
-      filteredReferral = reffral
+      filteredReferral = filterList
           .where((element) =>
-              (Global.getItemValues(element['enrolledResponce'],'child_name'))
+              (Global.getItemValues(element['enrolledResponce'], 'child_name'))
                   .toLowerCase()
-                  .startsWith(entry.toLowerCase()) )
+                  .startsWith(entry.toLowerCase()))
           .toList();
     } else {
-      filteredReferral = reffral;
+      filteredReferral = filterList;
     }
     setState(() {});
     print('cLength: ${filteredReferral.length}');
@@ -208,42 +225,78 @@ class _ChildReferralListingScreenState
                         ],
                       ),
                     ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 25),
+                      child: AnimatedRollingSwitch(
+                        title1: Global.returnTrLable(
+                            translats, CustomText.all, lng),
+                        title2: Global.returnTrLable(
+                            translats, CustomText.unsynched, lng),
+                        isOnlyUnsynched: isOnlyUnsyched,
+                        onChange: (value) async {
+                          setState(() {
+                            isOnlyUnsyched = value;
+                          });
+                          await fetchCompletedReffral();
+                        },
+                      ),
+                    )
                   ]),
             )),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
         child: Column(children: [
-          Row(
-            children: [
-              Expanded(
-                  child: CustomTextFieldRow(
-                    controller: Searchcontroller,
-                    onChanged: (value) {
-                      print(value);
-                      filterDataQu(value);
-                    },
-                    hintText: Global.returnTrLable(
-                        translats, CustomText.Search, lng),
-                    prefixIcon: Image.asset(
-                      "assets/search.png",
-                      scale: 2.4,
+          widget.isHomeScreen
+              ? Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextFieldRow(
+                        controller: Searchcontroller,
+                        onChanged: (value) {
+                          print(value);
+                          filterDataQu(value);
+                        },
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.Search, lng),
+                        prefixIcon: Image.asset(
+                          "assets/search.png",
+                          scale: 2.4,
+                        ),
+                      ),
                     ),
-                  ),),
-              SizedBox(
-                width: 10.w,
-              ),
-              GestureDetector(
-                onTap: () {
-                  _scaffoldKey.currentState!.openEndDrawer();
-                },
-                child: Image.asset(
-                  "assets/filter_icon.png",
-                  scale: 2.4,
+                    SizedBox(
+                      width: 10.w,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        _scaffoldKey.currentState!.openEndDrawer();
+                      },
+                      child: Image.asset(
+                        "assets/filter_icon.png",
+                        scale: 2.4,
+                      ),
+                    )
+                  ],
+                )
+              : Container(
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: AnimatedRollingSwitch(
+                      title1:
+                          Global.returnTrLable(translats, CustomText.all, lng),
+                      title2: Global.returnTrLable(
+                          translats, CustomText.unsynched, lng),
+                      isOnlyUnsynched: isOnlyUnsyched,
+                      onChange: (value) async {
+                        setState(() {
+                          isOnlyUnsyched = value;
+                        });
+                        await fetchCompletedReffral();
+                      },
+                    ),
+                  ),
                 ),
-              )
-            ],
-          ),
           Expanded(
             child: (filteredReferral.length > 0)
                 ? ListView.builder(
@@ -264,14 +317,13 @@ class _ChildReferralListingScreenState
 
                           var creche_id = Global.stringToInt(
                               Global.getItemValues(
-                                  filteredReferral[index]
-                                      ['enrolledResponce'],
+                                  filteredReferral[index]['enrolledResponce'],
                                   'creche_id'));
                           var child_referral_guid =
-                          filteredReferral[index]['child_referral_guid'];
+                              filteredReferral[index]['child_referral_guid'];
                           var backDate =
-                          DateTime.parse(Validate().currentDate())
-                              .subtract(Duration(days: 7));
+                              DateTime.parse(Validate().currentDate())
+                                  .subtract(Duration(days: 7));
                           if (backDate.isAfter(DateTime.parse(
                               filteredReferral[index]['date_of_referral']))) {
                             minDate = backDate;
@@ -298,41 +350,35 @@ class _ChildReferralListingScreenState
                           bool isEditable = date.add(Duration(days: 8)).isAfter(
                               DateTime.parse(Validate().currentDate()));
 
-
-                            var refStatus = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        ChildReferralTabScreen(
-                                          tabTitle: widget.tabTitle,
-                                          GrowthMonitoringGUID:filteredReferral[index]['cgmguid'],
-                                          enrolChildGuid:
+                          var refStatus = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) => ChildReferralTabScreen(
+                                      tabTitle: widget.tabTitle,
+                                      GrowthMonitoringGUID:
+                                          filteredReferral[index]['cgmguid'],
+                                      enrolChildGuid: filteredReferral[index]
+                                          ["childenrolledguid"],
+                                      creche_id: creche_id,
+                                      ChildDOB: Global.getItemValues(
                                           filteredReferral[index]
-                                                  ["childenrolledguid"],
-                                          creche_id: creche_id,
-                                          ChildDOB: Global.getItemValues(
-                                              filteredReferral[index]
-                                                  ['enrolledResponce'],
-                                              'child_dob'),
-                                          enrollDate: Global.getItemValues(
-                                              filteredReferral[index]
-                                                  ['enrolledResponce'],
-                                              'date_of_enrollment'),
-                                          child_id: childId,
-                                          child_referral_guid:
-                                              child_referral_guid,
-                                            childName: childName,
-                                            minDate: minDate!,
-                                            isEditable: isEditable,
-                                            scheduleDate: filteredReferral[index]['date_of_referral'],
-                                          childId: childIdGen,
-                                            isDischarge: Global.validString(Global.getItemValues(filteredReferral[index]
-                                            ['responces'],
-                                                'discharge_date'))
-                                        )));
+                                              ['enrolledResponce'],
+                                          'child_dob'),
+                                      enrollDate: Global.getItemValues(
+                                          filteredReferral[index]
+                                              ['enrolledResponce'],
+                                          'date_of_enrollment'),
+                                      child_id: childId,
+                                      child_referral_guid: child_referral_guid,
+                                      childName: childName,
+                                      minDate: minDate!,
+                                      isEditable: isEditable,
+                                      scheduleDate: filteredReferral[index]
+                                          ['date_of_referral'],
+                                      childId: childIdGen,
+                                      isDischarge: Global.validString(Global.getItemValues(filteredReferral[index]['responces'], 'discharge_date')))));
 
-                            if (refStatus == 'itemRefresh') {
-                              await fetchCompletedReffral();
-
+                          if (refStatus == 'itemRefresh') {
+                            await fetchCompletedReffral();
                           }
                         },
                         child: Padding(
@@ -371,16 +417,23 @@ class _ChildReferralListingScreenState
                                         ),
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
                                           style: Styles.black104,
                                         ),
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.Creche_Name, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
                                           style: Styles.black104,
                                         ),
                                         Text(
-                                            Global.validString(Global.getItemValues(filteredReferral[index]
-                                            ['responces'],
-                                                'discharge_date'))?'${Global.returnTrLable(translats, CustomText.DischangeDate, lng).trim()} : ':'${Global.returnTrLable(translats, CustomText.visitDate, lng).trim()} : ',
+                                          Global.validString(
+                                                  Global.getItemValues(
+                                                      filteredReferral[index]
+                                                          ['responces'],
+                                                      'discharge_date'))
+                                              ? '${Global.returnTrLable(translats, CustomText.DischangeDate, lng).trim()} : '
+                                              : '${Global.returnTrLable(translats, CustomText.visitDate, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
                                           style: Styles.black104,
                                         ),
                                       ],
@@ -406,7 +459,7 @@ class _ChildReferralListingScreenState
                                                 filteredReferral[index]
                                                     ['enrolledResponce'],
                                                 'child_name'),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
@@ -414,7 +467,8 @@ class _ChildReferralListingScreenState
                                                 filteredReferral[index]
                                                     ['enrolledResponce'],
                                                 'child_id'),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
@@ -423,32 +477,46 @@ class _ChildReferralListingScreenState
                                                     filteredReferral[index]
                                                         ['enrolledResponce'],
                                                     'creche_id')),
-                                            style: Styles.blue125,
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
-                                             Global.validString(Global.getItemValues(filteredReferral[index]
-                                             ['responces'],
-                                                 'discharge_date'))? Validate().displeDateFormate(Global.getItemValues(filteredReferral[index]
-                                              ['responces'],
-                                              'discharge_date')):Validate().displeDateFormate(Global.getItemValues(filteredReferral[index]
-                                             ['responces'],
-                                                 'visit_date')),
-                                            style: Styles.blue125,
+                                            Global.validString(
+                                                    Global.getItemValues(
+                                                        filteredReferral[index]
+                                                            ['responces'],
+                                                        'discharge_date'))
+                                                ? Validate().displeDateFormate(
+                                                    Global.getItemValues(
+                                                        filteredReferral[index]
+                                                            ['responces'],
+                                                        'discharge_date'))
+                                                : Validate().displeDateFormate(
+                                                    Global.getItemValues(
+                                                        filteredReferral[index]
+                                                            ['responces'],
+                                                        'visit_date')),
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ],
                                       ),
                                     ),
-                                    (filteredReferral[index]['is_edited']==0 && filteredReferral[index]['is_uploaded']==1)?
-                                    Image.asset(
-                                      "assets/sync.png",
-                                      scale: 1.5,
-                                    ):
-                                    Image.asset(
-                                      "assets/sync_gray.png",
-                                      scale: 1.5,
-                                    )
+                                    (filteredReferral[index]['is_edited'] ==
+                                                0 &&
+                                            filteredReferral[index]
+                                                    ['is_uploaded'] ==
+                                                1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : Image.asset(
+                                            "assets/sync_gray.png",
+                                            scale: 1.5,
+                                          )
                                   ]),
                             ),
                           ),
@@ -475,6 +543,4 @@ class _ChildReferralListingScreenState
     }
     return returnValue;
   }
-
-
 }

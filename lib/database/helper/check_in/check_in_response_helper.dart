@@ -114,8 +114,8 @@ class CheckInResponseHelper {
           is_uploaded: 1,
           is_edited: 0,
           is_deleted: 0,
-          created_by: chechIn['owner'],
-          created_at: chechIn['creation'],
+          created_by: chechIn['app_created_by'],
+          created_at: chechIn['app_created_on'],
           update_at: chechIn['modified'],
           updated_by: chechIn['modified_by'],
           responces: jsonEncode(Validate().keyesFromResponce(chechIn)));

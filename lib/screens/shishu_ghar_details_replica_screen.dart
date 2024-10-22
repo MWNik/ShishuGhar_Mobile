@@ -4,14 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/screens/tabed_screens/anthrometory/child_growth_listing_screen.dart';
+import 'package:shishughar/screens/tabed_screens/anthrometory/child_growth_listing_screen_cc.dart';
 import 'package:shishughar/screens/tabed_screens/attendence/attendance_listed_screen.dart';
 import 'package:shishughar/screens/tabed_screens/cashbook/cashbook_listing_Tab_screen.dart';
 import 'package:shishughar/screens/tabed_screens/child_exit/child_exit_listing_Tab_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_commite_meeting/creche_committe_listing_screen.dart';
+import 'package:shishughar/screens/tabed_screens/creche_monitering_checkList_cbm/creche_monitering_checklist_CBM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_CC/creche_monitering_checklist_CC_listing_screen.dart';
+import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_alm/creche_monitering_checklist_ALM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitor/creche_monitor_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/enrolled_children/children_enrolled_for_cc_listed.dart';
 import 'package:shishughar/screens/tabed_screens/enrolled_exit_child/enrolled_exit_child_listing_tab.dart';
+import 'package:shishughar/screens/tabed_screens/stock/stock_tab_listing_screen.dart';
+// import 'package:shishughar/screens/tabed_screens/stock/stock_tab_listing_screen.dart';
 
 import '../custom_widget/custom_text.dart';
 import '../database/helper/creche_helper/creche_data_helper.dart';
@@ -26,9 +31,7 @@ import '../utils/validate.dart';
 
 class ShishuGharDetailsReplica extends StatefulWidget {
   final int crecheId;
-  ShishuGharDetailsReplica(
-      {super.key, required this.crecheId});
-
+  ShishuGharDetailsReplica({super.key, required this.crecheId});
 
   @override
   _ShishuGharDetailsReplicaState createState() =>
@@ -63,8 +66,8 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       crechName = Global.getItemValues(responce!.responces!, 'creche_name');
       if (Global.validString(
           Global.getItemValues(responce!.responces!, 'state_id'))) {
-        var states =
-            await OptionsModelHelper().getLocationData('State', responseData,lng!);
+        var states = await OptionsModelHelper()
+            .getLocationData('State', responseData, lng!);
         if (states.length > 0) {
           state = states[0].values;
         }
@@ -72,15 +75,15 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       if (Global.validString(
           Global.getItemValues(responce!.responces!, 'district_id'))) {
         var districts = await OptionsModelHelper()
-            .getLocationData('District', responseData,lng!);
+            .getLocationData('District', responseData, lng!);
         if (districts.length > 0) {
           district = districts[0].values;
         }
       }
       if (Global.validString(
           Global.getItemValues(responce!.responces!, 'block_id'))) {
-        var blocks =
-            await OptionsModelHelper().getLocationData('Block', responseData,lng!);
+        var blocks = await OptionsModelHelper()
+            .getLocationData('Block', responseData, lng!);
         if (blocks.length > 0) {
           block = blocks[0].values;
         }
@@ -88,15 +91,16 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       if (Global.validString(
           Global.getItemValues(responce!.responces!, 'gp_id'))) {
         var gps = await OptionsModelHelper()
-            .getLocationData('Gram Panchayat', responseData,lng!);
+            .getLocationData('Gram Panchayat', responseData, lng!);
         if (gps.length > 0) {
           gp = gps[0].values;
         }
       }
 
-      if (Global.validString(Global.getItemValues(responce!.responces!, 'village_id'))) {
-        var villages =
-            await OptionsModelHelper().getLocationData('Village', responseData,lng!);
+      if (Global.validString(
+          Global.getItemValues(responce!.responces!, 'village_id'))) {
+        var villages = await OptionsModelHelper()
+            .getLocationData('Village', responseData, lng!);
         if (villages.length > 0) {
           village = villages[0].values;
         }
@@ -146,44 +150,37 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                  Global.returnTrLable(locationControlls,
-                                      CustomText.Creche_Name, lng!),
+                                  '${Global.returnTrLable(locationControlls, CustomText.Creche_Name, lng!)} :',
                                   style: Styles.black104),
                               Text(
-                                Global.returnTrLable(locationControlls,
-                                    CustomText.Village, lng!),
+                                '${Global.returnTrLable(locationControlls, CustomText.Village, lng!)} :',
                                 style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.3),
+                                strutStyle: StrutStyle(height: 1.2),
                               ),
                               Text(
-                                Global.returnTrLable(locationControlls,
-                                    CustomText.GramPanchayat, lng!),
+                                '${Global.returnTrLable(locationControlls, CustomText.GramPanchayat, lng!)} :',
                                 style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.3),
+                                strutStyle: StrutStyle(height: 1.2),
                               ),
                               Text(
-                                Global.returnTrLable(
-                                    locationControlls, CustomText.Block, lng!),
+                                '${Global.returnTrLable(locationControlls, CustomText.Block, lng!)} :',
                                 style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.3),
+                                strutStyle: StrutStyle(height: 1.2),
                               ),
                               Text(
-                                Global.returnTrLable(locationControlls,
-                                    CustomText.District, lng!),
+                                '${Global.returnTrLable(locationControlls, CustomText.District, lng!)} :',
                                 style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.3),
+                                strutStyle: StrutStyle(height: 1.2),
                               ),
                               Text(
-                                Global.returnTrLable(
-                                    locationControlls, CustomText.State, lng!),
+                                '${Global.returnTrLable(locationControlls, CustomText.State, lng!)} :',
                                 style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.3),
+                                strutStyle: StrutStyle(height: 1.2),
                               ),
                               Text(
-                                Global.returnTrLable(locationControlls,
-                                    CustomText.Supervisor, lng!),
+                                '${Global.returnTrLable(locationControlls, CustomText.Supervisor, lng!)} :',
                                 style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.3),
+                                strutStyle: StrutStyle(height: 1.2),
                               ),
                             ],
                           ),
@@ -207,37 +204,36 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
                                         Global.getItemValues(
                                             responce!.responces!,
                                             'creche_name'),
-                                        style: Styles.blue125,
-                                        strutStyle: StrutStyle(height: 1),
+                                        style: Styles.cardBlue10,
                                       ),
                                       Text(
                                         village != null ? '$village' : '',
-                                        style: Styles.blue125,
-                                        strutStyle: StrutStyle(height: 1.1),
+                                        style: Styles.cardBlue10,
+                                        strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         gp != null ? '$gp' : '',
-                                        style: Styles.blue125,
+                                        style: Styles.cardBlue10,
                                         strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         block != null ? '$block' : '',
-                                        style: Styles.blue125,
+                                        style: Styles.cardBlue10,
                                         strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         district != null ? '$district' : '',
-                                        style: Styles.blue125,
+                                        style: Styles.cardBlue10,
                                         strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         state != null ? '$state' : '',
-                                        style: Styles.blue125,
+                                        style: Styles.cardBlue10,
                                         strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
                                         supName != null ? '$supName' : '',
-                                        style: Styles.blue125,
+                                        style: Styles.cardBlue10,
                                         strutStyle: StrutStyle(height: 1.2),
                                       ),
                                     ],
@@ -320,6 +316,8 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
                                           locationControlls, text[i], lng!),
                                       style: Styles.listlablefont,
                                       textAlign: TextAlign.center,
+                                      // overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
                                     ),
                                   )
                                 ],
@@ -347,7 +345,6 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       'assets/creche_profile/notes.png',
       'assets/creche_profile/casebook.png',
       'assets/creche_profile/stock.png',
-
     ];
 
     text = [
@@ -385,30 +382,25 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
 
   Future<void> onclick(int i, String imsgeItem) async {
     if (i == 0) {
-      if (role == 'Creche Supervisor') {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => EnrolledExitChildListingTab(
-                creCheId:widget.crecheId,
-                village_id:Global.getItemValues(responce!.responces!, 'village_id')
-            )));
-      } else {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => EnrolledChildrenForCC()));
-      }
+      // if (role == CustomText.crecheSupervisor.trim() ||
+      //     role == CustomText.clusterCoordinator.trim()) {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => EnrolledExitChildListingTab(
+              creCheId: widget.crecheId,
+              village_id:
+                  Global.getItemValues(responce!.responces!, 'village_id'))));
+      // }
     } else if (i == 1) {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => ChildExitListingTabScreen(
-              creche_id:widget.crecheId.toString()
-          )));
+              creche_id: widget.crecheId.toString())));
     } else if (i == 2) {
       Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) =>
-              CrecheCommitteListingScreen(
-                  creche_id: widget.crecheId.toString(),
-                  crecheName: crechName!
-              )));
+          builder: (BuildContext context) => CrecheCommitteListingScreen(
+              creche_id: widget.crecheId.toString(), crecheName: crechName!)));
     } else if (i == 3) {
-      var items = await EnrolledExitChilrenResponceHelper().enrolledChildByCreche(widget.crecheId);
+      var items = await EnrolledExitChilrenResponceHelper()
+          .enrolledChildByCreche(widget.crecheId);
       if (items.length > 0) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => AttendanceListedScreen(
@@ -419,13 +411,22 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
         Validate().singleButtonPopup(CustomText.DontHaveChildrenForAttender,
             CustomText.ok, false, context);
     } else if (i == 4) {
-      var items = await EnrolledExitChilrenResponceHelper().enrolledChildByCreche(widget.crecheId);
+      var items = await EnrolledExitChilrenResponceHelper()
+          .enrolledChildByCreche(widget.crecheId);
       if (items.length > 0) {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => ChildGrowthListingScreen(
-                  creche_nameId: widget.crecheId,
-                  creche_name: crechName!,
-                )));
+        if (role == CustomText.crecheSupervisor) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => ChildGrowthListingScreen(
+                    creche_nameId: widget.crecheId,
+                    creche_name: crechName!,
+                  )));
+        } else {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => ChildGrowthListingScreenCC(
+                    creche_nameId: widget.crecheId,
+                    creche_name: crechName!,
+                  )));
+        }
       } else
         Validate().singleButtonPopup(
             CustomText.DontHaveChildrenForAnthropometry,
@@ -433,28 +434,41 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
             false,
             context);
     } else if (i == 5) {
-      if (role == 'Creche Supervisor') {
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => CrecheMonitorListingScreen(
-            crecheId: widget.crecheId.toString(),
-            crecheName: crechName!,
-          )));
-      }else if (role == 'Cluster Coordinator') {
+      if (role == CustomText.crecheSupervisor) {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => CrecheMonitorListingScreen(
+                  crecheId: widget.crecheId.toString(),
+                  crecheName: crechName!,
+                )));
+      } else if (role == CustomText.clusterCoordinator) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => cmcCCListingScreen(
-              creche_id: widget.crecheId.toString(),
-              crecheName: crechName!,
-            )));
+                  creche_id: widget.crecheId.toString(),
+                  crecheName: crechName!,
+                )));
+      } else if (role == CustomText.alm.trim()) {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => cmcALMListingScreen(
+                  creche_id: widget.crecheId.toString(),
+                  crecheName: crechName!,
+                )));
+      } else if (role == CustomText.cbm.trim()) {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => cmcCBMListingScreen(
+                  creche_id: widget.crecheId.toString(),
+                  crecheName: crechName!,
+                )));
       }
     } else if (i == 6) {
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) =>
-              CashBookListingTabScreen(
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => CashBookListingTabScreen(
                 creche_id: widget.crecheId.toString(),
-              )
-          )
-      );
+              )));
     } else if (i == 7) {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => StockTabListingScreen(
+                creche_id: widget.crecheId.toString(),
+              )));
     }
   }
 }

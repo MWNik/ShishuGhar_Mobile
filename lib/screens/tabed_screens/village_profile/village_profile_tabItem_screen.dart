@@ -36,6 +36,7 @@ class VillageProfileTbaItem extends StatefulWidget {
   final Function(int) changeTab;
   final int tabIndex;
   final int totalTab;
+  final bool isEditable;
 
   const VillageProfileTbaItem({
     super.key,
@@ -45,6 +46,7 @@ class VillageProfileTbaItem extends StatefulWidget {
     required this.changeTab,
     required this.tabIndex,
     required this.totalTab,
+    required this.isEditable,
   });
 
   @override
@@ -74,6 +76,7 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
   }
 
   Future<void> initializeData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     List<String> valueNames = [
       CustomText.Creches,
@@ -180,14 +183,25 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
                             : SizedBox(),
                         Expanded(
                           child: CElevatedButton(
-                            color: Color(0xff369A8D),
+                            color: widget.isEditable
+                                ? Color(0xff369A8D)
+                                : Color(0xff5979AA),
                             onPressed: () {
-                              nextTab(1, context);
-                              // widget.changeTab(1);
+                              if (widget.isEditable)
+                                nextTab(1, context);
+                              else {
+                                if (widget.tabIndex == (widget.totalTab - 1))
+                                  Navigator.pop(context, 'itemRefresh');
+                                else
+                                  widget.changeTab(1);
+                              }
                             },
                             text: widget.tabIndex == (widget.totalTab - 1)
-                                ? (Global.returnTrLable(
-                                    translats, CustomText.Submit, lng))
+                                ? (widget.isEditable
+                                    ? (Global.returnTrLable(
+                                        translats, CustomText.Submit, lng))
+                                    : (Global.returnTrLable(
+                                        translats, CustomText.exit, lng)))
                                 : Global.returnTrLable(
                                     translats, CustomText.Next, lng),
                           ),
@@ -208,11 +222,11 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
     var items = widget.screenItem[itemId];
     if (items != null) {
       for (int i = 0; i < items.length; i++) {
-        screenItems.add(widgetTypeWidget(i, items[i]));
-        screenItems.add(SizedBox(height: 5.h));
         if (!DependingLogic().callDependingLogic(logics, myMap, items[i])) {
           myMap.remove(items[i].fieldname);
         }
+        screenItems.add(widgetTypeWidget(i, items[i]));
+        screenItems.add(SizedBox(height: 5.h));
       }
     }
     return screenItems;
@@ -224,8 +238,8 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
         List<OptionsModel> items = options
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
-        if(options.length==1){
-          defaultDisableDailog(quesItem.fieldname!,'tab${quesItem.options}');
+        if (options.length == 1) {
+          defaultDisableDailog(quesItem.fieldname!, 'tab${quesItem.options}');
         }
         return DynamicCustomDropdownField(
           titleText:
@@ -237,6 +251,9 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
           selectedItem: myMap[quesItem.fieldname],
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          readable: widget.isEditable
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -249,6 +266,9 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
         return CustomDatepickerDynamic(
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
+          readable: widget.isEditable
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
@@ -283,7 +303,9 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEditable
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
@@ -303,7 +325,9 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEditable
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
@@ -348,6 +372,9 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           selectedItem: myMap[quesItem.fieldname],
           responceFieldName: itemResopnceField,
+          readable: widget.isEditable
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           onChanged: (value) {
             if (value != null) myMap[quesItem.fieldname!] = value;
             // else
@@ -360,13 +387,16 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
         return DynamicCustomYesNoCheckboxWithLabel(
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: myMap[quesItem.fieldname],
+          readable: widget.isEditable
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           labelControlls: translats,
           lng: lng,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isVisible: DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -383,7 +413,9 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEditable
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
@@ -402,7 +434,9 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEditable
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialvalue: myMap[quesItem.fieldname!],
@@ -424,7 +458,9 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: widget.isEditable
+              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              : true,
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -452,7 +488,6 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -475,7 +510,7 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
             (items[i].options == 'Village') ||
             (items[i].options == 'Gram Panchayat')) {
           await OptionsModelHelper()
-              .getLocationData(items[i].options!.trim(), responsedata,lng)
+              .getLocationData(items[i].options!.trim(), responsedata, lng)
               .then((data) {
             options.addAll(data);
           });
@@ -489,7 +524,7 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
       logicFields.add(items[i].fieldname!);
     }
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptionsWthouASC(defaultCommon,lng)
+        .getAllMstCommonNotINOptionsWthouASC(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });

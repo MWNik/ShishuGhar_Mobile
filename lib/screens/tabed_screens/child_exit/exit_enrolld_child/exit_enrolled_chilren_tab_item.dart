@@ -31,7 +31,6 @@ import '../../../../database/helper/image_file_tab_responce_helper.dart';
 import '../../../../database/helper/translation_language_helper.dart';
 import '../../../../model/databasemodel/tab_image_file_model.dart';
 import '../../../../utils/globle_method.dart';
-import 'exit_enrolled_child_tab.dart';
 
 class ExitEnrolledChildTabItem extends StatefulWidget {
   final String EnrolledChilGUID;
@@ -49,6 +48,8 @@ class ExitEnrolledChildTabItem extends StatefulWidget {
   String? minDate;
   final bool isForExit;
   final String screenType;
+  final bool isForExitList;
+  final bool isForCrecheEnrollment;
 
   ExitEnrolledChildTabItem(
       {super.key,
@@ -66,7 +67,9 @@ class ExitEnrolledChildTabItem extends StatefulWidget {
       required this.isEditable,
       required this.screenType,
       this.minDate,
-      required this.isForExit});
+      required this.isForExit,
+      required this.isForExitList,
+      required this.isForCrecheEnrollment});
 
   @override
   _EnrolledChilrenTabItemState createState() => _EnrolledChilrenTabItemState();
@@ -89,15 +92,21 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
   bool isRecordNew = true;
   DateTime? minDateforExit;
   String childDOB = '';
-  List<String> redableItemsData = [
+  // List<String> redableItemsData = [
+  //
+  // ];
+  List<String> redableItemsDate = [
+    'child_dob',
+    'date_of_enrollment',
+    'gender_id',
     'child_id',
     'child_name',
-  ];
-  List<String> redableItemsDate = ['child_dob', 'date_of_enrollment'];
-  List<String> redableItemsFloat = [
     'height',
     'weight',
   ];
+  // List<String> redableItemsFloat = [
+  //
+  // ];
 
   @override
   void initState() {
@@ -106,6 +115,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
   }
 
   Future<void> initializeData() async {
+    userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     List<String> valueNames = [
       CustomText.Creches,
@@ -234,15 +244,17 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
                             : SizedBox(),
                         widget.tabIndex == (widget.totalTab - 1)
                             ? (widget.isEditable == false
-                                ? Expanded(
-                                    child: CElevatedButton(
-                                    color: Color(0xff5979AA),
-                                    onPressed: () {
-                                      Navigator.pop(context, 'itemRefresh');
-                                    },
-                                    text: Global.returnTrLable(
-                                        translats, CustomText.exit, lng),
-                                  ))
+                                ? widget.isForCrecheEnrollment
+                                    ? SizedBox()
+                                    : Expanded(
+                                        child: CElevatedButton(
+                                        color: Color(0xff5979AA),
+                                        onPressed: () {
+                                          Navigator.pop(context, 'itemRefresh');
+                                        },
+                                        text: Global.returnTrLable(
+                                            translats, CustomText.exit, lng),
+                                      ))
                                 : Expanded(
                                     child: CElevatedButton(
                                       color: Color(0xff5979AA),
@@ -430,7 +442,14 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
                   : DependingLogic()
                       .dependeOnMendotory(logics, myMap, quesItem)),
           items: items,
-          readable: widget.isEditable == true ? null : true,
+          readable: widget.isEditable == true
+              ? (widget.isForExit
+                  ? redableItemsDate.contains(quesItem.fieldname)
+                      ? true
+                      : DependingLogic()
+                          .callReadableLogic(logics, myMap, quesItem)
+                  : DependingLogic().callReadableLogic(logics, myMap, quesItem))
+              : true,
           selectedItem: myMap[quesItem.fieldname],
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
@@ -514,7 +533,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
           readable: widget.isEditable == true
               ? (widget.isForExit
-                  ? redableItemsData.contains(quesItem.fieldname)
+                  ? redableItemsDate.contains(quesItem.fieldname)
                       ? true
                       : DependingLogic()
                           .callReadableLogic(logics, myMap, quesItem)
@@ -624,10 +643,16 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
-            print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
             if (myMap['child_specially_abled'] == 0) {
               myMap['specially_abled_option'] = [];
+            }
+            if (quesItem.fieldname == 'is_child_enrolled_awc' &&
+                myMap['is_child_enrolled_awc'] == 1) {
+              myMap['date_of_enrollment_awc'] =
+                  Global.validString(myMap['date_of_enrollment'])
+                      ? myMap['date_of_enrollment']
+                      : Global.initCurrentDate();
             }
             setState(() {});
           },
@@ -712,7 +737,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
               ? (quesItem.fieldname == 'height' ||
                       quesItem.fieldname == 'weight'
                   ? (widget.isForExit
-                      ? (redableItemsFloat.contains(quesItem.fieldname)
+                      ? (redableItemsDate.contains(quesItem.fieldname)
                           ? true
                           : false)
                       : shouldEditMesure)
@@ -761,7 +786,6 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    userName = (await Validate().readString(Validate.userName))!;
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -796,16 +820,9 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
       logics.addAll(data);
     });
-    await FormLogicDataHelper().callFormLogic('Child Profile').then((data) {
-      logics.addAll(data);
-    });
-  }
-
-  Future<void> calinitialScreen() async {
-    await callScrenControllers('Child Profile');
-    setState(() {
-      _isLoading = false;
-    });
+    // await FormLogicDataHelper().callFormLogic('Child Enrollment and Exit').then((data) {
+    //   logics.addAll(data);
+    // });
   }
 
   defaultDisableDailog(String fieldName, String flag) async {
@@ -891,7 +908,6 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
       });
       var responcesJs = jsonEncode(myMap);
       var name = myMap['name'];
-      ExitEnrolledChilrenTab.childName = myMap['child_name'];
       print(responcesJs);
       await EnrolledExitChilrenResponceHelper().insertUpdate(
           widget.EnrolledChilGUID,
@@ -909,16 +925,14 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
       var reffralItem = await ChildReferralTabResponseHelper()
           .callChildReffralsByEnrolledGUID(widget.EnrolledChilGUID);
       if (reffralItem.length > 0) {
-        reffralItem.forEach((reItem) async {
-          if(reItem['visit_count']>0){
-            Map<String, dynamic> jsonBody = jsonDecode(reItem['responces']!);
-            jsonBody['visit_count'] = 0;
-            var itemResponce = jsonEncode(jsonBody);
-            await ChildReferralTabResponseHelper().updateVisitFollowUps(itemResponce,reItem['child_referral_guid'],0);
-          }
-        });
-
-
+        if (reffralItem.last['visit_count'] > 0) {
+          Map<String, dynamic> jsonBody =
+              jsonDecode(reffralItem.last['responces']!);
+          jsonBody['visit_count'] = 0;
+          var itemResponce = jsonEncode(jsonBody);
+          await ChildReferralTabResponseHelper().updateVisitFollowUps(
+              itemResponce, reffralItem.last['child_referral_guid'], 0);
+        }
       }
     }
   }
@@ -965,10 +979,15 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
         var validationMsg =
             DependingLogic().validationMessge(logics, myMap, element);
         if (Global.validString(validationMsg)) {
-          Validate()
-              .singleButtonPopup(validationMsg!, CustomText.ok, false, context);
-          validStatus = false;
-          break;
+          if ((Global.validString(myMap['reason_for_exit'].toString()) &&
+              element.fieldname == 'age_at_enrollment_in_months')) {
+            validStatus = true;
+          } else {
+            Validate().singleButtonPopup(
+                validationMsg!, CustomText.ok, false, context);
+            validStatus = false;
+            break;
+          }
         }
       }
       ;
@@ -988,7 +1007,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
       responseData.forEach((key, value) {
         myMap[key] = value;
       });
-      if (widget.isForExit) {
+      if (widget.isForExitList) {
         myMap['date_of_exit'] = Validate().currentDate();
         if (Global.validString(myMap['date_of_exit']) &&
             Global.validString(myMap['child_dob'])) {
@@ -1000,11 +1019,15 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
 
       if (responseData['appcreated_on'] != null ||
           responseData['appcreated_by'] != null) {
-        myMap['app_updated_on'] = Validate().currentDateTime();
-        myMap['app_updated_by'] = userName;
-      } else {
-        myMap['appcreated_on'] = Validate().currentDateTime();
-        myMap['appcreated_by'] = userName;
+        if (widget.isForExitList == true && widget.isEditable == true) {
+          myMap['appcreated_on'] = Validate().currentDateTime();
+          myMap['appcreated_by'] = userName;
+          myMap['app_updated_on'] = Validate().currentDateTime();
+          myMap['app_updated_by'] = userName;
+        } else {
+          myMap['app_updated_on'] = Validate().currentDateTime();
+          myMap['app_updated_by'] = userName;
+        }
       }
       if (Global.validString(myMap['date_of_enrollment'])) {
         var parts = myMap['date_of_enrollment']
@@ -1012,7 +1035,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
             .split('-')
             .map(int.parse)
             .toList();
-        minDateforExit = DateTime(parts[0], parts[1], parts[2]);
+        minDateforExit =
+            DateTime(parts[0], parts[1], parts[2]).subtract(Duration(days: 1));
       }
       if (widget.isForExit) {
         if (!Global.validString(myMap['date_of_enrollment_awc'])) {
@@ -1047,8 +1071,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
       Map<String, dynamic> responseData = jsonDecode(fromHHInfo[0].responces!);
 
       childDOB = Global.getItemValues(fromHHInfo[0].responces, 'child_dob');
-      myMap['gender_id'] =
-          Global.getItemValues(fromHHInfo[0].responces, 'gender_id');
+      // myMap['gender_id'] =
+      //     Global.getItemValues(fromHHInfo[0].responces, 'gender_id');
       responseData.forEach((key, value) {
         if (key != 'appcreated_on' && key != 'appcreated_by' && key != 'name')
           myMap[key] = value;
@@ -1074,7 +1098,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
 
       myMap['date_of_enrollment'] = Global.initCurrentDate();
       myMap['appcreated_by'] = userName;
-      myMap['appcreated_on'] = Validate().currentDate();
+      myMap['appcreated_on'] = Validate().currentDateTime();
 
       if (Global.validString(myMap['date_of_enrollment']) &&
           Global.validString(myMap['child_dob'])) {
