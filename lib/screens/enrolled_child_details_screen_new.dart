@@ -514,6 +514,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
             builder: (BuildContext content) => ReferallCompletedListForCC(
                   isHomeScreen: false,
                   enrolledChildGUID: widget.EnrolledChilGUID,
+                  title: Global.returnTrLable(
+                      labelControlls, CustomText.childReferral, lng),
                 )));
       }
     } else if (i == 4) {

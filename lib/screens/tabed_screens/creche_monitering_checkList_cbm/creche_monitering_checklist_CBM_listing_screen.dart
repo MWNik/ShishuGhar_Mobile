@@ -236,15 +236,28 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
                                       ),
                                     ),
                                     SizedBox(width: 5),
-                                    (cmcCBMData[index].is_edited==0 && cmcCBMData[index].is_uploaded==1)?
-                                    Image.asset(
-                                      "assets/sync.png",
-                                      scale: 1.5,
-                                    ):
-                                    Image.asset(
-                                      "assets/sync_gray.png",
-                                      scale: 1.5,
-                                    )
+                                    (cmcCBMData[index].is_edited == 0 &&
+                                          cmcCBMData[index].is_uploaded == 1)
+                                      ? Image.asset(
+                                          "assets/sync.png",
+                                          scale: 1.5,
+                                        )
+                                      : (cmcCBMData[index].is_edited == 1 &&
+                                              cmcCBMData[index].is_uploaded == 0)
+                                          ? Image.asset(
+                                              "assets/sync_gray.png",
+                                              scale: 1.5,
+                                            )
+                                          : Icon(
+                                              Icons.error_outline_outlined,
+                                              color: Colors.red.shade700,
+                                              shadows: [
+                                                BoxShadow(
+                                                    spreadRadius: 2,
+                                                    blurRadius: 4,
+                                                    color: Colors.red.shade200)
+                                              ],
+                                            )
                                   ]),
                             ),
                           ),

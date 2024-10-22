@@ -1065,7 +1065,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           .isBefore(DateTime.parse(Validate().currentDate()))) {
         shouldEditMesure = true;
       }
-    } else {
+    }
+    else {
       var fromHHInfo = await HouseHoldChildrenHelperHelper()
           .callHouseHoldChildrenItem(widget.cHHGuid);
       Map<String, dynamic> responseData = jsonDecode(fromHHInfo[0].responces!);
@@ -1108,6 +1109,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
       }
     }
     myMap['hhcguid'] = widget.cHHGuid;
+    myMap['is_exited'] = 1;
     myMap['childenrollguid'] = widget.EnrolledChilGUID;
   }
 

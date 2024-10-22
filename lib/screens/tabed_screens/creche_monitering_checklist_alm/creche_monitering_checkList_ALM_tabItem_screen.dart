@@ -63,7 +63,8 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
   List<TabFormsLogic> _logics = [];
   List<Translation> _translation = [];
   bool _isLoading = true;
-
+  int? isEditExisting;
+  
   Map<String, dynamic> _myMap = {};
 
   @override
@@ -499,9 +500,9 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
     if (type == 1) {
       if (_checkValidation()) {
         if (widget.tabIndex < (widget.totalTab - 1)) {
-          await saveDataInData();
+          await saveDataInData(false);
         } else if (widget.tabIndex == (widget.totalTab - 1)) {
-          await saveDataInData();
+          await saveDataInData(true);
           bool shouldProceed = await showDialog(
             context: context,
             builder: (context) {
@@ -582,7 +583,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
   Future<void> saveOnly(int type) async {
     if (type == 1) {
       if (_checkValidation()) {
-        await saveDataInData();
+        await saveDataInData(false);
         Validate().singleButtonPopup(
             Global.returnTrLable(
                 _translation, CustomText.dataSaveSuc, _language),
@@ -599,7 +600,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
     }
   }
 
-  Future<void> saveDataInData() async {
+  Future<void> saveDataInData(bool isLastIndex) async {
     var widgets = widget.screenItem[widget.tabBreakItem.name];
     if (widgets != null) {
       Map<String, dynamic> responces = {};
@@ -611,8 +612,23 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
       var responcesJs = jsonEncode(_myMap);
       var name = _myMap['name'];
       print(responcesJs);
-      await CmcALMTabResponseHelper().insertUpdate(widget.almguid, name as int?,
-          responcesJs, username, Global.stringToInt(widget.creche_id));
+      var itemALM = CmcALMResponseModel(
+        almguid: widget.almguid,
+        creche_id: Global.stringToInt(
+          widget.creche_id
+        ),
+        // childenrolledguid: enrolChildGuid,
+        responces: responcesJs,
+        is_uploaded: 0,
+        is_edited: isLastIndex? 1: (widget.isEdit == false ? 2 : isEditExisting),
+        is_deleted: 0,
+        name: name,
+        created_by: username,
+        created_at: Validate().currentDateTime()
+      );
+      await CmcALMTabResponseHelper().inserts(itemALM);
+      // await CmcALMTabResponseHelper().insertUpdate(widget.almguid, name as int?,
+      //     responcesJs, username, Global.stringToInt(widget.creche_id));
     }
   }
 
@@ -624,7 +640,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
       final Map<String, dynamic> responseData =
           jsonDecode(records.first.responces!);
       responseData.forEach((key, value) => _myMap[key] = value);
-
+      isEditExisting = records.first.is_edited;
       final createdOnNotNull = responseData['appcreated_on'] != null;
       final createdByNotNull = responseData['appcreated_by'] != null;
 

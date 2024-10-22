@@ -197,7 +197,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                             if (pendindTaskCount == 0) {
 
                               var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
-                              var childEnrollExitData = await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
+                              // var childProfile = await EnrolledChilrenResponceHelper().callChildrenForUpload();
+                              var childEnrollExitData = await EnrolledExitChilrenResponceHelper().callChildrenForUploadDarftEdited();
                               var villageProfile = await await CrecheMonitorResponseHelper().getVillageProfileforUploadDarftEdit();
                               var creCheMonitoring = await CrecheMonitorResponseHelper().getVillageProfileforUploadDarftEdit();
                               var chilAttendence = await ChildAttendanceResponceHelper().callChildAttendencesAllForUpoadEditDarft();
@@ -206,6 +207,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                                   childEnrollExitData.length +
                                   villageProfile.length +
                                   chilAttendence.length +
+                                  // childProfile.length +
                                   creCheMonitoring.length;
                               if (daftCount == 0) {
                                 totalApiCount = 19;

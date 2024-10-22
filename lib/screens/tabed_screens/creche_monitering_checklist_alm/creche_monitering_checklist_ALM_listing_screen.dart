@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
@@ -18,10 +17,8 @@ class cmcALMListingScreen extends StatefulWidget {
   final String? creche_id;
   final String crecheName;
 
-  cmcALMListingScreen({super.key,
-    required this.creche_id,
-    required this.crecheName
-  });
+  cmcALMListingScreen(
+      {super.key, required this.creche_id, required this.crecheName});
 
   @override
   State<cmcALMListingScreen> createState() => _cmcALMListingScreenState();
@@ -74,8 +71,9 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
   Future<void> fetchCmcCBMRecords() async {
     cmcALMData = await CmcALMTabResponseHelper()
         .childALMChild(Global.stringToInt(widget.creche_id));
-    usynchedList =
-        cmcALMData.where((element) => element.is_edited == 1 || element.is_edited == 2).toList();
+    usynchedList = cmcALMData
+        .where((element) => element.is_edited == 1 || element.is_edited == 2)
+        .toList();
     allList = cmcALMData;
     cmcALMData = isOnlyUnsyched ? usynchedList : allList;
     setState(() {});
@@ -89,22 +87,19 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
           String cmgUid = '';
           if (!(Global.validString(cmgUid))) {
             cmgUid = Validate().randomGuid();
-              var refStatus = await Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          CmcALMTabSCreen(
-                            almguid: cmgUid,
-                            crecheName: widget.crecheName,
-                            creche_id: Global.stringToInt(
-                                widget.creche_id,
-                            ),
-                              isEdit: false,
-                              isViewScreen:false
-                          )));
+            var refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => CmcALMTabSCreen(
+                    almguid: cmgUid,
+                    crecheName: widget.crecheName,
+                    creche_id: Global.stringToInt(
+                      widget.creche_id,
+                    ),
+                    isEdit: false,
+                    isViewScreen: false)));
 
-              if (refStatus == 'itemRefresh') {
-                await fetchCmcCBMRecords();
-              }
+            if (refStatus == 'itemRefresh') {
+              await fetchCmcCBMRecords();
+            }
           }
         },
         child: Image.asset(
@@ -126,7 +121,8 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
             children: [
               AnimatedRollingSwitch(
                 title1: Global.returnTrLable(translats, CustomText.all, lng),
-                title2: Global.returnTrLable(translats, CustomText.usynchedAndDraft, lng),
+                title2: Global.returnTrLable(
+                    translats, CustomText.usynchedAndDraft, lng),
                 isOnlyUnsynched: isOnlyUnsyched,
                 onChange: (value) async {
                   setState(() {
@@ -148,23 +144,29 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
                       return GestureDetector(
                         onTap: () async {
                           var cbmguid = cmcALMData[index].almguid;
-                          var created_at = DateTime.parse(cmcALMData[index].created_at.toString());
-                          var date  = DateTime(created_at.year,created_at.month,created_at.day);
-                          bool isViewScreen = date.add(Duration(days: 7)).isBefore(DateTime.parse(Validate().currentDate()));
+                          var created_at = DateTime.parse(
+                              cmcALMData[index].created_at.toString());
+                          var date = DateTime(created_at.year, created_at.month,
+                              created_at.day);
+                          bool isViewScreen = date
+                              .add(Duration(days: 7))
+                              .isBefore(
+                                  DateTime.parse(Validate().currentDate()));
                           if (Global.validString(cbmguid)) {
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
                                         CmcALMTabSCreen(
-                                          almguid: cbmguid!,
-                                          crecheName: widget.crecheName,
-                                          creche_id: Global.stringToInt(
+                                            almguid: cbmguid!,
+                                            crecheName: widget.crecheName,
+                                            creche_id: Global.stringToInt(
                                               widget.creche_id,
-                                          ),
-                                          date_of_visit:Global.getItemValues(cmcALMData[index].responces!, 'date_of_visit'),
-                                          isEdit:true,
-                                            isViewScreen:isViewScreen
-                                        )));
+                                            ),
+                                            date_of_visit: Global.getItemValues(
+                                                cmcALMData[index].responces!,
+                                                'date_of_visit'),
+                                            isEdit: true,
+                                            isViewScreen: isViewScreen)));
 
                             if (refStatus == 'itemRefresh') {
                               await fetchCmcCBMRecords();
@@ -234,7 +236,9 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
                                           //   overflow: TextOverflow.ellipsis,
                                           // ),
                                           Text(
-                                            Global.getItemValues(cmcALMData[index].responces!, 'date_of_visit'),
+                                            Global.getItemValues(
+                                                cmcALMData[index].responces!,
+                                                'date_of_visit'),
                                             style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -242,15 +246,30 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
                                       ),
                                     ),
                                     SizedBox(width: 5),
-                                    (cmcALMData[index].is_edited==0 && cmcALMData[index].is_uploaded==1)?
-                                    Image.asset(
-                                      "assets/sync.png",
-                                      scale: 1.5,
-                                    ):
-                                    Image.asset(
-                                      "assets/sync_gray.png",
-                                      scale: 1.5,
-                                    )
+                                    (cmcALMData[index].is_edited == 0 &&
+                                            cmcALMData[index].is_uploaded == 1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : (cmcALMData[index].is_edited == 1 &&
+                                                cmcALMData[index].is_uploaded ==
+                                                    0)
+                                            ? Image.asset(
+                                                "assets/sync_gray.png",
+                                                scale: 1.5,
+                                              )
+                                            : Icon(
+                                                Icons.error_outline_outlined,
+                                                color: Colors.red.shade700,
+                                                shadows: [
+                                                  BoxShadow(
+                                                      spreadRadius: 2,
+                                                      blurRadius: 4,
+                                                      color:
+                                                          Colors.red.shade200)
+                                                ],
+                                              )
                                   ]),
                             ),
                           ),

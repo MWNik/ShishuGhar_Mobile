@@ -43,14 +43,10 @@ class DatabaseHelper {
       }
       if (oldVersion == 2 && newVersion > 2) {
         try {
-          await db.execute(
-              'ALTER TABLE tabWeightforAgeBoys RENAME COLUMN age_in_months TO age_in_days');
-          await db.execute(
-              'ALTER TABLE tabWeightforAgeGirls RENAME COLUMN age_in_months TO age_in_days');
-          await db.execute(
-              'ALTER TABLE tabHeightforAgeBoys RENAME COLUMN age_in_months TO age_in_days');
-          await db.execute(
-              'ALTER TABLE tabHeightforAgeGirls RENAME COLUMN age_in_months TO age_in_days');
+          await updateColoumnName(db,'tabWeightforAgeGirls','age_in_days','age_in_months');
+          await updateColoumnName(db,'tabWeightforAgeBoys','age_in_days','age_in_months');
+          await updateColoumnName(db,'tabHeightforAgeBoys','age_in_days','age_in_months');
+          await updateColoumnName(db,'tabHeightforAgeGirls','age_in_days','age_in_months');
 
           await db.execute('''CREATE TABLE tabCreche_stock_response (
           sguid TEXT PRIMARY KEY,
@@ -250,7 +246,7 @@ class DatabaseHelper {
     await database!.delete('tabMaster_Stock');
   }
 
-  Future updateColoumnName(Database db,String tableName,String columnName) async{
+  Future updateColoumnName(Database db,String tableName,String columnName,String oldColmnName) async{
     try{
       var tempTableName='$tableName'+'New';
       await db.execute('''CREATE TABLE $tempTableName (
@@ -262,9 +258,9 @@ class DatabaseHelper {
           yellow_min NUMERIC
           );''');
 
-      await db.execute('INSERT INTO $tempTableName (id, $columnName, green,red,yellow_max,yellow_min) SELECT name, age_in_months, green,red,yellow_max,yellow_min FROM $tableName');
+      await db.execute('INSERT INTO $tempTableName (name, $columnName, green,red,yellow_max,yellow_min) SELECT name, $oldColmnName, green,red,yellow_max,yellow_min FROM $tableName');
       await db.execute('DROP TABLE $tableName');
-      await db.execute('ALTER TABLE $tempTableName RENAME TO $tempTableName');
+      await db.execute('ALTER TABLE $tempTableName RENAME TO $tableName');
     }catch(e){
       print(e);
     }

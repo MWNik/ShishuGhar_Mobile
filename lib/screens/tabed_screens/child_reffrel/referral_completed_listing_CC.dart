@@ -23,8 +23,9 @@ import 'package:shishughar/utils/validate.dart';
 class ReferallCompletedListForCC extends StatefulWidget {
   String? enrolledChildGUID;
   bool isHomeScreen;
+  String? title;
   ReferallCompletedListForCC(
-      {super.key, this.enrolledChildGUID, required this.isHomeScreen});
+      {super.key, this.enrolledChildGUID, required this.isHomeScreen,  this.title});
 
   @override
   State<ReferallCompletedListForCC> createState() =>
@@ -162,7 +163,7 @@ class _ReferallCompletedListForCCState
         : Scaffold(
             appBar: widget.isHomeScreen
                 ? CustomAppbar(
-                    text: Global.returnTrLable(
+                    text:widget.title!=null?widget.title!:Global.returnTrLable(
                         translats, CustomText.FlaggedChilderen, lng),
                     actions: [])
                 : AppBar(
@@ -199,7 +200,7 @@ class _ReferallCompletedListForCCState
                           ]),
                         ),
                         Text(
-                            Global.returnTrLable(
+                            widget.title!=null?widget.title!:Global.returnTrLable(
                                 translats, CustomText.FlaggedChilderen, lng),
                             style: Styles.white126P),
                       ],

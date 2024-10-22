@@ -1590,11 +1590,23 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                 // break;
               }
             }
+            var requItem=await RequisitionFieldsHelper().getRequisitionFields();
+            if(requItem.length==0){
+              await callApiLogicData(userName, password, token, true);
+              await requisitionMetaData(userName, password, token, true);
+            }
+
+            var stockItem=await StockFieldHelper().getStockFields();
+            if(stockItem.length==0){
+              await callApiLogicData(userName, password, token, true);
+              await stockMetaData(userName, password, token, true);
+            }
           } else {
             print("Not Insert translation data into the database");
           }
         }
-      } else if (response.statusCode == 401) {
+      }
+      else if (response.statusCode == 401) {
         await handleUnauthorized();
       } else {
         handleErrorResponse(response);
@@ -1878,13 +1890,18 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     } else if (role == 'Cluster Coordinator') {
       syncCount = await callCountForUploadCC();
     } else if (role == 'Accounts and Logistics Manager') {
-      var visitNots =
-          await CmcALMTabResponseHelper().getAlmForUpload();
-      syncCount = visitNots.length;
+      var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
+      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+      var visitNots = await CmcALMTabResponseHelper().getAlmForUpload();
+      syncCount = visitNots.length+crecheCheckIn.length+grievanceData.length+ImageFileData.length;
     } else if (role == 'Capacity and Building Manager') {
+      var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
+      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
       var visitNots = await CmcCBMTabResponseHelper().getCBMForUpload();
 
-      syncCount = visitNots.length;
+      syncCount = visitNots.length+crecheCheckIn.length+grievanceData.length+ImageFileData.length;
     }
   }
 
@@ -3004,15 +3021,12 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   Future<int> callCountForUploadCC() async {
     showLoaderDialog(context);
 
-    var crecheCheckIn =
-        await CheckInResponseHelper().callCrecheCheckInResponses();
-
-    var grievanceData = await ChildGrievancesTabResponceHelper()
-        .getChildGrievanceForUploadDarft();
-    var creCheMonitoring =
-        await CmcCCTabResponseHelper().getCcForUpload();
-
+    var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
+    var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
     var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+    var creCheMonitoring = await CmcCCTabResponseHelper().getCcForUpload();
+
+
 
     Navigator.pop(context);
     int totalPendingCount = crecheCheckIn.length +
@@ -3110,14 +3124,14 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   Future<int> callDarftData() async{
      if (role == 'Creche Supervisor') {
        var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
-       var childEnrollExitData = await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
+       var childEnrollExitData = await EnrolledExitChilrenResponceHelper().callChildrenForUploadDarftEdited();
+       // var childProfile = await EnrolledChilrenResponceHelper().callChildrenForUpload();
        var villageProfile = await await CrecheMonitorResponseHelper().getVillageProfileforUploadDarftEdit();
        var creCheMonitoring = await CrecheMonitorResponseHelper().getVillageProfileforUploadDarftEdit();
        var chilAttendence = await ChildAttendanceResponceHelper().callChildAttendencesAllForUpoadEditDarft();
        return (hhItems.length+childEnrollExitData.length+villageProfile.length+creCheMonitoring.length+chilAttendence.length);
      } else if (role == 'Cluster Coordinator') {
-       var creCheMonitoring =
-       await CmcCCTabResponseHelper().getCcForUploadEditDarft();
+       var creCheMonitoring = await CmcCCTabResponseHelper().getCcForUploadEditDarft();
        return creCheMonitoring.length;
      } else if (role == 'Accounts and Logistics Manager') {
        var visitNots =
