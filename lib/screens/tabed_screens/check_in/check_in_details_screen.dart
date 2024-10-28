@@ -1385,7 +1385,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         // if (e is TimeoutException) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Location not ticked please try again.")));
+              content: Text("Location is not captured. Please try again.")));
         // }
       } finally {
         Navigator.pop(context);

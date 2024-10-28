@@ -187,7 +187,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                                             else
                                               await methods[index](context);
                                           }
-                                        } else {
+                                        }
+                                        else {
                                           await methods[index](context);
                                         }
                                       } else
@@ -787,7 +788,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    } else if (userRole == 'Cluster Coordinator') {
+    }
+    else if (userRole == 'Cluster Coordinator') {
       /* var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
       if (hhItems.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -854,7 +856,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    } else if (userRole == 'Accounts and Logistics Manager') {
+    }
+    else if (userRole == 'Accounts and Logistics Manager') {
       var cmcALMData = await CmcALMTabResponseHelper().getAlmForUpload();
       if (cmcALMData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -908,7 +911,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    } else if (userRole == 'Capacity and Building Manager') {
+    }
+    else if (userRole == 'Capacity and Building Manager') {
       var cmcCBMData = await CmcCBMTabResponseHelper().getCBMForUpload();
       if (cmcCBMData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -962,6 +966,23 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
+    }
+    else  {
+      var grievanceData =
+          await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
+      if (grievanceData.length > 1) {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.ChildGrievances, lng!)] =
+            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+                locationControlls, CustomText.ChildGrievances, lng!)] =
+            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      syncInfoCount[Global.returnTrLable(
+              locationControlls, CustomText.ChildGrievances, lng!)] =
+          grievanceData.length;
+
     }
 
     setState(() {
@@ -1995,6 +2016,10 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         uploadChildGrievanceData,
         uploadCheckInData,
         uploadImageFile
+      ];
+    }else{
+      methods = [
+        uploadChildGrievanceData,
       ];
     }
 

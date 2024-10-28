@@ -6,6 +6,7 @@ import 'package:shishughar/database/helper/child_attendence/child_attendence_hel
 import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../database/helper/child_attendence/attendance_responce_helper.dart';
 import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
@@ -17,7 +18,6 @@ import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
 import 'attendance_form_screen_tab.dart';
-import 'attendance_responce_helper.dart';
 
 class AttendanceListedScreen extends StatefulWidget {
   final int? creche_nameId;
@@ -164,7 +164,7 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
         onTap: () => Navigator.pop(context),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 0.h),
         child: Column(children: [
           // Row(
           //   children: [
@@ -192,7 +192,7 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
           // ),
           (role == CustomText.crecheSupervisor)
               ? Padding(
-                  padding: EdgeInsets.only(bottom: 10, right: 5),
+                  padding: EdgeInsets.only(right: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -228,7 +228,7 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
                   ),
                 )
               : Padding(
-                  padding: EdgeInsets.only(bottom: 10, right: 5),
+                  padding: EdgeInsets.only( right: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [

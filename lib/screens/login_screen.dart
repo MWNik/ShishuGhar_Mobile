@@ -484,7 +484,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                           //         content: Text(
                                           //             "Internal Server Error!")));
                                         }
-                                      } else {
+                                      }
+                                      else {
                                         Navigator.pop(context);
                                         Validate().singleButtonPopup(
                                             Global.errorBodyToString(

@@ -874,7 +874,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
       if (e is TimeoutException) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Location not get please try again.")));
+            content: Text("Location is not captured. Please try again.")));
       }
       print('Error getting location: $e');
     } finally {

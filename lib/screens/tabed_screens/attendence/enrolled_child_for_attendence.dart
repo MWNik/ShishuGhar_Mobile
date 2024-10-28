@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:path/path.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
@@ -11,16 +10,15 @@ import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
+import '../../../custom_widget/custom_textfield.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.dart';
+import '../../../database/helper/child_attendence/attendance_responce_helper.dart';
 import '../../../database/helper/child_attendence/child_attendance_helper_responce.dart';
 import '../../../database/helper/child_attendence/child_attendence_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../model/databasemodel/child_attendance_responce_model.dart';
 import '../../../model/databasemodel/child_for_attendence_model.dart';
-import '../../../model/dynamic_screen_model/enrolled_children_responce_model.dart';
 import '../../../style/styles.dart';
-import 'attendance_responce_helper.dart';
 
 class AddAttendance extends StatefulWidget {
   final String? ChildAttenGUID;
@@ -41,7 +39,9 @@ class _AddAttendanceState extends State<AddAttendance> {
   String? lng;
   List<Translation> translats = [];
   List<EnrolledExitChildResponceModel> childHHData = [];
+  List<EnrolledExitChildResponceModel> filterdData = [];
   List<ChildForAttendenceModel> attendecedRecord = [];
+  TextEditingController Searchcontroller = TextEditingController();
   int cIndex = 0;
   String? attendeceDate;
   Map<String, bool> checkedItem = {};
@@ -105,7 +105,8 @@ class _AddAttendanceState extends State<AddAttendance> {
       childHHData = await EnrolledExitChilrenResponceHelper()
           .enrolledChildByCrecheByAttendeGUID(
               widget.ChildAttenGUID!, widget.crecheId);
-    } else {
+    }
+    else {
       _selectAll = false;
       childHHData = await EnrolledExitChilrenResponceHelper()
           .enrolledChildByCrecheWithDateOfExit(widget.crecheId, attendeceDate!);
@@ -121,7 +122,7 @@ class _AddAttendanceState extends State<AddAttendance> {
         return false;
       }).toList();
     }
-
+    filterdData=childHHData;
     // if(_selectAll==null){
     //   _selectAll=false;
     // }
@@ -131,10 +132,6 @@ class _AddAttendanceState extends State<AddAttendance> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> childPresent = checkedItem.entries
-        .where((entry) => entry.value == true)
-        .map((entry) => entry.key)
-        .toList();
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
@@ -150,6 +147,21 @@ class _AddAttendanceState extends State<AddAttendance> {
                     translats, CustomText.DateofAttendance, lng!)
                 : '',
           ),
+          CustomTextFieldRow(
+            controller: Searchcontroller,
+            onChanged: (value) {
+              print(value);
+              filterDataQu(value);
+            },
+            hintText: (lng != null)
+                ? Global.returnTrLable(
+                translats, 'Search', lng!)
+                : '',
+            prefixIcon: Image.asset(
+              "assets/search.png",
+              scale: 2.4,
+            ),
+          ),
           lng != null
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -157,7 +169,7 @@ class _AddAttendanceState extends State<AddAttendance> {
                     Checkbox(
                         value: _selectAll == true,
                         onChanged: (value) {
-                          childHHData.forEach((element) =>
+                          filterdData.forEach((element) =>
                               checkedItem[element.ChildEnrollGUID!] = value!);
                           setState(() {
                             _selectAll = !_selectAll;
@@ -173,21 +185,22 @@ class _AddAttendanceState extends State<AddAttendance> {
                         text: TextSpan(children: [
                       TextSpan(
                           text:
-                              '${Global.returnTrLable(translats, CustomText.childCount, lng!)}: ${childHHData.length}',
+                              '${Global.returnTrLable(translats, CustomText.childCount, lng!)}: ${filterdData.length}',
                           style: Styles.black12700),
                       TextSpan(text: '\n'),
                       TextSpan(
                           text:
-                              '${Global.returnTrLable(translats, CustomText.childPresent, lng!)}: ${childPresent.length}',
+                              '${Global.returnTrLable(translats, CustomText.childPresent, lng!)}: ${callPresentChild()}',
                           style: Styles.black12700)
                     ]))
                   ],
                 )
               : SizedBox(),
+
           Expanded(
-            child: (childHHData.length > 0)
+            child: (filterdData.length > 0)
                 ? ListView.builder(
-                    itemCount: childHHData.length,
+                    itemCount: filterdData.length,
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
                     scrollDirection: Axis.vertical,
@@ -273,14 +286,14 @@ class _AddAttendanceState extends State<AddAttendance> {
                                       children: [
                                         Text(
                                           Global.getItemValues(
-                                              childHHData[index].responces!,
+                                              filterdData[index].responces!,
                                               'child_name'),
                                           style: Styles.cardBlue10,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
                                           Global.getItemValues(
-                                              childHHData[index].responces!,
+                                              filterdData[index].responces!,
                                               'name_of_primary_caregiver'),
                                           style: Styles.cardBlue10,
                                           strutStyle: StrutStyle(height: 1.2),
@@ -292,19 +305,19 @@ class _AddAttendanceState extends State<AddAttendance> {
                                           //     'age_at_enrollment_in_months'),
                                           Global.validString(
                                                   Global.getItemValues(
-                                                      childHHData[index]
+                                                      filterdData[index]
                                                           .responces,
                                                       'child_dob'))
                                               ? Validate()
                                                   .calculateAgeInMonths(
                                                       Validate().stringToDate(
                                                           Global.getItemValues(
-                                                              childHHData[index]
+                                                              filterdData[index]
                                                                   .responces,
                                                               'child_dob')))
                                                   .toString()
                                               : Global.getItemValues(
-                                                  childHHData[index].responces,
+                                              filterdData[index].responces,
                                                   'age_at_enrollment_in_months'),
                                           style: Styles.cardBlue10,
                                           strutStyle: StrutStyle(height: 1.2),
@@ -314,16 +327,16 @@ class _AddAttendanceState extends State<AddAttendance> {
                                     ),
                                   ),
                                   Checkbox(
-                                      value: checkedItem[childHHData[index]
+                                      value: checkedItem[filterdData[index]
                                                   .ChildEnrollGUID] !=
                                               null
-                                          ? checkedItem[childHHData[index]
+                                          ? checkedItem[filterdData[index]
                                               .ChildEnrollGUID]
                                           : false,
                                       onChanged: (newValue) {
                                         setState(() {
                                           _selectAll = false;
-                                          checkedItem[childHHData[index]
+                                          checkedItem[filterdData[index]
                                               .ChildEnrollGUID!] = newValue!;
                                         });
                                       })
@@ -525,4 +538,29 @@ class _AddAttendanceState extends State<AddAttendance> {
           .callUpdaeAttendesResponce(widget.ChildAttenGUID!, responcesJs);
     }
   }
+
+  filterDataQu(String entry) {
+    if (entry.length > 0) {
+      filterdData = childHHData
+          .where((element) =>
+      (Global.getItemValues(element.responces!, 'child_name'))
+          .toLowerCase()
+          .startsWith(entry.toLowerCase()))
+          .toList();
+    } else {
+      filterdData = childHHData;
+    }
+    setState(() {});
+  }
+
+  int callPresentChild(){
+    List<String> childPresent = checkedItem.entries
+        .where((entry) => entry.value == true)
+        .map((entry) => entry.key)
+        .toList();
+    var items=filterdData.where((entry) => childPresent.contains(entry.ChildEnrollGUID));
+    return items.length;
+  }
+
+
 }

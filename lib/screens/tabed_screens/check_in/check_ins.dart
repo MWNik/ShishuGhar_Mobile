@@ -59,7 +59,9 @@ class _CheckInsScreenState extends State<CheckIns> {
               ),
               floatingActionButton: (currentDateAttendece
                   ? SizedBox()
-                  : InkWell(
+                  : (role== CustomText.crecheSupervisor|| role== CustomText.clusterCoordinator||
+                  role== CustomText.alm|| role==CustomText.cbm)?
+              InkWell(
                       onTap: () async {
                         String hhGuid = '';
                         if (!Global.validString(hhGuid)) {
@@ -85,14 +87,15 @@ class _CheckInsScreenState extends State<CheckIns> {
                         scale: 2.7,
                         color: Color(0xff5979AA),
                       ),
-                    )),
-              body: SingleChildScrollView(
+                    ):null),
+              body:   (items.length > 0)?SingleChildScrollView(
                 child: Padding(
                   padding:
                       EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
                   child: Column(
                     children: [
-                      Align(
+                      (role== CustomText.crecheSupervisor|| role== CustomText.clusterCoordinator||
+                          role== CustomText.alm|| role==CustomText.cbm)?Align(
                         alignment: Alignment.topRight,
                         child: AnimatedRollingSwitch(
                           title1: Global.returnTrLable(
@@ -107,9 +110,9 @@ class _CheckInsScreenState extends State<CheckIns> {
                             await initData();
                           },
                         ),
-                      ),
-                      (items.length > 0)
-                          ? ListView.builder(
+                      ):SizedBox(),
+
+                          ListView.builder(
                               itemCount: items.length,
                               shrinkWrap: true,
                               scrollDirection: Axis.vertical,
@@ -256,11 +259,15 @@ class _CheckInsScreenState extends State<CheckIns> {
                                   ),
                                 );
                               })
-                          : SizedBox(),
+
                     ],
                   ),
                 ),
-              ),
+              ): Center(
+                  child: Text((lng != null)
+                      ? Global.returnTrLable(translatsLabel,
+                      CustomText.NorecordAvailable, lng!)
+                      : '')),
             ),
           );
   }
@@ -281,7 +288,8 @@ class _CheckInsScreenState extends State<CheckIns> {
       CustomText.checkInAs,
       CustomText.dateCheckin,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.NorecordAvailable
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)

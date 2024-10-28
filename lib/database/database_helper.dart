@@ -48,75 +48,7 @@ class DatabaseHelper {
           await updateColoumnName(db,'tabHeightforAgeBoys','age_in_days','age_in_months');
           await updateColoumnName(db,'tabHeightforAgeGirls','age_in_days','age_in_months');
 
-          await db.execute('''CREATE TABLE tabCreche_stock_response (
-          sguid TEXT PRIMARY KEY,
-          name INTEGER,
-          responces TEXT,
-          is_edited INTEGER,
-          is_deleted INTEGER,
-          created_at TEXT,
-          created_by TEXT,
-          update_at TEXT,
-          updated_by TEXT,
-          is_uploaded INTEGER,
-          creche_id INTEGER,
-          month INTEGER,
-          year INTEGER,
-          item_id INTEGER
-          );''');
 
-          await db.execute('''CREATE TABLE tabCreche_requisition_response (
-            rguid TEXT PRIMARY KEY,
-            name INTEGER,
-            responces TEXT,
-            is_edited INTEGER,
-            is_deleted INTEGER,
-            created_at TEXT,
-            created_by TEXT,
-            update_at TEXT,
-            updated_by TEXT,
-            is_uploaded INTEGER,
-            creche_id INTEGER,
-            month INTEGER,
-            year INTEGER,
-            item_id INTEGER
-          );''');
-
-          await db.execute('''CREATE TABLE tabCreche_stock_fields (
-            name TEXT,
-            idx INTEGER,
-            fieldtype TEXT,
-            fieldname TEXT,
-            reqd INTEGER,
-            label TEXT,
-            options TEXT,
-            parent TEXT,
-            hidden INTEGER,
-            length INTEGER,
-            depends_on TEXT,
-            mandatory_depends_on TEXT,
-            read_only_depends_on TEXT,
-            ismultiselect INTEGER,
-            multiselectlink TEXT
-          );''');
-
-          await db.execute('''CREATE TABLE tabCreche_requisition_fields (
-            name TEXT,
-            idx INTEGER,
-            fieldtype TEXT,
-            fieldname TEXT,
-            reqd INTEGER,
-            label TEXT,
-            options TEXT,
-            parent TEXT,
-            hidden INTEGER,
-            length INTEGER,
-            depends_on TEXT,
-            mandatory_depends_on TEXT,
-            read_only_depends_on TEXT,
-            ismultiselect INTEGER,
-            multiselectlink TEXT
-          );''');
 
           await db.execute('''CREATE TABLE tabPartner_Stock (
             name INTEGER PRIMARY KEY,

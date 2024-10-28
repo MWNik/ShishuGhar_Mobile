@@ -26,8 +26,6 @@ import 'package:shishughar/model/databasemodel/tabDistrict_model.dart';
 import 'package:shishughar/model/databasemodel/tabGramPanchayat_model.dart';
 import 'package:shishughar/model/databasemodel/tabVillage_model.dart';
 import 'package:shishughar/model/databasemodel/tabstate_model.dart';
-import 'package:shishughar/screens/dashboardscreen.dart';
-import 'package:shishughar/screens/tabed_screens/attendence/attendance_responce_helper.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/validate.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
@@ -56,6 +54,7 @@ import '../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../database/helper/cashbook/expences/cashbook_response_expences_helper.dart';
 import '../database/helper/cashbook/receipt/cashbook_receipt_response_helper.dart';
 import '../database/helper/check_in/check_in_response_helper.dart';
+import '../database/helper/child_attendence/attendance_responce_helper.dart';
 import '../database/helper/child_event/child_event_response_helper.dart';
 import '../database/helper/child_gravience/child_grievances_response_helper.dart';
 import '../database/helper/child_health/child_health_response_helper.dart';
@@ -990,6 +989,8 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
               mContext, villagesss, userName, password, token);
         else if (widget.role == CustomText.cbm)
           await callCMCCBMchecklist(
+              mContext, villagesss, userName, password, token);
+        else  await callFollowUpDownloadApiCC(
               mContext, villagesss, userName, password, token);
       } else if (response.statusCode == 401) {
         Navigator.pop(mContext);

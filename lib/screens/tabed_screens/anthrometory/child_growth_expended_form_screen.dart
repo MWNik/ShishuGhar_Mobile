@@ -11,6 +11,7 @@ import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 
 import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
+import '../../../custom_widget/custom_textfield.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_textfield_float.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_yesno_checkbox.dart';
@@ -71,6 +72,7 @@ class _ChildGrowthExpendedFormState
   HouseHoldFielItemdModel? measurement_equipment;
   HouseHoldFielItemdModel? do_you_have_height_weight;
   HouseHoldFielItemdModel? measurement_taken_date;
+  TextEditingController Searchcontroller = TextEditingController();
   bool _isLoading = true;
   List<Translation> translatsLabel = [];
   List<int> mesureMonths = [1, 4, 7, 10];
@@ -100,6 +102,7 @@ class _ChildGrowthExpendedFormState
   Map<String, Map<String, dynamic>> attepmtChild = {};
   List<TabFormsLogic> logics = [];
   List<EnrolledExitChildResponceModel> enrolledChild = [];
+  List<EnrolledExitChildResponceModel> filterdData = [];
   List<OptionsModel> options = [];
   List<OptionsModel> genders = [];
 
@@ -184,6 +187,7 @@ class _ChildGrowthExpendedFormState
         enrolledChild = await EnrolledExitChilrenResponceHelper()
             .enrolledChildByEnrolledGUID(
                 selectedChildItems, widget.creche_nameId);
+        filterdData = enrolledChild;
       }
     }
 
@@ -239,11 +243,11 @@ class _ChildGrowthExpendedFormState
                       ],
                     ),
                   ),
-                  SizedBox(height: 10),
+                  // SizedBox(height: 10),
                   measurement_date != null
                       ? Padding(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 20.w, vertical: 10.h),
+                              horizontal: 20.w, vertical: 2.h),
                           child: CustomDatepickerDynamic(
                             calenderValidate: [],
                             initialvalue: myMap[measurement_date!.fieldname!],
@@ -279,9 +283,27 @@ class _ChildGrowthExpendedFormState
                           ),
                         )
                       : SizedBox(),
+                  // Padding(
+                  //     padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  //     child: Divider()),
                   Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      child: Divider()),
+                    padding: EdgeInsets.only(left: 20,right: 20),
+                    child: CustomTextFieldRow(
+                      controller: Searchcontroller,
+                      onChanged: (value) {
+                        print(value);
+                        filterDataQu(value);
+                      },
+                      hintText: (lng != null)
+                          ? Global.returnTrLable(
+                          translatsLabel, 'Search', lng!)
+                          : '',
+                      prefixIcon: Image.asset(
+                        "assets/search.png",
+                        scale: 2.4,
+                      ),
+                    ),
+                  ),
                   Expanded(
                       child: Padding(
                     padding:
@@ -539,8 +561,8 @@ class _ChildGrowthExpendedFormState
 
   List<Widget> cParentWidget() {
     List<Widget> screenItems = [];
-    if (enrolledChild.length > 0) {
-      for (int i = 0; i < enrolledChild.length; i++) {
+    if (filterdData.length > 0) {
+      for (int i = 0; i < filterdData.length; i++) {
         Map<String, FocusNode> focusMaps = {};
         for (var elements in formItem) {
           focusMaps.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
@@ -554,10 +576,10 @@ class _ChildGrowthExpendedFormState
         //     });
         //   }
         // });
-        var cWidgetDatamap = attepmtChild[enrolledChild[i].ChildEnrollGUID];
+        var cWidgetDatamap = attepmtChild[filterdData[i].ChildEnrollGUID];
         if (cWidgetDatamap == null) {
           var date = Validate().stringToDate(
-              Global.getItemValues(enrolledChild[i].responces, 'child_dob'));
+              Global.getItemValues(filterdData[i].responces, 'child_dob'));
           int calucalteDate = 0;
           if (myMap['measurement_date'] != null) {
             var mesurmentDate =
@@ -575,10 +597,10 @@ class _ChildGrowthExpendedFormState
           }
 
           ///default value 1
-          attepmtChild[enrolledChild[i].ChildEnrollGUID!] = cWidgetDatamap;
+          attepmtChild[filterdData[i].ChildEnrollGUID!] = cWidgetDatamap;
         } else {
           var date = Validate().stringToDate(
-              Global.getItemValues(enrolledChild[i].responces, 'child_dob'));
+              Global.getItemValues(filterdData[i].responces, 'child_dob'));
           int calucalteDate = 0;
           if (cWidgetDatamap['measurement_taken_date'] != null) {
             var mesurmentDate = Validate()
@@ -592,7 +614,7 @@ class _ChildGrowthExpendedFormState
             cWidgetDatamap['measurement_taken_date'] =
                 myMap['measurement_date'];
           }
-          attepmtChild[enrolledChild[i].ChildEnrollGUID!] = cWidgetDatamap;
+          attepmtChild[filterdData[i].ChildEnrollGUID!] = cWidgetDatamap;
         }
 
         screenItems.add(
@@ -661,7 +683,7 @@ class _ChildGrowthExpendedFormState
                                       children: [
                                         TextSpan(
                                             text: Global.getItemValues(
-                                                enrolledChild[i].responces!,
+                                                filterdData[i].responces!,
                                                 'child_id'),
                                             style: Styles.blue126),
                                       ])),
@@ -674,7 +696,7 @@ class _ChildGrowthExpendedFormState
                                       children: [
                                         TextSpan(
                                             text: Global.getItemValues(
-                                                enrolledChild[i].responces,
+                                                filterdData[i].responces,
                                                 'child_name'),
                                             style: Styles.blue126),
                                       ])),
@@ -688,7 +710,7 @@ class _ChildGrowthExpendedFormState
                                         TextSpan(
                                             text: callGenderName(
                                                 Global.getItemValues(
-                                                    enrolledChild[i].responces,
+                                                    filterdData[i].responces,
                                                     'gender_id')),
                                             style: Styles.blue126),
                                       ])),
@@ -743,23 +765,23 @@ class _ChildGrowthExpendedFormState
                             ? widgetTypeWidget(
                                 do_you_have_height_weight!,
                                 cWidgetDatamap,
-                                enrolledChild[i].ChildEnrollGUID!)
+                            filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
                         measurement_taken_date != null
                             ? widgetTypeWidget(
                                 measurement_taken_date!,
                                 cWidgetDatamap,
-                                enrolledChild[i].ChildEnrollGUID!)
+                            filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
                         measurement_equipment != null
                             ? widgetTypeWidget(
                                 measurement_equipment!,
                                 cWidgetDatamap,
-                                enrolledChild[i].ChildEnrollGUID!)
+                            filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
                         Row(
                           children: cWidgetInputType(
-                              enrolledChild[i].ChildEnrollGUID!,
+                              filterdData[i].ChildEnrollGUID!,
                               cWidgetDatamap),
                         ),
                         SizedBox(
@@ -789,10 +811,10 @@ class _ChildGrowthExpendedFormState
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: cWidgetRadiomColor(
-                                      enrolledChild[i].ChildEnrollGUID!,
+                                      filterdData[i].ChildEnrollGUID!,
                                       cWidgetDatamap,
                                       Global.getItemValues(
-                                          enrolledChild[i].responces,
+                                          filterdData[i].responces,
                                           'gender_id')),
                                 ),
                               )
@@ -809,7 +831,7 @@ class _ChildGrowthExpendedFormState
                         Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: cWidgetInLessCheckNew(
-                                enrolledChild[i].ChildEnrollGUID!,
+                                filterdData[i].ChildEnrollGUID!,
                                 cWidgetDatamap))
                       ],
                     ),
@@ -1989,6 +2011,21 @@ class _ChildGrowthExpendedFormState
       }
       return false;
     }).toList();
+    filterdData = enrolledChild;
+    setState(() {});
+  }
+
+  filterDataQu(String entry) {
+    if (entry.length > 0) {
+      filterdData = enrolledChild
+          .where((element) =>
+          (Global.getItemValues(element.responces!, 'child_name'))
+              .toLowerCase()
+              .startsWith(entry.toLowerCase()))
+          .toList();
+    } else {
+      filterdData = enrolledChild;
+    }
     setState(() {});
   }
 }

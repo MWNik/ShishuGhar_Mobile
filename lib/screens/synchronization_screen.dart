@@ -19,7 +19,6 @@ import 'package:shishughar/database/helper/requisition/requisition_response_help
 import 'package:shishughar/database/helper/stock/stock_response_helper.dart';
 
 import 'package:shishughar/screens/pendingSyncScreen.dart';
-import 'package:shishughar/screens/tabed_screens/attendence/attendance_responce_helper.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
@@ -53,6 +52,7 @@ import '../database/helper/block_data_helper.dart';
 import '../database/helper/cashbook/expences/cashbook_response_expences_helper.dart';
 import '../database/helper/cashbook/receipt/cashbook_receipt_response_helper.dart';
 import '../database/helper/check_in/check_in_response_helper.dart';
+import '../database/helper/child_attendence/attendance_responce_helper.dart';
 import '../database/helper/child_attendence/child_attendance_helper_responce.dart';
 import '../database/helper/child_event/child_event_response_helper.dart';
 import '../database/helper/child_exit/child_exit_response_Helper.dart';
@@ -290,7 +290,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                                   false,
                                   context);
                           }
-                        } else if (i == 1) {
+                        }
+                        else if (i == 1) {
                           String refStatus = '';
                           if (role == CustomText.crecheSupervisor) {
                             if (pendindTaskCount > 0) {
@@ -310,7 +311,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                                       locationControlls, CustomText.ok, lngtr!),
                                   false,
                                   context);
-                          } else if (role == CustomText.clusterCoordinator) {
+                          }
+                          else if (role == CustomText.clusterCoordinator) {
                             if (pendindTaskCount > 0) {
                               refStatus = await Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -328,7 +330,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                                       locationControlls, CustomText.ok, lngtr!),
                                   false,
                                   context);
-                          } else if (role == 'Accounts and Logistics Manager') {
+                          }
+                          else if (role == 'Accounts and Logistics Manager') {
                             var visitNots = await CmcALMTabResponseHelper()
                                 .getAlmForUpload();
                             if (pendindTaskCount > 0) {
@@ -348,7 +351,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                                       locationControlls, CustomText.ok, lngtr!),
                                   false,
                                   context);
-                          } else if (role == 'Capacity and Building Manager') {
+                          }
+                          else if (role == 'Capacity and Building Manager') {
                             var visitNots = await CmcCBMTabResponseHelper()
                                 .getCBMForUpload();
                             if (pendindTaskCount > 0) {
@@ -358,7 +362,28 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                                             PendingSyncScreen()),
                                   ) ??
                                   '';
-                            } else
+                            }
+                            else
+                              Validate().singleButtonPopup(
+                                  Global.returnTrLable(
+                                      locationControlls,
+                                      CustomText.nothing_for_upload_msg,
+                                      lngtr!),
+                                  Global.returnTrLable(
+                                      locationControlls, CustomText.ok, lngtr!),
+                                  false,
+                                  context);
+                          }
+                          else {
+                            if (pendindTaskCount > 0) {
+                              refStatus = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        PendingSyncScreen()),
+                              ) ??
+                                  '';
+                            }
+                            else
                               Validate().singleButtonPopup(
                                   Global.returnTrLable(
                                       locationControlls,
@@ -372,9 +397,10 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                           if (refStatus == 'itemRefresh') {
                             await initializeData();
                           }
-                        } else if (i == 2) {
+                        }
+                        else if (i == 2) {
                           totalApiCount = 5;
-                          downMaster(context);
+                          callMasterData(context);
                         }
                       },
                       child: Column(
@@ -954,6 +980,9 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
           crecheCheckIn.length +
           grievanceData.length +
           ImageFileData.length;
+    }else{
+      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
+      pendindTaskCount=grievanceData.length;
     }
 
     List<String> valueNames = [
@@ -992,7 +1021,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
     initializeData();
   }
 
-  initMasterData(MasterDataModel master) async {
+  Future initMasterData(MasterDataModel master) async {
     if (master != null) {
       List<TabState> stateList = master.tabState!;
 
@@ -1061,15 +1090,10 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
     }
   }
 
-  Future<void> downMaster(BuildContext mContext) async {
+  Future<void> downMaster(BuildContext mContext,String userName,String password,String token) async {
     ////master user auth
-    downloadedApi = 1;
-    var network = await Validate().checkNetworkConnection();
-    if (network) {
-      showLoaderDialog(context);
-      var token = await Validate().readString(Validate.appToken);
-      var userName = await Validate().readString(Validate.userName);
-      var password = await Validate().readString(Validate.Password);
+    downloadedApi = 2;
+    updateLoadingText(dialogSetState);
       var villagesList = await VillageDataHelper().getTabVillageList();
       String villagesListString = '';
       villagesList.forEach((element) {
@@ -1080,8 +1104,9 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
       });
 
       var masterOtherDataResponse = await MasterApiService()
-          .fetchmasterOtherData(userName!, password!, token!);
-      if (masterOtherDataResponse.statusCode == 200) {
+          .fetchmasterOtherData(userName, password, token);
+      if (masterOtherDataResponse.statusCode == 200)
+      {
         MstCommonModel mstCommonModel =
             MstCommonModel.fromJson(json.decode(masterOtherDataResponse.body));
 
@@ -1089,7 +1114,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
 
         await callApiLogicData(
             mContext, userName, password, token, villagesListString);
-      } else if (masterOtherDataResponse.statusCode == 401) {
+      }
+      else if (masterOtherDataResponse.statusCode == 401) {
         Navigator.pop(mContext);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.remove(Validate.Password);
@@ -1103,7 +1129,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
             MaterialPageRoute(
               builder: (mContext) => LoginScreen(),
             ));
-      } else {
+      }
+        else {
         Navigator.pop(mContext);
         var errorMsg =
             Global.errorBodyToString(masterOtherDataResponse.body, 'message');
@@ -1113,19 +1140,12 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
             false,
             context);
       }
-    } else {
-      Validate().singleButtonPopup(
-          Global.returnTrLable(locationControlls,
-              CustomText.nointernetconnectionavailable, lngtr!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
-          false,
-          context);
-    }
+
   }
 
   Future<void> callApiLogicData(BuildContext mContext, String userName,
       String password, String token, String villagesListString) async {
-    downloadedApi = 2;
+    downloadedApi = 3;
     updateLoadingText(dialogSetState);
     var logisResponce =
         await FormLogicApiService().fetchLogicData(userName, password, token);
@@ -1147,7 +1167,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
 
   Future<void> callApiTranslateData(BuildContext mContext, String userName,
       String password, String token, String villagesListString) async {
-    downloadedApi = 3;
+    downloadedApi = 4;
     updateLoadingText(dialogSetState);
     var translateResponce =
         await TranslationService().translateApi(userName, password, token);
@@ -1156,11 +1176,11 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
       Map<String, dynamic> responseData = json.decode(translateResponce.body);
       await initTranslation(TranslationModel.fromJson(responseData));
       // await callMasterData( mContext, userName, password, token);
-      if (role == CustomText.clusterCoordinator.trim())
-        await getCrecheDataCC(
-            mContext, userName, password, token, villagesListString);
-      else
+      if (role == CustomText.crecheSupervisor.trim())
         await getCrecheData(mContext, userName, password, token);
+
+      else await getCrecheDataCC(
+      mContext, userName, password, token, villagesListString);
     } else {
       Navigator.pop(mContext);
       Validate().singleButtonPopup(
@@ -1171,35 +1191,57 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
     }
   }
 
-  Future<void> callMasterData(BuildContext mContext, String userName,
-      String password, String token) async {
-    downloadedApi = 5;
-    updateLoadingText(dialogSetState);
-    var msterDataResponse =
-        await MasterApiService().fetchmasterData(userName, password, token);
-
-    if (msterDataResponse.statusCode == 200) {
-      MasterDataModel masterDataApiModel =
-          MasterDataModel.fromJson(json.decode(msterDataResponse.body));
-      await initMasterData(masterDataApiModel);
-      Validate().saveString(
-          Validate.msterDownloadDateTime, Validate().currentDateTime());
-      await initializeData();
-      Navigator.pop(mContext);
-      Validate().singleButtonPopup(
-          Global.returnTrLable(
-              locationControlls, CustomText.master_data_download, lngtr!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
-          false,
-          context);
-    } else {
-      Navigator.pop(mContext);
-      Validate().singleButtonPopup(
-          Global.errorBodyToString(msterDataResponse.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
-          false,
-          context);
+  Future<void> callMasterData(BuildContext mContext) async {
+    downloadedApi = 1;
+    var network = await Validate().checkNetworkConnection();
+    if (network) {
+      showLoaderDialog(context);
+      var token = await Validate().readString(Validate.appToken);
+      var userName = await Validate().readString(Validate.userName);
+      var password = await Validate().readString(Validate.Password);
+      var msterDataResponse =
+      await MasterApiService().fetchmasterData(userName!, password!, token!);
+      if (msterDataResponse.statusCode == 200) {
+        MasterDataModel masterDataApiModel =
+        MasterDataModel.fromJson(json.decode(msterDataResponse.body));
+        await initMasterData(masterDataApiModel);
+       await  downMaster(mContext, userName, password, token);
+      } else
+      if (msterDataResponse.statusCode == 401) {
+        Navigator.pop(mContext);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.remove(Validate.Password);
+        ScaffoldMessenger.of(mContext).showSnackBar(
+          SnackBar(
+              content: Text(Global.returnTrLable(
+                  locationControlls, CustomText.token_expired, lngtr!))),
+        );
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (mContext) => LoginScreen(),
+            ));
+      }
+      else {
+        Navigator.pop(mContext);
+        var errorMsg =
+        Global.errorBodyToString(msterDataResponse.body, 'message');
+        Validate().singleButtonPopup(
+            errorMsg,
+            Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
+            false,
+            context);
+      }
     }
+    else  Validate().singleButtonPopup(
+        Global.returnTrLable(locationControlls,
+            CustomText.nointernetconnectionavailable, lngtr!),
+        Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
+        false,
+        context);
+
+
+
   }
 
   Future<void> initTranslation(TranslationModel? translationModel) async {
@@ -1229,14 +1271,23 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
 
   Future<void> getCrecheData(BuildContext mContext, String userName,
       String password, String appToken) async {
-    downloadedApi = 4;
+    downloadedApi = 5;
     updateLoadingText(dialogSetState);
     var response = await CrecehDataDownloadApi()
         .crechedatadownloadapi(userName, password, appToken);
     if (response.statusCode == 200) {
       Map<String, dynamic> resultMap = jsonDecode(response.body);
       await CrecheDataHelper().downloadCrecheData(resultMap);
-      await callMasterData(mContext, userName, password, appToken);
+      Validate().saveString(
+          Validate.msterDownloadDateTime, Validate().currentDateTime());
+      await initializeData();
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(
+          Global.returnTrLable(
+              locationControlls, CustomText.master_data_download, lngtr!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
+          false,
+          context);
     } else if (response.statusCode == 401) {
       Navigator.pop(mContext);
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1263,12 +1314,23 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
 
   Future<void> getCrecheDataCC(BuildContext mContext, String userName,
       String password, String appToken, String villagesListString) async {
+    downloadedApi = 5;
+    updateLoadingText(dialogSetState);
     var response = await CrecehDataDownloadApi().crechedatadownloadapiCC(
         villagesListString, userName, password, appToken);
     if (response.statusCode == 200) {
       Map<String, dynamic> resultMap = jsonDecode(response.body);
       await CrecheDataHelper().downloadCrecheData(resultMap);
-      await callMasterData(mContext, userName, password, appToken);
+      Validate().saveString(
+          Validate.msterDownloadDateTime, Validate().currentDateTime());
+      await initializeData();
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(
+          Global.returnTrLable(
+              locationControlls, CustomText.master_data_download, lngtr!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
+          false,
+          context);
     } else if (response.statusCode == 401) {
       Navigator.pop(mContext);
       SharedPreferences prefs = await SharedPreferences.getInstance();

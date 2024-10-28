@@ -1885,23 +1885,26 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   // }
 
   Future<void> pendingDataForVerify() async {
-    if (role == 'Creche Supervisor') {
+    if (role == CustomText.crecheSupervisor) {
       syncCount = await callCountForUpload();
-    } else if (role == 'Cluster Coordinator') {
+    } else if (role == CustomText.clusterCoordinator) {
       syncCount = await callCountForUploadCC();
-    } else if (role == 'Accounts and Logistics Manager') {
+    } else if (role == CustomText.alm) {
       var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
       var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
       var ImageFileData = await ImageFileTabHelper().getImageForUpload();
       var visitNots = await CmcALMTabResponseHelper().getAlmForUpload();
       syncCount = visitNots.length+crecheCheckIn.length+grievanceData.length+ImageFileData.length;
-    } else if (role == 'Capacity and Building Manager') {
+    } else if (role == CustomText.cbm) {
       var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
       var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
       var ImageFileData = await ImageFileTabHelper().getImageForUpload();
       var visitNots = await CmcCBMTabResponseHelper().getCBMForUpload();
 
       syncCount = visitNots.length+crecheCheckIn.length+grievanceData.length+ImageFileData.length;
+    }else{
+      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
+      syncCount=grievanceData.length;
     }
   }
 
