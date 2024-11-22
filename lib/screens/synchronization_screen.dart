@@ -231,7 +231,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                                       locationControlls, CustomText.ok, lngtr!),
                                   false,
                                   context);
-                          } else {
+                          }
+                          else {
                             if (pendindTaskCount == 0) {
                               List<dynamic> visitNotes = [];
                               if (role == CustomText.clusterCoordinator)
