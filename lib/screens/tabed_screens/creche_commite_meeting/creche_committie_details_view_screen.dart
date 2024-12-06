@@ -34,7 +34,6 @@ class CrecheCommitteDetailsViewScreen extends StatefulWidget {
   final String? creche_id;
   final String? ccGuid;
 
-
   CrecheCommitteDetailsViewScreen({
     super.key,
     required this.ccGuid,
@@ -81,7 +80,9 @@ class _CrecheCommettieDetailsScreenState
       CustomText.Next,
       CustomText.back,
       CustomText.Submit,
-      CustomText.ccDetails
+      CustomText.ccDetails,
+      CustomText.typehere,
+      CustomText.select_here
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -169,6 +170,8 @@ class _CrecheCommettieDetailsScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng!),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
@@ -197,7 +200,8 @@ class _CrecheCommettieDetailsScreenState
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           // minDate: quesItem.fieldname == 'meeting_date' ? widget.minDate : null,
-          readable: quesItem.fieldname == 'meeting_date'?isDateReadable:null,
+          readable:
+              quesItem.fieldname == 'meeting_date' ? isDateReadable : null,
           calenderValidate:
               DependingLogic().calenderValidation(logics, myMap, quesItem),
           onChanged: (value) {
@@ -332,18 +336,16 @@ class _CrecheCommettieDetailsScreenState
           assetPath: myMap[quesItem.fieldname!],
           readable: true,
           titleText:
-          Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          onChanged: (value) async {
-          },
-          onName: (value) async {
-
-          },
+          onChanged: (value) async {},
+          onName: (value) async {},
         );
-        case 'Int':
+      case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng!),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -455,13 +457,13 @@ class _CrecheCommettieDetailsScreenState
     }
 
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
       logics.addAll(data);
     });
-     List<String> labelItems = [];
+    List<String> labelItems = [];
     allItems.forEach((element) {
       if (Global.validString(element.label)) {
         labelItems.add(element.label!);
@@ -470,7 +472,6 @@ class _CrecheCommettieDetailsScreenState
     await TranslationDataHelper()
         .callTranslateString(labelItems)
         .then((value) => translats.addAll(value));
-
 
     setState(() {
       _isLoading = false;
@@ -499,10 +500,9 @@ class _CrecheCommettieDetailsScreenState
             validStatus = false;
             break;
           }
-
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(translats, validationMsg, lng!),

@@ -52,7 +52,10 @@ class _WeightforAgeBoysGirlsScreenState
     }
     List<String> valueItems = [
       CustomText.NorecordAvailable,
-      CustomText.GrowthChart
+      CustomText.GrowthChart,
+      CustomText.WeightforAge,
+      CustomText.WeightforHeight,
+      CustomText.HeightforAge
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -199,7 +202,7 @@ class _WeightforAgeBoysGirlsScreenState
                         maxY: maxY!,
                         bottomName: "Age",
                         leftName: "Weight",
-                        heading: "Weight For Age",
+                        heading: CustomText.WeightforAge,
                         // minY: minY!,
                         // minX: minX!,
                         childenrollguid: widget.childenrollguid,
@@ -217,7 +220,7 @@ class _WeightforAgeBoysGirlsScreenState
                           gender: widget.gender_id,
                           bottomName: "Age",
                           leftName: "Weight",
-                          heading: "Weight For Age",
+                          heading: CustomText.WeightforAge,
                           maxY: maxY!,
                           child: child,
                           maxX: maxX!,

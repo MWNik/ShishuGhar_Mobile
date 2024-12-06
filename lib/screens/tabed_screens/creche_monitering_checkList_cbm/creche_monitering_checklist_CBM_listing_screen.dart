@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/model/dynamic_screen_model/creche_monitering_checkList_cbm_response_model.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
@@ -17,8 +18,8 @@ class cmcCBMListingScreen extends StatefulWidget {
   final String? creche_id;
   final String? crecheName;
 
-  cmcCBMListingScreen({super.key, required this.creche_id,
-    required this.crecheName});
+  cmcCBMListingScreen(
+      {super.key, required this.creche_id, required this.crecheName});
 
   @override
   State<cmcCBMListingScreen> createState() => _cmcCBMListingScreenState();
@@ -31,6 +32,8 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
   bool isOnlyUnsyched = false;
   List<CmcCBMResponseModel> usynchedList = [];
   List<CmcCBMResponseModel> allList = [];
+  DateTime applicableDate = Validate().stringToDate(Validate.date);
+  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -39,6 +42,8 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -56,7 +61,10 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
       CustomText.EntryTime,
       CustomText.ExitTime,
       CustomText.all,
-      CustomText.usynchedAndDraft
+      CustomText.usynchedAndDraft,
+      CustomText.areSureToDelete,
+      CustomText.Cancel,
+      CustomText.delete
     ];
 
     await TranslationDataHelper()
@@ -70,8 +78,9 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
   Future<void> fetchCmcCBMRecords() async {
     cmcCBMData = await CmcCBMTabResponseHelper()
         .childCBMChild(Global.stringToInt(widget.creche_id));
-    usynchedList =
-        cmcCBMData.where((element) => element.is_edited == 1 || element.is_edited == 2).toList();
+    usynchedList = cmcCBMData
+        .where((element) => element.is_edited == 1 || element.is_edited == 2)
+        .toList();
     allList = cmcCBMData;
     cmcCBMData = isOnlyUnsyched ? usynchedList : allList;
     setState(() {});
@@ -85,18 +94,16 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
           String cmbGUid = '';
           if (!(Global.validString(cmbGUid))) {
             cmbGUid = Validate().randomGuid();
-            var refStatus = await Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                        CmcCBMTabSCreen(
-                          cbmguid: cmbGUid,
-                          crecheName: widget.crecheName!,
-                          creche_id: Global.stringToInt(
-                              widget.creche_id,
-                          ),
-                          isEdit: false,
-                          isViewScreen: false,
-                        )));
+            var refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => CmcCBMTabSCreen(
+                      cbmguid: cmbGUid,
+                      crecheName: widget.crecheName!,
+                      creche_id: Global.stringToInt(
+                        widget.creche_id,
+                      ),
+                      isEdit: false,
+                      isViewScreen: false,
+                    )));
 
             if (refStatus == 'itemRefresh') {
               await fetchCmcCBMRecords();
@@ -111,7 +118,7 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
       ),
       appBar: CustomAppbar(
         text: Global.returnTrLable(translats, CustomText.VisitNotes, lng),
-        subTitle:widget.crecheName,
+        subTitle: widget.crecheName,
         onTap: () => Navigator.pop(context, 'itemRefresh'),
       ),
       body: Padding(
@@ -122,7 +129,8 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
             children: [
               AnimatedRollingSwitch(
                 title1: Global.returnTrLable(translats, CustomText.all, lng),
-                title2: Global.returnTrLable(translats, CustomText.usynchedAndDraft, lng),
+                title2: Global.returnTrLable(
+                    translats, CustomText.usynchedAndDraft, lng),
                 isOnlyUnsynched: isOnlyUnsyched,
                 onChange: (value) async {
                   setState(() {
@@ -145,21 +153,30 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
                         onTap: () async {
                           var cbmguid = cmcCBMData[index].cbmguid;
                           if (Global.validString(cbmguid)) {
-                            var created_at = DateTime.parse(cmcCBMData[index].created_at.toString());
-                            var date  = DateTime(created_at.year,created_at.month,created_at.day);
-                            bool isViewScreen = date.add(Duration(days: 7)).isBefore(DateTime.parse(Validate().currentDate()));
+                            var created_at = DateTime.parse(
+                                cmcCBMData[index].created_at.toString());
+                            var date = DateTime(created_at.year,
+                                created_at.month, created_at.day);
+                            bool isViewScreen = date
+                                .add(Duration(days: 7))
+                                .isBefore(
+                                    DateTime.parse(Validate().currentDate()));
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
                                         CmcCBMTabSCreen(
-                                          crecheName: widget.crecheName!,
-                                          cbmguid: cbmguid!,
-                                          creche_id: Global.stringToInt(
-                                              widget.creche_id),
-                                          isEdit: true,
-                                            isViewScreen: isViewScreen,
-                                            date_of_visit:Global.getItemValues(cmcCBMData[index].responces!, 'date_of_visit')
-                                        )));
+                                            crecheName: widget.crecheName!,
+                                            cbmguid: cbmguid!,
+                                            creche_id: Global.stringToInt(
+                                                widget.creche_id),
+                                            isEdit: true,
+                                            isViewScreen:
+                                                now.isBefore(applicableDate)
+                                                    ? false
+                                                    : isViewScreen,
+                                            date_of_visit: Global.getItemValues(
+                                                cmcCBMData[index].responces!,
+                                                'date_of_visit'))));
 
                             if (refStatus == 'itemRefresh') {
                               await fetchCmcCBMRecords();
@@ -228,7 +245,9 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
                                           //   overflow: TextOverflow.ellipsis,
                                           // ),
                                           Text(
-                                            Global.getItemValues(cmcCBMData[index].responces!, 'date_of_visit'),
+                                            Global.getItemValues(
+                                                cmcCBMData[index].responces!,
+                                                'date_of_visit'),
                                             style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -237,27 +256,66 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
                                     ),
                                     SizedBox(width: 5),
                                     (cmcCBMData[index].is_edited == 0 &&
-                                          cmcCBMData[index].is_uploaded == 1)
-                                      ? Image.asset(
-                                          "assets/sync.png",
-                                          scale: 1.5,
-                                        )
-                                      : (cmcCBMData[index].is_edited == 1 &&
-                                              cmcCBMData[index].is_uploaded == 0)
-                                          ? Image.asset(
-                                              "assets/sync_gray.png",
-                                              scale: 1.5,
-                                            )
-                                          : Icon(
-                                              Icons.error_outline_outlined,
-                                              color: Colors.red.shade700,
-                                              shadows: [
-                                                BoxShadow(
-                                                    spreadRadius: 2,
-                                                    blurRadius: 4,
-                                                    color: Colors.red.shade200)
-                                              ],
-                                            )
+                                            cmcCBMData[index].is_uploaded == 1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : (cmcCBMData[index].is_edited == 1 &&
+                                                cmcCBMData[index].is_uploaded ==
+                                                    0)
+                                            ? Image.asset(
+                                                "assets/sync_gray.png",
+                                                scale: 1.5,
+                                              )
+                                            : Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons
+                                                        .error_outline_outlined,
+                                                    color: Colors.red,
+                                                    shadows: [
+                                                      BoxShadow(
+                                                        spreadRadius: 2,
+                                                        blurRadius: 4,
+                                                        color:
+                                                            Colors.red.shade200,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      showDeleteDialog(
+                                                          cmcCBMData[index]);
+                                                      // setState(() {});
+                                                    },
+                                                    child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 8
+                                                              .w), // Optional spacing from content
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        color:
+                                                            Colors.red,
+                                                      ),
+                                                      child: Padding(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 2.w,
+                                                                vertical: 2.h),
+                                                        child: Icon(
+                                                          Icons.delete_rounded,
+                                                          color: Colors
+                                                              .white,
+                                                          size: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                   ]),
                             ),
                           ),
@@ -272,5 +330,25 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
         ]),
       ),
     );
+  }
+
+  showDeleteDialog(CmcCBMResponseModel record) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return CustomDoubleButton(
+              message: Global.returnTrLable(
+                  translats, CustomText.areSureToDelete, lng),
+              posButton:
+                  Global.returnTrLable(translats, CustomText.delete, lng),
+              negButton:
+                  Global.returnTrLable(translats, CustomText.Cancel, lng),
+              onPositive: () async {
+                await CmcCBMTabResponseHelper().deleteDraftRecords(record);
+                await fetchCmcCBMRecords();
+                Navigator.of(context).pop(true);
+                setState(() {});
+              });
+        });
   }
 }

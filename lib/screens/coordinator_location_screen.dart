@@ -990,7 +990,8 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
         else if (widget.role == CustomText.cbm)
           await callCMCCBMchecklist(
               mContext, villagesss, userName, password, token);
-        else  await callFollowUpDownloadApiCC(
+        else
+          await callFollowUpDownloadApiCC(
               mContext, villagesss, userName, password, token);
       } else if (response.statusCode == 401) {
         Navigator.pop(mContext);
@@ -1673,7 +1674,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
       String password, String token) async {
     var network = await Validate().checkNetworkConnection();
     if (network) {
-      downloadedApi = 0;
+      downloadedApi = 10;
       loadingText = ((downloadedApi / totalApiCount) * 100).toInt();
       showLoaderDialog(context);
 

@@ -387,6 +387,7 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => EnrolledExitChildListingTab(
               creCheId: widget.crecheId,
+              creCheName: crechName!,
               village_id:
                   Global.getItemValues(responce!.responces!, 'village_id'))));
       // }

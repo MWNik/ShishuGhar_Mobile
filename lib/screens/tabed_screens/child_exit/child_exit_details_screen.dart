@@ -426,7 +426,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,labelControlls,lng);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(labelControlls, validationMsg, lng!),

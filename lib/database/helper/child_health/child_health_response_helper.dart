@@ -88,40 +88,99 @@ class ChildHealthTabResponceHelper {
         'UPDATE child_health_responce SET name = ?  ,  is_uploaded=1 , is_edited=0 where child_health_guid=?',
         [cename, ceGuid]);
   }
+Future<void> childDownloadHealthData(Map<String, dynamic> item) async {
+  List<Map<String, dynamic>> growth = List<Map<String, dynamic>>.from(item['Data']);
 
-  Future<void> childDownloadHealthData(Map<String, dynamic> item) async {
-    List<Map<String, dynamic>> growth =
-    List<Map<String, dynamic>>.from(item['Data']);
-    print(growth);
-    growth.forEach((element) async {
-      var growthData = element['Child Health'];
+  // List to hold child health data models
+  List<ChildHealthResponceModel> healthItems = [];
 
-      var name = growthData['name'];
-      var creche_id = growthData['creche_id'];
-      var child_health_guid = growthData['child_health_guid'];
-      var childenrolledguid = growthData['childenrolledguid'];
-      var appCreatedOn = growthData['appcreated_on'];
-      var appcreated_by = growthData['appcreated_by'];
-      var app_updated_by = growthData['app_updated_by'];
-      var app_updated_on = growthData['app_updated_on'];
-      var finalHHData = Validate().keyesFromResponce(growthData);
-      var hhDtaResponce = jsonEncode(finalHHData);
+  // Prepare data
+  for (var element in growth) {
+    var growthData = element['Child Health'];
 
-      var items = ChildHealthResponceModel(
-        child_health_guid: child_health_guid,
-        childenrolledguid: childenrolledguid,
+    var name = growthData['name'];
+    var crecheId = growthData['creche_id'];
+    var childHealthGuid = growthData['child_health_guid'];
+    var childEnrolledGuid = growthData['childenrolledguid'];
+    var appCreatedOn = growthData['appcreated_on'];
+    var appCreatedBy = growthData['appcreated_by'];
+    var appUpdatedBy = growthData['app_updated_by'];
+    var appUpdatedOn = growthData['app_updated_on'];
+    var finalHHData = Validate().keyesFromResponce(growthData);
+    var hhDataResponse = jsonEncode(finalHHData);
+
+    // Add the health data model to the list
+    healthItems.add(
+      ChildHealthResponceModel(
+        child_health_guid: childHealthGuid,
+        childenrolledguid: childEnrolledGuid,
         name: name,
         is_uploaded: 1,
         is_edited: 0,
         is_deleted: 0,
-        creche_id: Global.stringToInt(creche_id.toString()),
-        update_at: app_updated_on,
-        updated_by: app_updated_by,
+        creche_id: Global.stringToInt(crecheId.toString()),
+        update_at: appUpdatedOn,
+        updated_by: appUpdatedBy,
         created_at: appCreatedOn,
-        created_by: appcreated_by,
-        responces: hhDtaResponce,
-      );
-      await inserts(items);
-    });
+        created_by: appCreatedBy,
+        responces: hhDataResponse,
+      ),
+    );
   }
+
+  // Commit data in a transaction using batch
+  await DatabaseHelper.database!.transaction((txn) async {
+    var batch = txn.batch();
+
+    // Add all health items to the batch
+    for (var item in healthItems) {
+      batch.insert(
+        'child_health_responce',  // Table name where the data will be inserted
+        item.toJson(),  // Convert model to JSON format for insertion
+        conflictAlgorithm: ConflictAlgorithm.replace,  // Handle conflicts
+      );
+    }
+
+    // Commit the batch
+    await batch.commit(noResult: true);
+  });
+
+  print('Child Health data successfully inserted.');
+}
+
+  // Future<void> childDownloadHealthData(Map<String, dynamic> item) async {
+  //   List<Map<String, dynamic>> growth =
+  //   List<Map<String, dynamic>>.from(item['Data']);
+  //   print(growth);
+  //   growth.forEach((element) async {
+  //     var growthData = element['Child Health'];
+
+  //     var name = growthData['name'];
+  //     var creche_id = growthData['creche_id'];
+  //     var child_health_guid = growthData['child_health_guid'];
+  //     var childenrolledguid = growthData['childenrolledguid'];
+  //     var appCreatedOn = growthData['appcreated_on'];
+  //     var appcreated_by = growthData['appcreated_by'];
+  //     var app_updated_by = growthData['app_updated_by'];
+  //     var app_updated_on = growthData['app_updated_on'];
+  //     var finalHHData = Validate().keyesFromResponce(growthData);
+  //     var hhDtaResponce = jsonEncode(finalHHData);
+
+  //     var items = ChildHealthResponceModel(
+  //       child_health_guid: child_health_guid,
+  //       childenrolledguid: childenrolledguid,
+  //       name: name,
+  //       is_uploaded: 1,
+  //       is_edited: 0,
+  //       is_deleted: 0,
+  //       creche_id: Global.stringToInt(creche_id.toString()),
+  //       update_at: app_updated_on,
+  //       updated_by: app_updated_by,
+  //       created_at: appCreatedOn,
+  //       created_by: appcreated_by,
+  //       responces: hhDtaResponce,
+  //     );
+  //     await inserts(items);
+  //   });
+  // }
 }

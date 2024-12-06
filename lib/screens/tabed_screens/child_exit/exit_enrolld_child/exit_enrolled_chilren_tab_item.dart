@@ -103,6 +103,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
     'child_name',
     'height',
     'weight',
+    'measurement_taken',
+    'measurement_equipment'
   ];
   // List<String> redableItemsFloat = [
   //
@@ -128,6 +130,10 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
       CustomText.dataSaveSuc,
       CustomText.childUpdatedSucces,
       CustomText.ChildEnrollsuccess,
+      CustomText.Submit,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -139,7 +145,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
 
     if (widget.isNew == 1) {
       isRecordNew = false;
@@ -433,6 +439,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -638,7 +646,12 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           readable: widget.isEditable == true
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? (widget.isForExit
+                  ? redableItemsDate.contains(quesItem.fieldname)
+                      ? true
+                      : DependingLogic()
+                          .callReadableLogic(logics, myMap, quesItem)
+                  : DependingLogic().callReadableLogic(logics, myMap, quesItem))
               : true,
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
@@ -977,7 +990,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,translats,lng);
         if (Global.validString(validationMsg)) {
           if ((Global.validString(myMap['reason_for_exit'].toString()) &&
               element.fieldname == 'age_at_enrollment_in_months')) {
@@ -1065,8 +1078,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           .isBefore(DateTime.parse(Validate().currentDate()))) {
         shouldEditMesure = true;
       }
-    }
-    else {
+    } else {
       var fromHHInfo = await HouseHoldChildrenHelperHelper()
           .callHouseHoldChildrenItem(widget.cHHGuid);
       Map<String, dynamic> responseData = jsonDecode(fromHHInfo[0].responces!);

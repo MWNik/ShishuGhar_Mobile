@@ -51,6 +51,9 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
   void Function()? ontap;
   String lng = "en";
   String? role;
+  double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
 
   Future<void> initializeData() async {
     lng = (await Validate().readString(Validate.sLanguage))!;
@@ -61,7 +64,8 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
       CustomText.Creches,
       CustomText.CrecheCaregiver,
       CustomText.Next,
-      CustomText.back
+      CustomText.back,
+      CustomText.villageProfile
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -75,6 +79,7 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
 
   @override
   Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
     } else {
@@ -96,7 +101,8 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
             ),
           ),
           title: Text(
-              Global.returnTrLable(translatsLabel, 'Village Profile', lng),
+              Global.returnTrLable(
+                  translatsLabel, CustomText.villageProfile, lng),
               style: Styles.white145),
           // actions: [
           //   (role == 'Cluster Coordinator')
@@ -116,10 +122,15 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
           // ],
           centerTitle: true,
           bottom: TabBar(
-            indicatorColor: Colors.white,
+            indicatorColor: Color(0xffF26BA3),
             unselectedLabelColor: Colors.grey.shade300,
             unselectedLabelStyle: Styles.white124P,
             labelColor: Colors.white,
+            controller: _tabController,
+            isScrollable: tabIsScrollable,
+            labelPadding: EdgeInsets.zero,
+            // tabAlignment: TabAlignment.start,
+            tabAlignment: tabIsScrollable ? TabAlignment.start : null,
             onTap: (index) {
               if (_tabController.indexIsChanging) {
                 _tabController.index = _tabController.previousIndex;
@@ -130,8 +141,7 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
                 return;
               }
             },
-            controller: _tabController,
-            isScrollable: true,
+
             tabs: tabController(),
           ),
         ),
@@ -160,8 +170,8 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
             tabIndex: i,
             totalTab: tabBreakItems.length));
       } else {
-        tabItem.add(DemograficalListingScreen(vName: widget.name,
-          isEditable: widget.isEditable));
+        tabItem.add(DemograficalListingScreen(
+            vName: widget.name, isEditable: widget.isEditable));
       }
     }
     return tabItem;
@@ -192,15 +202,20 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
   List<Widget> tabController() {
     List<Widget> tabItem = [];
     tabBreakItems.forEach((element) {
-      bool isSelected = tabIndex == tabBreakItems.indexOf(element);
-      Widget tabLabel = Text(
-        Global.returnTrLable(translatsLabel, element.label!, lng),
-        style: TextStyle(
-            fontSize: isSelected ? 16.0 : 13.0,
-            color: isSelected ? Colors.white : Colors.grey.shade300),
-      );
-      tabItem.add(Tab(
-        child: tabLabel,
+      tabItem.add(Container(
+        width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
+        // padding: EdgeInsets.only(left: 10, right: 10),
+        padding: EdgeInsets.only(
+            left: tabIsScrollable ? 10 : 0, right: tabIsScrollable ? 10 : 0),
+        decoration: BoxDecoration(
+            color: Color(0xff369A8D),
+            border: Border(
+                right: BorderSide(
+                    color: Colors.white, width: 1, style: BorderStyle.solid))),
+        child: Tab(
+            child: Text(
+          Global.returnTrLable(translatsLabel, element.label!, lng),
+        )),
       ));
     });
     return tabItem;
@@ -274,14 +289,38 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
     }
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
+    tabIsScrollable = tabWidth * tabBreakItems.length > screenWidth;
+
     // _tabController.addListener(handleTabChange);
     List<String> tabLabelItems = [];
     tabBreakItems.forEach((element) {
-      if(Global.validString(element.label)){
-       tabLabelItems.add(element.label!);
+      if (Global.validString(element.label)) {
+        tabLabelItems.add(element.label!);
       }
     });
-    await TranslationDataHelper().callTranslateString(tabLabelItems).then((value) => translatsLabel.addAll(value));
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelItems)
+        .then((value) => translatsLabel.addAll(value));
+    tabWidth = 0;
+    for (int i = 0; i < tabBreakItems.length; i++) {
+      final textPainter = TextPainter(
+        text: TextSpan(
+            text: Global.returnTrLable(
+                translatsLabel, tabBreakItems[i].label!, lng!),
+            style: Styles.white124P),
+        maxLines: 1, // Single line text
+        textDirection: TextDirection.ltr,
+      );
+
+      // Layout the text (this step is required to calculate the width)
+      textPainter.layout();
+      double textWidth = textPainter.width + 20;
+      tabWidth = tabWidth + textWidth;
+      print(textWidth);
+    }
+    screenWidth = MediaQuery.of(context).size.width;
+    // tabIsScrollable = tabWidth * tabBreakItems.length >= screenWidth;
+    tabIsScrollable = tabWidth > screenWidth;
 
     setState(() {
       _isLoading = false;
@@ -289,8 +328,8 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
   }
 
   @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     initializeData();
   }
 

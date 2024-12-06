@@ -128,18 +128,27 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
       CustomText.exit,
       CustomText.ChildEnrollsuccess,
       CustomText.enrolled,
+      CustomText.Save,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.Submit,
+      CustomText.plsFilManForm,
+      CustomText.dataSaveSuc,
+      CustomText.childUpdatedSucces
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
     items.forEach((element) {
       if (Global.validString(element.label)) {
-        valueNames.add(element.label!);
+        valueNames.add(element.label!.trim());
       }
     });
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
 
     if (widget.isNew == 1) {
       isRecordNew = false;
@@ -432,6 +441,8 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -519,6 +530,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
@@ -931,8 +943,8 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate()
               .singleButtonPopup(validationMsg!, CustomText.ok, false, context);

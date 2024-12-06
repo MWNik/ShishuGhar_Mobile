@@ -47,8 +47,9 @@ class AttendanceTabItems extends StatefulWidget {
   final bool isEdit;
   final int totalTab;
   final List<String> existingDates;
+  DateTime? minDate;
 
-  const AttendanceTabItems({
+  AttendanceTabItems({
     super.key,
     required this.creche_nameId,
     required this.isEdit,
@@ -60,6 +61,7 @@ class AttendanceTabItems extends StatefulWidget {
     required this.tabIndex,
     required this.totalTab,
     required this.existingDates,
+    this.minDate,
   });
 
   @override
@@ -128,7 +130,9 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       CustomText.Submit,
       CustomText.dataSaveSuc,
       CustomText.attenAlredyExist,
-      CustomText.noEnrolledChild
+      CustomText.noEnrolledChild,
+      CustomText.Yes,
+      CustomText.No
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -287,7 +291,6 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       case 'Date':
         return CustomDatepickerDynamic(
           focusNode: _focusNode[quesItem.fieldname],
-
           calenderValidate: [],
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
@@ -296,8 +299,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          
-          minDate: defaultMinDate,
+          minDate: widget.minDate,
           maxDate: AddAttendanceScreenFormTab.minDate != null
               ? ((quesItem.fieldname == 'date_of_attendance')
                   ? AddAttendanceScreenFormTab.minDate
@@ -405,6 +407,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
+
             setState(() {});
           },
         );
@@ -984,8 +987,8 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           }
         }
         var validationMsgother = otherTableDependCotrol(logics, myMap, element);
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng);
         if (Global.validString(validationMsg) ||
             Global.validString(validationMsgother)) {
           if (Global.validString(validationMsg)) {

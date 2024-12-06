@@ -114,7 +114,9 @@ class _HeightforAgeBoysGirlsScreenState
         double x = (data['age_months'] as num).toDouble();
         (x > age_in_months!.last) ? maxX = x : maxX = age_in_months!.last;
         // (x < age_in_months!.first) ? minX = x : minX = age_in_months!.first;
-        var height = Global.validString(data['height'].toString())?data['height']:0.0;
+        var height = Global.validString(data['height'].toString())
+            ? data['height']
+            : 0.0;
         double y = (height as num).toDouble();
 
         (y > height_max!.last) ? maxY = y : maxY = height_max!.last;
@@ -183,7 +185,7 @@ class _HeightforAgeBoysGirlsScreenState
                         maxY: maxY!,
                         bottomName: "Age",
                         leftName: "Height",
-                        heading: "Height For Age",
+                        heading: CustomText.HeightforAge,
                         // minY: minY!,
                         // minX: minX!,
                         childenrollguid: widget.childenrollguid,
@@ -199,7 +201,7 @@ class _HeightforAgeBoysGirlsScreenState
                           coordinatesThree: red_cor!,
                           coordinatesFour: yellow_min!,
                           gender: widget.gender_id,
-                          heading: "Height For Age",
+                          heading: CustomText.HeightforAge,
                           bottomName: "Age",
                           leftName: "Height",
                           maxY: maxY!,

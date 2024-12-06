@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/database/helper/creche_monitoring/creche_monitoring_response_helper.dart';
@@ -36,6 +37,8 @@ class _CrecheMonitorListingScreenState
   String lng = 'en';
   List<Translation> translats = [];
   bool isOnlyUnsynched = false;
+  DateTime applicableDate = Validate().stringToDate(Validate.date);
+  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -44,6 +47,8 @@ class _CrecheMonitorListingScreenState
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     lng = (await Validate().readString(Validate.sLanguage))!;
     List<String> valueNames = [
       CustomText.VisitNotes,
@@ -55,7 +60,10 @@ class _CrecheMonitorListingScreenState
       CustomText.clear,
       CustomText.NorecordAvailable,
       CustomText.all,
-      CustomText.usynchedAndDraft
+      CustomText.usynchedAndDraft,
+      CustomText.areSureToDelete,
+      CustomText.Cancel,
+      CustomText.delete
     ];
 
     await TranslationDataHelper()
@@ -119,7 +127,7 @@ class _CrecheMonitorListingScreenState
 
       // appBar
       appBar: CustomAppbar(
-        text: CustomText.VisitNotes,
+        text: Global.returnTrLable(translats, CustomText.VisitNotes, lng),
         subTitle: widget.crecheName,
         onTap: () => Navigator.pop(context),
       ),
@@ -169,7 +177,9 @@ class _CrecheMonitorListingScreenState
                               cmgUid,
                               Global.getItemValues(responce!, 'date_of_visit'),
                               true,
-                              isViewScreen);
+                              now.isBefore(applicableDate)
+                                  ? false
+                                  : isViewScreen);
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),
@@ -196,7 +206,7 @@ class _CrecheMonitorListingScreenState
                                       //   strutStyle: StrutStyle(height: 1),
                                       // ),
                                       Text(
-                                        '${CustomText.datevisit} : ',
+                                        '${Global.returnTrLable(translats, CustomText.datevisit, lng)} : ',
                                         style: Styles.black104,
                                       ),
                                     ],
@@ -259,14 +269,47 @@ class _CrecheMonitorListingScreenState
                                               "assets/sync_gray.png",
                                               scale: 1.5,
                                             )
-                                          : Icon(
-                                              Icons.error_outline_outlined,
-                                              color: Colors.red.shade700,
-                                              shadows: [
-                                                BoxShadow(
-                                                    spreadRadius: 2,
-                                                    blurRadius: 4,
-                                                    color: Colors.red.shade200)
+                                          : Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.error_outline_outlined,
+                                                  color: Colors.red,
+                                                  shadows: [
+                                                    BoxShadow(
+                                                        spreadRadius: 2,
+                                                        blurRadius: 4,
+                                                        color:
+                                                            Colors.red.shade200)
+                                                  ],
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    showDeleteDialog(
+                                                        selectedItem);
+                                                  },
+                                                  child: Container(
+                                                    margin: EdgeInsets.only(
+                                                        left: 8
+                                                            .w), // Optional spacing from content
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              50),
+                                                      color: Colors.red,
+                                                    ),
+                                                    child: Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 2.w,
+                                                              vertical: 2.h),
+                                                      child: Icon(
+                                                        Icons.delete_rounded,
+                                                        color: Colors.white,
+                                                        size: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
                                               ],
                                             )
                                 ],
@@ -282,5 +325,25 @@ class _CrecheMonitorListingScreenState
         ]),
       ),
     );
+  }
+
+  showDeleteDialog(CrecheMonitorResponseModel record) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return CustomDoubleButton(
+              message: Global.returnTrLable(
+                  translats, CustomText.areSureToDelete, lng),
+              posButton:
+                  Global.returnTrLable(translats, CustomText.delete, lng),
+              negButton:
+                  Global.returnTrLable(translats, CustomText.Cancel, lng),
+              onPositive: () async {
+                await CrecheMonitorResponseHelper().deleteDraftRecords(record);
+                await fetchCmcData();
+                Navigator.of(context).pop(true);
+                setState(() {});
+              });
+        });
   }
 }

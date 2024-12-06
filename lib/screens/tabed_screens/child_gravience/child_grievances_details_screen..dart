@@ -80,7 +80,10 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
       CustomText.plsFilManForm,
       CustomText.ok,
       CustomText.ChildHealth,
-      CustomText.Submit
+      CustomText.Submit,
+      CustomText.ChildGrievances,
+      CustomText.select_here,
+      CustomText.typehere
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -168,6 +171,8 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText: Global.returnTrLable(
+              labelControlls, CustomText.select_here, lng!),
           focusNode: _focusNode[quesItem.fieldname],
           readable: !editingRemoved
               ? true
@@ -414,14 +419,19 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
         // }
       }
     }
+    List<String> _labelTranslats = [];
     for (var elements in allItems) {
       _focusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
+      _labelTranslats.add(elements.label!);
     }
     _scrollController.addListener(() {
       if (_scrollController.position.isScrollingNotifier.value) {
         _focusNode.forEach((_, focusNode) => focusNode.unfocus());
       }
     });
+    await TranslationDataHelper()
+        .callTranslateString(_labelTranslats)
+        .then((value) => labelControlls.addAll(value));
 
     await OptionsModelHelper()
         .getAllMstCommonNotINOptions(defaultCommon, lng!)
@@ -470,7 +480,7 @@ class _ChildGrievancesDetailsState extends State<ChildGrievancesDetailScreen> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,labelControlls,lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(labelControlls, validationMsg, lng!),

@@ -85,7 +85,12 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
       CustomText.childPresent,
       CustomText.childCount,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.minAgeInMonthEn,
+      CustomText.maxAgeInMonthEn,
+      CustomText.Gender,
+      CustomText.clear,
+      CustomText.Filter
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -339,6 +344,9 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
                               .add(Duration(days: 16))
                               .isAfter(
                                   DateTime.parse(Validate().currentDate()));
+                          var applicableDate =
+                              Validate().stringToDate(Validate.date);
+                          var now = DateTime.parse(Validate().currentDate());
 
                           // var childName = detailMap.values.first;
                           var refStatus = await Navigator.of(context).push(
@@ -363,7 +371,9 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
                                           isEditable: role ==
                                                   CustomText.crecheSupervisor
                                                       .trim()
-                                              ? true
+                                              ? now.isBefore(applicableDate)
+                                                  ? true
+                                                  : isEditable
                                               : false,
                                           minDate: date_of_enrollment)));
                           if (refStatus == 'itemRefresh') {

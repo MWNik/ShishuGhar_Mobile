@@ -8,6 +8,7 @@ import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_h
 import 'package:shishughar/database/helper/stock/stock_response_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
+import 'package:shishughar/screens/tabed_screens/stock/stock/stock_details_screen.dart';
 import 'package:shishughar/screens/tabed_screens/stock/stock/stock_details_screen_replica.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
@@ -253,7 +254,7 @@ class _StockListingScreenState extends State<StockListingScreen> {
                                     var refStatus = await Navigator.of(context)
                                         .push(MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                Replica(
+                                                StockDetails(
                                                   sguid: guid,
                                                   month: Global.stringToInt(
                                                       Global.getItemValues(
@@ -384,7 +385,7 @@ class _StockListingScreenState extends State<StockListingScreen> {
                                                     : Icon(
                                                         Icons.error_outline,
                                                         color:
-                                                            Colors.red.shade500,
+                                                            Colors.red,
                                                         shadows: [
                                                           BoxShadow(
                                                               spreadRadius: 2,

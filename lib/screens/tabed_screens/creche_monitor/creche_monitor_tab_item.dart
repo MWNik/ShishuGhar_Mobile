@@ -9,6 +9,7 @@ import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_customdat
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';
+import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
@@ -66,6 +67,8 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
   int? isEditFromExisting = 0;
   Map<String, FocusNode> _focusNode = {};
   ScrollController _scrollController = ScrollController();
+  var applicableDate = Validate().stringToDate(Validate.date);
+  var now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -90,6 +93,8 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
   }
 
   Future<void> _initData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     _role = await Validate().readString(Validate.role);
     username = (await Validate().readString(Validate.userName))!;
 
@@ -98,7 +103,13 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
       CustomText.Next,
       CustomText.back,
       CustomText.ok,
-      CustomText.ChildEnrollsuccess
+      CustomText.ChildEnrollsuccess,
+      CustomText.Save,
+      CustomText.select_here,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.visitNoteAlrdyExists,
+      CustomText.dataSaveSuc
     ];
 
     final items = widget.screenItem[widget.tabBreakItem.name!]!;
@@ -108,6 +119,9 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
         valueNames.add(element.label!);
       }
     });
+    await TranslationDataHelper()
+        .callTranslateString(valueNames)
+        .then((value) => _translation.addAll(value));
 
     await updateExistingFields();
 
@@ -200,6 +214,8 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText: Global.returnTrLable(
+              _translation, CustomText.select_here, _language),
           focusNode: _focusNode[quesItem.fieldname],
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
@@ -227,7 +243,9 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           minDate: quesItem.fieldname == 'date_of_visit'
-              ? DateTime.now().subtract(Duration(days: 7))
+              ? now.isBefore(applicableDate)
+                  ? null
+                  : DateTime.now().subtract(Duration(days: 7))
               : null,
           // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
           calenderValidate:
@@ -242,7 +260,7 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
                 _myMap.remove(quesItem.fieldname);
                 setState(() {});
                 Validate().singleButtonPopup(
-                    'A Visit Note already exists for the selected Date "${value}"',
+                    '${Global.returnTrLable(_translation, CustomText.visitNoteAlrdyExists, _language)} "${value}"',
                     Global.returnTrLable(
                         _translation, CustomText.ok, _language),
                     false,
@@ -495,7 +513,7 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
               _myMap.remove(element.fieldname);
               setState(() {});
               Validate().singleButtonPopup(
-                  'A Visit Note already exists for the selected Date "${values}"',
+                  '${Global.returnTrLable(_translation, CustomText.visitNoteAlrdyExists, _language)} "${values}"',
                   Global.returnTrLable(_translation, CustomText.ok, _language),
                   false,
                   context);
@@ -505,7 +523,7 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(_logics, _myMap, element);
+            DependingLogic().validationMessge(_logics, _myMap, element,_translation,_language);
         if (Global.validString(validationMsg)) {
           Validate()
               .singleButtonPopup(validationMsg!, CustomText.ok, false, context);

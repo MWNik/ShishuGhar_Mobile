@@ -220,7 +220,7 @@ class _ExitEnrolledDetailsScreenState extends State<ExitEnrolledDetailsScreen> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,translatsLabel,lng);
         if (Global.validString(validationMsg)) {
           if ((Global.validString(myMap['reason_for_exit'].toString()) &&
               element.fieldname == 'age_at_enrollment_in_months')) {

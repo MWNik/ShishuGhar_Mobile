@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shishughar/model/dynamic_screen_model/stock_response_model.dart';
 
 import 'package:shishughar/utils/globle_method.dart';
@@ -129,12 +130,12 @@ class StockResponseHelper {
 
     return result;
   }
+
   Future<List<Map<String, dynamic>>> getPrevStockresponseByYearMonth(
-    int creche_id,int year,int month
-  ) async {
+      int creche_id, int year, int month) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'select s.* from (select *,((year*12)+month) as f from tabCreche_stock_response) s INNER join (SELECT creche_id,Max(((year*12)+month))  as d from tabCreche_stock_response where creche_id =? and ((year*12)+month)<((?*12)+?))d on s.creche_id=d.creche_id and s.f=d.d',
-        [creche_id,year,month]);
+        [creche_id, year, month]);
 
     return result;
   }
@@ -149,13 +150,20 @@ class StockResponseHelper {
   }
 
   Future<void> StockDataDownload(Map<String, dynamic> item) async {
-    List<Map<String, dynamic>> growth =
-        List<Map<String, dynamic>>.from(item['Data']);
-    print(growth);
-    growth.forEach((element) async {
-      var growthData = element['Creche Stock'];
+    try {
+      List<Map<String, dynamic>> growth =
+          List<Map<String, dynamic>>.from(item['Data']);
+      print(growth.length);
 
-      var items = StockResponseModel(
+      // List to collect all StockResponseModel items
+      List<StockResponseModel> itemsList = [];
+
+      // Process each data and add to the items list
+      for (var element in growth) {
+        var growthData = element['Creche Stock'];
+
+        // Create StockResponseModel instance
+        var item = StockResponseModel(
           sguid: growthData['sguid'],
           creche_id: Global.stringToInt(growthData['creche_id']),
           name: growthData['name'],
@@ -167,10 +175,76 @@ class StockResponseHelper {
           created_at: growthData['appcreated_on'],
           created_by: growthData['appcreated_by'],
           item_id: Global.stringToInt(growthData['stock_item'].toString()),
-          responces: await jsonEncode(Validate().keyesFromResponce(growthData)),
+          responces: jsonEncode(Validate().keyesFromResponce(growthData)),
           year: Global.stringToInt(growthData['year'].toString()),
-          month: Global.stringToInt(growthData['month'].toString()));
-      await inserts(items);
+          month: Global.stringToInt(growthData['month'].toString()),
+        );
+
+        // Add the item to the list
+        itemsList.add(item);
+      }
+
+      // If the list has more than 500 items, split it into batches
+      if (itemsList.length > 500) {
+        for (int i = 0; i < itemsList.length; i += 500) {
+          var batchItems = itemsList.sublist(
+              i, (i + 500) > itemsList.length ? itemsList.length : (i + 500));
+
+          // Insert the batch
+          await _insertBatch(batchItems);
+        }
+      } else {
+        // If the list has 500 or fewer items, insert them all at once
+        await _insertBatch(itemsList);
+      }
+
+      print("Data insertion successful!");
+    } catch (e) {
+      debugPrint("StockDataDownload() : $e");
+    }
+  }
+
+// Helper function to insert a batch of items
+  Future<void> _insertBatch(List<StockResponseModel> batchItems) async {
+    await DatabaseHelper.database!.transaction((txn) async {
+      var batch = txn.batch();
+
+      for (var item in batchItems) {
+        batch.insert(
+          'tabCreche_stock_response', // Change to your actual table name
+          item.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      // Commit the batch insert
+      await batch.commit(noResult: true);
     });
   }
+
+  // Future<void> StockDataDownload(Map<String, dynamic> item) async {
+  //   List<Map<String, dynamic>> growth =
+  //       List<Map<String, dynamic>>.from(item['Data']);
+  //   print(growth);
+  //   growth.forEach((element) async {
+  //     var growthData = element['Creche Stock'];
+
+  //     var items = StockResponseModel(
+  //         sguid: growthData['sguid'],
+  //         creche_id: Global.stringToInt(growthData['creche_id']),
+  //         name: growthData['name'],
+  //         is_uploaded: 1,
+  //         is_edited: 0,
+  //         is_deleted: 0,
+  //         update_at: growthData['app_updated_on'],
+  //         updated_by: growthData['app_updated_by'],
+  //         created_at: growthData['appcreated_on'],
+  //         created_by: growthData['appcreated_by'],
+  //         item_id: Global.stringToInt(growthData['stock_item'].toString()),
+  //         responces: await jsonEncode(Validate().keyesFromResponce(growthData)),
+  //         year: Global.stringToInt(growthData['year'].toString()),
+  //         month: Global.stringToInt(growthData['month'].toString()));
+  //     await inserts(items);
+  //   });
+  // }
 }

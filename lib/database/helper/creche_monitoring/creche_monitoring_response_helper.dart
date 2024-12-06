@@ -28,8 +28,26 @@ class CrecheMonitorResponseHelper {
   }
 
   //
-  Future<void> insertUpdate(int crecheId, String cmgUid, int? name,
-      String response, String? created_on, String? created_by, String? updated_by, String? updated_on) async {
+
+  Future<void> deleteDraftRecords(CrecheMonitorResponseModel record) async {
+    try {
+      await DatabaseHelper.database!.delete(_table,
+          where: 'is_edited = ? AND name IS NULL AND cmguid = ?',
+          whereArgs: [2, record.cmguid]);
+    } catch (e) {
+      debugPrint("Error deleting drfat records : $e");
+    }
+  }
+
+  Future<void> insertUpdate(
+      int crecheId,
+      String cmgUid,
+      int? name,
+      String response,
+      String? created_on,
+      String? created_by,
+      String? updated_by,
+      String? updated_on) async {
     try {
       final item = CrecheMonitorResponseModel(
         creche_id: crecheId,
@@ -84,10 +102,11 @@ class CrecheMonitorResponseHelper {
   //   }
   // }
 
-  Future<List<CrecheMonitorResponseModel>> getCrecheResponseWithCrecheId( String? crecheId) async {
+  Future<List<CrecheMonitorResponseModel>> getCrecheResponseWithCrecheId(
+      String? crecheId) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-        'select * from tab_creche_monitoring_response where creche_id=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC'
-        ,[Global.stringToInt(crecheId)]);
+        'select * from tab_creche_monitoring_response where creche_id=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC',
+        [Global.stringToInt(crecheId)]);
     List<CrecheMonitorResponseModel> items = [];
 
     result.forEach((itemMap) {
@@ -110,10 +129,10 @@ class CrecheMonitorResponseHelper {
   //     return [];
   //   }
   // }
-  Future<List<CrecheMonitorResponseModel>> callCrecheMonitoringResponse() async {
+  Future<List<CrecheMonitorResponseModel>>
+      callCrecheMonitoringResponse() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-        'select * from tab_creche_monitoring_response ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC'
-       );
+        'select * from tab_creche_monitoring_response ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC');
     List<CrecheMonitorResponseModel> items = [];
 
     result.forEach((itemMap) {
@@ -122,8 +141,6 @@ class CrecheMonitorResponseHelper {
 
     return items;
   }
-
-
 
   /// Get Creche Monitor Response for Upload
   Future<List<CrecheMonitorResponseModel>> getCrecheResponseForUpload() async {
@@ -140,9 +157,10 @@ class CrecheMonitorResponseHelper {
     }
   }
 
-  Future<List<CrecheMonitorResponseModel>> getVillageProfileforUploadDarftEdit() async {
-    List<Map<String, dynamic>> result = await DatabaseHelper.database!
-        .rawQuery('select * from tab_creche_monitoring_response where is_edited=1 or is_edited=2');
+  Future<List<CrecheMonitorResponseModel>>
+      getVillageProfileforUploadDarftEdit() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from tab_creche_monitoring_response where is_edited=1 or is_edited=2');
     List<CrecheMonitorResponseModel> items = [];
 
     result.forEach((itemMap) {
@@ -165,12 +183,15 @@ class CrecheMonitorResponseHelper {
         [name, cmgUid]);
   }
 
-  /// Download Checklist Data
   Future<void> downloadChecklistData(Map<String, dynamic> item) async {
     try {
       ListOfMap data = ListOfMap.from(item['Data']);
 
-      data.forEach((element) async {
+      // List to collect all CrecheMonitorResponseModel items
+      List<CrecheMonitorResponseModel> itemsList = [];
+
+      // Process each element and add to the items list
+      for (var element in data) {
         final checkListData = element['Creche Monitoring Checklist'];
 
         final items = CrecheMonitorResponseModel(
@@ -187,10 +208,71 @@ class CrecheMonitorResponseHelper {
           responces: jsonEncode(Validate().keyesFromResponce(checkListData)),
         );
 
-        await insertResponse(items);
-      });
+        itemsList.add(items);
+      }
+
+      // If the list has more than 500 items, split it into batches
+      if (itemsList.length > 500) {
+        for (int i = 0; i < itemsList.length; i += 500) {
+          var batchItems = itemsList.sublist(
+              i, (i + 500) > itemsList.length ? itemsList.length : (i + 500));
+
+          // Insert the batch
+          await _insertBatch(batchItems);
+        }
+      } else {
+        // If the list has 500 or fewer items, insert them all at once
+        await _insertBatch(itemsList);
+      }
     } catch (e) {
       debugPrint("downloadChecklistData() : $e");
     }
   }
+
+// Helper function to insert a batch of items
+  Future<void> _insertBatch(List<CrecheMonitorResponseModel> batchItems) async {
+    await DatabaseHelper.database!.transaction((txn) async {
+      var batch = txn.batch();
+
+      for (var item in batchItems) {
+        batch.insert(
+          'tab_creche_monitoring_response',
+          item.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      // Commit the batch insert
+      await batch.commit(noResult: true);
+    });
+  }
+
+  /// Download Checklist Data
+  // Future<void> downloadChecklistData(Map<String, dynamic> item) async {
+  //   try {
+  //     ListOfMap data = ListOfMap.from(item['Data']);
+
+  //     data.forEach((element) async {
+  //       final checkListData = element['Creche Monitoring Checklist'];
+
+  //       final items = CrecheMonitorResponseModel(
+  //         cmguid: checkListData['cmguid'],
+  //         name: checkListData['name'],
+  //         is_uploaded: 1,
+  //         is_edited: 0,
+  //         is_deleted: 0,
+  //         creche_id: Global.stringToInt(checkListData['creche_id'].toString()),
+  //         update_at: checkListData['app_updated_on'],
+  //         updated_by: checkListData['app_updated_by'],
+  //         created_at: checkListData['appcreated_on'],
+  //         created_by: checkListData['appcreated_by'],
+  //         responces: jsonEncode(Validate().keyesFromResponce(checkListData)),
+  //       );
+
+  //       await insertResponse(items);
+  //     });
+  //   } catch (e) {
+  //     debugPrint("downloadChecklistData() : $e");
+  //   }
+  // }
 }

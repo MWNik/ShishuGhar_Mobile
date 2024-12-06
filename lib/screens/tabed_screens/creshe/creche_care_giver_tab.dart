@@ -17,7 +17,6 @@ class CreheCareGiverTab extends StatefulWidget {
   final String crechedCode;
   final bool isEditable;
 
-
   const CreheCareGiverTab({
     super.key,
     required this.CGGuid,
@@ -32,7 +31,6 @@ class CreheCareGiverTab extends StatefulWidget {
 
 class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
     with TickerProviderStateMixin {
-
   late TabController _tabController;
   int tabIndex = 0;
   List<Widget> tabTitleItem = [];
@@ -41,13 +39,12 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
   bool _isLoading = true;
   String? role;
   String? lng;
-  List<Translation> labelControlls=[];
-  
+  List<Translation> labelControlls = [];
 
   @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    await callScrenControllers(CustomText.crecheCaregiver);
+  void initState()  {
+    super.initState();
+    callScrenControllers(CustomText.crecheCaregiver);
   }
 
   @override
@@ -55,8 +52,6 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
     _tabController.dispose();
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -85,19 +80,25 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
                 ),
               ),
             ),
-            title:  Text(lng!=null?Global.returnTrLable(labelControlls,CustomText.Creches,lng!):"",style: Styles.white145,),
+            title: Text(
+              lng != null
+                  ? Global.returnTrLable(
+                      labelControlls, CustomText.Creches, lng!)
+                  : "",
+              style: Styles.white145,
+            ),
             centerTitle: true,
             bottom: _isLoading
                 ? null
                 : TabBar(
-              indicatorColor: Colors.white,
-              unselectedLabelColor: Colors.grey.shade300,
-              unselectedLabelStyle: Styles.white124P,
-              labelColor: Colors.white,
-              controller: _tabController,
-              // isScrollable: true,
-              tabs: tabTitleItem,
-            ),
+                    indicatorColor: Colors.white,
+                    unselectedLabelColor: Colors.grey.shade300,
+                    unselectedLabelStyle: Styles.white124P,
+                    labelColor: Colors.white,
+                    controller: _tabController,
+                    // isScrollable: true,
+                    tabs: tabTitleItem,
+                  ),
           ),
           body: Column(
             children: [
@@ -115,24 +116,19 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
     }
   }
 
-
-
   Future<void> callScrenControllers(screen_type) async {
     List<HouseHoldFielItemdModel> allItems = [];
-    role=await Validate().readString(Validate.role);
+    role = await Validate().readString(Validate.role);
     await CrecheFieldHelper()
         .getCrecheFieldsForm(screen_type)
         .then((value) async {
       allItems = value;
     });
     tabBreakItems = [CustomText.crecheCaregiver];
-    itemScreenItems[CustomText.crecheCaregiver]=allItems;
+    itemScreenItems[CustomText.crecheCaregiver] = allItems;
 
-
-
-    await tabController().then((value) =>
-    _tabController = TabController(length: tabBreakItems.length, vsync: this)
-    );
+    await tabController().then((value) => _tabController =
+        TabController(length: tabBreakItems.length, vsync: this));
 
     await setLabelTextData();
     setState(() {
@@ -140,29 +136,27 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
     });
   }
 
-
   Future tabController() async {
     tabBreakItems.forEach((element) async {
       lng = await Validate().readString(Validate.sLanguage);
-      var verifiLable =
-      await TranslationDataHelper().getTranslation(CustomText.crecheCaregiver, lng!);
+      var verifiLable = await TranslationDataHelper()
+          .getTranslation(CustomText.crecheCaregiver, lng!);
       tabTitleItem.add(Tab(icon: Container(child: Text(verifiLable))));
     });
-
   }
 
   List<Widget> tabControllerScreen() {
     List<Widget> tabItem = [];
     tabItem.add(CareGiverScreenItem(
-        parentName:widget.parentName,
-        crechedCode:widget.crechedCode,
-        CGGuid:widget.CGGuid,
-       tabBreakItem:tabBreakItems[0],
-        screenItem:itemScreenItems,
-        changeTab:changeTab,
-        isEditable:widget.isEditable,
-        tabIndex:0,
-        totalTab:1));
+        parentName: widget.parentName,
+        crechedCode: widget.crechedCode,
+        CGGuid: widget.CGGuid,
+        tabBreakItem: tabBreakItems[0],
+        screenItem: itemScreenItems,
+        changeTab: changeTab,
+        isEditable: widget.isEditable,
+        tabIndex: 0,
+        totalTab: 1));
     return tabItem;
   }
 
@@ -174,7 +168,7 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
           _tabController.animateTo(tabIndex);
         });
       }
-    } else if (tabIndex < tabBreakItems.length-1) {
+    } else if (tabIndex < tabBreakItems.length - 1) {
       setState(() {
         tabIndex++;
         _tabController.animateTo(tabIndex);
@@ -187,7 +181,6 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
     List<String> valueNames = [CustomText.Creches];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls=value);
+        .then((value) => labelControlls = value);
   }
-
 }

@@ -83,6 +83,7 @@ class _ChildImmunizationExpendedScreenSatet
   DateTime? lastDate;
 
   Future<void> initializeData() async {
+    bool isLoading = true;
     List<int> dateParts = widget.childDob.split('-').map(int.parse).toList();
     lastDate = DateTime(dateParts[0], dateParts[1], dateParts[2])
         .subtract(Duration(days: 1));
@@ -116,13 +117,15 @@ class _ChildImmunizationExpendedScreenSatet
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls = value);
+        .then((value) => labelControlls.addAll(value));
 
     await TranslationDataHelper()
         .callTranslateEnrolledChildren()
         .then((value) => labelControlls.addAll(value));
 
     await callVaccinelistItem();
+    isLoading = false;
+    setState(() {});
   }
 
   @override
@@ -179,8 +182,8 @@ class _ChildImmunizationExpendedScreenSatet
                       ),
 
                       Text(
-                        Global.returnTrLable(
-                            labelControlls, CustomText.ChildImmunizationDetails, lng!),
+                        Global.returnTrLable(labelControlls,
+                            CustomText.ChildImmunizationDetails, lng!),
                         style: Styles.white126P,
                       ),
                       // Add additional TextSpans here if needed
@@ -194,14 +197,19 @@ class _ChildImmunizationExpendedScreenSatet
           bottom: TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
             labelPadding: EdgeInsets.zero,
+
+            // indicatorWeight: 4.5,
+            indicatorColor: Colors.white,
             indicator: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.white, // Divider color
-                  width: 3.0, // Divider thickness
+                  color: Colors.yellow.shade600, // Divider color
+                  width: 4.5,
+                  // Divider thickness
                 ),
               ),
             ),
+
             unselectedLabelColor: Colors.transparent,
             tabs: (tabCount == 2)
                 ? [
@@ -289,6 +297,14 @@ class _ChildImmunizationExpendedScreenSatet
 
     var alrecords = await ChildImmunizationResponseHelper()
         .getChildEventResponcewithGuid(widget.child_immunization_guid!);
+    List<String> siteOfvaccineList = [];
+    vaccinesOverdue.forEach((element) {
+      if (Global.validString(element.site_for_vaccinations))
+        siteOfvaccineList.add(element.site_for_vaccinations!.trim());
+    });
+    await TranslationDataHelper()
+        .callTranslateString(siteOfvaccineList)
+        .then((value) => labelControlls.addAll(value));
 
     if (alrecords.length > 0) {
       Map<String, dynamic> responcesData = jsonDecode(alrecords[0].responces!);
@@ -722,6 +738,7 @@ class _ChildImmunizationExpendedScreenSatet
                           0,
                         );
                       } else if (type == 'completed') {
+                        print(type);
                         if (Global.validString(
                             createAtVaccines[vaccines[index].name!])) {
                           var editDate = DateTime.parse(
@@ -729,7 +746,13 @@ class _ChildImmunizationExpendedScreenSatet
                               .add(Duration(days: 16));
                           var currentDate =
                               DateTime.parse(Validate().currentDateTime());
-                          if (editDate.isAfter(currentDate)) {
+                          var date = await Validate().readString(Validate.date);
+                          var applicableDate =
+                              Validate().stringToDate(date ?? "2024-12-31");
+                          print(date);
+                          if (currentDate.isBefore(applicableDate)
+                              ? true
+                              : editDate.isAfter(currentDate)) {
                             await createVaccine(
                                 vaccines[index].name!,
                                 vaccines[index].vaccine!,
@@ -760,7 +783,8 @@ class _ChildImmunizationExpendedScreenSatet
                       children: [
                         Text('${vaccines[index].vaccine}',
                             style: Styles.black123),
-                        Text('${vaccines[index].site_for_vaccinations}',
+                        Text(
+                            '${Global.returnTrLable(labelControlls, vaccines[index].site_for_vaccinations, lng!)}',
                             style: Styles.black123),
                         if (type == 'completed')
                           Text(

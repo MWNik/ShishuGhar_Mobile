@@ -101,19 +101,21 @@ class _ChildFollowupTabItemsScreenState
       CustomText.Selecthere,
       CustomText.typehere,
       CustomText.plsFilManForm,
-      CustomText.dataSaveSuc
+      CustomText.dataSaveSuc,
+      CustomText.Yes,
+      CustomText.No
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
     items.forEach((element) {
       if (Global.validString(element.label)) {
-        valueNames.add(element.label!);
+        valueNames.add(element.label!.trim());
       }
     });
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
 
     // attendecedRecord = await ChildAttendenceHelper()
     //     .callChildAttendencesByGuid(widget.ChildAttenGUID);
@@ -532,7 +534,7 @@ class _ChildFollowupTabItemsScreenState
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,translats,lng);
         if (Global.validString(validationMsg)) {
           Validate()
               .singleButtonPopup(validationMsg!, CustomText.ok, false, context);
@@ -551,12 +553,9 @@ class _ChildFollowupTabItemsScreenState
           validStatus = false;
           break;
         }
-        if(myMap['is_child_available']==null){
-          Validate().singleButtonPopup(
-              'Please select Is child available? ',
-              CustomText.ok,
-              false,
-              context);
+        if (myMap['is_child_available'] == null) {
+          Validate().singleButtonPopup('Please select Is child available? ',
+              CustomText.ok, false, context);
           validStatus = false;
           break;
         }
@@ -651,7 +650,6 @@ class _ChildFollowupTabItemsScreenState
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -810,16 +808,16 @@ class _ChildFollowupTabItemsScreenState
       var alredyGenrated = await ChildFollowUpTabResponseHelper()
           .getScduledEnrollGuid(
               widget.enrolChildGuid, widget.child_referral_guid);
-      if(myMap['reasons']!='3'){
-        if (Global.validToInt(reffralItem.first.visit_count) == folloUps.length) {
+      if (myMap['reasons'] != '3') {
+        if (Global.validToInt(reffralItem.first.visit_count) ==
+            folloUps.length) {
           Map<String, dynamic> jsonBody =
-          jsonDecode(reffralItem.first.responces!);
+              jsonDecode(reffralItem.first.responces!);
           jsonBody['visit_count'] = 0;
           var itemResponce = jsonEncode(jsonBody);
           await ChildReferralTabResponseHelper().updateVisitFollowUps(
               itemResponce, reffralItem.first.child_referral_guid!, 0);
-        }
-        else if (reffralItem.length > 0 && alredyGenrated.length == 0) {
+        } else if (reffralItem.length > 0 && alredyGenrated.length == 0) {
           if (reffralItem.first.visit_count != folloUps.length) {
             DateTime? folloupDate;
             if (reffralItem.first.visit_count == 3) {
@@ -837,22 +835,20 @@ class _ChildFollowupTabItemsScreenState
                 userName);
           }
         }
-      }
-      else{
+      } else {
         Map<String, dynamic> jsonBody =
-        jsonDecode(reffralItem.first.responces!);
+            jsonDecode(reffralItem.first.responces!);
         jsonBody['visit_count'] = 0;
         var itemResponce = jsonEncode(jsonBody);
         await ChildReferralTabResponseHelper().updateVisitFollowUps(
             itemResponce, reffralItem.first.child_referral_guid!, 0);
-        if(alredyGenrated.length>0){
+        if (alredyGenrated.length > 0) {
           alredyGenrated.forEach((element) async {
-            await ChildFollowUpTabResponseHelper().deleteFollowUpBYFollowpGUID(element.child_followup_guid!);
+            await ChildFollowUpTabResponseHelper()
+                .deleteFollowUpBYFollowpGUID(element.child_followup_guid!);
           });
-
         }
       }
-
     }
   }
 

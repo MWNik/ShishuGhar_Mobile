@@ -64,6 +64,7 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
   String crechName = "";
   int? enName;
   String? role;
+  String? date;
 
   int _currentIndex = 0;
   List image = [
@@ -77,7 +78,7 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
     'assets/creche_profile/health_detail_new.png',
     'assets/childeventdetail.png',
   ];
-  List text = [
+  List<String> text = [
     CustomText.ChildProfile,
     CustomText.creche_enrollement,
     CustomText.anthropomertry,
@@ -342,7 +343,20 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
                       itemBuilder: (ctx, i) {
                         return InkWell(
                           onTap: () async {
-                            await onclick(i, image[i]);
+                            if (i == 0) {
+                              await onclick(i, image[i]);
+                            } else if (Global.validToInt(
+                                    enrolledItem?.is_edited) !=
+                                2) {
+                              await onclick(i, image[i]);
+                            } else
+                              Validate().singleButtonPopup(
+                                  Global.returnTrLable(labelControlls,
+                                      CustomText.childDarftMsg, lng),
+                                  Global.returnTrLable(
+                                      labelControlls, CustomText.ok, lng),
+                                  false,
+                                  context);
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -437,30 +451,34 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
     iniData();
   }
 
-  // bool checkEditable() {
-  //   bool returnStatus = true;
-  //   if (enrolledItem != null && Global.validString(enrolledItem!.created_at)) {
-  //     var creation = DateTime.parse(enrolledItem!.created_at.toString());
-  //     var datePart = DateTime(creation.year, creation.month, creation.day);
-  //     var now = DateTime.now();
-  //     var nowDatePart = DateTime(now.year, now.month, now.day);
-  //     returnStatus = datePart.add(Duration(days: 16)).isAfter(nowDatePart);
-  //   }
-  //   return returnStatus;
-  // }
+  bool checkEditable() {
+    bool returnStatus = true;
+    if (enrolledItem != null && Global.validString(enrolledItem!.created_at)) {
+      var creation = DateTime.parse(enrolledItem!.created_at.toString());
+      var datePart = DateTime(creation.year, creation.month, creation.day);
+      var now = DateTime.now();
+      var nowDatePart = DateTime(now.year, now.month, now.day);
+      returnStatus = datePart.add(Duration(days: 16)).isAfter(nowDatePart);
+    }
+
+    var applicableDate = Validate().stringToDate(date ?? "2024-12-31");
+    var now = DateTime.parse(Validate().currentDate());
+
+    return now.isBefore(applicableDate) ? true : returnStatus;
+  }
 
   Future<void> onclick(int i, String imsgeItem) async {
     print("Role =======> $role");
     if (i == 0) {
-      // bool isEdit = checkEditable();
+      bool isEdit = checkEditable();
 
       String? minDate = await callDateOfExit(enrolledItem!.CHHGUID!);
       EnrolledExitChilrenTab.childName =
           Global.getItemValues(enrolledItem!.responces!, 'child_name');
       // EnrolledExitChilrenTab.childName = '';
-      Navigator.of(context).push(MaterialPageRoute(
+      var refstatus = await Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => EnrolledExitChilrenTab(
-              isEditable: role == CustomText.crecheSupervisor ? true : false,
+              isEditable: role == CustomText.crecheSupervisor ? isEdit : false,
               CHHGUID: widget.CHHGUID,
               HHGUID: Global.getItemValues(enrolledItem!.responces!, 'hhguid'),
               HHname: widget.HHname,
@@ -473,6 +491,9 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
               minDate: minDate,
               isImageUpdate: Global.validString(Global.getItemValues(
                   enrolledItem!.responces!, 'image_field')))));
+      if (refstatus == CustomText.itemRefresh) {
+        await iniData();
+      }
     } else if (i == 1) {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => CrecheEnrollChildEnrollSingleScreen(
@@ -552,17 +573,16 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
       }
     } else if (i == 5) {
       Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) =>
-              WeightforAgeBoysGirlsScreen(
-              childenrollguid: widget.EnrolledChilGUID,
-              childId:
-                  '${Global.getItemValues(enrolledItem!.responces!, 'child_id')}',
-              childName:
-                  '${Global.getItemValues(enrolledItem!.responces!, 'child_name')}',
-              gender_id: Global.stringToInt(
-                Global.getItemValues(enrolledItem!.responces!, 'gender_id'),
-              ),
-                  // date_of_birth:Global.stringToDate(Global.getItemValues(enrolledItem!.responces!, 'child_dob'))!
+          builder: (BuildContext context) => WeightforAgeBoysGirlsScreen(
+                childenrollguid: widget.EnrolledChilGUID,
+                childId:
+                    '${Global.getItemValues(enrolledItem!.responces!, 'child_id')}',
+                childName:
+                    '${Global.getItemValues(enrolledItem!.responces!, 'child_name')}',
+                gender_id: Global.stringToInt(
+                  Global.getItemValues(enrolledItem!.responces!, 'gender_id'),
+                ),
+                // date_of_birth:Global.stringToDate(Global.getItemValues(enrolledItem!.responces!, 'child_dob'))!
               )));
     } else if (i == 6) {
       var childImmuData = await ChildImmunizationResponseHelper()
@@ -651,6 +671,7 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
         await OptionsModelHelper().getMstCommonOptions('Gender', lng);
 
     var lngtr = await Validate().readString(Validate.sLanguage);
+    date = await Validate().readString(Validate.date);
     if (lngtr != null) {
       lng = lngtr;
     }
@@ -725,7 +746,10 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
       CustomText.IssueSubmit,
       CustomText.creche_enrollement,
       CustomText.GrowthChart,
-      CustomText.hhNameS
+      CustomText.hhNameS,
+      CustomText.anthropomertry,
+      CustomText.childDarftMsg,
+      ...text
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)

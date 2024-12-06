@@ -93,12 +93,14 @@ class _ChildFollowupTabItemsViewScreenState
       CustomText.back,
       CustomText.ok,
       CustomText.childrenCountVallidattion,
+      CustomText.Yes,
+      CustomText.No
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
     items.forEach((element) {
       if (Global.validString(element.label)) {
-        valueNames.add(element.label!);
+        valueNames.add(element.label!.trim());
       }
     });
 
@@ -508,7 +510,7 @@ class _ChildFollowupTabItemsViewScreenState
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,translats,lng);
         if (Global.validString(validationMsg)) {
           // ScaffoldMessenger.of(context).showSnackBar(
           //   SnackBar(content: Text(validationMsg!)),

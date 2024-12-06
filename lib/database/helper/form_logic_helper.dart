@@ -25,10 +25,18 @@ class FormLogicDataHelper {
       List<TabFormsLogic> formLogicList) async {
     await DatabaseHelper.database!.delete('tabformsLogic');
     if (formLogicList.isNotEmpty) {
-      for (var element in formLogicList) {
-        await DatabaseHelper.database!
-            .insert('tabformsLogic', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        var batch = txn.batch();
+
+        for (var element in formLogicList) {
+          batch.insert('tabformsLogic', element.toJson());
+        }
+        await batch.commit(noResult: true);
+      });
+      // for (var element in formLogicList) {
+      //   await DatabaseHelper.database!
+      //       .insert('tabformsLogic', element.toJson());
+      // }
     }
   }
 

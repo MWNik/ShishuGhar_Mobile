@@ -11,7 +11,11 @@ import 'package:share_plus/share_plus.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
+import 'package:shishughar/custom_widget/custom_text.dart';
+import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/utils/constants.dart';
+import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/secure_storage.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,6 +26,7 @@ class Validate {
   static String userName = 'name';
   static String loginName = 'loginName';
   static String fullName = 'fullName';
+  static String date = 'date';
   static String appToken = 'appToken';
   static String Password = 'Password';
   static String state = 'StateName';
@@ -58,6 +63,7 @@ class Validate {
   static String msterDownloadDateTime = 'msterDownloadDateTime';
   static String dataDownloadDateTime = 'dataDownloadDateTime';
   static String dataUploadDateTime = 'dataUploadDateTime';
+  static String doctypeUpdateTimeStamp = "doctypeUpdateTimeStamp";
 
   static String childEventUpdateDate = 'childEventUpdateDate';
   static String childExitUpdatedDate = 'childExitUpdatedDate';
@@ -80,6 +86,7 @@ class Validate {
   static String chechInUpdateDate = 'ChechInUpdateDate';
   static String stockmetaUpdateDate = "stockmetaUpdateDate";
   static String requisitionMetaUpdateDate = "requisitionMetaUpdateDate";
+  static String household = "household";
 
 //
 
@@ -245,7 +252,7 @@ class Validate {
 
   void singleButtonPopup(
       String msg, String button, bool isBack, BuildContext context) async {
-    bool shouldProceed = await showDialog(
+    bool? shouldProceed = await showDialog(
       context: context,
       barrierDismissible: true,
       builder: (context) {
@@ -257,6 +264,25 @@ class Validate {
         Navigator.pop(context);
       }
     }
+  }
+
+  showExitDialog(
+      BuildContext mContext, List<Translation> translats, String lng) {
+    showDialog(
+        context: mContext,
+        barrierDismissible: false,
+        builder: (BuildContext bContext) {
+          return CustomDoubleButton(
+              message:
+                  Global.returnTrLable(translats, CustomText.shouldExit, lng),
+              posButton: Global.returnTrLable(translats, CustomText.exit, lng),
+              negButton:
+                  Global.returnTrLable(translats, CustomText.Cancel, lng),
+              onPositive: () {
+                Navigator.pop(bContext);
+                Navigator.pop(mContext, CustomText.itemRefresh);
+              });
+        });
   }
 
   Map<String, dynamic> keyesFromResponce(Map<String, dynamic> responce) {
@@ -581,6 +607,24 @@ class Validate {
       print('Error creating backup: ${e.toString()}');
     }
   }
+
+  DateTime stringToTime(String time) {
+    var slots = Global.splitData(time, ":");
+    if (slots.length == 3) {
+      int hour = int.parse(slots[0]);
+      int minute = int.parse(slots[1]);
+      int second = int.parse(slots[2]);
+      return DateTime(DateTime.now().year, DateTime.now().month,
+          DateTime.now().day, hour, minute, second);
+    } else {
+      int hour = int.parse(slots[0]);
+      int minute = int.parse(slots[1]);
+      return DateTime(DateTime.now().year, DateTime.now().month,
+          DateTime.now().day, hour, minute);
+    }
+  }
+
+  int toMinutes(TimeOfDay time) => time.hour * 60 + time.minute;
 
   Future<void> createUploadedJson(String testData) async {
     try {

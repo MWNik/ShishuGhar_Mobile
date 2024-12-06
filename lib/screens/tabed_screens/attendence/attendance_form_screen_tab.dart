@@ -63,6 +63,12 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
   String lng = "en";
   bool isEditable = true;
   String? role;
+  double screenWidth = 0.0;
+  double tabWidth = 105.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
+  var now = DateTime.parse(Validate().currentDate());
+  var applicableDate = DateTime.parse("2024-12-31");
+  
 
   @override
   void initState() {
@@ -71,6 +77,8 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = DateTime.parse(date ?? "2024-12-31");
     role = (await Validate().readString(Validate.role))!;
     AddAttendanceScreenFormTab.maxDate = widget.lastGrowthDate;
     AddAttendanceScreenFormTab.minDate = widget.minGrowthDate;
@@ -82,7 +90,10 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
       CustomText.CrecheCaregiver,
       CustomText.Next,
       CustomText.back,
-      CustomText.Add_Attendance
+      CustomText.Add_Attendance,
+      CustomText.shouldExit,
+      CustomText.exit,
+      CustomText.Cancel
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -98,7 +109,9 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
     } else {
       return WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context, 'itemRefresh');
+            isEditable
+                ? Validate().showExitDialog(context, translatsLabel, lng)
+                : Navigator.pop(context, 'itemRefresh');
             return false;
           },
           child: Scaffold(
@@ -109,7 +122,10 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
                 padding: EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pop(context, 'itemRefresh');
+                    isEditable
+                        ? Validate()
+                            .showExitDialog(context, translatsLabel, lng)
+                        : Navigator.pop(context, 'itemRefresh');
                   },
                   child: Icon(
                     Icons.arrow_back_ios_sharp,
@@ -135,12 +151,14 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
               bottom: _isLoading
                   ? null
                   : TabBar(
-                      indicatorColor: Colors.white,
+                      indicatorColor: Color(0xffF26BA3),
                       unselectedLabelColor: Colors.grey.shade300,
                       unselectedLabelStyle: Styles.white124P,
                       labelColor: Colors.white,
                       controller: _tabController,
-                      isScrollable: true,
+                      isScrollable: tabIsScrollable,
+                      labelPadding: EdgeInsets.zero,
+                      tabAlignment: tabIsScrollable ? TabAlignment.start : null,
                       tabs: tabController(),
                       onTap: (index) {
                         if (_tabController.indexIsChanging) {
@@ -186,6 +204,7 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
       } else {
         tabItem.add(isEditable
             ? AttendanceTabItems(
+                minDate: widget.lastGrowthDate,
                 existingDates: widget.existingDates,
                 isEdit: widget.isEdit,
                 creche_name: widget.crexhe_name,
@@ -195,6 +214,7 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
                 screenItem: expendedItems,
                 changeTab: changeTab,
                 tabIndex: i,
+               
                 totalTab: tabBreakItems.length)
             : AttendanceTabItemsView(
                 creche_name: widget.crexhe_name,
@@ -209,6 +229,8 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
     }
     return tabItem;
   }
+
+ 
 
   void changeTab(int index) {
     if (index == 0) {
@@ -231,15 +253,18 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
   List<Widget> tabController() {
     List<Widget> tabItem = [];
     tabBreakItems.forEach((element) {
-      bool isSelected = tabIndex == tabBreakItems.indexOf(element);
       Widget tabLabel = Text(
         Global.returnTrLable(translatsLabel, element.label!, lng),
-        style: TextStyle(
-            fontSize: isSelected ? 16.0 : 13.0,
-            color: isSelected ? Colors.white : Colors.grey.shade300),
       );
-      tabItem.add(Tab(
-        child: tabLabel,
+      tabItem.add(Container(
+        width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
+        padding: EdgeInsets.only(left: 10, right: 10),
+        decoration: BoxDecoration(
+            color: Color(0xff369A8D),
+            border: Border(
+                right: BorderSide(
+                    color: Colors.white, width: 1, style: BorderStyle.solid))),
+        child: Tab(child: tabLabel),
       ));
     });
     return tabItem;
@@ -314,6 +339,25 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
     }
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
+    tabWidth = 0;
+    for (int i = 0; i < tabBreakItems.length; i++) {
+      final textPainter = TextPainter(
+        text: TextSpan(
+            text: Global.returnTrLable(
+                translatsLabel, tabBreakItems[i].label!, lng),
+            style: Styles.white124P),
+        maxLines: 1, // Single line text
+        textDirection: TextDirection.ltr,
+      );
+
+      // Layout the text (this step is required to calculate the width)
+      textPainter.layout();
+      double textWidth = textPainter.width + 20;
+      tabWidth = tabWidth + textWidth;
+      print(textWidth);
+    }
+    screenWidth = MediaQuery.of(context).size.width;
+    tabIsScrollable = tabWidth > screenWidth;
     List<String> tabLabelItems = [];
     tabBreakItems.forEach((element) {
       if (Global.validString(element.label)) {
@@ -341,8 +385,8 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
         .callAttendanceResponce(widget.ChildAttenGUID);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
-
-      var items = expendedItems[tabBreakItems[index].name];
+      if(responseData['is_shishu_ghar_is_closed_for_the_day'] == 0){
+var items = expendedItems[tabBreakItems[index].name];
       if (items != null && items.isNotEmpty) {
         for (int i = 0; i < items.length; i++) {
           if (responseData.containsKey(items[i].fieldname)) {
@@ -371,6 +415,9 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
           }
         }
       }
+      } 
+      
+      
     }
     // Return false if conditions are not met
     return returnStatus;
@@ -413,16 +460,21 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
     var record = await AttendanceResponnceHelper()
         .callChildrenResponce(widget.ChildAttenGUID);
     if (record.isNotEmpty) {
-      // var dateInString =
-      // Global.getItemValues(record[0].responces, 'date_of_attendance');
-      // var parts = dateInString.split('-').map(int.parse).toList();
-      // var dateOfAttendance = DateTime(parts[0], parts[1], parts[2]);
+      var dateInString =
+          Global.getItemValues(record[0].responces, 'date_of_attendance');
+      var parts = dateInString.split('-').map(int.parse).toList();
+      var dateOfAttendance = DateTime(parts[0], parts[1], parts[2]);
       var created_at = DateTime.parse(record[0].created_at.toString());
       var date = DateTime(created_at.year, created_at.month, created_at.day);
-      // isEditable = role == CustomText.crecheSupervisor.trim()?(date
-      //     .add(Duration(days: 3))
-      //     .isAfter(DateTime.parse(Validate().currentDate()))):false;
-      isEditable = role == CustomText.crecheSupervisor.trim()?true:false;
+      isEditable = role == CustomText.crecheSupervisor.trim()
+          ? now.isBefore(applicableDate)
+              ? true
+              : (date
+                  .add(Duration(days: 3))
+                  .isAfter(DateTime.parse(Validate().currentDate())))
+          : false;
+
+      // isEditable = role == CustomText.crecheSupervisor.trim() ? true : false;
     }
   }
 }

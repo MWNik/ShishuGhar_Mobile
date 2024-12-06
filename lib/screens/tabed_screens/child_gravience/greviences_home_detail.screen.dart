@@ -74,14 +74,13 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
     labelControlls.clear();
     List<String> valueNames = [
       CustomText.Save,
-      CustomText.Creches,
-      CustomText.CrecheCaregiver,
+      CustomText.select_here,
       CustomText.Next,
       CustomText.dataSaveSuc,
       CustomText.back,
       CustomText.plsFilManForm,
       CustomText.ok,
-      CustomText.ChildHealth,
+      CustomText.ChildGrievances,
       CustomText.Submit
     ];
     await TranslationDataHelper()
@@ -97,58 +96,64 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: CustomAppbar(
-          text: Global.returnTrLable(
-              labelControlls, CustomText.ChildGrievances, lng!),
-          onTap: () => Navigator.pop(context, 'itemRefresh'),
-        ),
-        body: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Column(
-                children: [
-                  Expanded(
-                      child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: SingleChildScrollView(
-                        controller: _scrollController,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: cWidget(),
-                        )),
-                  )),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: Row(
-                      children: [
-                        Expanded(
-                            child: CElevatedButton(
-                          onPressed: () {
-                            nextTab(0, context);
-                          },
-                          color: Color(0xffF26BA3),
-                          text: Global.returnTrLable(
-                              labelControlls, CustomText.back, lng!),
-                        )),
-                        widget.isNew ? SizedBox(width: 10) : SizedBox(),
-                        widget.isNew
-                            ? Expanded(
-                                child: CElevatedButton(
-                                onPressed: () {
-                                  nextTab(1, context);
-                                },
-                                color: Color(0xff369A8D),
-                                text: Global.returnTrLable(
-                                    labelControlls, CustomText.Submit, lng!),
-                              ))
-                            : SizedBox(),
-                      ],
+    if (_isLoading)
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    else {
+      return Scaffold(
+          appBar: CustomAppbar(
+            text: Global.returnTrLable(
+                labelControlls, CustomText.ChildGrievances, lng!),
+            onTap: () => Navigator.pop(context, 'itemRefresh'),
+          ),
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    Expanded(
+                        child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.w, vertical: 10.h),
+                      child: SingleChildScrollView(
+                          controller: _scrollController,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: cWidget(),
+                          )),
+                    )),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.w, vertical: 10.h),
+                      child: Row(
+                        children: [
+                          Expanded(
+                              child: CElevatedButton(
+                            onPressed: () {
+                              nextTab(0, context);
+                            },
+                            color: Color(0xffF26BA3),
+                            text: Global.returnTrLable(
+                                labelControlls, CustomText.back, lng!),
+                          )),
+                          widget.isNew ? SizedBox(width: 10) : SizedBox(),
+                          widget.isNew
+                              ? Expanded(
+                                  child: CElevatedButton(
+                                  onPressed: () {
+                                    nextTab(1, context);
+                                  },
+                                  color: Color(0xff369A8D),
+                                  text: Global.returnTrLable(
+                                      labelControlls, CustomText.Submit, lng!),
+                                ))
+                              : SizedBox(),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ));
+                  ],
+                ));
+    }
   }
 
   List<Widget> cWidget() {
@@ -172,6 +177,8 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText: Global.returnTrLable(
+              labelControlls, CustomText.select_here, lng!),
           focusNode: _focusNode[quesItem.fieldname],
           readable: !widget.isNew
               ? true
@@ -429,14 +436,19 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
           defaultCommon.add('tab${allItems[i].options!.trim()}');
       }
     }
+    List<String> _fieldLabelNames = [];
     for (var elements in allItems) {
       _focusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
+      _fieldLabelNames.add(elements.label!);
     }
     _scrollController.addListener(() {
       if (_scrollController.position.isScrollingNotifier.value) {
         _focusNode.forEach((_, focusNode) => focusNode.unfocus());
       }
     });
+    await TranslationDataHelper()
+        .callTranslateString(_fieldLabelNames)
+        .then((value) => labelControlls.addAll(value));
 
     await OptionsModelHelper()
         .getAllMstCommonNotINOptions(defaultCommon, lng!)
@@ -487,8 +499,8 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, labelControlls, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(labelControlls, validationMsg, lng!),

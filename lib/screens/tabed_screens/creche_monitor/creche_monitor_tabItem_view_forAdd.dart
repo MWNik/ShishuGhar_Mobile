@@ -552,7 +552,7 @@ class _CrecheMonitorTabItemViewForAddState
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(_logics, _myMap, element);
+            DependingLogic().validationMessge(_logics, _myMap, element,_translation,_language);
 
         if (Global.validString(validationMsg)) {
           Validate()

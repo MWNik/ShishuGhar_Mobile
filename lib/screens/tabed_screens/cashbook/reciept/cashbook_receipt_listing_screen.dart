@@ -72,7 +72,13 @@ class _CashBookReceiptListingScreenState
       CustomText.Search,
       CustomText.Village,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.received,
+      CustomText.mismatched,
+      CustomText.moneyRecevied,
+      CustomText.DateS,
+      CustomText.amount,
+      CustomText.Status
     ];
 
     await TranslationDataHelper()
@@ -164,16 +170,16 @@ class _CashBookReceiptListingScreenState
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${Global.returnTrLable(translats, 'Date', lng!).trim()} :',
+                                      '${Global.returnTrLable(translats, CustomText.DateS, lng!).trim()} :',
                                       style: Styles.black104,
                                     ),
                                     Text(
-                                      '${Global.returnTrLable(translats, 'Amount', lng!).trim()} :',
+                                      '${Global.returnTrLable(translats, CustomText.amount, lng!).trim()} :',
                                       style: Styles.black104,
                                       strutStyle: StrutStyle(height: 1.2),
                                     ),
                                     Text(
-                                      '${Global.returnTrLable(translats, 'Status', lng!).trim()} :',
+                                      '${Global.returnTrLable(translats, CustomText.Status, lng!).trim()} :',
                                       style: Styles.black104,
                                       strutStyle: StrutStyle(height: 1.2),
                                     ),
@@ -324,7 +330,7 @@ class _CashBookReceiptListingScreenState
                         ),
                         SizedBox(height: 15.h),
                         Center(
-                            child: Text(CustomText.moneyRecevied,
+                            child: Text(Global.returnTrLable(translats,CustomText.moneyRecevied,lng!),
                                 style: Styles.black3125,
                                 textAlign: TextAlign.center)),
                         SizedBox(height: 15.h),
@@ -335,7 +341,7 @@ class _CashBookReceiptListingScreenState
                             children: [
                               Expanded(
                                 child: CElevatedButton(
-                                  text: 'Mismatch',
+                                  text: Global.returnTrLable(translats, CustomText.mismatched, lng!),
                                   color: Color(0xffDB4B73),
                                   onPressed: () async {
                                     var map2 = jsonDecode(responces);
@@ -350,7 +356,7 @@ class _CashBookReceiptListingScreenState
                               SizedBox(width: 5),
                               Expanded(
                                 child: CElevatedButton(
-                                  text: 'Received',
+                                  text: Global.returnTrLable(translats, CustomText.received, lng!),
                                   color: Color(0xff369A8D),
                                   onPressed: () async {
                                     var map1 = jsonDecode(responces);

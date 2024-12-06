@@ -58,7 +58,6 @@ class DynamicCustomTextFieldNew extends StatefulWidget {
     this.isRequred,
     this.isVisible,
     this.keyboard,
-
   });
 
   @override
@@ -141,8 +140,7 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
                   // EmojiInputFormatter()
                   CustomInputFormatter(RegExp(widget.keyboard != null
                       ? keyLogicFormate(widget.keyboard!)
-                      : (r'^[a-zA-Z0-9\s]+$')))
-                  // Allow only digits and up to 2 decimal places
+                      : (r'^[a-zA-Z0-9\u0400-\u04FF\u0900-\u097F\u4e00-\u9fff\u0B00-\u0B7F\s]+$')))
                 ],
                 style: Styles.black124,
                 decoration: InputDecoration(
@@ -220,16 +218,16 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
     if (keyboard.algorithmExpression == '1') {
       return r'^[0-9]*$';
     } else if (keyboard.algorithmExpression == '2') {
-      return r'^[a-zA-Z\s]+$';
+      return r'^[^\d]*$';
     } else if (keyboard.algorithmExpression == '3') {
-      return r'^[a-zA-Z\s,]+$';
+      return r'^[^\d]*$';
     } else
-      return r'^[a-zA-Z0-9\s]+$';
+      return r'^[a-zA-Z0-9\u0400-\u04FF\u0900-\u097F\u4e00-\u9fff\u0B00-\u0B7F\s]+$';
   }
 }
 
 class CustomInputFormatter extends TextInputFormatter {
-  RegExp allowedCharacters = RegExp(r'^[a-zA-Z0-9\s]+$');
+  RegExp allowedCharacters;
 
   CustomInputFormatter(this.allowedCharacters);
 

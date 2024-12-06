@@ -77,7 +77,8 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
       CustomText.villageName,
       CustomText.ok,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.villageList
     ];
     // await fetchStateList();
     await TranslationDataHelper()

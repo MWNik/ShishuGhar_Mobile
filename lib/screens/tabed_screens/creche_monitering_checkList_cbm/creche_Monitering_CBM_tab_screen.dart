@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/screens/tabed_screens/creche_Monitering_checkList_CBM/creche_Monitering_checkList__CBM_TAbItem_screen.dart';
 
 import '../../../custom_widget/custom_text.dart';
@@ -18,16 +19,20 @@ import 'creche_monitering_checklist_CBM_tabItem_view_screen.dart';
 
 class CmcCBMTabSCreen extends StatefulWidget {
   final String cbmguid;
-   String? crecheName;
+  String? crecheName;
   final int? creche_id;
   String? date_of_visit;
   final bool isEdit;
   final bool isViewScreen;
 
-  CmcCBMTabSCreen({super.key, required this.cbmguid,
-    required this.creche_id,  this.crecheName ,
-    required this.isEdit,  this.date_of_visit ,required this.isViewScreen
-  });
+  CmcCBMTabSCreen(
+      {super.key,
+      required this.cbmguid,
+      required this.creche_id,
+      this.crecheName,
+      required this.isEdit,
+      this.date_of_visit,
+      required this.isViewScreen});
 
   @override
   State<CmcCBMTabSCreen> createState() => _CmcCBMTabSCreenState();
@@ -49,6 +54,9 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
   void Function()? ontap;
   String lng = "en";
   bool isView = false;
+   double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
 
   @override
   void initState() {
@@ -64,7 +72,10 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
       CustomText.Creches,
       CustomText.CrecheCaregiver,
       CustomText.Next,
-      CustomText.back
+      CustomText.back,
+      CustomText.shouldExit,
+      CustomText.exit,
+      CustomText.Cancel
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -75,12 +86,16 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
 
   @override
   Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
+
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
     } else {
       return WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context, 'itemRefresh');
+            widget.isViewScreen
+                ? Navigator.pop(context, CustomText.itemRefresh)
+                : Validate().showExitDialog(context,translatsLabel,lng);
             return false;
           },
           child: Scaffold(
@@ -91,7 +106,9 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
                 padding: EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pop(context, 'itemRefresh');
+                    widget.isViewScreen
+                        ? Navigator.pop(context, CustomText.itemRefresh)
+                        : Validate().showExitDialog(context,translatsLabel,lng);
                   },
                   child: Icon(
                     Icons.arrow_back_ios_sharp,
@@ -100,27 +117,32 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
                   ),
                 ),
               ),
-              title: Column(children: [
-                Text(
-                  Global.returnTrLable(
-                      translatsLabel, CustomText.VisitNote, lng),
-                  style: Styles.white145,
-                ),
-                Text(
-                  widget.crecheName!=null?widget.crecheName!:'',
-                  style: Styles.white145,
-                ),
-              ],),
+              title: Column(
+                children: [
+                  Text(
+                    Global.returnTrLable(
+                        translatsLabel, CustomText.VisitNote, lng),
+                    style: Styles.white145,
+                  ),
+                  Text(
+                    widget.crecheName != null ? widget.crecheName! : '',
+                    style: Styles.white145,
+                  ),
+                ],
+              ),
               centerTitle: true,
               bottom: _isLoading
                   ? null
                   : TabBar(
-                      indicatorColor: Colors.white,
+                      indicatorColor: Color(0xffF26BA3),
                       unselectedLabelColor: Colors.grey.shade300,
                       unselectedLabelStyle: Styles.white124P,
                       labelColor: Colors.white,
                       controller: _tabController,
-                      isScrollable: true,
+                      isScrollable: tabIsScrollable,
+                      labelPadding: EdgeInsets.zero,
+                      // tabAlignment: TabAlignment.start,
+                      tabAlignment: tabIsScrollable ? TabAlignment.start : null,
                       tabs: tabController(),
                       onTap: (index) {
                         if (_tabController.indexIsChanging) {
@@ -149,15 +171,22 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
   List<Widget> tabController() {
     List<Widget> tabItem = [];
     tabBreakItems.forEach((element) {
-      bool isSelected = tabIndex == tabBreakItems.indexOf(element);
-      Widget tabLabel = Text(
-        Global.returnTrLable(translatsLabel, element.label!, lng),
-        style: TextStyle(
-            fontSize: isSelected ? 16.0 : 13.0,
-            color: isSelected ? Colors.white : Colors.grey.shade300),
-      );
-      tabItem.add(Tab(
-        child: tabLabel,
+      
+      tabItem.add(Container(
+        width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
+        // padding: EdgeInsets.only(left: 10, right: 10),
+        padding: EdgeInsets.only(
+            left: tabIsScrollable ? 10 : 0, right: tabIsScrollable ? 10 : 0),
+        decoration: BoxDecoration(
+            color: Color(0xff369A8D),
+            border: Border(
+                right: BorderSide(
+                    color: Colors.white, width: 1, style: BorderStyle.solid))),
+        child: Tab(
+            child: Text(
+          Global.returnTrLable(translatsLabel, element.label!, lng),
+         
+        )),
       ));
     });
     return tabItem;
@@ -167,27 +196,25 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
     List<Widget> tabItem = [];
     for (int i = 0; i < tabBreakItems.length; i++) {
       if (tabBreakItems[i].parent == 'Creche Monitoring Checklist CBM') {
-        tabItem.add(
-            isView
-                ?CmcCBMTabItemViewSCreen(
+        tabItem.add(isView
+            ? CmcCBMTabItemViewSCreen(
                 creche_id: widget.creche_id.toString(),
                 cbmguid: widget.cbmguid!,
                 tabBreakItem: tabBreakItems[i],
                 screenItem: expendedItems,
                 changeTab: changeTab,
                 tabIndex: i,
-                totalTab: tabBreakItems.length
-            ):CmcCBMTabItemSCreen(
-            creche_id: widget.creche_id.toString(),
-            cbmguid: widget.cbmguid!,
-            tabBreakItem: tabBreakItems[i],
-            screenItem: expendedItems,
-            changeTab: changeTab,
-            tabIndex: i,
-            totalTab: tabBreakItems.length,
+                totalTab: tabBreakItems.length)
+            : CmcCBMTabItemSCreen(
+                creche_id: widget.creche_id.toString(),
+                cbmguid: widget.cbmguid!,
+                tabBreakItem: tabBreakItems[i],
+                screenItem: expendedItems,
+                changeTab: changeTab,
+                tabIndex: i,
+                totalTab: tabBreakItems.length,
                 isEdit: widget.isEdit,
-                date_of_visit: widget.date_of_visit
-            ));
+                date_of_visit: widget.date_of_visit));
       }
     }
 
@@ -285,9 +312,11 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
     }
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
+    tabIsScrollable = tabWidth * tabBreakItems.length > screenWidth;
+
     if (Global.validString(widget.date_of_visit)) {
       List<int> parts =
-      widget.date_of_visit.toString().split('-').map(int.parse).toList();
+          widget.date_of_visit.toString().split('-').map(int.parse).toList();
       var dov = DateTime(parts[0], parts[1], parts[2]);
       if (dov
           .add(Duration(days: 7))

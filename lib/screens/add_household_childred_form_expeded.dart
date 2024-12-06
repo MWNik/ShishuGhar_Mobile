@@ -34,10 +34,11 @@ class AddHouseholdScreenChildrenFromExpended extends StatefulWidget {
   final String cHHGuid;
   final bool dobisReadable;
 
-  const AddHouseholdScreenChildrenFromExpended({super.key,
-    required this.hhGuid,
-    required this.cHHGuid,
-    required this.dobisReadable});
+  const AddHouseholdScreenChildrenFromExpended(
+      {super.key,
+      required this.hhGuid,
+      required this.cHHGuid,
+      required this.dobisReadable});
 
   @override
   State<AddHouseholdScreenChildrenFromExpended> createState() =>
@@ -106,41 +107,39 @@ class _HouseholdScreenState
                   // style:Styles.white145,
                   children: (Global.validString(houseHoldHeadName))
                       ? [
-                    WidgetSpan(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            Global.returnTrLable(
-                                labelControlls, 'Children Detail', lng),
-                            style: Styles.white145,
+                          WidgetSpan(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  Global.returnTrLable(
+                                      labelControlls, 'Children Detail', lng),
+                                  style: Styles.white145,
+                                ),
+                                Text(
+                                  '${Global.returnTrLable(labelControlls, hhNameTitle, lng)} : ${Global.validToString(houseHoldHeadName)}',
+                                  style: Styles.white126P,
+                                ),
+                                // Add additional TextSpans here if needed
+                              ],
+                            ),
                           ),
-                          Text(
-                            '${Global.returnTrLable(
-                                labelControlls, hhNameTitle, lng)} : ${Global
-                                .validToString(houseHoldHeadName)}',
-                            style: Styles.white126P,
-                          ),
-                          // Add additional TextSpans here if needed
-                        ],
-                      ),
-                    ),
-                  ]
+                        ]
                       : [
-                    WidgetSpan(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            Global.returnTrLable(
-                                labelControlls, 'Children Detail', lng),
-                            style: Styles.white145,
+                          WidgetSpan(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  Global.returnTrLable(
+                                      labelControlls, 'Children Detail', lng),
+                                  style: Styles.white145,
+                                ),
+                                // Add additional TextSpans here if needed
+                              ],
+                            ),
                           ),
-                          // Add additional TextSpans here if needed
                         ],
-                      ),
-                    ),
-                  ],
                 ),
               ),
               centerTitle: true,
@@ -199,10 +198,10 @@ class _HouseholdScreenState
                             SizedBox(height: 5.h),
                             expandableList == i
                                 ? Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: cWidget(tabBreakItems[i].name!),
-                            )
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: cWidget(tabBreakItems[i].name!),
+                                  )
                                 : SizedBox.shrink(),
                             if (i != tabBreakItems.length - 1) Divider(),
                             // Add a Divider after each item except the last one
@@ -222,26 +221,28 @@ class _HouseholdScreenState
                             nextTab(0);
                           },
                           text:
-                          Global.returnTrLable(labelControlls, 'Back', lng),
+                              Global.returnTrLable(labelControlls, 'Back', lng),
                         ),
                       ),
                       role == CustomText.crecheSupervisor
                           ? SizedBox(width: 10)
                           : SizedBox(),
-                      role == CustomText.crecheSupervisor ? Expanded(
-                        child: CElevatedButton(
-                          color: Color(0xff369A8D),
-                          onPressed: () {
-                            print(myMap);
-                            nextTab(1);
-                            // Navigator.of(context).push(MaterialPageRoute(
-                            //   builder: (BuildContext context) => AddHouseholdScreenChildFrom(),
-                            // ));
-                          },
-                          text: Global.returnTrLable(
-                              labelControlls, saveNext, lng),
-                        ),
-                      ) : SizedBox(),
+                      role == CustomText.crecheSupervisor
+                          ? Expanded(
+                              child: CElevatedButton(
+                                color: Color(0xff369A8D),
+                                onPressed: () {
+                                  print(myMap);
+                                  nextTab(1);
+                                  // Navigator.of(context).push(MaterialPageRoute(
+                                  //   builder: (BuildContext context) => AddHouseholdScreenChildFrom(),
+                                  // ));
+                                },
+                                text: Global.returnTrLable(
+                                    labelControlls, saveNext, lng),
+                              ),
+                            )
+                          : SizedBox(),
                     ],
                   ),
                 ],
@@ -273,16 +274,20 @@ class _HouseholdScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(labelControlls, CustomText.Selecthere, lng),
           titleText: Global.returnTrLable(translats, quesItem.label, lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           items: items,
           readable: role == CustomText.crecheSupervisor
-              ? isEdited?DependingLogic().callReadableLogic(logics, myMap, quesItem):true
+              ? isEdited
+                  ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  : true
               : true,
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           selectedItem: myMap[quesItem.fieldname],
           onChanged: (value) {
             if (value != null)
@@ -300,12 +305,14 @@ class _HouseholdScreenState
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           calenderValidate:
-          DependingLogic().calenderValidation(logics, myMap, quesItem),
+              DependingLogic().calenderValidation(logics, myMap, quesItem),
           readable: role == CustomText.crecheSupervisor
-              ? isEdited?DependingLogic().callReadableLogic(logics, myMap, quesItem):true
+              ? isEdited
+                  ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  : true
               : true,
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = '$value';
             var logData = DependingLogic()
@@ -328,12 +335,14 @@ class _HouseholdScreenState
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           readable: role == CustomText.crecheSupervisor
-              ? isEdited?DependingLogic().callReadableLogic(logics, myMap, quesItem):true
+              ? isEdited
+                  ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  : true
               : true,
           initialvalue: myMap[quesItem.fieldname!],
           keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           hintText: Global.returnTrLable(translats, quesItem.label, lng),
           maxlength: quesItem.length,
           onChanged: (value) {
@@ -346,16 +355,20 @@ class _HouseholdScreenState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText:
+              Global.returnTrLable(labelControlls, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           readable: role == CustomText.crecheSupervisor
-              ? isEdited?DependingLogic().callReadableLogic(logics, myMap, quesItem):true
+              ? isEdited
+                  ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  : true
               : true,
           initialvalue: myMap[quesItem.fieldname!],
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           titleText: Global.returnTrLable(translats, quesItem.label, lng),
           maxlength: quesItem.length,
           onChanged: (value) {
@@ -367,38 +380,40 @@ class _HouseholdScreenState
             }
           },
         );
-    // case 'Check':
-    //   return DynamicCustomCheckboxWithLabel(
-    //     label: Global.returnTrLable(translats,quesItem.label,lng),
-    //     initialValue: myMap[quesItem.fieldname!],
-    //     readable: role=='Creche Supervisor'?DependingLogic().callReadableLogic(logics, myMap, quesItem):true,
-    //     isVisible: DependingLogic().callDependingLogic(logics,myMap,quesItem),
-    //     onChanged: (value) {
-    //       print("checkVa $value");
-    //       // if(value>0)
-    //         myMap[quesItem.fieldname!] = value;
-    //       // else myMap.remove(quesItem.fieldname);
-    //       setState(() {});
-    //     },
-    //   );
+      // case 'Check':
+      //   return DynamicCustomCheckboxWithLabel(
+      //     label: Global.returnTrLable(translats,quesItem.label,lng),
+      //     initialValue: myMap[quesItem.fieldname!],
+      //     readable: role=='Creche Supervisor'?DependingLogic().callReadableLogic(logics, myMap, quesItem):true,
+      //     isVisible: DependingLogic().callDependingLogic(logics,myMap,quesItem),
+      //     onChanged: (value) {
+      //       print("checkVa $value");
+      //       // if(value>0)
+      //         myMap[quesItem.fieldname!] = value;
+      //       // else myMap.remove(quesItem.fieldname);
+      //       setState(() {});
+      //     },
+      //   );
 
       case 'Check':
         return DynamicCustomYesNoCheckboxWithLabel(
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: myMap[quesItem.fieldname],
-          labelControlls: translats,
+          labelControlls: labelControlls,
           lng: lng,
           isRequred: quesItem.fieldname == 'is_dob_available'
               ? 1
               : (quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic()
-              .dependeOnMendotory(logics, myMap, quesItem)),
+                  ? quesItem.reqd
+                  : DependingLogic()
+                      .dependeOnMendotory(logics, myMap, quesItem)),
           readable: role == CustomText.crecheSupervisor
-              ? isEdited?DependingLogic().callReadableLogic(logics, myMap, quesItem):true
+              ? isEdited
+                  ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  : true
               : true,
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -419,12 +434,14 @@ class _HouseholdScreenState
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: role == CustomText.crecheSupervisor
-              ? isEdited?DependingLogic().callReadableLogic(logics, myMap, quesItem):true
+              ? isEdited
+                  ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  : true
               : true,
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -440,12 +457,14 @@ class _HouseholdScreenState
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           readable: role == CustomText.crecheSupervisor
-              ? isEdited?DependingLogic().callReadableLogic(logics, myMap, quesItem):true
+              ? isEdited
+                  ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  : true
               : true,
           titleText: Global.returnTrLable(translats, quesItem.label, lng),
           initialvalue: myMap[quesItem.fieldname!],
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             myMap[quesItem.fieldname!] = value;
@@ -459,11 +478,13 @@ class _HouseholdScreenState
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           readable: role == CustomText.crecheSupervisor
-              ? isEdited==false?DependingLogic().callReadableLogic(logics, myMap, quesItem):true
+              ? isEdited == false
+                  ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+                  : true
               : true,
           initialvalue: myMap[quesItem.fieldname!],
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             myMap[quesItem.fieldname!] = value;
@@ -486,7 +507,7 @@ class _HouseholdScreenState
     await callHHHeadName();
     await TranslationDataHelper()
         .callTranslate()
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
     List<HouseHoldFielItemdModel> allItems = [];
     List<HouseHoldFielItemdModel> tempBreakDown = [];
     await HouseHoldFieldHelper()
@@ -504,7 +525,7 @@ class _HouseholdScreenState
       idxI = idxI + 1;
       temp = allItems
           .where((element) =>
-      element.fieldtype == 'Datetime' && element.idx == idxI)
+              element.fieldtype == 'Datetime' && element.idx == idxI)
           .toList();
       if (temp.length > 0) {
         tempBreakDown.add(tabBreakItems[i]);
@@ -519,8 +540,8 @@ class _HouseholdScreenState
       if (i < (tabBreakItems.length) - 1) {
         var filtredItem = allItems
             .where((element) =>
-        element.idx! > tabBreakItems[i].idx! &&
-            element.idx! < tabBreakItems[i + 1].idx!)
+                element.idx! > tabBreakItems[i].idx! &&
+                element.idx! < tabBreakItems[i + 1].idx!)
             .toList();
         expendedItems[tabBreakItems[i].name!] = filtredItem;
       } else {
@@ -555,7 +576,7 @@ class _HouseholdScreenState
       logicFields.add(allItems[i].fieldname!);
     }
     var alredRecord =
-    await HouseHoldTabResponceHelper().getHouseHoldResponce(widget.hhGuid);
+        await HouseHoldTabResponceHelper().getHouseHoldResponce(widget.hhGuid);
     if (alredRecord.length > 0) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
       houseHoldHeadName = responseData['hosuehold_head_name'];
@@ -670,8 +691,8 @@ class _HouseholdScreenState
             break;
           }
         }
-        var validationMsg =
-        DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
@@ -716,14 +737,14 @@ class _HouseholdScreenState
 
   Future<void> updateHiddenValue(String scrrenName) async {
     var items =
-    await HouseHoldFieldHelper().getHouseHoldFieldsHiddenField(scrrenName);
+        await HouseHoldFieldHelper().getHouseHoldFieldsHiddenField(scrrenName);
     var alredRecord = await HouseHoldChildrenHelperHelper()
         .getHouseHoldChildrenItem(widget.hhGuid, widget.cHHGuid);
     var hiddenIten = items
         .where((element) =>
-    !(element.fieldtype == 'Tab Break') &&
-        !(element.fieldtype == 'Section Break') &&
-        !(element.fieldtype == 'Column Break'))
+            !(element.fieldtype == 'Tab Break') &&
+            !(element.fieldtype == 'Section Break') &&
+            !(element.fieldtype == 'Column Break'))
         .toList();
 
     if (alredRecord.length > 0) {
@@ -769,8 +790,8 @@ class _HouseholdScreenState
 
       var enItems = await EnrolledExitChilrenResponceHelper()
           .enrolledChildByCHHGUID(widget.cHHGuid);
-      if (enItems.length>0) {
-        isEdited=false;
+      if (enItems.length > 0) {
+        isEdited = false;
       }
     }
   }
@@ -783,7 +804,7 @@ class _HouseholdScreenState
           posButton: Global.returnTrLable(labelControlls, 'Yes', lng),
           negButton: Global.returnTrLable(labelControlls, 'No', lng),
           message:
-          Global.returnTrLable(labelControlls, 'Do you want to Save?', lng),
+              Global.returnTrLable(labelControlls, 'Do you want to Save?', lng),
         );
       },
     );
@@ -795,7 +816,7 @@ class _HouseholdScreenState
 
   Future<String> callHHHeadName() async {
     var alredRecord =
-    await HouseHoldTabResponceHelper().getHouseHoldResponce(widget.hhGuid);
+        await HouseHoldTabResponceHelper().getHouseHoldResponce(widget.hhGuid);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
       var hh = responseData['hosuehold_head_name'];
@@ -811,7 +832,7 @@ class _HouseholdScreenState
       // var hhTitle = await TranslationDataHelper().getTranslation(
       //     hhNameTitle!, lngtr!);
       var hhTitle =
-      Global.returnTrLable(labelControlls, CustomText.hhHeadName, lng);
+          Global.returnTrLable(labelControlls, CustomText.hhHeadName, lng);
       return hhTitle;
     } else
       return "";
@@ -825,6 +846,9 @@ class _HouseholdScreenState
       CustomText.Save,
       CustomText.hhHeadName,
       CustomText.dataSaveSuc,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.typehere,
       'Do you want to Save?',
       'Yes',
       'No',
@@ -836,16 +860,16 @@ class _HouseholdScreenState
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls = value);
+        .then((value) => labelControlls.addAll(value));
   }
 
   Future<void> updateHHDetailsName(String hhGuid) async {
     var alredRecord =
-    await HouseHoldTabResponceHelper().getHouseHoldResponce(hhGuid);
+        await HouseHoldTabResponceHelper().getHouseHoldResponce(hhGuid);
     if (alredRecord.length > 0) {
       if (alredRecord[0].name != null) {
         Map<String, dynamic> responseData =
-        jsonDecode(alredRecord[0].responces!);
+            jsonDecode(alredRecord[0].responces!);
         responseData['name'] = alredRecord[0].name;
         var hhDtaResponce = jsonEncode(responseData);
         await DatabaseHelper.database!.rawQuery(

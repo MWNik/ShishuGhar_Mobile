@@ -10,10 +10,8 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   void Function()? onTap;
 
-  CustomAppbar({super.key, required this.text, this.actions,
-    this.onTap,
-    this.subTitle
-  });
+  CustomAppbar(
+      {super.key, required this.text, this.actions, this.onTap, this.subTitle});
   @override
   Size get preferredSize => Size.fromHeight(70);
 
@@ -36,23 +34,24 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           centerTitle: true,
-            title: subTitle!=null?Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
+          title: subTitle != null
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      text,
+                      style: Styles.white145,
+                    ),
+                    Text(
+                      subTitle!,
+                      style: Styles.white145,
+                    ),
+                  ],
+                )
+              : Text(
                   text,
                   style: Styles.white145,
                 ),
-                Text(
-                  subTitle!,
-                  style: Styles.white145,
-                ),
-              ],
-
-          ):Text(
-            text,
-            style: Styles.white145,
-          ),
           actions: actions),
     );
   }

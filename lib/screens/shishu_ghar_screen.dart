@@ -14,6 +14,7 @@ import 'package:shishughar/screens/shishu_ghar_details.dart';
 import 'package:shishughar/screens/shishu_ghar_details_bottom_bar.dart';
 import 'package:shishughar/screens/shishu_ghar_details_bottom_bar_new.dart';
 import 'package:shishughar/screens/shishu_ghar_details_replica_screen.dart';
+import 'package:shishughar/screens/shishu_ghar_list_navigation.dart';
 import 'package:shishughar/screens/tabed_screens/child_gravience/child_grievances_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checkList_cbm/creche_monitering_checklist_CBM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_CC/creche_monitering_checklist_CC_listing_screen.dart';
@@ -109,12 +110,15 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
       CustomText.NorecordAvailable,
       CustomText.pleaseWait,
       CustomText.ok,
-      CustomText.Selecthere
+      CustomText.Selecthere,
+      CustomText.ShishuGharList,
+      CustomText.Filter,
+      CustomText.clear
     ];
     await fetchStateList();
     await TranslationDataHelper()
         .callTranslateString(valueItems)
-        .then((value) => translatsLabel = value);
+        .then((value) => translatsLabel.addAll(value));
 
     await fetchCrecheDataList();
   }
@@ -140,6 +144,20 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
           onTap: () {
             Navigator.pop(context, 'itemRefresh');
           },
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 15),
+              child: InkWell(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ShishuGHarNavigation())),
+                child: Icon(
+                  Icons.place_rounded,
+                  size: 15.sp,
+                  color: Colors.white,
+                ),
+              ),
+            )
+          ],
         ),
         endDrawer: SafeArea(
             child: Drawer(
@@ -165,7 +183,8 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                                 width: 10.w,
                               ),
                               Text(
-                                CustomText.Filter,
+                                Global.returnTrLable(
+                                    translatsLabel, CustomText.Filter, lng),
                                 style: Styles.labelcontrollerfont,
                               ),
                               Spacer(),

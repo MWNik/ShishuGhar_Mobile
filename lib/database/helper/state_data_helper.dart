@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:shishughar/model/databasemodel/tabstate_model.dart';
 
 import '../database_helper.dart';
@@ -34,9 +35,19 @@ class StateDataHelper {
     databaseHelper.openDb();
     await DatabaseHelper.database!.delete('tabState');
     if (stateList.isNotEmpty) {
-      for (var element in stateList) {
-        await DatabaseHelper.database!.insert('tabState', element.toJson());
-      }
+      try {
+  await DatabaseHelper.database!.transaction((txn) async {
+    for(var element in stateList) {
+      await txn.insert('tabState', element.toJson());
+    }
+  });
+} on Exception catch (e) {
+  // TODO
+  debugPrint("Error inserting state records -> $e");
+}
+      // for (var element in stateList) {
+      //   await DatabaseHelper.database!.insert('tabState', element.toJson());
+      // }
     }
   }
 

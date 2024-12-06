@@ -73,7 +73,13 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
       CustomText.Search,
       CustomText.Village,
       CustomText.Creches,
-      CustomText.fllowUp
+      CustomText.fllowUp,
+      CustomText.Filter,
+      CustomText.clear,
+      CustomText.ChildId,
+      CustomText.schduleDate,
+      CustomText.followup_visit_date,
+      CustomText.weight
     ];
 
     await TranslationDataHelper()
@@ -242,7 +248,7 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
                           ),
                           SizedBox(width: 10.w),
                           Text(
-                            CustomText.Filter,
+                            Global.returnTrLable(translats, CustomText.Filter, lng),
                             style: Styles.labelcontrollerfont,
                           ),
                           Spacer(),

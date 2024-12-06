@@ -53,6 +53,10 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
   String lng = "en";
   bool isView = false;
 
+  double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
+
   @override
   void initState() {
     super.initState();
@@ -67,7 +71,10 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
       CustomText.Creches,
       CustomText.CrecheCaregiver,
       CustomText.Next,
-      CustomText.back
+      CustomText.back,
+      CustomText.shouldExit,
+      CustomText.exit,
+      CustomText.Cancel
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -83,7 +90,7 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
     } else {
       return WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context, 'itemRefresh');
+            widget.isViewScreen?Navigator.pop(context,CustomText.itemRefresh):Validate().showExitDialog(context,translatsLabel,lng);
             return false;
           },
           child: Scaffold(
@@ -94,7 +101,7 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
                 padding: EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pop(context, 'itemRefresh');
+                    widget.isViewScreen?Navigator.pop(context,CustomText.itemRefresh):Validate().showExitDialog(context,translatsLabel,lng);
                   },
                   child: Icon(
                     Icons.arrow_back_ios_sharp,
@@ -120,12 +127,14 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
               bottom: _isLoading
                   ? null
                   : TabBar(
-                      indicatorColor: Colors.white,
-                      unselectedLabelColor: Colors.grey.shade300,
-                      unselectedLabelStyle: Styles.white124P,
-                      labelColor: Colors.white,
-                      controller: _tabController,
-                      isScrollable: true,
+                indicatorColor: Color(0xffF26BA3),
+                unselectedLabelColor: Colors.grey.shade300,
+                unselectedLabelStyle: Styles.white124P,
+                labelColor: Colors.white,
+                controller: _tabController,
+                isScrollable: tabIsScrollable,
+                labelPadding: EdgeInsets.zero,
+                tabAlignment: tabIsScrollable ? TabAlignment.start : null,
                       tabs: tabController(),
                       onTap: (index) {
                         if (_tabController.indexIsChanging) {
@@ -154,15 +163,18 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
   List<Widget> tabController() {
     List<Widget> tabItem = [];
     tabBreakItems.forEach((element) {
-      bool isSelected = tabIndex == tabBreakItems.indexOf(element);
       Widget tabLabel = Text(
         Global.returnTrLable(translatsLabel, element.label!, lng),
-        style: TextStyle(
-            fontSize: isSelected ? 16.0 : 13.0,
-            color: isSelected ? Colors.white : Colors.grey.shade300),
       );
-      tabItem.add(Tab(
-        child: tabLabel,
+      tabItem.add(Container(
+        width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
+        padding: EdgeInsets.only(left: 10, right: 10),
+        decoration: BoxDecoration(
+            color: Color(0xff369A8D),
+            border: Border(
+                right: BorderSide(
+                    color: Colors.white, width: 1, style: BorderStyle.solid))),
+        child: Tab(child: tabLabel),
       ));
     });
     return tabItem;
@@ -246,7 +258,6 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
 
   Future<void> callScrenControllers() async {
     List<HouseHoldFielItemdModel> allItems = [];
-    List<HouseHoldFielItemdModel> tempBreakDown = [];
     List<String> remItem = [
       'partner_id',
       'state_id',
@@ -289,6 +300,28 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
     }
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
+    tabWidth=0;
+    for (int i = 0; i < tabBreakItems.length; i++) {
+      final textPainter = TextPainter(
+        text: TextSpan(
+            text: Global.returnTrLable(translatsLabel, tabBreakItems[i].label!, lng!),
+            style: Styles.white124P
+        ),
+        maxLines: 1, // Single line text
+        textDirection: TextDirection.ltr,
+      );
+
+      // Layout the text (this step is required to calculate the width)
+      textPainter.layout();
+      double textWidth = textPainter.width+20;
+      tabWidth=tabWidth+textWidth;
+      print(textWidth);
+
+    }
+    screenWidth = MediaQuery.of(context).size.width;
+    // tabIsScrollable = tabWidth * tabBreakItems.length >= screenWidth;
+    tabIsScrollable = tabWidth > screenWidth;
+
     if (Global.validString(widget.date_of_visit)) {
       List<int> parts =
           widget.date_of_visit.toString().split('-').map(int.parse).toList();

@@ -88,11 +88,13 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
       CustomText.Creches,
       CustomText.CrecheCaregiver,
       CustomText.Next,
-      CustomText.back
+      CustomText.back,
+      CustomText.ChildEnrollment,
+      
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translatsLabel = value);
+        .then((value) => translatsLabel.addAll(value));
 
     await TranslationDataHelper()
         .callTranslateEnrolledChildren()
@@ -193,7 +195,7 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
     List<Widget> tabItem = [];
     for (int i = 0; i < tabBreakItems.length; i++) {
       tabItem.add(ExitEnrolledChildTabItem(
-        isForCrecheEnrollment: widget.isForCrecheEnrollment,
+          isForCrecheEnrollment: widget.isForCrecheEnrollment,
           isForExitList: widget.isForExitList,
           isForExit: true,
           isEditable: widget.isForCrecheEnrollment ? false : widget.isEditable,
@@ -307,6 +309,16 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
         expendedItems[tabBreakItems[i].name!] = filtredItem;
       }
     }
+    List<String> tabLabelItems = [];
+
+    tabBreakItems.forEach((element) {
+      if (Global.validString(element.label)) {
+        tabLabelItems.add(element.label!);
+      }
+    });
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelItems)
+        .then((value) => translatsLabel.addAll(value));
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     // _tabController.addListener(handleTabChange);

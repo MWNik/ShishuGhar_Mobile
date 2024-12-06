@@ -375,7 +375,7 @@ class _RequisitionExpendedFormScreenState
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: _isLoading
           ? SizedBox()
-          : removedItemList.isEmpty||!widget.isEdit
+          : removedItemList.isEmpty || !widget.isEdit
               ? SizedBox()
               : Padding(
                   padding: EdgeInsets.only(bottom: 80),
@@ -468,16 +468,18 @@ class _RequisitionExpendedFormScreenState
                             text: Global.returnTrLable(
                                 translats, CustomText.back, lng!),
                           )),
-                          widget.isEdit?SizedBox(width: 10):SizedBox(),
-                          widget.isEdit?Expanded(
-                              child: CElevatedButton(
-                            color: Color(0xff369A8D),
-                            onPressed: () {
-                              nextTab(1, context);
-                            },
-                            text: Global.returnTrLable(
-                                translats, CustomText.Submit, lng!),
-                          )):SizedBox()
+                          widget.isEdit ? SizedBox(width: 10) : SizedBox(),
+                          widget.isEdit
+                              ? Expanded(
+                                  child: CElevatedButton(
+                                  color: Color(0xff369A8D),
+                                  onPressed: () {
+                                    nextTab(1, context);
+                                  },
+                                  text: Global.returnTrLable(
+                                      translats, CustomText.Submit, lng!),
+                                ))
+                              : SizedBox()
                         ],
                       ))
                 ],
@@ -503,8 +505,8 @@ class _RequisitionExpendedFormScreenState
           }
         }
 
-        var validationMsg =
-            DependingLogic().validationMessge(logics, itemMap[name]!, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, itemMap[name]!, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(translats, validationMsg, lng!),
@@ -682,7 +684,7 @@ class _RequisitionExpendedFormScreenState
         status = true;
       }
     }
-    if(role != CustomText.crecheSupervisor){
+    if (role != CustomText.crecheSupervisor) {
       status = true;
     }
     return status;
@@ -1242,7 +1244,9 @@ class _RequisitionExpendedFormScreenState
               : DependingLogic()
                   .dependeOnMendotory(logics, itemFields, quesItem),
           // maxlength: quesItem.length,
-          fieldName: quesItem.fieldname=='quantity_received'?'weight':quesItem.fieldname!,
+          fieldName: quesItem.fieldname == 'quantity_received'
+              ? 'weight'
+              : quesItem.fieldname!,
           initialvalue: ((quesItem.fieldname == 'quantity_required')
               ? quatRequired
               : itemFields[quesItem.fieldname]),
@@ -1266,7 +1270,7 @@ class _RequisitionExpendedFormScreenState
               if (quesItem.fieldname == 'quantity_received') {
                 itemFields[quesItem.fieldname!] = value;
                 var validateMessage = await DependingLogic()
-                    .validationMessge(logics, itemFields, quesItem);
+                    .validationMessge(logics, itemFields, quesItem,translats,lng);
                 if (Global.validString(validateMessage)) {
                   Validate().singleButtonPopup(
                       Global.returnTrLable(translats, validateMessage, lng),

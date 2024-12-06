@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 import 'package:sqflite/sqflite.dart';
@@ -17,6 +18,17 @@ class CmcCBMTabResponseHelper {
     print("object");
   }
 
+  Future<void> deleteDraftRecords(CmcCBMResponseModel record) async {
+    try {
+      await DatabaseHelper.database!.delete(
+          'tabCreche_Monitering_Checklist_CBM_response',
+          where: 'is_edited = ? AND name IS NULL AND cmguid = ?',
+          whereArgs: [2, record.cbmguid]);
+    } catch (e) {
+      debugPrint("Error deleting drfat records : $e");
+    }
+  }
+
   Future<List<CmcCBMResponseModel>> getCrecheCommittieResponcewithGuid(
       String cbmguid) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
@@ -30,7 +42,6 @@ class CmcCBMTabResponseHelper {
 
     return items;
   }
-
 
   Future<List<CmcCBMResponseModel>> childCBMChild(int? crecheIdName) async {
     var query =
@@ -52,7 +63,7 @@ class CmcCBMTabResponseHelper {
         'Select * from  tabCreche_Monitering_Checklist_CBM_response ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
 
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query);
+        await DatabaseHelper.database!.rawQuery(query);
 
     List<CmcCBMResponseModel> items = [];
     result.forEach((itemMap) {
@@ -113,14 +124,12 @@ class CmcCBMTabResponseHelper {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<void> crecheCBMDownloadData(
-      Map<String, dynamic> item) async {
+  Future<void> crecheCBMDownloadData(Map<String, dynamic> item) async {
     List<Map<String, dynamic>> growth =
         List<Map<String, dynamic>>.from(item['Data']);
     print(growth);
     growth.forEach((element) async {
       var growthData = element['Creche Monitoring Checklist CBM'];
-
 
       var items = CmcCBMResponseModel(
         cbmguid: growthData['cbmguid'],

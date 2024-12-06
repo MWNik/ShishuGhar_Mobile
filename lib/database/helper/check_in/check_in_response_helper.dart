@@ -9,7 +9,6 @@ import '../../../utils/validate.dart';
 import '../../database_helper.dart';
 import '../image_file_tab_responce_helper.dart';
 
-
 class CheckInResponseHelper {
   Future<List<CheckInResponseModel>> getCheckInList() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!
@@ -103,25 +102,74 @@ class CheckInResponseHelper {
   Future<void> crecheCheckInDwownload(Map<String, dynamic> item) async {
     List<Map<String, dynamic>> checkIns =
         List<Map<String, dynamic>>.from(item['Data']);
-    checkIns.forEach((element) async {
-      // for (var element in checkIns) {
+
+    // List to hold check-in models
+    List<CheckInResponseModel> checkInItems = [];
+
+    // Prepare data
+    for (var element in checkIns) {
       var chechIn = element['Creche Check In'];
 
-      var checkinitems = CheckInResponseModel(
-          ccinguid: chechIn['ccinguid'],
-          creche_id: Global.stringToInt(chechIn['creche_id']),
-          name: Global.stringToInt(chechIn['name'].toString()),
-          is_uploaded: 1,
-          is_edited: 0,
-          is_deleted: 0,
-          created_by: chechIn['app_created_by'],
-          created_at: chechIn['app_created_on'],
-          update_at: chechIn['modified'],
-          updated_by: chechIn['modified_by'],
-          responces: jsonEncode(Validate().keyesFromResponce(chechIn)));
-      print('Success');
-      await inserts(checkinitems);
+      var checkinItem = CheckInResponseModel(
+        ccinguid: chechIn['ccinguid'],
+        creche_id: Global.stringToInt(chechIn['creche_id']),
+        name: Global.stringToInt(chechIn['name'].toString()),
+        is_uploaded: 1,
+        is_edited: 0,
+        is_deleted: 0,
+        created_by: chechIn['app_created_by'],
+        created_at: chechIn['app_created_on'],
+        update_at: chechIn['modified'],
+        updated_by: chechIn['modified_by'],
+        responces: jsonEncode(Validate().keyesFromResponce(chechIn)),
+      );
+
+      // Add to the list of check-in items
+      checkInItems.add(checkinItem);
+    }
+
+    // Commit data in a transaction using batch
+    await DatabaseHelper.database!.transaction((txn) async {
+      var batch = txn.batch();
+
+      // Add all check-in items to the batch
+      for (var item in checkInItems) {
+        batch.insert(
+          'check_in_response',
+          item.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      // Commit the batch
+      await batch.commit(noResult: true);
     });
-    // }
+
+    print('Check-in data successfully inserted.');
   }
+
+  // Future<void> crecheCheckInDwownload(Map<String, dynamic> item) async {
+  //   List<Map<String, dynamic>> checkIns =
+  //       List<Map<String, dynamic>>.from(item['Data']);
+  //   checkIns.forEach((element) async {
+  //     // for (var element in checkIns) {
+  //     var chechIn = element['Creche Check In'];
+
+  //     var checkinitems = CheckInResponseModel(
+  //         ccinguid: chechIn['ccinguid'],
+  //         creche_id: Global.stringToInt(chechIn['creche_id']),
+  //         name: Global.stringToInt(chechIn['name'].toString()),
+  //         is_uploaded: 1,
+  //         is_edited: 0,
+  //         is_deleted: 0,
+  //         created_by: chechIn['app_created_by'],
+  //         created_at: chechIn['app_created_on'],
+  //         update_at: chechIn['modified'],
+  //         updated_by: chechIn['modified_by'],
+  //         responces: jsonEncode(Validate().keyesFromResponce(chechIn)));
+  //     print('Success');
+  //     await inserts(checkinitems);
+  //   });
+  //   // }
+  // }
 }

@@ -9,11 +9,23 @@ class PartnerStockHelper {
   Future insert(List<PartnerStockModel> PartnerStockModel) async {
     await DatabaseHelper.database!.delete('tabPartner_Stock');
     if (PartnerStockModel.isNotEmpty) {
-      for (var element in PartnerStockModel) {
-        await DatabaseHelper.database!.insert(
-            'tabPartner_Stock', element.toJson(),
-            conflictAlgorithm: ConflictAlgorithm.replace);
+      try {
+        await DatabaseHelper.database!.transaction((txn) async {
+          var batch = txn.batch();
+          for (var item in PartnerStockModel) {
+            batch.insert('tabPartner_Stock', item.toJson(),
+                conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+          await batch.commit(noResult: true);
+        });
+      } catch (e) {
+        print("Error inserting tabMaster_Stock data -> ${e.toString()}");
       }
+      // for (var element in PartnerStockModel) {
+      //   await DatabaseHelper.database!.insert(
+      //       'tabPartner_Stock', element.toJson(),
+      //       conflictAlgorithm: ConflictAlgorithm.replace);
+      // }
     }
   }
 

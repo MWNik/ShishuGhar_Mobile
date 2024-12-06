@@ -44,6 +44,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
   List<ChildGrowthMetaResponseModel> allList = [];
   bool isOnlyUnsynched = false;
   String? role;
+  DateTime applicableDate = Validate().stringToDate("2024-12-31");
 
   void initState() {
     super.initState();
@@ -57,6 +58,8 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     if (lngtr != null) {
       lng = lngtr;
     }
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
 
     List<String> valueItems = [
       CustomText.Enrolled,
@@ -68,7 +71,10 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
       CustomText.Search,
       CustomText.Village,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.GrowthMonitoring,
+      CustomText.schduleed,
+      CustomText.measurementDate
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -137,28 +143,36 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                             var lstDate =
                                 await minMaxDate(childHHData[index].created_at);
 
-                            // if(callMeasurementEditableDate(childHHData[index].created_at!)){  allowed for back dated entry
-                            var refStatus = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        ChildGrowthExpendedFormScreen(
-                                          creche_nameId: widget.creche_nameId,
-                                          creche_name: widget.creche_name,
-                                          cgmguid: childHHData[index].cgmguid!,
-                                          lastGrowthDate: lstDate,
-                                          minGrowthDate: maxGrowthDate,
-                                          createdAt:
-                                              childHHData[index].created_at,
-                                          isNew: childHHData[index].responces !=
-                                                  null
-                                              ? true
-                                              : false,
-                                        )));
+                            if (callMeasurementEditableDate(
+                                childHHData[index].created_at!)) {
+                              var refStatus = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          ChildGrowthExpendedFormScreen(
+                                            creche_nameId: widget.creche_nameId,
+                                            creche_name: widget.creche_name,
+                                            cgmguid:
+                                                childHHData[index].cgmguid!,
+                                            lastGrowthDate: lstDate,
+                                            minGrowthDate: maxGrowthDate,
+                                            createdAt:
+                                                childHHData[index].created_at,
+                                            isNew:
+                                                childHHData[index].responces !=
+                                                        null
+                                                    ? true
+                                                    : false,
+                                          )));
 
-                            if (refStatus == 'itemRefresh') {
-                              await fetchEnrolleChild();
-                            }
-                            // }else Validate().singleButtonPopup(CustomText.growthMonitoring, CustomText.ok, false, context);
+                              if (refStatus == 'itemRefresh') {
+                                await fetchEnrolleChild();
+                              }
+                            } else
+                              Validate().singleButtonPopup(
+                                  CustomText.growthMonitoring,
+                                  CustomText.ok,
+                                  false,
+                                  context);
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 5.h),
@@ -451,8 +465,9 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     }).toList();
     dateList.addAll(createdData);
 
+    var cutDate = Validate().stringToDate(Validate().currentDate());
     DateTime currentDateMonth =
-        Validate().stringToDate(Validate().currentDate());
+        DateTime(cutDate.year, cutDate.month, cutDate.day, 0, 1);
     DateTime messureDate = DateTime(2023, 12, currentDateMonth.day);
 
     if (currentDateMonth.isAfter(messureDate)) {
@@ -656,7 +671,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
       if (currentDate.isBefore(editableDate)) {
         isEditable = true;
       } else {
-        isEditable = false;
+        isEditable = currentDate.isBefore(applicableDate) ? true : false;
       }
     }
     return isEditable;

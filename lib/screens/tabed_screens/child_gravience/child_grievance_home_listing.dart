@@ -44,6 +44,8 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
   List<ChildGrievancesResponceModel> unsynchedList = [];
   List<ChildGrievancesResponceModel> allList = [];
   String? role;
+  DateTime applicableDate = Validate().stringToDate("2024-12-31");
+  var now = DateTime.parse(Validate().currentDate());
 
   void initState() {
     super.initState();
@@ -57,7 +59,8 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
     if (lngtr != null) {
       lng = lngtr;
     }
-
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -71,7 +74,11 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
       CustomText.Status,
       CustomText.Description,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.ChildGrievances,
+      CustomText.clear,
+      CustomText.Filter,
+      CustomText.Creches
     ];
 
     creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
@@ -146,7 +153,8 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                             width: 10.w,
                           ),
                           Text(
-                            CustomText.Filter,
+                            Global.returnTrLable(
+                                translats, CustomText.Filter, lng),
                             style: Styles.labelcontrollerfont,
                           ),
                           Spacer(),
@@ -193,7 +201,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                           Expanded(
                             child: CElevatedButton(
                               text: Global.returnTrLable(
-                                  translats, 'Clear', lng!),
+                                  translats, CustomText.clear, lng!),
                               color: Color(0xffF26BA3),
                               onPressed: () {
                                 Navigator.of(context).pop();
@@ -206,7 +214,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                           Expanded(
                             child: CElevatedButton(
                               text: Global.returnTrLable(
-                                  translats, 'Search', lng!),
+                                  translats, CustomText.Search, lng!),
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 filteredGetData(context);

@@ -85,6 +85,8 @@ class _CmcALMTabItemSCreenForAddState extends State<CmcALMTabItemSCreenForAdd> {
   List<TabDistrict> allDistrictRecord = [];
   Map<String, dynamic> _myMap = {};
   int? isEditFromExisting = 0;
+  var applicableDate = Validate().stringToDate(Validate.date);
+  var now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -93,6 +95,8 @@ class _CmcALMTabItemSCreenForAddState extends State<CmcALMTabItemSCreenForAdd> {
   }
 
   Future<void> _initData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     _role = await Validate().readString(Validate.role);
     username = (await Validate().readString(Validate.userName))!;
 
@@ -521,7 +525,9 @@ class _CmcALMTabItemSCreenForAddState extends State<CmcALMTabItemSCreenForAdd> {
           initialvalue: _myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           minDate: quesItem.fieldname == 'date_of_visit'
-              ? DateTime.now().subtract(Duration(days: 7))
+              ? now.isBefore(applicableDate)
+                  ? null
+                  : DateTime.now().subtract(Duration(days: 7))
               : null,
           // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
           isRequred: quesItem.reqd == 1
@@ -799,7 +805,7 @@ class _CmcALMTabItemSCreenForAddState extends State<CmcALMTabItemSCreenForAdd> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(_logics, _myMap, element);
+            DependingLogic().validationMessge(_logics, _myMap, element,_translation,_language);
         if (Global.validString(validationMsg)) {
           Validate()
               .singleButtonPopup(validationMsg!, CustomText.ok, false, context);

@@ -12,11 +12,14 @@ import 'completed_followups_listing_screen_all.dart';
 
 class FollowUpTabScreenAllChild extends StatefulWidget {
   final String tabTitle;
+  final String tabOneTitle;
+  final String tabTwoTitle;
 
-  FollowUpTabScreenAllChild({
-    super.key,
-    required this.tabTitle,
-  });
+  FollowUpTabScreenAllChild(
+      {super.key,
+      required this.tabTitle,
+      required this.tabOneTitle,
+      required this.tabTwoTitle});
 
   @override
   State<FollowUpTabScreenAllChild> createState() => _FollowUpTabScreenState();
@@ -32,6 +35,9 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenAllChild>
   List<Translation> translats = [];
   List<CresheDatabaseResponceModel> creche_rec = [];
   int tabCount = 2;
+  double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
 
   void initState() {
     super.initState();
@@ -40,6 +46,8 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenAllChild>
 
   @override
   Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
+
     if (_isLoading) {
       return Center(
         child: CircularProgressIndicator(),
@@ -78,38 +86,49 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenAllChild>
             ),
             centerTitle: true,
             bottom: TabBar(
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelPadding: EdgeInsets.zero,
-              indicator: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Color(0xffF26BA3),
-                    width: 3.0,
-                  ),
-                ),
-              ),
+              indicatorColor: Color(0xffF26BA3),
+              unselectedLabelColor: Colors.grey.shade300,
+              // unselectedLabelStyle: Styles.white124P,
+              labelColor: Colors.white,
               controller: _tabController,
-              unselectedLabelColor: Color(0xff369A8D),
+              isScrollable: tabIsScrollable,
+              labelPadding: EdgeInsets.zero,
+              // tabAlignment: TabAlignment.start,
+              tabAlignment: tabIsScrollable ? TabAlignment.start : null,
               tabs: [
                 Container(
-                  color: Color(0xff369A8D),
-                  width: double.infinity,
+                  width: tabIsScrollable ? null : screenWidth / 2,
+                  // padding: EdgeInsets.only(left: 10, right: 10),
+                  padding: EdgeInsets.only(
+                      left: tabIsScrollable ? 10 : 0,
+                      right: tabIsScrollable ? 10 : 0),
+                  decoration: BoxDecoration(
+                      color: Color(0xff369A8D),
+                      border: Border(
+                          right: BorderSide(
+                              color: Colors.white,
+                              width: 1,
+                              style: BorderStyle.solid))),
                   child: Tab(
-                    child: Text(
-                      Global.returnTrLable(
-                          translats, CustomText.schduleDate, lng),
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                      child: Text(Global.returnTrLable(
+                          translats, CustomText.schduleDate, lng!))),
                 ),
                 Container(
-                  color: Color(0xff369A8D),
-                  width: double.infinity,
+                  width: tabIsScrollable ? null : screenWidth / 2,
+                  // padding: EdgeInsets.only(left: 10, right: 10),
+                  padding: EdgeInsets.only(
+                      left: tabIsScrollable ? 10 : 0,
+                      right: tabIsScrollable ? 10 : 0),
+                  decoration: BoxDecoration(
+                      color: Color(0xff369A8D),
+                      border: Border(
+                          right: BorderSide(
+                              color: Colors.white,
+                              width: 1,
+                              style: BorderStyle.solid))),
                   child: Tab(
-                      child: Text(
-                    Global.returnTrLable(translats, CustomText.complted, lng),
-                    style: TextStyle(color: Colors.white),
-                  )),
+                      child: Text(Global.returnTrLable(
+                          translats, CustomText.complted, lng!))),
                 ),
               ],
             ),
@@ -145,9 +164,7 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenAllChild>
 
   tabController() {
     _tabController = TabController(length: tabCount, vsync: this);
-    setState(() {
-      _isLoading = false;
-    });
+    tabIsScrollable = tabWidth * 2 > screenWidth;
   }
 
   @override
@@ -173,5 +190,8 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenAllChild>
         .callTranslateString(valueNames)
         .then((value) => translats = value);
     tabController();
+    setState(() {
+      _isLoading = false;
+    });
   }
 }

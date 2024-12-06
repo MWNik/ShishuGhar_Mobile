@@ -10,9 +10,27 @@ import 'package:http/http.dart' as http;
 import '../utils/validate.dart';
 
 class ChildGrowthMetaUploadApi {
-  Future<http.Response> childGrowthMetaUpload(
+  // Future<http.Response> childGrowthMetaUpload(
+  //     String token, String responce) async {
+  //   var url = Uri.parse('${Constants.baseUrl}resource/Child Growth Monitoring');
+
+  //   var headers = {'Authorization':
+  //   token, 'Content-Type': 'application/json'};
+
+  //   print('PARAMETER FOR CHILD PROFILE DATA: $responce');
+
+  //   try {
+  //     await Validate().createUploadedJson("Token $token\n\n$json");
+  //     var response = await http.post(url, body: responce, headers: headers);
+  //     return response;
+  //   } catch (e) {
+  //     print('Exception caught: $e');
+  //     return http.Response('Error uploading child profile data', 500);
+  //   }
+  // }
+   Future<http.Response> childGrowthMetaUpload(
       String token, String responce) async {
-    var url = Uri.parse('${Constants.baseUrl}resource/Child Growth Monitoring');
+    var url = Uri.parse('${Constants.baseUrl}method/frappe.val.api.growth_monitoring');
 
     var headers = {'Authorization':
     token, 'Content-Type': 'application/json'};
@@ -20,7 +38,7 @@ class ChildGrowthMetaUploadApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
-      await Validate().createUploadedJson("Token $token\n\n$json");
+      await Validate().createUploadedJson("Token $token\n\n$responce");
       var response = await http.post(url, body: responce, headers: headers);
       return response;
     } catch (e) {
@@ -38,7 +56,7 @@ class ChildGrowthMetaUploadApi {
     print('PARAMETER FOR CHILD PROFILE DATA: $responce');
 
     try {
-      await Validate().createUploadedJson("Token $token\n\n$json");
+      await Validate().createUploadedJson("Token $token\n\n$responce");
       var response = await http.put(url, body: responce, headers: headers);
       return response;
     } catch (e) {

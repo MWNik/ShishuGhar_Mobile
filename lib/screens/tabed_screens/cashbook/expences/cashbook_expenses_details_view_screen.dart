@@ -87,7 +87,7 @@ class _CashbookExpensesDetailsViewScreenState
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
 
     await updateHiddenValue();
     await callScrenControllers('Cashbook');
@@ -377,11 +377,15 @@ class _CashbookExpensesDetailsViewScreenState
         .toList();
 
     List<String> defaultCommon = [];
+    List<String> fieldLabelTranslats = [];
     for (int i = 0; i < allItems.length; i++) {
       if (Global.validString(allItems[i].options)) {
         defaultCommon.add('tab${allItems[i].options!.trim()}');
       }
+      if(Global.validString(allItems[i].label))
+      fieldLabelTranslats.add(allItems[i].label!.trim());
     }
+    await TranslationDataHelper().callTranslateString(fieldLabelTranslats).then((value) => translats.addAll(value));
     await OptionsModelHelper()
         .getAllMstCommonNotINOptions(defaultCommon,lng!)
         .then((value) => options.addAll(value));
@@ -413,7 +417,7 @@ class _CashbookExpensesDetailsViewScreenState
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,translats,lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(translats, validationMsg, lng!),

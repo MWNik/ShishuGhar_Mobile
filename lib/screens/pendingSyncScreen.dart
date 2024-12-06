@@ -127,7 +127,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     syncCount > 0
                         ? Flexible(
                             child: DynamicCustomCheckboxWithLabel(
-                              label: CustomText.selectAllForUpload,
+                              label: Global.returnTrLable(locationControlls,
+                                  CustomText.selectAllForUpload, lng!),
                               initialValue: selectAllOpt,
                               onChanged: (value) {
                                 setState(() {
@@ -187,8 +188,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                                             else
                                               await methods[index](context);
                                           }
-                                        }
-                                        else {
+                                        } else {
                                           await methods[index](context);
                                         }
                                       } else
@@ -788,8 +788,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    }
-    else if (userRole == 'Cluster Coordinator') {
+    } else if (userRole == 'Cluster Coordinator') {
       /* var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
       if (hhItems.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -856,8 +855,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    }
-    else if (userRole == 'Accounts and Logistics Manager') {
+    } else if (userRole == 'Accounts and Logistics Manager') {
       var cmcALMData = await CmcALMTabResponseHelper().getAlmForUpload();
       if (cmcALMData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -911,8 +909,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    }
-    else if (userRole == 'Capacity and Building Manager') {
+    } else if (userRole == 'Capacity and Building Manager') {
       var cmcCBMData = await CmcCBMTabResponseHelper().getCBMForUpload();
       if (cmcCBMData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -966,8 +963,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    }
-    else  {
+    } else {
       var grievanceData =
           await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
       if (grievanceData.length > 1) {
@@ -982,7 +978,6 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       syncInfoCount[Global.returnTrLable(
               locationControlls, CustomText.ChildGrievances, lng!)] =
           grievanceData.length;
-
     }
 
     setState(() {
@@ -1529,128 +1524,132 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         if (childrensList.length > 0) {
           resultMap['childattendancelist'] = childrensList;
         }
+        // if (element.name != null) {
+        //   resultMap.remove("name");
+        // }
 
-        if (element.name == null) {
-          var responce = await ChildAttendanceUploadApi()
-              .AttendanceUpload(token!, jsonEncode(resultMap));
-          if (responce.statusCode == 200) {
-            Validate().saveString(
-                Validate.dataUploadDateTime, Validate().currentDateTime());
-            await updateResponcesChildAttendance(responce);
-            if ((chilAttendence.indexOf(element)) ==
-                (chilAttendence.length - 1)) {
-              Navigator.pop(mContext);
-              if (selectAllOpt == 1) {
-                currentUploadStatus = 6;
-                await methods[currentUploadStatus](context);
-              } else
-                Validate().singleButtonPopup(
-                    Global.returnTrLable(locationControlls,
-                        CustomText.data_upload_success_msg, lng!),
-                    Global.returnTrLable(
-                        locationControlls, CustomText.ok, lng!),
-                    false,
-                    context);
-            } else {
-              currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
-              loadingText = Global.returnTrLable(
-                  locationControlls, CustomText.uploading, lng!);
-              loadingText =
-                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
-              updateLoadingText(dialogSetState, loadingText);
-            }
-          } else if (responce.statusCode == 401) {
+        // if (element.name == null) {
+        var responce = await ChildAttendanceUploadApi()
+            .AttendanceUpload(token!, jsonEncode(resultMap));
+        if (responce.statusCode == 200) {
+          Validate().saveString(
+              Validate.dataUploadDateTime, Validate().currentDateTime());
+          await updateResponcesChildAttendance(responce);
+          if ((chilAttendence.indexOf(element)) ==
+              (chilAttendence.length - 1)) {
             Navigator.pop(mContext);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Validate.Password);
-            ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(
-                  content: Text(Global.returnTrLable(
-                      locationControlls, CustomText.token_expired, lng!))),
-            );
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (mContext) => LoginScreen(),
-                ));
-            // Validate().singleButtonPopup(
-            //     Global.returnTrLable(
-            //         locationControlls, CustomText.token_expired, lng!),
-            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-            //     false,
-            //     context);
+            if (selectAllOpt == 1) {
+              currentUploadStatus = 6;
+              await methods[currentUploadStatus](context);
+            } else
+              Validate().singleButtonPopup(
+                  Global.returnTrLable(locationControlls,
+                      CustomText.data_upload_success_msg, lng!),
+                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                  false,
+                  context);
           } else {
-            Navigator.pop(mContext);
-            await callUploadData();
-            Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
-
-            return;
+            currentItem = currentItem + 1;
+            loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
+            loadingText = Global.returnTrLable(
+                locationControlls, CustomText.uploading, lng!);
+            loadingText =
+                '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+            updateLoadingText(dialogSetState, loadingText);
           }
+        } else if (responce.statusCode == 401) {
+          Navigator.pop(mContext);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.remove(Validate.Password);
+          ScaffoldMessenger.of(mContext).showSnackBar(
+            SnackBar(
+                content: Text(Global.returnTrLable(
+                    locationControlls, CustomText.token_expired, lng!))),
+          );
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (mContext) => LoginScreen(),
+              ));
+          // Validate().singleButtonPopup(
+          //     Global.returnTrLable(
+          //         locationControlls, CustomText.token_expired, lng!),
+          //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          //     false,
+          //     context);
         } else {
-          var responce = await ChildAttendanceUploadApi().childAttendanceUpload(
-              token!, jsonEncode(resultMap), element.name);
-          if (responce.statusCode == 200) {
-            await updateResponcesChildAttendance(responce);
-            if ((chilAttendence.indexOf(element)) ==
-                (chilAttendence.length - 1)) {
-              Navigator.pop(mContext);
-              if (selectAllOpt == 1) {
-                currentUploadStatus = 6;
-                await methods[currentUploadStatus](context);
-              } else
-                Validate().singleButtonPopup(
-                    Global.returnTrLable(locationControlls,
-                        CustomText.data_upload_success_msg, lng!),
-                    Global.returnTrLable(
-                        locationControlls, CustomText.ok, lng!),
-                    false,
-                    context);
-            } else {
-              currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
-              loadingText = Global.returnTrLable(
-                  locationControlls, CustomText.uploading, lng!);
-              loadingText =
-                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
-              updateLoadingText(dialogSetState, loadingText);
-            }
-          } else if (responce.statusCode == 401) {
-            Navigator.pop(mContext);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Validate.Password);
-            ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(
-                  content: Text(Global.returnTrLable(
-                      locationControlls, CustomText.token_expired, lng!))),
-            );
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (mContext) => LoginScreen(),
-                ));
-            // Validate().singleButtonPopup(
-            //     Global.returnTrLable(
-            //         locationControlls, CustomText.token_expired, lng!),
-            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-            //     false,
-            //     context);
-          } else {
-            Navigator.pop(mContext);
-            await callUploadData();
-            Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
+          Navigator.pop(mContext);
+          await callUploadData();
+          debugPrint(responce.body);
+          Validate().singleButtonPopup(
+              Global.errorBodyToStringFromList(responce.body),
+              Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              false,
+              context);
 
-            return;
-          }
+          return;
         }
+        // } else {
+        //   var responce = await ChildAttendanceUploadApi().childAttendanceUpload(
+        //       token!, jsonEncode(resultMap), element.name);
+        //   if (responce.statusCode == 200) {
+        //     await updateResponcesChildAttendance(responce);
+        //     if ((chilAttendence.indexOf(element)) ==
+        //         (chilAttendence.length - 1)) {
+        //       Navigator.pop(mContext);
+        //       if (selectAllOpt == 1) {
+        //         currentUploadStatus = 6;
+        //         await methods[currentUploadStatus](context);
+        //       } else
+        //         Validate().singleButtonPopup(
+        //             Global.returnTrLable(locationControlls,
+        //                 CustomText.data_upload_success_msg, lng!),
+        //             Global.returnTrLable(
+        //                 locationControlls, CustomText.ok, lng!),
+        //             false,
+        //             context);
+        //     } else {
+        //       currentItem = currentItem + 1;
+        //       loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
+        //       loadingText = Global.returnTrLable(
+        //           locationControlls, CustomText.uploading, lng!);
+        //       loadingText =
+        //           '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+        //       updateLoadingText(dialogSetState, loadingText);
+        //     }
+        //   } else if (responce.statusCode == 401) {
+        //     Navigator.pop(mContext);
+        //     SharedPreferences prefs = await SharedPreferences.getInstance();
+        //     await prefs.remove(Validate.Password);
+        //     ScaffoldMessenger.of(mContext).showSnackBar(
+        //       SnackBar(
+        //           content: Text(Global.returnTrLable(
+        //               locationControlls, CustomText.token_expired, lng!))),
+        //     );
+        //     Navigator.pushReplacement(
+        //         context,
+        //         MaterialPageRoute(
+        //           builder: (mContext) => LoginScreen(),
+        //         ));
+        //     // Validate().singleButtonPopup(
+        //     //     Global.returnTrLable(
+        //     //         locationControlls, CustomText.token_expired, lng!),
+        //     //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+        //     //     false,
+        //     //     context);
+        //   } else {
+        //     Navigator.pop(mContext);
+        //     await callUploadData();
+        //     debugPrint(responce.body);
+        //     Validate().singleButtonPopup(
+        //         Global.errorBodyToStringFromList(responce.body),
+        //         Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+        //         false,
+        //         context);
+
+        //     return;
+        //   }
+        // }
       }
     } else {
       if (selectAllOpt == 1) {
@@ -1972,6 +1971,26 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       CustomText.crceheCheckIn,
       CustomText.visitPurpose,
       CustomText.disability,
+      CustomText.VisitNotes,
+      CustomText.enrollExitChild,
+      CustomText.GrowthMonitoring,
+      CustomText.childReferral,
+      CustomText.childAttendence,
+      CustomText.ChildEvents,
+      CustomText.ChildHealth,
+      CustomText.ChildImmunization,
+      CustomText.checkIns,
+      CustomText.CrecheCommitte,
+      CustomText.CashBookExpences,
+      CustomText.CashBookReceipt,
+      CustomText.villageProfile,
+      CustomText.Stock,
+      CustomText.requisition,
+      CustomText.imageFiles,
+      CustomText.selectAllForUpload,
+      CustomText.all,
+      CustomText.unsynched,
+      
     ];
     if (userRole == 'Creche Supervisor') {
       methods = [
@@ -2017,7 +2036,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         uploadCheckInData,
         uploadImageFile
       ];
-    }else{
+    } else {
       methods = [
         uploadChildGrievanceData,
       ];
@@ -2526,132 +2545,130 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         var element = childimmunizationdata[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
-        if (element.name != null) {
-          var responce = await ChildImmunizationUploadApi()
-              .childImmunzationUploadUpdate(
-                  token!, jsonEncode(jsonBody), element.name);
-          if (responce.statusCode == 200) {
-            Validate().saveString(
-                Validate.dataUploadDateTime, Validate().currentDateTime());
-            await updateResponcesChildImmunization(responce);
-            if ((childimmunizationdata.indexOf(element)) ==
-                (childimmunizationdata.length - 1)) {
-              Navigator.pop(mContext);
-              if (selectAllOpt == 1) {
-                currentUploadStatus = 9;
-                await methods[currentUploadStatus](context);
-              } else
-                Validate().singleButtonPopup(
-                    Global.returnTrLable(locationControlls,
-                        CustomText.data_upload_success_msg, lng!),
-                    Global.returnTrLable(
-                        locationControlls, CustomText.ok, lng!),
-                    false,
-                    context);
-            } else {
-              currentItem = currentItem + 1;
-              loadingTextUpdatedCount =
-                  '$currentItem/${childimmunizationdata.length}';
-              loadingText = Global.returnTrLable(
-                  locationControlls, CustomText.uploading, lng!);
-              loadingText =
-                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
-              updateLoadingText(dialogSetState, loadingText);
-            }
-          } else if (responce.statusCode == 401) {
+        // if (element.name != null) {
+        var responce = await ChildImmunizationUploadApi()
+            .childImmunzationUploadUpdate(token!, jsonEncode(jsonBody));
+        if (responce.statusCode == 200) {
+          Validate().saveString(
+              Validate.dataUploadDateTime, Validate().currentDateTime());
+          await updateResponcesChildImmunization(responce);
+          if ((childimmunizationdata.indexOf(element)) ==
+              (childimmunizationdata.length - 1)) {
             Navigator.pop(mContext);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Validate.Password);
-            ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(
-                  content: Text(Global.returnTrLable(
-                      locationControlls, CustomText.token_expired, lng!))),
-            );
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (mContext) => LoginScreen(),
-                ));
-            // Validate().singleButtonPopup(
-            //     Global.returnTrLable(
-            //         locationControlls, CustomText.token_expired, lng!),
-            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-            //     false,
-            //     context);
+            if (selectAllOpt == 1) {
+              currentUploadStatus = 9;
+              await methods[currentUploadStatus](context);
+            } else
+              Validate().singleButtonPopup(
+                  Global.returnTrLable(locationControlls,
+                      CustomText.data_upload_success_msg, lng!),
+                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                  false,
+                  context);
           } else {
-            Navigator.pop(mContext);
-            await callUploadData();
-            Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
-
-            return;
+            currentItem = currentItem + 1;
+            loadingTextUpdatedCount =
+                '$currentItem/${childimmunizationdata.length}';
+            loadingText = Global.returnTrLable(
+                locationControlls, CustomText.uploading, lng!);
+            loadingText =
+                '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+            updateLoadingText(dialogSetState, loadingText);
           }
+        } else if (responce.statusCode == 401) {
+          Navigator.pop(mContext);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.remove(Validate.Password);
+          ScaffoldMessenger.of(mContext).showSnackBar(
+            SnackBar(
+                content: Text(Global.returnTrLable(
+                    locationControlls, CustomText.token_expired, lng!))),
+          );
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (mContext) => LoginScreen(),
+              ));
+          // Validate().singleButtonPopup(
+          //     Global.returnTrLable(
+          //         locationControlls, CustomText.token_expired, lng!),
+          //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          //     false,
+          //     context);
         } else {
-          var responce = await ChildImmunizationUploadApi()
-              .childImmunzationUpload(token!, jsonEncode(jsonBody));
-          if (responce.statusCode == 200) {
-            Validate().saveString(
-                Validate.dataUploadDateTime, Validate().currentDateTime());
-            await updateResponcesChildImmunization(responce);
-            if ((childimmunizationdata.indexOf(element)) ==
-                (childimmunizationdata.length - 1)) {
-              Navigator.pop(mContext);
-              if (selectAllOpt == 1) {
-                currentUploadStatus = 9;
-                await methods[currentUploadStatus](context);
-              } else
-                Validate().singleButtonPopup(
-                    Global.returnTrLable(locationControlls,
-                        CustomText.data_upload_success_msg, lng!),
-                    Global.returnTrLable(
-                        locationControlls, CustomText.ok, lng!),
-                    false,
-                    context);
-            } else {
-              currentItem = currentItem + 1;
-              loadingTextUpdatedCount =
-                  '$currentItem/${childimmunizationdata.length}';
-              loadingText = Global.returnTrLable(
-                  locationControlls, CustomText.uploading, lng!);
-              loadingText =
-                  '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
-              updateLoadingText(dialogSetState, loadingText);
-            }
-          } else if (responce.statusCode == 401) {
-            Navigator.pop(mContext);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Validate.Password);
-            ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(
-                  content: Text(Global.returnTrLable(
-                      locationControlls, CustomText.token_expired, lng!))),
-            );
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (mContext) => LoginScreen(),
-                ));
-            // Validate().singleButtonPopup(
-            //     Global.returnTrLable(
-            //         locationControlls, CustomText.token_expired, lng!),
-            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-            //     false,
-            //     context);
-          } else {
-            Navigator.pop(mContext);
-            await callUploadData();
-            Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
+          Navigator.pop(mContext);
+          await callUploadData();
+          Validate().singleButtonPopup(
+              Global.errorBodyToStringFromList(responce.body),
+              Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              false,
+              context);
 
-            return;
-          }
+          return;
         }
+        // } else {
+        //   var responce = await ChildImmunizationUploadApi()
+        //       .childImmunzationUpload(token!, jsonEncode(jsonBody));
+        //   if (responce.statusCode == 200) {
+        //     Validate().saveString(
+        //         Validate.dataUploadDateTime, Validate().currentDateTime());
+        //     await updateResponcesChildImmunization(responce);
+        //     if ((childimmunizationdata.indexOf(element)) ==
+        //         (childimmunizationdata.length - 1)) {
+        //       Navigator.pop(mContext);
+        //       if (selectAllOpt == 1) {
+        //         currentUploadStatus = 9;
+        //         await methods[currentUploadStatus](context);
+        //       } else
+        //         Validate().singleButtonPopup(
+        //             Global.returnTrLable(locationControlls,
+        //                 CustomText.data_upload_success_msg, lng!),
+        //             Global.returnTrLable(
+        //                 locationControlls, CustomText.ok, lng!),
+        //             false,
+        //             context);
+        //     } else {
+        //       currentItem = currentItem + 1;
+        //       loadingTextUpdatedCount =
+        //           '$currentItem/${childimmunizationdata.length}';
+        //       loadingText = Global.returnTrLable(
+        //           locationControlls, CustomText.uploading, lng!);
+        //       loadingText =
+        //           '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+        //       updateLoadingText(dialogSetState, loadingText);
+        //     }
+        //   } else if (responce.statusCode == 401) {
+        //     Navigator.pop(mContext);
+        //     SharedPreferences prefs = await SharedPreferences.getInstance();
+        //     await prefs.remove(Validate.Password);
+        //     ScaffoldMessenger.of(mContext).showSnackBar(
+        //       SnackBar(
+        //           content: Text(Global.returnTrLable(
+        //               locationControlls, CustomText.token_expired, lng!))),
+        //     );
+        //     Navigator.pushReplacement(
+        //         context,
+        //         MaterialPageRoute(
+        //           builder: (mContext) => LoginScreen(),
+        //         ));
+        //     // Validate().singleButtonPopup(
+        //     //     Global.returnTrLable(
+        //     //         locationControlls, CustomText.token_expired, lng!),
+        //     //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+        //     //     false,
+        //     //     context);
+        //   } else {
+        //     Navigator.pop(mContext);
+        //     await callUploadData();
+        //     Validate().singleButtonPopup(
+        //         Global.errorBodyToStringFromList(responce.body),
+        //         Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+        //         false,
+        //         context);
+
+        //     return;
+        //   }
+        // }
       }
     } else {
       if (selectAllOpt == 1) {
@@ -4421,10 +4438,9 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         List<dynamic> childrensList = [];
 
         for (var cItem in cItems) {
-          Map<String,dynamic> map = jsonDecode(cItem);
+          Map<String, dynamic> map = jsonDecode(cItem);
           map.remove('owner');
-          childrensList
-              .add(map); //Added to the List in JSON format
+          childrensList.add(map); //Added to the List in JSON format
         }
         if (element.name == null) {
           if (childrensList.length > 0) {
@@ -4551,7 +4567,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         resultMap['status'] = '1';
         resultMap.remove('owner');
         var itemResponce = jsonEncode(resultMap);
-        
+
         if (element.name != null) {
           var responce = await EnrolledChildProfileUploadApi()
               .enrolledChildProfileUploadUpdate(
@@ -4761,6 +4777,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           } else {
             Navigator.pop(mContext);
             await callUploadData();
+            debugPrint(responce.body);
             Validate().singleButtonPopup(
                 Global.errorBodyToStringFromList(responce.body),
                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
@@ -4917,7 +4934,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         await ChildGrowthResponseHelper().callChildGrowthResponses();
     if (anthropomertydata.length > 0) {
       loadingTextUpdatedText = Global.returnTrLable(
-          locationControlls, CustomText.enrollExitChild, lng!);
+          locationControlls, CustomText.GrowthMonitoring, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
       loadingTextUpdatedCount = '$currentItem/${anthropomertydata.length}';
@@ -4930,94 +4947,94 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         var element = anthropomertydata[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
-        if (element.name != null) {
-          var responce = await ChildGrowthMetaUploadApi()
-              .childGrowthMetaUploadUpdate(
-                  token!, jsonEncode(jsonBody), element.name);
-          if (responce.statusCode == 200) {
-            Validate().saveString(
-                Validate.dataUploadDateTime, Validate().currentDateTime());
-            await updateResponcesChildGrowth(responce, element.responces!);
-            if ((anthropomertydata.indexOf(element)) ==
-                (anthropomertydata.length - 1)) {
-              Navigator.pop(mContext);
-              uploadChildReferralDataSeq2(mContext, methodeIndex);
-            }
-          } else if (responce.statusCode == 401) {
+        // if (element.name != null) {
+        var responce = await ChildGrowthMetaUploadApi()
+            .childGrowthMetaUpload(token!, jsonEncode(jsonBody));
+        if (responce.statusCode == 200) {
+          Validate().saveString(
+              Validate.dataUploadDateTime, Validate().currentDateTime());
+          await updateResponcesChildGrowth(responce, element.responces!);
+          if ((anthropomertydata.indexOf(element)) ==
+              (anthropomertydata.length - 1)) {
             Navigator.pop(mContext);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Validate.Password);
-            ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(
-                  content: Text(Global.returnTrLable(
-                      locationControlls, CustomText.token_expired, lng!))),
-            );
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (mContext) => LoginScreen(),
-                ));
-            // Validate().singleButtonPopup(
-            //     Global.returnTrLable(
-            //         locationControlls, CustomText.token_expired, lng!),
-            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-            //     false,
-            //     context);
-          } else {
-            Navigator.pop(mContext);
-            await callUploadData();
-            Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
-
-            return;
+            uploadChildReferralDataSeq2(mContext, methodeIndex);
           }
+        } else if (responce.statusCode == 401) {
+          Navigator.pop(mContext);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.remove(Validate.Password);
+          ScaffoldMessenger.of(mContext).showSnackBar(
+            SnackBar(
+                content: Text(Global.returnTrLable(
+                    locationControlls, CustomText.token_expired, lng!))),
+          );
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (mContext) => LoginScreen(),
+              ));
+          // Validate().singleButtonPopup(
+          //     Global.returnTrLable(
+          //         locationControlls, CustomText.token_expired, lng!),
+          //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          //     false,
+          //     context);
         } else {
-          var responce = await ChildGrowthMetaUploadApi()
-              .childGrowthMetaUpload(token!, jsonEncode(jsonBody));
-          if (responce.statusCode == 200) {
-            Validate().saveString(
-                Validate.dataUploadDateTime, Validate().currentDateTime());
-            await updateResponcesChildGrowth(responce, element.responces!);
-            if ((anthropomertydata.indexOf(element)) ==
-                (anthropomertydata.length - 1)) {
-              Navigator.pop(mContext);
-              uploadChildReferralDataSeq2(mContext, methodeIndex);
-            }
-          } else if (responce.statusCode == 401) {
-            Navigator.pop(mContext);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Validate.Password);
-            ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(
-                  content: Text(Global.returnTrLable(
-                      locationControlls, CustomText.token_expired, lng!))),
-            );
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (mContext) => LoginScreen(),
-                ));
-            // Validate().singleButtonPopup(
-            //     Global.returnTrLable(
-            //         locationControlls, CustomText.token_expired, lng!),
-            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-            //     false,
-            //     context);
-          } else {
-            Navigator.pop(mContext);
-            await callUploadData();
-            Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
+          Navigator.pop(mContext);
+          await callUploadData();
+          Validate().singleButtonPopup(
+              Global.errorBodyToStringFromList(responce.body),
+              Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              false,
+              context);
 
-            return;
-          }
+          return;
         }
+        // } else {
+        //   var responce = await ChildGrowthMetaUploadApi()
+        //       .childGrowthMetaUpload(token!, jsonEncode(jsonBody));
+        //   if (responce.statusCode == 200) {
+        //     Validate().saveString(
+        //         Validate.dataUploadDateTime, Validate().currentDateTime());
+        //     await updateResponcesChildGrowth(responce, element.responces!);
+        //     if ((anthropomertydata.indexOf(element)) ==
+        //         (anthropomertydata.length - 1)) {
+        //       Navigator.pop(mContext);
+        //       uploadChildReferralDataSeq2(mContext, methodeIndex);
+        //     }
+        //   } else if (responce.statusCode == 401) {
+        //     Navigator.pop(mContext);
+        //     SharedPreferences prefs = await SharedPreferences.getInstance();
+        //     await prefs.remove(Validate.Password);
+        //     ScaffoldMessenger.of(mContext).showSnackBar(
+        //       SnackBar(
+        //           content: Text(Global.returnTrLable(
+        //               locationControlls, CustomText.token_expired, lng!))),
+        //     );
+        //     Navigator.pushReplacement(
+        //         context,
+        //         MaterialPageRoute(
+        //           builder: (mContext) => LoginScreen(),
+        //         ));
+        //     // Validate().singleButtonPopup(
+        //     //     Global.returnTrLable(
+        //     //         locationControlls, CustomText.token_expired, lng!),
+        //     //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+        //     //     false,
+        //     //     context);
+        //   } else {
+        //     Navigator.pop(mContext);
+        //     await callUploadData();
+        //     debugPrint(responce.body);
+        //     Validate().singleButtonPopup(
+        //         Global.errorBodyToStringFromList(responce.body),
+        //         Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+        //         false,
+        //         context);
+
+        //     return;
+        //   }
+        // }
       }
     } else {
       uploadChildReferralDataSeq2(mContext, methodeIndex);

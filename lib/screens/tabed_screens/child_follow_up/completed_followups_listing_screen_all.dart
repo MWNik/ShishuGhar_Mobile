@@ -47,6 +47,7 @@ class _ChildFollowUpsListingScreenState
   List<OptionsModel> creches = [];
   TextEditingController Searchcontroller = TextEditingController();
   bool isOnlyUnsyched = false;
+  DateTime applicableDate = Validate().stringToDate("2024-12-31");
 
   @override
   void initState() {
@@ -60,6 +61,8 @@ class _ChildFollowUpsListingScreenState
     if (lngtr != null) {
       lng = lngtr;
     }
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -71,7 +74,13 @@ class _ChildFollowUpsListingScreenState
       CustomText.Village,
       CustomText.Creches,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.clear,
+      CustomText.Filter,
+      CustomText.ChildId,
+      CustomText.schduleDate,
+      CustomText.followup_visit_date,
+      CustomText.weight
     ];
 
     await TranslationDataHelper()
@@ -167,7 +176,8 @@ class _ChildFollowUpsListingScreenState
                             width: 10.w,
                           ),
                           Text(
-                            CustomText.Filter,
+                            Global.returnTrLable(
+                                translats, CustomText.Filter, lng),
                             style: Styles.labelcontrollerfont,
                           ),
                           Spacer(),
@@ -308,10 +318,12 @@ class _ChildFollowUpsListingScreenState
                               .map(int.parse)
                               .toList();
                           var date = DateTime(parts[0], parts[1], parts[2]);
-                          var backDate =
-                              DateTime.parse(Validate().currentDate())
+                          var backDate = currentDate.isBefore(applicableDate)
+                              ? DateTime(1992)
+                              : DateTime.parse(Validate().currentDate())
                                   .subtract(Duration(days: 7));
                           var backDateSD = date.subtract(Duration(days: 7));
+
                           if (Global.validString(child_followup_guid)) {
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
@@ -357,7 +369,10 @@ class _ChildFollowUpsListingScreenState
                                           minDate: backDate.isBefore(backDateSD)
                                               ? backDateSD
                                               : backDate,
-                                          isEditable: isEditable,
+                                          isEditable: currentDate
+                                                  .isBefore(applicableDate)
+                                              ? true
+                                              : isEditable,
                                         )));
 
                             if (refStatus == 'itemRefresh') {

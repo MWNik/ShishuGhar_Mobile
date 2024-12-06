@@ -21,8 +21,7 @@ class StockTabListingScreen extends StatefulWidget {
   StockTabListingScreen({super.key, required this.creche_id});
 
   @override
-  State<StockTabListingScreen> createState() =>
-      _StockTabListingScreenState();
+  State<StockTabListingScreen> createState() => _StockTabListingScreenState();
 }
 
 class _StockTabListingScreenState extends State<StockTabListingScreen>
@@ -36,6 +35,9 @@ class _StockTabListingScreenState extends State<StockTabListingScreen>
   List<Translation> translats = [];
   List<CresheDatabaseResponceModel> creche_rec = [];
   int tabCount = 2;
+  double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
 
   void initState() {
     super.initState();
@@ -44,6 +46,7 @@ class _StockTabListingScreenState extends State<StockTabListingScreen>
 
   @override
   Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
     if (_isLoading) {
       return Center(
         child: CircularProgressIndicator(),
@@ -96,37 +99,56 @@ class _StockTabListingScreenState extends State<StockTabListingScreen>
             ),
             centerTitle: true,
             bottom: TabBar(
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelPadding: EdgeInsets.zero,
-              indicator: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Color(0xffF26BA3),
-                    width: 3.0,
-                  ),
-                ),
-              ),
+              indicatorColor: Color(0xffF26BA3),
+              unselectedLabelColor: Colors.grey.shade300,
+              unselectedLabelStyle: Styles.white124P,
+              labelColor: Colors.white,
               controller: _tabController,
-              unselectedLabelColor: Color(0xff369A8D),
+              isScrollable: tabIsScrollable,
+              labelPadding: EdgeInsets.zero,
+              // tabAlignment: TabAlignment.start,
+              tabAlignment: tabIsScrollable ? TabAlignment.start : null,
               tabs: [
                 Container(
-                  color: Color(0xff369A8D),
-                  width: double.infinity,
+                  // color: Color(0xff369A8D),
+                  width: tabIsScrollable ? null : screenWidth / 2,
+                  padding: EdgeInsets.only(
+                      left: tabIsScrollable ? 10 : 0,
+                      right: tabIsScrollable ? 10 : 0),
+                  decoration: BoxDecoration(
+                      color: Color(0xff369A8D),
+                      border: Border(
+                          right: BorderSide(
+                              color: Colors.white,
+                              width: 1,
+                              style: BorderStyle.solid))),
                   child: Tab(
                     child: Text(
-                      CustomText.Stock,
+                      Global.returnTrLable(translats, CustomText.Stock, lng),
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
                 Container(
-                  color: Color(0xff369A8D),
-                  width: double.infinity,
+                  // color: Color(0xff369A8D),
+                  width: tabIsScrollable ? null : screenWidth / 2,
+                  padding: EdgeInsets.only(
+                      left: tabIsScrollable ? 10 : 0,
+                      right: tabIsScrollable ? 10 : 0),
+                  decoration: BoxDecoration(
+                      color: Color(0xff369A8D),
+                      border: Border(
+                          right: BorderSide(
+                              color: Colors.white,
+                              width: 1,
+                              style: BorderStyle.solid))),
                   child: Tab(
-                      child: Text(
-                    CustomText.requisition,
-                    style: TextStyle(color: Colors.white),
-                  )),
+                    child: Text(
+                      Global.returnTrLable(
+                          translats, CustomText.requisition, lng),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -161,6 +183,8 @@ class _StockTabListingScreenState extends State<StockTabListingScreen>
 
   tabController() {
     _tabController = TabController(length: tabCount, vsync: this);
+    tabIsScrollable = tabWidth * 2 > screenWidth;
+
     setState(() {
       _isLoading = false;
     });
@@ -182,7 +206,8 @@ class _StockTabListingScreenState extends State<StockTabListingScreen>
       CustomText.Next,
       CustomText.back,
       CustomText.Submit,
-      CustomText.Stock
+      CustomText.Stock,
+      CustomText.requisition
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -192,5 +217,4 @@ class _StockTabListingScreenState extends State<StockTabListingScreen>
     creche_name = Global.getItemValues(creche_rec[0].responces!, 'creche_name');
     tabController();
   }
-
 }

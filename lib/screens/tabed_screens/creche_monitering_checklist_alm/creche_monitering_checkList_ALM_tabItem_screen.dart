@@ -34,10 +34,10 @@ class CmcALMTabItemSCreen extends StatefulWidget {
   final Function(int) changeTab;
   final int tabIndex;
   final int totalTab;
-   String? date_of_visit;
+  String? date_of_visit;
   final bool isEdit;
 
-   CmcALMTabItemSCreen({
+  CmcALMTabItemSCreen({
     required this.almguid,
     required this.creche_id,
     required this.tabBreakItem,
@@ -45,7 +45,7 @@ class CmcALMTabItemSCreen extends StatefulWidget {
     required this.changeTab,
     required this.tabIndex,
     required this.totalTab,
-     this.date_of_visit,
+    this.date_of_visit,
     required this.isEdit,
   });
 
@@ -54,7 +54,7 @@ class CmcALMTabItemSCreen extends StatefulWidget {
 }
 
 class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
-  List<String>unpicableDates = [];
+  List<String> unpicableDates = [];
   String? _role;
   String username = '';
   String _language = 'en';
@@ -64,8 +64,10 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
   List<Translation> _translation = [];
   bool _isLoading = true;
   int? isEditExisting;
-  
+
   Map<String, dynamic> _myMap = {};
+  var applicableDate = Validate().stringToDate(Validate.date);
+  var now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -74,6 +76,8 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
   }
 
   Future<void> _initData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     _role = await Validate().readString(Validate.role);
     username = (await Validate().readString(Validate.userName))!;
 
@@ -84,7 +88,6 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
       CustomText.ok,
       CustomText.ChildEnrollsuccess
     ];
-
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -99,15 +102,15 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
   }
 
   Future<List<String>> fetchDatesList() async {
-    List<CmcALMResponseModel> cmcRespose =
-    await CmcALMTabResponseHelper()
+    List<CmcALMResponseModel> cmcRespose = await CmcALMTabResponseHelper()
         .childALMChild(Global.stringToInt(widget.creche_id));
     List<String> visitdatesListString = [];
     cmcRespose.forEach((element) {
       visitdatesListString
           .add(Global.getItemValues(element.responces, 'date_of_visit'));
     });
-    if(Global.validString(widget.date_of_visit)&&visitdatesListString.contains(widget.date_of_visit)){
+    if (Global.validString(widget.date_of_visit) &&
+        visitdatesListString.contains(widget.date_of_visit)) {
       visitdatesListString.remove(widget.date_of_visit);
     }
     return visitdatesListString;
@@ -216,7 +219,8 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
       if (Global.validString(items[i].options)) {
         if (items[i].options == 'Creche') {
           await OptionsModelHelper()
-              .callCrechInOption(items[i].options!.trim(),Global.stringToInt(widget.creche_id))
+              .callCrechInOption(items[i].options!.trim(),
+                  Global.stringToInt(widget.creche_id))
               .then((data) {
             _options.addAll(data);
           });
@@ -228,7 +232,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
       logicFields.add(items[i].fieldname!);
     }
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lang!)
+        .getAllMstCommonNotINOptions(defaultCommon, lang!)
         .then((data) {
       _options.addAll(data);
     });
@@ -290,13 +294,17 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
           initialvalue: _myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           // readable:  quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
-          minDate: quesItem.fieldname=='date_of_visit'?DateTime.now().subtract(Duration(days: 7)):null,
+          minDate: quesItem.fieldname == 'date_of_visit'
+              ? now.isBefore(applicableDate)
+                  ? null
+                  : DateTime.now().subtract(Duration(days: 7))
+              : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           calenderValidate:
-          DependingLogic().calenderValidation(_logics, _myMap, quesItem),
-          onChanged: (value) async{
+              DependingLogic().calenderValidation(_logics, _myMap, quesItem),
+          onChanged: (value) async {
             if (quesItem.fieldname == 'date_of_visit') {
               // if (Global.validString(_myMap['creche_id'])) {
               //   unpicableDates = await fetchDatesList(_myMap['creche_id']);
@@ -409,9 +417,11 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
         return CustomTimepickerDynamic(
           initialvalue: _myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           isVisible:
-          DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
           onChanged: (value) {
             _myMap[quesItem.fieldname!] = value;
             var logData = DependingLogic()
@@ -424,8 +434,8 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
               }
             }
           },
-          titleText:
-          Global.returnTrLable(_translation, quesItem.label!.trim(), _language),
+          titleText: Global.returnTrLable(
+              _translation, quesItem.label!.trim(), _language),
         );
       case 'Long Text':
         return DynamicCustomTextFieldNew(
@@ -547,15 +557,13 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
                 context);
             validStatus = false;
             break;
-          }
-          else if(element.fieldname=='date_of_visit'){
+          } else if (element.fieldname == 'date_of_visit') {
             if (unpicableDates.contains(values)) {
               _myMap.remove(element.fieldname);
               setState(() {});
               Validate().singleButtonPopup(
                   'A Visit Note already exists for the selected Date "${values}"',
-                  Global.returnTrLable(
-                      _translation, CustomText.ok, _language),
+                  Global.returnTrLable(_translation, CustomText.ok, _language),
                   false,
                   context);
               validStatus = false;
@@ -564,7 +572,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(_logics, _myMap, element);
+            DependingLogic().validationMessge(_logics, _myMap, element,_translation,_language);
         if (Global.validString(validationMsg)) {
           Validate()
               .singleButtonPopup(validationMsg!, CustomText.ok, false, context);
@@ -613,19 +621,17 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
       var name = _myMap['name'];
       print(responcesJs);
       var itemALM = CmcALMResponseModel(
-        almguid: widget.almguid,
-        creche_id: Global.stringToInt(
-          widget.creche_id
-        ),
-        // childenrolledguid: enrolChildGuid,
-        responces: responcesJs,
-        is_uploaded: 0,
-        is_edited: isLastIndex? 1: (widget.isEdit == false ? 2 : isEditExisting),
-        is_deleted: 0,
-        name: name,
-        created_by: username,
-        created_at: Validate().currentDateTime()
-      );
+          almguid: widget.almguid,
+          creche_id: Global.stringToInt(widget.creche_id),
+          // childenrolledguid: enrolChildGuid,
+          responces: responcesJs,
+          is_uploaded: 0,
+          is_edited:
+              isLastIndex ? 1 : (widget.isEdit == false ? 2 : isEditExisting),
+          is_deleted: 0,
+          name: name,
+          created_by: username,
+          created_at: Validate().currentDateTime());
       await CmcALMTabResponseHelper().inserts(itemALM);
       // await CmcALMTabResponseHelper().insertUpdate(widget.almguid, name as int?,
       //     responcesJs, username, Global.stringToInt(widget.creche_id));
@@ -681,7 +687,6 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
         _myMap['date_of_visit'] = Global.initCurrentDate();
       }
       _myMap['almguid'] = widget.almguid;
-
     }
   }
 }

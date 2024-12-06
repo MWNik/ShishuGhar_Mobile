@@ -26,6 +26,7 @@ class CrecheCareGivers extends StatefulWidget {
 }
 
 class _CrecheCareGiversState extends State<CrecheCareGivers> {
+  bool _isLoading = true;
   List<CareGiverResponceModel> caregiverData = [];
   List<Translation> translats = [];
   List<Translation> translatsLabel = [];
@@ -61,6 +62,9 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
         .callTranslateCreche()
         .then((value) => translats = value);
     fetchCrecheDataList();
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> fetchCrecheDataList() async {
@@ -75,241 +79,258 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: role == CustomText.crecheSupervisor.trim()
-          ? InkWell(
-              onTap: () async {
-                String hhGuid = '';
-                if (!Global.validString(hhGuid)) {
-                  hhGuid = Validate().randomGuid();
-                  print("line $hhGuid");
-                  var refStatus = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => CreheCareGiverTab(
-                              isEditable: true,
-                              CGGuid: hhGuid,
-                              crechedCode: widget.crechedCode,
-                              parentName: widget.parentName)));
-                  if (refStatus == 'itemRefresh') {
-                    await fetchCrecheDataList();
-                  }
-                }
-              },
-              child: Image.asset(
-                "assets/add_btn.png",
-                scale: 2.7,
-                color: Color(0xff5979AA),
-              ),
-            )
-          : SizedBox(),
-      body: Padding(
-        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-        child: Column(children: [
-          role == CustomText.crecheSupervisor
-              ? Align(
-                  alignment: Alignment.topRight,
-                  child: AnimatedRollingSwitch(
-                    title1:
-                        Global.returnTrLable(translats, CustomText.all, lng),
-                    title2: Global.returnTrLable(
-                        translats, CustomText.unsynched, lng),
-                    isOnlyUnsynched: isOnlyUnsynched ?? false,
-                    onChange: (value) async {
-                      setState(() {
-                        isOnlyUnsynched = value;
-                      });
+    if (_isLoading)
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    else {
+      return Scaffold(
+        floatingActionButton: role == CustomText.crecheSupervisor.trim()
+            ? InkWell(
+                onTap: () async {
+                  String hhGuid = '';
+                  if (!Global.validString(hhGuid)) {
+                    hhGuid = Validate().randomGuid();
+                    print("line $hhGuid");
+                    var refStatus = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                CreheCareGiverTab(
+                                    isEditable: true,
+                                    CGGuid: hhGuid,
+                                    crechedCode: widget.crechedCode,
+                                    parentName: widget.parentName)));
+                    if (refStatus == 'itemRefresh') {
                       await fetchCrecheDataList();
-                    },
-                  ),
-                )
-              : SizedBox(),
-          Expanded(
-            child: ListView.builder(
-                itemCount: caregiverData.length,
-                shrinkWrap: true,
-                physics: BouncingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () async {
-                      // Handle item tap here
-                      // print('Item $index tapped');
-                      // String? hhGuid = '';
-                      // if(Global.validString(caregiverData[index].CGGUID)){
-                      //   hhGuid=caregiverData[index].CGGUID!;
-                      // }else if (!Global.validString(hhGuid)) {
-                      //   hhGuid = Validate().randomGuid();
-                      //   print("line $hhGuid");
-                      // }
-                      var created_at = DateTime.parse(
-                          caregiverData[index].created_at.toString());
-                      var date = DateTime(
-                          created_at.year, created_at.month, created_at.day);
-                      bool isEditab = date
-                          .add(Duration(days: 8))
-                          .isAfter(DateTime.parse(Validate().currentDate()));
-
-                      var refStatus = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  CreheCareGiverTab(
-                                      isEditable: role ==
-                                              CustomText.crecheSupervisor.trim()
-                                          ? true
-                                          : false,
-                                      CGGuid: caregiverData[index].CGGUID!,
-                                      crechedCode: widget.crechedCode,
-                                      parentName:
-                                          caregiverData[index].parent!)));
-                      if (refStatus == 'itemRefresh') {
+                    }
+                  }
+                },
+                child: Image.asset(
+                  "assets/add_btn.png",
+                  scale: 2.7,
+                  color: Color(0xff5979AA),
+                ),
+              )
+            : SizedBox(),
+        body: Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+          child: Column(children: [
+            role == CustomText.crecheSupervisor
+                ? Align(
+                    alignment: Alignment.topRight,
+                    child: AnimatedRollingSwitch(
+                      title1: Global.returnTrLable(
+                          translatsLabel, CustomText.all, lng),
+                      title2: Global.returnTrLable(
+                          translatsLabel, CustomText.unsynched, lng),
+                      isOnlyUnsynched: isOnlyUnsynched ?? false,
+                      onChange: (value) async {
+                        setState(() {
+                          isOnlyUnsynched = value;
+                        });
                         await fetchCrecheDataList();
-                      }
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5.h),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff5A5A5A).withOpacity(
-                                    0.2), // Shadow color with opacity
-                                offset: Offset(
-                                    0, 3), // Horizontal and vertical offset
-                                blurRadius: 6, // Blur radius
-                                spreadRadius: 0, // Spread radius
-                              ),
-                            ],
-                            color: Colors.white,
-                            border: Border.all(color: Color(0xffE7F0FF)),
-                            borderRadius: BorderRadius.circular(10.r)),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10.w, vertical: 8.h),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // Container(
-                              //   decoration: BoxDecoration(
-                              //     shape: BoxShape.circle,
-                              //     border: Border.all(
-                              //       color: Colors.black, // Color of the stroke
-                              //       width: 2, // Width of the stroke
-                              //     ),
-                              //   ),
-                              //   child: ClipOval(
-                              //     child: Global.validString(
-                              //         Global.getItemValues(
-                              //             caregiverData[index].responces!,
-                              //             'caregiver_img'))
-                              //     //     ? Image.memory(
-                              //     //   base64Decode(Global.getItemValues(
-                              //     //       caregiverData[index].responces!,
-                              //     //       'caregiver_img')),
-                              //     //   width: 50,
-                              //     //   height: 50,
-                              //     //   fit: BoxFit.cover,
-                              //     // )
-                              //         ? Image.file(
-                              //         File(Global.getItemValues( caregiverData[index].responces!,'caregiver_img')),
-                              //       // base64Decode(Global.getItemValues(
-                              //       //     caregiverData[index].responces!,
-                              //       //     'caregiver_img')),
-                              //       width: 50,
-                              //       height: 50,
-                              //       fit: BoxFit.cover,
-                              //     )
-                              //         :
-                              //     Image.asset("assets/person.png",
-                              //         width: 50,
-                              //         height: 50,
-                              //         fit: BoxFit.cover),
-                              //   ),
-                              // ),
-                              // SizedBox(width: 10.w),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${Global.returnTrLable(translats, CustomText.Caregiver_Code, lng).trim()} : ',
-                                    style: Styles.black104,
-                                  ),
-                                  Text(
-                                    '${Global.returnTrLable(translats, CustomText.Caregiver_Name, lng).trim()} : ',
-                                    style: Styles.black104,
-                                    strutStyle: StrutStyle(height: 1.2),
-                                  ),
-                                  Text(
-                                    '${Global.returnTrLable(translats, CustomText.MobileNo, lng).trim()} : ',
-                                    style: Styles.black104,
-                                    strutStyle: StrutStyle(height: 1.2),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 10),
-                              SizedBox(
-                                height: 30.h,
-                                width: 2,
-                                child: VerticalDivider(
-                                  color: Color(0xffE6E6E6),
+                      },
+                    ),
+                  )
+                : SizedBox(),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: caregiverData.length,
+                  shrinkWrap: true,
+                  physics: BouncingScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () async {
+                        // Handle item tap here
+                        // print('Item $index tapped');
+                        // String? hhGuid = '';
+                        // if(Global.validString(caregiverData[index].CGGUID)){
+                        //   hhGuid=caregiverData[index].CGGUID!;
+                        // }else if (!Global.validString(hhGuid)) {
+                        //   hhGuid = Validate().randomGuid();
+                        //   print("line $hhGuid");
+                        // }
+                        var created_at = DateTime.parse(
+                            caregiverData[index].created_at.toString());
+                        var date = DateTime(
+                            created_at.year, created_at.month, created_at.day);
+                        bool isEditab = date
+                            .add(Duration(days: 8))
+                            .isAfter(DateTime.parse(Validate().currentDate()));
+                        var backDate =
+                            await Validate().readString(Validate.date);
+
+                        var applicableDate =
+                            Validate().stringToDate(backDate ?? "2024-12-31");
+                        var now = DateTime.parse(Validate().currentDate());
+
+                        var refStatus = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    CreheCareGiverTab(
+                                        isEditable: role ==
+                                                CustomText.crecheSupervisor
+                                                    .trim()
+                                            ? now.isBefore(applicableDate)
+                                                ? true
+                                                : isEditab
+                                            : false,
+                                        CGGuid: caregiverData[index].CGGUID!,
+                                        crechedCode: widget.crechedCode,
+                                        parentName:
+                                            caregiverData[index].parent!)));
+                        if (refStatus == 'itemRefresh') {
+                          await fetchCrecheDataList();
+                        }
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5.h),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xff5A5A5A).withOpacity(
+                                      0.2), // Shadow color with opacity
+                                  offset: Offset(
+                                      0, 3), // Horizontal and vertical offset
+                                  blurRadius: 6, // Blur radius
+                                  spreadRadius: 0, // Spread radius
                                 ),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
+                              ],
+                              color: Colors.white,
+                              border: Border.all(color: Color(0xffE7F0FF)),
+                              borderRadius: BorderRadius.circular(10.r)),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10.w, vertical: 8.h),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                // Container(
+                                //   decoration: BoxDecoration(
+                                //     shape: BoxShape.circle,
+                                //     border: Border.all(
+                                //       color: Colors.black, // Color of the stroke
+                                //       width: 2, // Width of the stroke
+                                //     ),
+                                //   ),
+                                //   child: ClipOval(
+                                //     child: Global.validString(
+                                //         Global.getItemValues(
+                                //             caregiverData[index].responces!,
+                                //             'caregiver_img'))
+                                //     //     ? Image.memory(
+                                //     //   base64Decode(Global.getItemValues(
+                                //     //       caregiverData[index].responces!,
+                                //     //       'caregiver_img')),
+                                //     //   width: 50,
+                                //     //   height: 50,
+                                //     //   fit: BoxFit.cover,
+                                //     // )
+                                //         ? Image.file(
+                                //         File(Global.getItemValues( caregiverData[index].responces!,'caregiver_img')),
+                                //       // base64Decode(Global.getItemValues(
+                                //       //     caregiverData[index].responces!,
+                                //       //     'caregiver_img')),
+                                //       width: 50,
+                                //       height: 50,
+                                //       fit: BoxFit.cover,
+                                //     )
+                                //         :
+                                //     Image.asset("assets/person.png",
+                                //         width: 50,
+                                //         height: 50,
+                                //         fit: BoxFit.cover),
+                                //   ),
+                                // ),
+                                // SizedBox(width: 10.w),
+                                Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      Global.getItemValues(
-                                          caregiverData[index].responces!,
-                                          'caregiver_code'),
-                                      style: Styles.cardBlue10,
-                                      overflow: TextOverflow.ellipsis,
+                                      '${Global.returnTrLable(translats, CustomText.Caregiver_Code, lng).trim()} : ',
+                                      style: Styles.black104,
                                     ),
                                     Text(
-                                      Global.getItemValues(
-                                          caregiverData[index].responces!,
-                                          'caregiver_name'),
-                                      style: Styles.cardBlue10,
+                                      '${Global.returnTrLable(translats, CustomText.Caregiver_Name, lng).trim()} : ',
+                                      style: Styles.black104,
                                       strutStyle: StrutStyle(height: 1.2),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
-                                      Global.getItemValues(
-                                          caregiverData[index].responces!,
-                                          'mobile_no'),
-                                      style: Styles.cardBlue10,
+                                      '${Global.returnTrLable(translats, CustomText.MobileNo, lng).trim()} : ',
+                                      style: Styles.black104,
                                       strutStyle: StrutStyle(height: 1.2),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
-                              ),
-                              (caregiverData[index].is_edited == 0 &&
-                                      caregiverData[index].is_uploaded == 1)
-                                  ? Image.asset(
-                                      "assets/sync.png",
-                                      scale: 1.5,
-                                    )
-                                  : Image.asset(
-                                      "assets/sync_gray.png",
-                                      scale: 1.5,
-                                    )
-                            ],
+                                SizedBox(width: 10),
+                                SizedBox(
+                                  height: 30.h,
+                                  width: 2,
+                                  child: VerticalDivider(
+                                    color: Color(0xffE6E6E6),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        Global.getItemValues(
+                                            caregiverData[index].responces!,
+                                            'caregiver_code'),
+                                        style: Styles.cardBlue10,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        Global.getItemValues(
+                                            caregiverData[index].responces!,
+                                            'caregiver_name'),
+                                        style: Styles.cardBlue10,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        Global.getItemValues(
+                                            caregiverData[index].responces!,
+                                            'mobile_no'),
+                                        style: Styles.cardBlue10,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                (caregiverData[index].is_edited == 0 &&
+                                        caregiverData[index].is_uploaded == 1)
+                                    ? Image.asset(
+                                        "assets/sync.png",
+                                        scale: 1.5,
+                                      )
+                                    : Image.asset(
+                                        "assets/sync_gray.png",
+                                        scale: 1.5,
+                                      )
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                }),
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-        ]),
-      ),
-    );
+                    );
+                  }),
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+          ]),
+        ),
+      );
+    }
   }
 }

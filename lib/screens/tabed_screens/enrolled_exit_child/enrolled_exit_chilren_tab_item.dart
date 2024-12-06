@@ -26,7 +26,14 @@ import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/house_hold_children_helper.dart';
 import '../../../database/helper/enrolled_children/enrolled_children_field_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
+import '../../../database/helper/height_weight_boys_girls_helper.dart';
 import '../../../database/helper/image_file_tab_responce_helper.dart';
+import '../../../model/apimodel/tabHeight_for_age_Boys_model.dart';
+import '../../../model/apimodel/tabHeight_for_age_Girls_model.dart';
+import '../../../model/apimodel/tabWeight_for_age_Boys _model.dart';
+import '../../../model/apimodel/tabWeight_for_age_Girls _model.dart';
+import '../../../model/apimodel/tabWeight_to_Height_Boys_model.dart';
+import '../../../model/apimodel/tabWeight_to_Height_Girls_model.dart';
 import '../../../model/databasemodel/tab_image_file_model.dart';
 import '../../../utils/globle_method.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
@@ -108,6 +115,13 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
   Map<String, FocusNode> _focusNode = {};
   final ScrollController _scrollController = ScrollController();
 
+  List<TabHeightforageBoysModel> tabHeightforageBoys = [];
+  List<TabHeightforageGirlsModel> tHeightforageGirls = [];
+  List<TabWeightforageBoysModel> tabWeightforageBoys = [];
+  List<TabWeightforageGirlsModel> tabWeightforageGirls = [];
+  List<TabWeightToHeightBoysModel> tabWeightToHeightBoys = [];
+  List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls = [];
+
   @override
   void initState() {
     super.initState();
@@ -139,6 +153,11 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
       CustomText.dataSaveSuc,
       CustomText.childUpdatedSucces,
       CustomText.ChildEnrollsuccess,
+      CustomText.Save,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -150,7 +169,20 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
+
+    tabHeightforageBoys =
+        await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
+    tHeightforageGirls =
+        await HeightWeightBoysGirlsHelper().callHeightForAgeGirls();
+    tabWeightforageBoys =
+        await HeightWeightBoysGirlsHelper().callWeightforAgeBoys();
+    tabWeightforageGirls =
+        await HeightWeightBoysGirlsHelper().callWeightforAgeGirls();
+    tabWeightToHeightBoys =
+        await HeightWeightBoysGirlsHelper().callWeightToHeightBoys();
+    tabWeightToHeightGirls =
+        await HeightWeightBoysGirlsHelper().callWeightToHeightGirls();
 
     if (widget.isNew == 1) {
       isRecordNew = false;
@@ -450,8 +482,9 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           focusNode: _focusNode[quesItem.fieldname],
-
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -466,7 +499,6 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           isVisible:
               DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
-          
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
             else
@@ -565,6 +597,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
@@ -650,9 +683,12 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           initialValue: myMap[quesItem.fieldname],
           labelControlls: translats,
           lng: lng,
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.fieldname == 'measurement_taken'
+              ? 1
+              : quesItem.reqd == 1
+                  ? quesItem.reqd
+                  : DependingLogic()
+                      .dependeOnMendotory(logics, myMap, quesItem),
           readable: widget.isEditable == true
               ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
               : true,
@@ -739,6 +775,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         );
       case 'Float':
         return DynamicCustomTextFieldFloat(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -929,9 +966,55 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           responces[element.fieldname!] = myMap[element.fieldname];
         }
       });
+      if (Global.stringToInt(myMap['measurement_taken'].toString()) > 0) {
+        Map<String, dynamic> childResponce = {
+          'weight': myMap['weight'],
+          'height': myMap['height'],
+          'age_months': Validate()
+              .calculateAgeInDays(Validate().stringToDate(myMap['child_dob'])),
+          'measurement_equipment': myMap['measurement_equipment'],
+        };
+        var weightForAge = DependingLogic().AutoColorCreateByHeightWight(
+            tabHeightforageBoys,
+            tHeightforageGirls,
+            tabWeightforageBoys,
+            tabWeightforageGirls,
+            tabWeightToHeightBoys,
+            tabWeightToHeightGirls,
+            'weight_for_age',
+            myMap['gender_id'],
+            childResponce);
+        var heightForAge = DependingLogic().AutoColorCreateByHeightWight(
+            tabHeightforageBoys,
+            tHeightforageGirls,
+            tabWeightforageBoys,
+            tabWeightforageGirls,
+            tabWeightToHeightBoys,
+            tabWeightToHeightGirls,
+            'height_for_age',
+            myMap['gender_id'],
+            childResponce);
+
+        var weightForHeight = DependingLogic().AutoColorCreateByHeightWight(
+            tabHeightforageBoys,
+            tHeightforageGirls,
+            tabWeightforageBoys,
+            tabWeightforageGirls,
+            tabWeightToHeightBoys,
+            tabWeightToHeightGirls,
+            'weight_for_height',
+            myMap['gender_id'],
+            childResponce);
+
+        myMap['weight_for_age'] = weightForAge;
+        myMap['height_for_age'] = heightForAge;
+        myMap['weight_for_height'] = weightForHeight;
+      }
+
       var responcesJs = jsonEncode(myMap);
       var name = myMap['name'];
       EnrolledExitChilrenTab.childName = myMap['child_name'];
+
       print(responcesJs);
       var childItem = EnrolledExitChildResponceModel(
         name: Global.stringToIntNull(name.toString()),
@@ -955,19 +1038,8 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         is_deleted: 0,
         is_uploaded: 0,
       );
+
       await EnrolledExitChilrenResponceHelper().inserts(childItem);
-      // await EnrolledExitChilrenResponceHelper().insertUpdate(
-      //     widget.EnrolledChilGUID,
-      //     widget.cHHGuid,
-      //     widget.HHname,
-      //     Global.stringToIntNull(name.toString()),
-      //     Global.stringToInt(myMap['creche_id']),
-      //     responcesJs,
-      //     myMap['appcreated_on'],
-      //     myMap['appcreated_by'],
-      //     myMap['app_updated_on'],
-      //     myMap['app_updated_by'],
-      //     myMap['date_of_exit']);
       if (childDOB != Global.getItemValues(responcesJs, 'child_dob') ||
           childName != Global.getItemValues(responcesJs, 'child_name') ||
           genderId != Global.getItemValues(responcesJs, 'gender_id')) {
@@ -997,7 +1069,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     if (items != null) {
       for (int i = 0; i < items.length; i++) {
         var element = items[i];
-        if (element.reqd == 1) {
+        if (element.reqd == 1 || element.fieldname == 'measurement_taken') {
           var valuees = myMap[element.fieldname];
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
@@ -1009,8 +1081,8 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate()
               .singleButtonPopup(validationMsg!, CustomText.ok, false, context);

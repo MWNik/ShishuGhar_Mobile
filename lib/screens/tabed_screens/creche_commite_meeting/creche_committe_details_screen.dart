@@ -90,7 +90,13 @@ class _CrecheCommettieDetailsScreenState
       CustomText.Next,
       CustomText.back,
       CustomText.Submit,
-      CustomText.ccDetails
+      CustomText.ccDetails,
+      CustomText.SelectOneoption,
+      CustomText.Camera,
+      CustomText.Gallery,
+      CustomText.typehere,
+      CustomText.select_here,
+      CustomText.plsFilManForm
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -339,6 +345,7 @@ class _CrecheCommettieDetailsScreenState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng!),
           focusNode: _foocusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
@@ -400,6 +407,8 @@ class _CrecheCommettieDetailsScreenState
         );
       case 'Attach':
         return CustomImageDynamicReplica(
+          translats: translats,
+          lng: lng!,
           isDelitable: widget.isImageUpdate ? false : true,
           docType: CustomText.creche_committee_meeting,
           child_guid: widget.ccGuid,
@@ -546,8 +555,8 @@ class _CrecheCommettieDetailsScreenState
             }
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(translats, validationMsg, lng!),

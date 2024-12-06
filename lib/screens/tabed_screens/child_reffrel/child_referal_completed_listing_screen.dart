@@ -51,6 +51,8 @@ class _ChildReferralListingScreenState
   List<OptionsModel> creches = [];
   String? selectedCreche;
   bool isOnlyUnsyched = false;
+  var applicableDate = Validate().stringToDate("2024-12-31");
+  var now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -64,6 +66,8 @@ class _ChildReferralListingScreenState
     if (lngtr != null) {
       lng = lngtr;
     }
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -74,7 +78,14 @@ class _ChildReferralListingScreenState
       CustomText.Search,
       CustomText.Village,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.Filter,
+      CustomText.clear,
+      CustomText.Creches,
+      CustomText.ChildId,
+      CustomText.Creche_Name,
+      CustomText.visitDate,
+      CustomText.DischangeDate
     ];
 
     await TranslationDataHelper()
@@ -164,7 +175,8 @@ class _ChildReferralListingScreenState
                             width: 10.w,
                           ),
                           Text(
-                            CustomText.Filter,
+                            Global.returnTrLable(
+                                translats, CustomText.Filter, lng),
                             style: Styles.labelcontrollerfont,
                           ),
                           Spacer(),
@@ -321,8 +333,9 @@ class _ChildReferralListingScreenState
                                   'creche_id'));
                           var child_referral_guid =
                               filteredReferral[index]['child_referral_guid'];
-                          var backDate =
-                              DateTime.parse(Validate().currentDate())
+                          var backDate = now.isBefore(applicableDate)
+                              ? DateTime(1992)
+                              : DateTime.parse(Validate().currentDate())
                                   .subtract(Duration(days: 7));
                           if (backDate.isAfter(DateTime.parse(
                               filteredReferral[index]['date_of_referral']))) {
@@ -350,32 +363,32 @@ class _ChildReferralListingScreenState
                           bool isEditable = date.add(Duration(days: 8)).isAfter(
                               DateTime.parse(Validate().currentDate()));
 
-                          var refStatus = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) => ChildReferralTabScreen(
-                                      tabTitle: widget.tabTitle,
-                                      GrowthMonitoringGUID:
-                                          filteredReferral[index]['cgmguid'],
-                                      enrolChildGuid: filteredReferral[index]
-                                          ["childenrolledguid"],
-                                      creche_id: creche_id,
-                                      ChildDOB: Global.getItemValues(
-                                          filteredReferral[index]
-                                              ['enrolledResponce'],
-                                          'child_dob'),
-                                      enrollDate: Global.getItemValues(
-                                          filteredReferral[index]
-                                              ['enrolledResponce'],
-                                          'date_of_enrollment'),
-                                      child_id: childId,
-                                      child_referral_guid: child_referral_guid,
-                                      childName: childName,
-                                      minDate: minDate!,
-                                      isEditable: isEditable,
-                                      scheduleDate: filteredReferral[index]
-                                          ['date_of_referral'],
-                                      childId: childIdGen,
-                                      isDischarge: Global.validString(Global.getItemValues(filteredReferral[index]['responces'], 'discharge_date')))));
+                          var refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                              builder: (BuildContext context) => ChildReferralTabScreen(
+                                  tabTitle: widget.tabTitle,
+                                  GrowthMonitoringGUID: filteredReferral[index]
+                                      ['cgmguid'],
+                                  enrolChildGuid: filteredReferral[index]
+                                      ["childenrolledguid"],
+                                  creche_id: creche_id,
+                                  ChildDOB: Global.getItemValues(
+                                      filteredReferral[index]
+                                          ['enrolledResponce'],
+                                      'child_dob'),
+                                  enrollDate: Global.getItemValues(
+                                      filteredReferral[index]
+                                          ['enrolledResponce'],
+                                      'date_of_enrollment'),
+                                  child_id: childId,
+                                  child_referral_guid: child_referral_guid,
+                                  childName: childName,
+                                  minDate: minDate!,
+                                  isEditable: now.isBefore(applicableDate)
+                                      ? true
+                                      : isEditable,
+                                  scheduleDate: filteredReferral[index]['date_of_referral'],
+                                  childId: childIdGen,
+                                  isDischarge: Global.validString(Global.getItemValues(filteredReferral[index]['responces'], 'discharge_date')))));
 
                           if (refStatus == 'itemRefresh') {
                             await fetchCompletedReffral();

@@ -1,10 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 import 'package:sqflite/sqflite.dart';
-
 
 import '../../../model/dynamic_screen_model/child_referral_response_model.dart';
 import '../../database_helper.dart';
@@ -50,7 +50,8 @@ class ChildReferralTabResponseHelper {
 
   Future<List<ChildReferralTabResponceModel>> childReffralChildByCreche(
       String? crecheIdName) async {
-    var query = 'Select * from  child_referral_responce  where creche_id=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
+    var query =
+        'Select * from  child_referral_responce  where creche_id=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
 
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.rawQuery(query, [crecheIdName]);
@@ -64,10 +65,11 @@ class ChildReferralTabResponseHelper {
   }
 
   Future<List<ChildReferralTabResponceModel>> callAllReffrals() async {
-    var query = 'Select * from  child_referral_responce ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
+    var query =
+        'Select * from  child_referral_responce ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
 
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query);
+        await DatabaseHelper.database!.rawQuery(query);
 
     List<ChildReferralTabResponceModel> items = [];
     result.forEach((itemMap) {
@@ -77,11 +79,13 @@ class ChildReferralTabResponseHelper {
     return items;
   }
 
-  Future<List<ChildReferralTabResponceModel>> callAllReffralsWithoutExit() async {
-    var query = 'Select efr.* from  child_referral_responce efr left join enrollred_exit_child_responce as excr on efr.childenrolledguid=excr.ChildEnrollGUID where excr.date_of_exit IS NULL ORDER BY CASE  WHEN efr.update_at IS NOT NULL AND length(RTRIM(LTRIM(efr.update_at))) > 0 THEN efr.update_at ELSE efr.created_at END DESC';
+  Future<List<ChildReferralTabResponceModel>>
+      callAllReffralsWithoutExit() async {
+    var query =
+        'Select efr.* from  child_referral_responce efr left join enrollred_exit_child_responce as excr on efr.childenrolledguid=excr.ChildEnrollGUID where excr.date_of_exit IS NULL ORDER BY CASE  WHEN efr.update_at IS NOT NULL AND length(RTRIM(LTRIM(efr.update_at))) > 0 THEN efr.update_at ELSE efr.created_at END DESC';
 
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query);
+        await DatabaseHelper.database!.rawQuery(query);
 
     List<ChildReferralTabResponceModel> items = [];
     result.forEach((itemMap) {
@@ -91,34 +95,33 @@ class ChildReferralTabResponseHelper {
     return items;
   }
 
-    Future<List<Map<String, dynamic>>> callChildReffrals() async {
-    var query = 'select efr.*,ecr.responces as enrolledResponce from child_referral_responce  efr left join enrollred_exit_child_responce as ecr on efr.childenrolledguid=ecr.ChildEnrollGUID where ecr.date_of_exit is null ORDER BY CASE  WHEN efr.update_at IS NOT NULL AND length(RTRIM(LTRIM(efr.update_at))) > 0 THEN efr.update_at ELSE efr.created_at END DESC';
+  Future<List<Map<String, dynamic>>> callChildReffrals() async {
+    var query =
+        'select efr.*,ecr.responces as enrolledResponce from child_referral_responce  efr left join enrollred_exit_child_responce as ecr on efr.childenrolledguid=ecr.ChildEnrollGUID where ecr.date_of_exit is null ORDER BY CASE  WHEN efr.update_at IS NOT NULL AND length(RTRIM(LTRIM(efr.update_at))) > 0 THEN efr.update_at ELSE efr.created_at END DESC';
 
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query);
-
+        await DatabaseHelper.database!.rawQuery(query);
 
     return result;
   }
 
   Future<List<Map<String, dynamic>>> callChildReffralsForSchudle() async {
-    var query = 'select efr.*,ecr.responces as enrolledResponce from child_referral_responce  efr left join enrollred_exit_child_responce as ecr on efr.childenrolledguid=ecr.ChildEnrollGUID where efr.visit_count>0 ORDER BY CASE  WHEN efr.update_at IS NOT NULL AND length(RTRIM(LTRIM(efr.update_at))) > 0 THEN efr.update_at ELSE efr.created_at END DESC';
+    var query =
+        'select efr.*,ecr.responces as enrolledResponce from child_referral_responce  efr left join enrollred_exit_child_responce as ecr on efr.childenrolledguid=ecr.ChildEnrollGUID where efr.visit_count>0 ORDER BY CASE  WHEN efr.update_at IS NOT NULL AND length(RTRIM(LTRIM(efr.update_at))) > 0 THEN efr.update_at ELSE efr.created_at END DESC';
 
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query);
-
+        await DatabaseHelper.database!.rawQuery(query);
 
     return result;
   }
 
-
-
-  Future<List<Map<String, dynamic>>> callChildReffralsByEnrolledGUID(String childenrolledguid) async {
-    var query = 'select efr.*,ecr.responces as enrolledResponce from child_referral_responce  efr left join enrollred_exit_child_responce as ecr on efr.childenrolledguid=ecr.ChildEnrollGUID where childenrolledguid=? ORDER BY CASE  WHEN efr.update_at IS NOT NULL AND length(RTRIM(LTRIM(efr.update_at))) > 0 THEN efr.update_at ELSE efr.created_at END DESC';
+  Future<List<Map<String, dynamic>>> callChildReffralsByEnrolledGUID(
+      String childenrolledguid) async {
+    var query =
+        'select efr.*,ecr.responces as enrolledResponce from child_referral_responce  efr left join enrollred_exit_child_responce as ecr on efr.childenrolledguid=ecr.ChildEnrollGUID where childenrolledguid=? ORDER BY CASE  WHEN efr.update_at IS NOT NULL AND length(RTRIM(LTRIM(efr.update_at))) > 0 THEN efr.update_at ELSE efr.created_at END DESC';
 
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query,[childenrolledguid]);
-
+        await DatabaseHelper.database!.rawQuery(query, [childenrolledguid]);
 
     return result;
   }
@@ -145,21 +148,31 @@ class ChildReferralTabResponseHelper {
         [cename, ceGuid]);
   }
 
-  Future<void> updateVisitFollowUps(String itemResponce,String child_referral_guid,visitCount) async {
+  Future<void> updateVisitFollowUps(
+      String itemResponce, String child_referral_guid, visitCount) async {
     await DatabaseHelper.database!.rawQuery(
         'UPDATE child_referral_responce SET responces = ?  ,  visit_count=? , is_edited=1 where child_referral_guid=?',
-        [itemResponce,visitCount, child_referral_guid]);
+        [itemResponce, visitCount, child_referral_guid]);
   }
 
-  Future<void> insertUpdate(String child_referral_guid, String enrolChildGuid,String date_of_referral,
-      int? name,int? crecheId, int? visitCount, String? schedule_date,String responces, String userId, String cgmguid) async {
+  Future<void> insertUpdate(
+      String child_referral_guid,
+      String enrolChildGuid,
+      String date_of_referral,
+      int? name,
+      int? crecheId,
+      int? visitCount,
+      String? schedule_date,
+      String responces,
+      String userId,
+      String cgmguid) async {
     var item = ChildReferralTabResponceModel(
         child_referral_guid: child_referral_guid,
         childenrolledguid: enrolChildGuid,
         cgmguid: cgmguid,
         date_of_referral: date_of_referral,
-         creche_id: crecheId,
-         responces: responces,
+        creche_id: crecheId,
+        responces: responces,
         is_uploaded: 0,
         is_edited: 1,
         is_deleted: 0,
@@ -174,52 +187,146 @@ class ChildReferralTabResponseHelper {
   }
 
   Future<void> childDownloadReferralData(Map<String, dynamic> item) async {
-    List<Map<String, dynamic>> growth =
-        List<Map<String, dynamic>>.from(item['Data']);
-    print(growth);
-    growth.forEach((element) async {
-      var growthData = element['Child Referral'];
+    try {
+      List<Map<String, dynamic>> growth =
+          List<Map<String, dynamic>>.from(item['Data']);
 
+      // List to collect all ChildReferralTabResponceModel items
+      List<ChildReferralTabResponceModel> itemsList = [];
 
-      var items = ChildReferralTabResponceModel(
-        child_referral_guid: growthData['child_referral_guid'],
-        childenrolledguid: growthData['childenrolledguid'],
-        cgmguid: growthData['cgmguid'],
-        name: growthData['name'],
-        visit_count: growthData['visit_count'],
-        date_of_referral: growthData['date_of_referral'],
-        schedule_date: growthData['schedule_date'],
-        is_uploaded: 1,
-        is_edited: 0,
-        is_deleted: 0,
-        creche_id: Global.stringToInt(growthData['creche_id'].toString()),
-        update_at: growthData['app_updated_on'],
-        updated_by: growthData['app_updated_by'],
-        created_at: growthData['appcreated_on'],
-        created_by: growthData['appcreated_by'],
-        responces: await jsonEncode(Validate().keyesFromResponce(growthData)),
-      );
-      await inserts(items);
-      if(Global.stringToInt(growthData['visit_count'].toString())>0){
-        await callCheckNextFollowUp(growthData['child_referral_guid'],
-            growthData['childenrolledguid'],
-            Global.stringToInt(growthData['visit_count'].toString()),
-            Global.stringToInt(growthData['creche_id'].toString()),
-            growthData['appcreated_by'],growthData['child_status'],growthData['discharge_date'],growthData['visit_date']);
+      // Process each element and add to the items list
+      for (var element in growth) {
+        var growthData = element['Child Referral'];
+
+        var items = ChildReferralTabResponceModel(
+          child_referral_guid: growthData['child_referral_guid'],
+          childenrolledguid: growthData['childenrolledguid'],
+          cgmguid: growthData['cgmguid'],
+          name: growthData['name'],
+          visit_count: growthData['visit_count'],
+          date_of_referral: growthData['date_of_referral'],
+          schedule_date: growthData['schedule_date'],
+          is_uploaded: 1,
+          is_edited: 0,
+          is_deleted: 0,
+          creche_id: Global.stringToInt(growthData['creche_id'].toString()),
+          update_at: growthData['app_updated_on'],
+          updated_by: growthData['app_updated_by'],
+          created_at: growthData['appcreated_on'],
+          created_by: growthData['appcreated_by'],
+          responces: await jsonEncode(Validate().keyesFromResponce(growthData)),
+        );
+
+        itemsList.add(items);
       }
 
+      // If the list has more than 500 items, split it into batches
+      if (itemsList.length > 500) {
+        for (int i = 0; i < itemsList.length; i += 500) {
+          var batchItems = itemsList.sublist(
+              i, (i + 500) > itemsList.length ? itemsList.length : (i + 500));
+
+          // Insert the batch
+          await _insertBatch(batchItems);
+        }
+      } else {
+        // If the list has 500 or fewer items, insert them all at once
+        await _insertBatch(itemsList);
+      }
+
+      // After all items are inserted, handle the follow-up logic
+      for (var growthData in growth) {
+        var referralData = growthData['Child Referral'];
+        if (Global.stringToInt(referralData['visit_count'].toString()) > 0) {
+          await callCheckNextFollowUp(
+            referralData['child_referral_guid'],
+            referralData['childenrolledguid'],
+            Global.stringToInt(referralData['visit_count'].toString()),
+            Global.stringToInt(referralData['creche_id'].toString()),
+            referralData['appcreated_by'],
+            referralData['child_status'],
+            referralData['discharge_date'],
+            referralData['visit_date'],
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("childDownloadReferralData() : $e");
+    }
+  }
+
+// Helper function to insert a batch of items
+  Future<void> _insertBatch(
+      List<ChildReferralTabResponceModel> batchItems) async {
+    await DatabaseHelper.database!.transaction((txn) async {
+      var batch = txn.batch();
+
+      for (var item in batchItems) {
+        batch.insert(
+          'child_referral_responce', // Change the table name to your actual table name
+          item.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      // Commit the batch insert
+      await batch.commit(noResult: true);
     });
   }
-  Future callCheckNextFollowUp(String child_referral_guid,String enrolChildGuid,
-      int visit_count,int creche_id,String userName,String child_status,
-      String? discharge_date,String? visit_date) async {
+
+  // Future<void> childDownloadReferralData(Map<String, dynamic> item) async {
+  //   List<Map<String, dynamic>> growth =
+  //       List<Map<String, dynamic>>.from(item['Data']);
+  //   print(growth);
+  //   growth.forEach((element) async {
+  //     var growthData = element['Child Referral'];
+
+  //     var items = ChildReferralTabResponceModel(
+  //       child_referral_guid: growthData['child_referral_guid'],
+  //       childenrolledguid: growthData['childenrolledguid'],
+  //       cgmguid: growthData['cgmguid'],
+  //       name: growthData['name'],
+  //       visit_count: growthData['visit_count'],
+  //       date_of_referral: growthData['date_of_referral'],
+  //       schedule_date: growthData['schedule_date'],
+  //       is_uploaded: 1,
+  //       is_edited: 0,
+  //       is_deleted: 0,
+  //       creche_id: Global.stringToInt(growthData['creche_id'].toString()),
+  //       update_at: growthData['app_updated_on'],
+  //       updated_by: growthData['app_updated_by'],
+  //       created_at: growthData['appcreated_on'],
+  //       created_by: growthData['appcreated_by'],
+  //       responces: await jsonEncode(Validate().keyesFromResponce(growthData)),
+  //     );
+  //     await inserts(items);
+  //     if(Global.stringToInt(growthData['visit_count'].toString())>0){
+  //       await callCheckNextFollowUp(growthData['child_referral_guid'],
+  //           growthData['childenrolledguid'],
+  //           Global.stringToInt(growthData['visit_count'].toString()),
+  //           Global.stringToInt(growthData['creche_id'].toString()),
+  //           growthData['appcreated_by'],growthData['child_status'],growthData['discharge_date'],growthData['visit_date']);
+  //     }
+
+  //   });
+  // }
+
+  Future callCheckNextFollowUp(
+      String child_referral_guid,
+      String enrolChildGuid,
+      int visit_count,
+      int creche_id,
+      String userName,
+      String child_status,
+      String? discharge_date,
+      String? visit_date) async {
     var folloUps = await ChildFollowUpTabResponseHelper()
         .checkReffralCounts(enrolChildGuid, child_referral_guid);
     var alredyGenrated = await ChildFollowUpTabResponseHelper()
         .getScduledEnrollGuid(enrolChildGuid, child_referral_guid);
 
-    if (alredyGenrated.length==0) {
-      if(folloUps.length==0){
+    if (alredyGenrated.length == 0) {
+      if (folloUps.length == 0) {
         DateTime? folloupDate;
         if (!(child_status == '1' || child_status == '2') &&
             !Global.validString(discharge_date)) {
@@ -227,11 +334,10 @@ class ChildReferralTabResponseHelper {
         } else if (Global.validString(discharge_date)) {
           folloupDate = Validate().stringToDate(discharge_date!);
         }
-        if(folloupDate!=null){
+        if (folloupDate != null) {
           if (visit_count == 3) {
             folloupDate = folloupDate.add(Duration(days: 7));
-          }
-          else {
+          } else {
             folloupDate = folloupDate.add(Duration(days: 15));
           }
           await ChildFollowUpTabResponseHelper().autoCreateFollowRecord(
@@ -241,15 +347,12 @@ class ChildReferralTabResponseHelper {
               creche_id,
               userName);
         }
-
-
-      }else if (visit_count != folloUps.length) {
+      } else if (visit_count != folloUps.length) {
         DateTime? folloupDate;
         if (visit_count == 3) {
           folloupDate = DateTime.parse(folloUps.last.schedule_date!)
               .add(Duration(days: 7));
-        }
-        else {
+        } else {
           folloupDate = DateTime.parse(folloUps.last.schedule_date!)
               .add(Duration(days: 15));
         }
@@ -263,10 +366,10 @@ class ChildReferralTabResponseHelper {
     }
   }
 
-  Future<List<Map<String, dynamic>>>
-  getChildlistingforFollowUp() async {
+  Future<List<Map<String, dynamic>>> getChildlistingforFollowUp() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'select efr.*,ecr.responces as enrolledResponce from child_referral_responce  efr left join enrollred_exit_child_responce as ecr on efr.childenrolledguid=ecr.ChildEnrollGUID ORDER BY CASE  WHEN efr.update_at IS NOT NULL AND length(RTRIM(LTRIM(efr.update_at))) > 0 THEN efr.update_at ELSE efr.created_at END DESC');
+
     ///avaliblae disscharge date
     // result=
     //     result.where((element) => Global.validString(
@@ -274,19 +377,18 @@ class ChildReferralTabResponseHelper {
     //         .toList();
 
     return result;
+  }
 
-     }
-
-  Future<List<ChildReferralTabResponceModel>>
-                callReffralByGUID(String childenrolledguid) async {
+  Future<List<ChildReferralTabResponceModel>> callReffralByGUID(
+      String childenrolledguid) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-        'select * from child_referral_responce where childenrolledguid=?',[childenrolledguid]);
+        'select * from child_referral_responce where childenrolledguid=?',
+        [childenrolledguid]);
     List<ChildReferralTabResponceModel> items = [];
 
     result.forEach((itemMap) {
       items.add(ChildReferralTabResponceModel.fromJson(itemMap));
     });
     return items;
-
   }
 }

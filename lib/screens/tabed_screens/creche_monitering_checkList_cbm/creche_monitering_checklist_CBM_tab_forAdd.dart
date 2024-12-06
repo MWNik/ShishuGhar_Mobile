@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/screens/tabed_screens/creche_Monitering_checkList_CBM/creche_Monitering_checkList__CBM_TAbItem_screen.dart';
 
 import '../../../../custom_widget/custom_text.dart';
@@ -55,6 +56,9 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
   String lng = "en";
   List<String> unpicableDates = [];
   bool isView = false;
+  double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
 
   @override
   void initState() {
@@ -71,7 +75,10 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
       CustomText.CrecheCaregiver,
       CustomText.Next,
       CustomText.back,
-      CustomText.VisitNote
+      CustomText.VisitNote,
+      CustomText.shouldExit,
+      CustomText.exit,
+      CustomText.Cancel
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -82,12 +89,16 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
 
   @override
   Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
+
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
     } else {
       return WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context, 'itemRefresh');
+            widget.isViewScreen
+                ? Navigator.pop(context, CustomText.itemRefresh)
+                : Validate().showExitDialog(context, translatsLabel, lng);
             return false;
           },
           child: Scaffold(
@@ -98,7 +109,10 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
                 padding: EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pop(context, 'itemRefresh');
+                    widget.isViewScreen
+                        ? Navigator.pop(context, CustomText.itemRefresh)
+                        : Validate()
+                            .showExitDialog(context, translatsLabel, lng);
                   },
                   child: Icon(
                     Icons.arrow_back_ios_sharp,
@@ -124,12 +138,15 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
               bottom: _isLoading
                   ? null
                   : TabBar(
-                      indicatorColor: Colors.white,
+                      indicatorColor: Color(0xffF26BA3),
                       unselectedLabelColor: Colors.grey.shade300,
                       unselectedLabelStyle: Styles.white124P,
                       labelColor: Colors.white,
                       controller: _tabController,
-                      isScrollable: true,
+                      isScrollable: tabIsScrollable,
+                      labelPadding: EdgeInsets.zero,
+                      // tabAlignment: TabAlignment.start,
+                      tabAlignment: tabIsScrollable ? TabAlignment.start : null,
                       tabs: tabController(),
                       onTap: (index) {
                         if (_tabController.indexIsChanging) {
@@ -158,15 +175,22 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
   List<Widget> tabController() {
     List<Widget> tabItem = [];
     tabBreakItems.forEach((element) {
-      bool isSelected = tabIndex == tabBreakItems.indexOf(element);
-      Widget tabLabel = Text(
-        Global.returnTrLable(translatsLabel, element.label!, lng),
-        style: TextStyle(
-            fontSize: isSelected ? 16.0 : 13.0,
-            color: isSelected ? Colors.white : Colors.grey.shade300),
-      );
-      tabItem.add(Tab(
-        child: tabLabel,
+     
+      tabItem.add(Container(
+        width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
+        // padding: EdgeInsets.only(left: 10, right: 10),
+        padding: EdgeInsets.only(
+            left: tabIsScrollable ? 10 : 0, right: tabIsScrollable ? 10 : 0),
+        decoration: BoxDecoration(
+            color: Color(0xff369A8D),
+            border: Border(
+                right: BorderSide(
+                    color: Colors.white, width: 1, style: BorderStyle.solid))),
+        child: Tab(
+            child: Text(
+          Global.returnTrLable(translatsLabel, element.label!, lng),
+         
+        )),
       ));
     });
     return tabItem;
@@ -300,6 +324,8 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
     }
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
+    tabIsScrollable = tabWidth * tabBreakItems.length > screenWidth;
+
     // List<String> tabLabelItems = [];
     // tabBreakItems.forEach((element) {
     //   if(Global.validString(element.label)){

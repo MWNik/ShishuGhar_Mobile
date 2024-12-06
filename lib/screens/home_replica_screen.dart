@@ -26,6 +26,7 @@ import 'package:shishughar/model/apimodel/stock_fields_meta_model.dart';
 import 'package:shishughar/screens/pad_viewer_using_dio.dart';
 import 'package:shishughar/screens/shishu_ghar_screen.dart';
 import 'package:shishughar/screens/synchronization_screen.dart';
+import 'package:shishughar/screens/synchronization_screen_new.dart';
 import 'package:shishughar/screens/tabed_screens/child_follow_up/child_followup_completed_list_CC.dart';
 import 'package:shishughar/screens/tabed_screens/child_follow_up/follow_up_tab_screen_all_child.dart';
 import 'package:shishughar/screens/tabed_screens/child_gravience/child_grievance_home_listing.dart';
@@ -168,6 +169,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   String fullName = '';
   List<Translation> locationControlls = [];
   String appVersionName = '';
+  bool shouldDownloadFirst = false;
 
   @override
   Widget build(BuildContext context) {
@@ -217,7 +219,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (BuildContext context) =>
-                        SynchronizationScreen()));
+                        SynchronizationScreenNew()));
               },
               child: Stack(
                 children: [
@@ -354,8 +356,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text("$fullName", style: Styles.black126P),
-                                  Text("$username", style: Styles.black126P),
-                                  Text("$role", style: Styles.Grey104),
+                                  Text(
+                                    "$username",
+                                    style: Styles.black126P,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                  Text(
+                                      "${Global.returnTrLable(locationControlls, role, lng ?? 'en')}",
+                                      style: Styles.Grey104),
                                 ],
                               )
                             ]),
@@ -713,33 +722,33 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                         locationControlls, CustomText.ok, lng!),
                                     false,
                                     context);
-                              } else
-                              {
-                                var darftData=await callDarftData();
-                                if(darftData==0){
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
+                              } else {
+                                var darftData = await callDarftData();
+                                if (darftData == 0) {
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
 
-                                showLoaderDialog(context);
-                                await prefs.clear();
-                                await DatabaseHelper().deleteAllRecords();
-                                Navigator.pop(context);
+                                  showLoaderDialog(context);
+                                  await prefs.clear();
+                                  await DatabaseHelper().deleteAllRecords();
+                                  Navigator.pop(context);
 
-                                HomeReplicaScreen.scaffoldKey!.currentState
-                                    ?.closeDrawer();
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginScreen()),
-                                    (Route<dynamic> route) => false);
-                              }else Validate().singleButtonPopup(
-                                    Global.returnTrLable(locationControlls,
-                                        CustomText.darftDataForLogoyt, lng!),
-                                    Global.returnTrLable(
-                                        locationControlls, CustomText.ok, lng!),
-                                    false,
-                                    context);
+                                  HomeReplicaScreen.scaffoldKey!.currentState
+                                      ?.closeDrawer();
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LoginScreen()),
+                                      (Route<dynamic> route) => false);
+                                } else
+                                  Validate().singleButtonPopup(
+                                      Global.returnTrLable(locationControlls,
+                                          CustomText.darftDataForLogoyt, lng!),
+                                      Global.returnTrLable(locationControlls,
+                                          CustomText.ok, lng!),
+                                      false,
+                                      context);
                               }
                               ;
                             }),
@@ -1305,6 +1314,11 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     Creche = await Validate().readString(Validate.CrecheSName);
     username = (await Validate().readString(Validate.userName))!;
     fullName = (await Validate().readString(Validate.fullName))!;
+    int? houseHold = await Validate().readInt((Validate.household));
+    String? downloadTimeStamp =
+        await Validate().readString(Validate.dataDownloadDateTime);
+    shouldDownloadFirst =
+        (houseHold ?? 0) > 0 && !Global.validString(downloadTimeStamp);
     // await GetLocation().cachingCurrentLocationn(context);
     await _getAppVersionName();
     await locationData();
@@ -1327,289 +1341,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       var token = (await Validate().readString(Validate.appToken))!;
       var response = await modifiedDateApiService.getModifiedData();
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        var modifiedApiModel = ModifiedApiModel.fromJson(responseData);
-
-        if (responseData.isNotEmpty) {
-          List<DocType>? docTypeList = modifiedApiModel.docType;
-          ModifiedDataHelper modifiedDataHelper = ModifiedDataHelper();
-
-          if (docTypeList != null) {
-            await modifiedDataHelper.insertModifiedData(docTypeList);
-
-            // Map to store the document type names and corresponding actions
-            final docActions = {
-              CustomText.houseHoldForm: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.householdForm, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callFieldData(true);
-                }
-              },
-              CustomText.houseHoldChildForm:
-                  (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.householdChildForm, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callFieldData(true);
-                }
-              },
-              CustomText.childEnrollExit: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(
-                      Validate.childEnrolledExitmodifiedData, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callEnrolledExitMetaApi(
-                      userName, password, token, true);
-                }
-              },
-              CustomText.childProfileDoctype:
-                  (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate()
-                      .saveString(Validate.childProfilemodifiedDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callEnrooledChildrenDataApi(
-                      userName, password, token, true);
-                }
-              },
-              CustomText.creche: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.creChemodifiedDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callCreshDataApi(userName, password, token, true);
-                }
-              },
-              CustomText.childHealthDoctype:
-                  (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.ChildHealthUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callChildHealthData(userName, password, token, true);
-                }
-              },
-              CustomText.childEventDoctype: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.childEventUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callChildEventData(userName, password, token, true);
-                }
-              },
-              CustomText.childreferralDoctype:
-                  (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate()
-                      .saveString(Validate.childReferralUpdatedDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callChildReffrelMeta(userName, password, token, true);
-                }
-              },
-              CustomText.childExit: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.childExitUpdatedDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callChildExitMeta(userName, password, token, true);
-                }
-              },
-              CustomText.childImmunization: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate()
-                      .saveString(Validate.ChildImmunizationUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callChildImmunizationData(
-                      userName, password, token, true);
-                }
-              },
-              CustomText.childFollowUp: (String date1, String date2) async {
-                if (!Global.validString(date1)) {
-                  Validate()
-                      .saveString(Validate.childFollowUpUpdatedDate, date2);
-                }
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callChildFollowUpMeta(userName, password, token, true);
-                }
-              },
-              CustomText.childGrowthMonitoring:
-                  (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.ChildAntroUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callAnthropomertryData(userName, password, token, true);
-                }
-              },
-              CustomText.cashbook: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(
-                      Validate.cashbookExpencesMetaUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callCashBookExpensesMetaApi(
-                      userName, password, token, true);
-                }
-              },
-              CustomText.childAttendance: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate()
-                      .saveString(Validate.ChildAttendeceUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callAttendanceData(userName, password, token, true);
-                }
-              },
-              CustomText.village: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate()
-                      .saveString(Validate.villageProfileUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await villageProfileMetaApi(userName, password, token, true);
-                }
-              },
-              CustomText.crceheCheckIn: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.chechInUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await checkinFieldsMeta(userName, password, token, true);
-                }
-              },
-              CustomText.cmcALMDoctype: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.crecheMonitoringMeta, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callCMCALMMetaApi(userName, password, token, true);
-                }
-              },
-              CustomText.crecheMeeting: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate()
-                      .saveString(Validate.crecheCommitteUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callCrecheCommitteMeta(userName, password, token, true);
-                }
-              },
-              CustomText.cmcDoctype: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.crecheMonitoringMeta, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await crecheMonitoringApiMeta(
-                      userName, password, token, true);
-                }
-              },
-              CustomText.cmcCCDoctype: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.crecheMonitoringMeta, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2))
-                  await callApiLogicData(userName, password, token, true);
-                await callCMCCCMetaApi(userName, password, token, true);
-              },
-              CustomText.cmcCBMDoxtype: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.crecheMonitoringMeta, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callCMCCBMMetaApi(userName, password, token, true);
-                }
-              },
-              CustomText.grievienceDoctype: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate()
-                      .saveString(Validate.childGravienceUpdatedDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await callChildGrievancesMeta(
-                      userName, password, token, true);
-                }
-              },
-              CustomText.crecheStock: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate().saveString(Validate.stockmetaUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await stockMetaData(userName, password, token, true);
-                }
-              },
-              CustomText.crecheRequisiton: (String date1, String date2) async {
-                if (!Global.validString(date1))
-                  Validate()
-                      .saveString(Validate.requisitionMetaUpdateDate, date2);
-                if (compareDates(
-                    Global.validString(date1) ? date1 : date2, date2)) {
-                  await callApiLogicData(userName, password, token, true);
-                  await requisitionMetaData(userName, password, token, true);
-                }
-              },
-            };
-
-            for (var element in docTypeList) {
-              var date2 = element.modified.toString();
-              // setModifiedDateTime(element.name.toString(), date2);
-              var date1 = await getDateFromValidate(element.name.toString());
-
-              if (docActions.containsKey(element.name)) {
-                await docActions[element.name]!(date1 ?? '', date2);
-                // break;
-              }
-            }
-            var requItem=await RequisitionFieldsHelper().getRequisitionFields();
-            if(requItem.length==0){
-              await callApiLogicData(userName, password, token, true);
-              await requisitionMetaData(userName, password, token, true);
-            }
-
-            var stockItem=await StockFieldHelper().getStockFields();
-            if(stockItem.length==0){
-              await callApiLogicData(userName, password, token, true);
-              await stockMetaData(userName, password, token, true);
-            }
-          } else {
-            print("Not Insert translation data into the database");
-          }
-        }
-      }
-      else if (response.statusCode == 401) {
+      if (response.statusCode == 401) {
         await handleUnauthorized();
-      } else {
-        handleErrorResponse(response);
       }
     }
   }
@@ -1820,8 +1553,13 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       CustomText.userMannual,
       CustomText.logoutPendingDataMsg,
       CustomText.ticketSupport,
+      CustomText.dbBackup,
       CustomText.languages,
-      CustomText.darftDataForLogoyt
+      CustomText.darftDataForLogoyt,
+      CustomText.schduleDate,
+      CustomText.complted,
+      CustomText.downloadFiyrst,
+      role!
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -1890,21 +1628,32 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     } else if (role == CustomText.clusterCoordinator) {
       syncCount = await callCountForUploadCC();
     } else if (role == CustomText.alm) {
-      var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
-      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
+      var crecheCheckIn =
+          await CheckInResponseHelper().callCrecheCheckInResponses();
+      var grievanceData = await ChildGrievancesTabResponceHelper()
+          .getChildGrievanceForUploadDarft();
       var ImageFileData = await ImageFileTabHelper().getImageForUpload();
       var visitNots = await CmcALMTabResponseHelper().getAlmForUpload();
-      syncCount = visitNots.length+crecheCheckIn.length+grievanceData.length+ImageFileData.length;
+      syncCount = visitNots.length +
+          crecheCheckIn.length +
+          grievanceData.length +
+          ImageFileData.length;
     } else if (role == CustomText.cbm) {
-      var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
-      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
+      var crecheCheckIn =
+          await CheckInResponseHelper().callCrecheCheckInResponses();
+      var grievanceData = await ChildGrievancesTabResponceHelper()
+          .getChildGrievanceForUploadDarft();
       var ImageFileData = await ImageFileTabHelper().getImageForUpload();
       var visitNots = await CmcCBMTabResponseHelper().getCBMForUpload();
 
-      syncCount = visitNots.length+crecheCheckIn.length+grievanceData.length+ImageFileData.length;
-    }else{
-      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
-      syncCount=grievanceData.length;
+      syncCount = visitNots.length +
+          crecheCheckIn.length +
+          grievanceData.length +
+          ImageFileData.length;
+    } else {
+      var grievanceData = await ChildGrievancesTabResponceHelper()
+          .getChildGrievanceForUploadDarft();
+      syncCount = grievanceData.length;
     }
   }
 
@@ -1961,6 +1710,14 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     if (i == 0) {
       // if (role == CustomText.crecheSupervisor.trim() ||
       //     role == CustomText.clusterCoordinator.trim()) {
+      if (shouldDownloadFirst)
+        Validate().singleButtonPopup(
+            Global.returnTrLable(
+                locationControlls, CustomText.downloadFiyrst, lng),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng),
+            false,
+            context);
+      else
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => ShiShuGharScreen(type: 0)));
       // }
@@ -1973,7 +1730,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                 )));
       }
       //  else if (role == CustomText.clusterCoordinator.trim()) {
-        else {
+      else {
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) =>
               ReferallCompletedListForCC(isHomeScreen: true),
@@ -1985,8 +1742,12 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
             builder: (BuildContext context) => FollowUpTabScreenAllChild(
                   tabTitle: Global.returnTrLable(
                       locationControlls, CustomText.fllowUp, lng),
+                  tabOneTitle: Global.returnTrLable(
+                      locationControlls, CustomText.schduleDate, lng),
+                  tabTwoTitle: Global.returnTrLable(
+                      locationControlls, CustomText.complted, lng),
                 )));
-      } 
+      }
       // else if (role == CustomText.clusterCoordinator.trim()) {
       else {
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
@@ -1994,35 +1755,52 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                 FollowCompletedListForCC(isHomeScreen: true)));
       }
     } else if (i == 3) {
-      if (role == CustomText.clusterCoordinator.trim()) {
-        refStatus = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => AllcmcCCListingScreen()));
-      } else if (role == CustomText.crecheSupervisor.trim()) {
-        refStatus = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) =>
-                AllCrecheMonitorListingScreen()));
-      } else if (role == CustomText.alm.trim()) {
-        refStatus = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => AllcmcALMListingScreen()));
-      } else if (role == CustomText.cbm.trim()) {
-        refStatus = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => AllcmcCBMListingScreen()));
+      if (shouldDownloadFirst) {
+        Validate().singleButtonPopup(
+            Global.returnTrLable(
+                locationControlls, CustomText.downloadFiyrst, lng),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng),
+            false,
+            context);
+      } else {
+        if (role == CustomText.clusterCoordinator.trim()) {
+          refStatus = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => AllcmcCCListingScreen()));
+        } else if (role == CustomText.crecheSupervisor.trim()) {
+          refStatus = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) =>
+                  AllCrecheMonitorListingScreen()));
+        } else if (role == CustomText.alm.trim()) {
+          refStatus = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => AllcmcALMListingScreen()));
+        } else if (role == CustomText.cbm.trim()) {
+          refStatus = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => AllcmcCBMListingScreen()));
+        }
       }
     } else if (i == 4) {
       // if (role == CustomText.crecheSupervisor.trim() ||
       //     role == CustomText.clusterCoordinator.trim()) {
-        refStatus = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => VillageProfileListingScreen()));
+      refStatus = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => VillageProfileListingScreen()));
       // }
     } else if (i == 5) {
       // if (role == CustomText.crecheSupervisor.trim() ||
       //     role == CustomText.clusterCoordinator.trim()) {
+      if (shouldDownloadFirst) {
+        Validate().singleButtonPopup(
+            Global.returnTrLable(
+                locationControlls, CustomText.downloadFiyrst, lng),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng),
+            false,
+            context);
+      } else
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => GrievanceHomeListing()));
       // }
     } else if (i == 6) {
       refStatus = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => SynchronizationScreen()));
+          builder: (BuildContext context) => SynchronizationScreenNew()));
     }
 
     if (refStatus == 'itemRefresh') {
@@ -2617,6 +2395,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           CashBookReceiptFieldsMetaModel.fromJson(jsonDecode(responce.body));
 
       await callInsertCashBookreceiptMeta(cashbookReceiptMetaFields);
+      Validate().saveString(
+          Validate.doctypeUpdateTimeStamp, DateTime.now().toString());
 
       // Validate().saveString(Validate.cashbookRecieptMetaUpdateDate,
       //     cashbookReceiptMetaFields.tab_cashbook_receipt!.modified!);
@@ -2792,6 +2572,16 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       // Validate().saveString(
       //     Validate.crecheMonitoringMeta, childExitMetaFields.meta!.modified!);
       Navigator.pop(context);
+
+      if (shouldDownloadFirst) {
+        print("Data needs to be downloaded first ====>");
+        Validate().singleButtonPopup(
+            Global.returnTrLable(
+                locationControlls, CustomText.downloadFiyrst, lng!),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+            false,
+            context);
+      }
     } else if (response.statusCode == 401) {
       Navigator.pop(context);
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -3022,16 +2812,16 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<int> callCountForUploadCC() async {
-    showLoaderDialog(context);
+    // showLoaderDialog(context);
 
-    var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
-    var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
+    var crecheCheckIn =
+        await CheckInResponseHelper().callCrecheCheckInResponses();
+    var grievanceData = await ChildGrievancesTabResponceHelper()
+        .getChildGrievanceForUploadDarft();
     var ImageFileData = await ImageFileTabHelper().getImageForUpload();
     var creCheMonitoring = await CmcCCTabResponseHelper().getCcForUpload();
 
-
-
-    Navigator.pop(context);
+    // Navigator.pop(context);
     int totalPendingCount = crecheCheckIn.length +
         grievanceData.length +
         creCheMonitoring.length +
@@ -3041,20 +2831,19 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<int> callCountForUpload() async {
-    showLoaderDialog(context);
-    var hhItems =
-        await HouseHoldTabResponceHelper().getHouseHoldItems();
+    // showLoaderDialog(context);
+    var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
     hhItems = hhItems
         .where((element) =>
-    Global.stringToInt(Global.getItemValues(
-        element.responces!, 'verification_status')) >
-        1)
+            Global.stringToInt(Global.getItemValues(
+                element.responces!, 'verification_status')) >
+            1)
         .toList();
-    var childEnrollExitData = await EnrolledExitChilrenResponceHelper()
-        .callChildrenForUpload();
+    var childEnrollExitData =
+        await EnrolledExitChilrenResponceHelper().callChildrenForUpload();
     var crecheProfile = await CrecheDataHelper().callCrecheForUpload();
-    var chilAttendence = await ChildAttendanceResponceHelper()
-        .callChildAttendencesAllForUpoad();
+    var chilAttendence =
+        await ChildAttendanceResponceHelper().callChildAttendencesAllForUpoad();
     var crecheCheckIn =
         await CheckInResponseHelper().callCrecheCheckInResponses();
     var anthropomentry =
@@ -3069,8 +2858,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         await ChildExitResponceHelper().getEditedChildExitForUpload();
     var grievanceData =
         await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
-    var creCheMonitoring = await CrecheMonitorResponseHelper()
-        .getCrecheResponseForUpload();
+    var creCheMonitoring =
+        await CrecheMonitorResponseHelper().getCrecheResponseForUpload();
     var referralData =
         await ChildReferralTabResponseHelper().getChildReferralForUpload();
     var followUpData =
@@ -3097,7 +2886,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
             1)
         .toList();
 
-    Navigator.pop(context);
+    // Navigator.pop(context);
     int totalPendingCount = hhItems.length +
         childEnrollExitData.length +
         crecheProfile.length +
@@ -3123,26 +2912,35 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     return totalPendingCount;
   }
 
-
-  Future<int> callDarftData() async{
-     if (role == 'Creche Supervisor') {
-       var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
-       var childEnrollExitData = await EnrolledExitChilrenResponceHelper().callChildrenForUploadDarftEdited();
-       // var childProfile = await EnrolledChilrenResponceHelper().callChildrenForUpload();
-       var villageProfile = await await CrecheMonitorResponseHelper().getVillageProfileforUploadDarftEdit();
-       var creCheMonitoring = await CrecheMonitorResponseHelper().getVillageProfileforUploadDarftEdit();
-       var chilAttendence = await ChildAttendanceResponceHelper().callChildAttendencesAllForUpoadEditDarft();
-       return (hhItems.length+childEnrollExitData.length+villageProfile.length+creCheMonitoring.length+chilAttendence.length);
-     } else if (role == 'Cluster Coordinator') {
-       var creCheMonitoring = await CmcCCTabResponseHelper().getCcForUploadEditDarft();
-       return creCheMonitoring.length;
-     } else if (role == 'Accounts and Logistics Manager') {
-       var visitNots =
-           await CmcALMTabResponseHelper().getAlmForUploadDarftEdited();
-       return visitNots.length;
-     } else if (role == 'Capacity and Building Manager') {
-       var visitNots = await CmcCBMTabResponseHelper().getCBMForUploadDarft();
-       return visitNots.length;
-     }return 0;
+  Future<int> callDarftData() async {
+    if (role == 'Creche Supervisor') {
+      var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
+      var childEnrollExitData = await EnrolledExitChilrenResponceHelper()
+          .callChildrenForUploadDarftEdited();
+      // var childProfile = await EnrolledChilrenResponceHelper().callChildrenForUpload();
+      var villageProfile = await await CrecheMonitorResponseHelper()
+          .getVillageProfileforUploadDarftEdit();
+      var creCheMonitoring = await CrecheMonitorResponseHelper()
+          .getVillageProfileforUploadDarftEdit();
+      var chilAttendence = await ChildAttendanceResponceHelper()
+          .callChildAttendencesAllForUpoadEditDarft();
+      return (hhItems.length +
+          childEnrollExitData.length +
+          villageProfile.length +
+          creCheMonitoring.length +
+          chilAttendence.length);
+    } else if (role == 'Cluster Coordinator') {
+      var creCheMonitoring =
+          await CmcCCTabResponseHelper().getCcForUploadEditDarft();
+      return creCheMonitoring.length;
+    } else if (role == 'Accounts and Logistics Manager') {
+      var visitNots =
+          await CmcALMTabResponseHelper().getAlmForUploadDarftEdited();
+      return visitNots.length;
+    } else if (role == 'Capacity and Building Manager') {
+      var visitNots = await CmcCBMTabResponseHelper().getCBMForUploadDarft();
+      return visitNots.length;
+    }
+    return 0;
   }
 }

@@ -16,10 +16,15 @@ class CrecheMonitoringFieldHelper {
     try {
       if (items.isEmpty) return;
 
-      for (final item in items) {
-        await DatabaseHelper.database!.insert(_table, item.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async {
+        for (var element in items) {
+          await txn.insert(_table, element.toJson());
+        }
+      });
 
+      // for (final item in items) {
+      //   await DatabaseHelper.database!.insert(_table, item.toJson());
+      // }
     } catch (e) {
       debugPrint("insertCrecheMonitorFields() : $e");
     }
@@ -45,7 +50,8 @@ class CrecheMonitoringFieldHelper {
       String parent) async {
     try {
       final ListOfMap queryResult = await DatabaseHelper.database!.rawQuery(
-          'SELECT * FROM $_table WHERE parent = ? and hidden=0 ORDER BY idx asc', [parent]);
+          'SELECT * FROM $_table WHERE parent = ? and hidden=0 ORDER BY idx asc',
+          [parent]);
 
       return queryResult
           .map((e) => HouseHoldFielItemdModel.fromJson(e))

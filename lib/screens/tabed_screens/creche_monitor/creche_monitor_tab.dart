@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import 'package:shishughar/database/helper/creche_monitoring/creche_monitoring_helper.dart';
@@ -21,17 +22,17 @@ import 'creche_monitor_taItem_view_screen.dart';
 class CrecheMonitorTab extends StatefulWidget {
   final String cmgUid;
   final String crecheId;
-   String? dateOfVisit;
-   final bool isEdit;
-   final bool isViewScreen;
+  String? dateOfVisit;
+  final bool isEdit;
+  final bool isViewScreen;
 
-   CrecheMonitorTab({
+  CrecheMonitorTab({
     super.key,
     required this.cmgUid,
     required this.crecheId,
-     this.dateOfVisit,
-     required this.isEdit,
-     required this.isViewScreen,
+    this.dateOfVisit,
+    required this.isEdit,
+    required this.isViewScreen,
   });
 
   @override
@@ -50,7 +51,10 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
   List<Translation> _translation = [];
   Map<String, List<HouseHoldFielItemdModel>> _expandedItems = {};
   bool _isLoading = true;
-  bool isView=false;
+  bool isView = false;
+  double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
 
   @override
   void initState() {
@@ -73,7 +77,11 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
       CustomText.Creches,
       CustomText.CrecheMonitor,
       CustomText.Next,
-      CustomText.back
+      CustomText.back,
+      CustomText.shouldExit,
+      CustomText.exit,
+      CustomText.Cancel,
+      CustomText.VisitNote
     ];
 
     await TranslationDataHelper()
@@ -121,9 +129,18 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
     }
 
     _tabController = TabController(length: _tabBreakItems.length, vsync: this);
+    tabIsScrollable = tabWidth * _tabBreakItems.length > screenWidth;
+    List<String> tabLabelTranslats = [];
+    _tabBreakItems.forEach((element) {
+      if(Global.validString(element.label)){
+        tabLabelTranslats.add(element.label!);
+      }
+    });
+    await TranslationDataHelper().callTranslateString(tabLabelTranslats).then((value) => _translation.addAll(value));
+
     if (Global.validString(widget.dateOfVisit)) {
       List<int> parts =
-      widget.dateOfVisit.toString().split('-').map(int.parse).toList();
+          widget.dateOfVisit.toString().split('-').map(int.parse).toList();
       var dov = DateTime(parts[0], parts[1], parts[2]);
       if (dov
           .add(Duration(days: 7))
@@ -140,16 +157,25 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
     List<Widget> tabItem = [];
 
     _tabBreakItems.forEach((element) {
-      bool isSelected = _tabIndex == _tabBreakItems.indexOf(element);
+     
 
-      Widget tabLabel = Text(
-        Global.returnTrLable(_translation, element.label!, _language),
-        style: TextStyle(
-            fontSize: isSelected ? 16.0 : 13.0,
-            color: isSelected ? Colors.white : Colors.grey.shade300),
-      );
+    
 
-      tabItem.add(Tab(child: tabLabel));
+      tabItem.add(Container(
+        width: tabIsScrollable ? null : screenWidth / _tabBreakItems.length,
+        // padding: EdgeInsets.only(left: 10, right: 10),
+        padding: EdgeInsets.only(
+            left: tabIsScrollable ? 10 : 0, right: tabIsScrollable ? 10 : 0),
+        decoration: BoxDecoration(
+            color: Color(0xff369A8D),
+            border: Border(
+                right: BorderSide(
+                    color: Colors.white, width: 1, style: BorderStyle.solid))),
+        child: Tab(
+            child: Text(
+          Global.returnTrLable(_translation, element.label!, _language),
+        )),
+      ));
     });
     return tabItem;
   }
@@ -160,27 +186,29 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
       final item = _tabBreakItems[i];
 
       if (item.parent == _parentName) {
-        final itemToAdd = widget.isViewScreen?CrecheMonitorTabItemView(crecheId: widget.crecheId,
-          parentName: _parentName,
-          cmgUid: widget.cmgUid,
-          tabBreakItem: item,
-          screenItem: _expandedItems,
-          changeTab: changeTab,
-          tabIndex: i,
-          totalTab: _tabBreakItems.length,
-        ):
-        CrecheMonitorTabItem(
-          crecheId: widget.crecheId,
-          parentName: _parentName,
-          cmgUid: widget.cmgUid,
-          tabBreakItem: item,
-          screenItem: _expandedItems,
-          changeTab: changeTab,
-          tabIndex: i,
-          totalTab: _tabBreakItems.length,
-          dateOfVisit: widget.dateOfVisit,
-          isEdit: widget.isEdit,
-        );
+        final itemToAdd = widget.isViewScreen
+            ? CrecheMonitorTabItemView(
+                crecheId: widget.crecheId,
+                parentName: _parentName,
+                cmgUid: widget.cmgUid,
+                tabBreakItem: item,
+                screenItem: _expandedItems,
+                changeTab: changeTab,
+                tabIndex: i,
+                totalTab: _tabBreakItems.length,
+              )
+            : CrecheMonitorTabItem(
+                crecheId: widget.crecheId,
+                parentName: _parentName,
+                cmgUid: widget.cmgUid,
+                tabBreakItem: item,
+                screenItem: _expandedItems,
+                changeTab: changeTab,
+                tabIndex: i,
+                totalTab: _tabBreakItems.length,
+                dateOfVisit: widget.dateOfVisit,
+                isEdit: widget.isEdit,
+              );
 
         tabItem.add(itemToAdd);
       }
@@ -206,7 +234,9 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
     await checkConditionsBeforeChangingTab(index).then((value) {
       if (value) {
         _tabIndex = index;
-        _tabController.index = _tabIndex;
+        setState(() {
+          _tabController.index = _tabIndex;
+        });
       }
     });
   }
@@ -248,7 +278,7 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
 
   Future<void> updateVerificationStatus(BuildContext mContext) async {
     var varyItem = await OptionsModelHelper()
-        .getMstCommonOptions('CC Verification status',_language);
+        .getMstCommonOptions('CC Verification status', _language);
     varyItem = varyItem
         .where((element) => (element.name == '2') || (element.name == '3'))
         .toList();
@@ -343,96 +373,108 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
       // responseData['appcreated_on'] = Validate().currentDateTime();
       String response = jsonEncode(responseData);
       await CrecheMonitorResponseHelper().insertUpdate(
-        int.parse(widget.crecheId),
-        widget.cmgUid,
-        name,
-        response,
-         responseData['appcreated_on'],responseData['appcreated_by'],responseData['app_updated_by'],responseData['app_updated_on']
-      );
+          int.parse(widget.crecheId),
+          widget.cmgUid,
+          name,
+          response,
+          responseData['appcreated_on'],
+          responseData['appcreated_by'],
+          responseData['app_updated_by'],
+          responseData['app_updated_on']);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
     } else {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context, 'itemRefresh');
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          toolbarHeight: kToolbarHeight,
-          backgroundColor: Color(0xff5979AA),
-          leading: Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context, 'itemRefresh'),
-              child: Icon(
-                Icons.arrow_back_ios_sharp,
-                size: 20,
-                color: Colors.white,
+      return WillPopScope(
+        onWillPop: () async {
+          widget.isViewScreen
+              ? Navigator.pop(context, CustomText.itemRefresh)
+              : Validate().showExitDialog(context, _translation, _language);
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            toolbarHeight: kToolbarHeight,
+            backgroundColor: Color(0xff5979AA),
+            leading: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onTap: () => widget.isViewScreen
+                    ? Navigator.pop(context, CustomText.itemRefresh)
+                    : Validate()
+                        .showExitDialog(context, _translation, _language),
+                child: Icon(
+                  Icons.arrow_back_ios_sharp,
+                  size: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-          title: Text(
-            Global.returnTrLable(
-                _translation, CustomText.VisitNote, _language)
-                .trim(),
-            style: Styles.white145,
-          ),
-          actions: [
-            (_role == 'Cluster Coordinator')
-                ? GestureDetector(
-              onTap: () async {
-                await updateVerificationStatus(context);
+            title: Text(
+              Global.returnTrLable(
+                      _translation, CustomText.VisitNote, _language)
+                  .trim(),
+              style: Styles.white145,
+            ),
+            actions: [
+              (_role == 'Cluster Coordinator')
+                  ? GestureDetector(
+                      onTap: () async {
+                        await updateVerificationStatus(context);
+                      },
+                      child: Image.asset(
+                        "assets/verify_icon.png",
+                        scale: 1.5,
+                      ),
+                    )
+                  : SizedBox(),
+              SizedBox(
+                width: 10,
+              )
+            ],
+
+            /// TabBar
+            bottom: TabBar(
+              indicatorColor: Color(0xffF26BA3),
+              unselectedLabelColor: Colors.grey.shade300,
+              unselectedLabelStyle: Styles.white124P,
+              labelColor: Colors.white,
+              controller: _tabController,
+              isScrollable: tabIsScrollable,
+              labelPadding: EdgeInsets.zero,
+              // tabAlignment: TabAlignment.start,
+              tabAlignment: tabIsScrollable ? TabAlignment.start : null,
+              onTap: (index) {
+                if (_tabController.indexIsChanging) {
+                  _tabController.index = _tabController.previousIndex;
+                  _handleTabChange(index);
+                }
               },
-              child: Image.asset(
-                "assets/verify_icon.png",
-                scale: 1.5,
-              ),
-            )
-                : SizedBox(),
-            SizedBox(
-              width: 10,
-            )
-          ],
 
-          /// TabBar
-          bottom: TabBar(
-            indicatorColor: Colors.white,
-            unselectedLabelColor: Colors.grey.shade300,
-            unselectedLabelStyle: Styles.white124P,
-            labelColor: Colors.white,
-            onTap: (index) {
-              if (_tabController.indexIsChanging) {
-                _tabController.index = _tabController.previousIndex;
-                _handleTabChange(index);
-              }
-            },
-            controller: _tabController,
-            isScrollable: true,
-            tabs: _tabControllerWidgets(),
+              tabs: _tabControllerWidgets(),
+            ),
+          ),
+
+          // Body
+          body: Column(
+            children: [
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: _tabControllerScreens(),
+                ),
+              ),
+            ],
           ),
         ),
-
-        // Body
-        body: Column(
-          children: [
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                physics: NeverScrollableScrollPhysics(),
-                children: _tabControllerScreens(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+      );
     }
   }
 }

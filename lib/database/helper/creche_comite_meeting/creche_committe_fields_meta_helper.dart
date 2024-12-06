@@ -6,10 +6,15 @@ class CrecheCommitteFieldsMetaHelper {
   Future<void> insertCrecheCommitteMeta(
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     if (houseFieldItem.isNotEmpty) {
-      for (var element in houseFieldItem) {
-        await DatabaseHelper.database!
-            .insert('tab_creche_committe', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        for(var element in houseFieldItem){
+          await txn.insert('tab_creche_committe', element.toJson());
+        }
+      });
+      // for (var element in houseFieldItem) {
+      //   await DatabaseHelper.database!
+      //       .insert('tab_creche_committe', element.toJson());
+      // }
     }
   }
 

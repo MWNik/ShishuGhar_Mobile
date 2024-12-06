@@ -66,6 +66,9 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
   String lng = "en";
   String? role;
   int? isUploaded = 0;
+  double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false; // Approximate width of each tab
 
   Future<void> initializeData() async {
     lng = (await Validate().readString(Validate.sLanguage))!;
@@ -76,15 +79,18 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
       CustomText.Creches,
       CustomText.CrecheCaregiver,
       CustomText.Next,
-      CustomText.back
+      CustomText.back,
+      CustomText.shouldExit,
+      CustomText.exit,
+      CustomText.Cancel
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
         .then((value) => translatsLabel = value);
 
-    await TranslationDataHelper()
-        .callTranslateEnrolledChildren()
-        .then((value) => translatsLabel.addAll(value));
+    // await TranslationDataHelper()
+    //     .callTranslateEnrolledChildren()
+    //     .then((value) => translatsLabel.addAll(value));
 
     await callScrenControllers('Child Profile');
   }
@@ -94,74 +100,83 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 60,
-          backgroundColor: Color(0xff5979AA),
-          leading: Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context, 'itemRefresh');
-              },
-              child: Icon(
-                Icons.arrow_back_ios_sharp,
-                size: 20,
-                color: Colors.white,
+      return WillPopScope(
+        onWillPop: () async {
+          Validate().showExitDialog(context, translatsLabel, lng);
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 60,
+            backgroundColor: Color(0xff5979AA),
+            leading: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onTap: () {
+                  Validate().showExitDialog(context, translatsLabel, lng);
+                },
+                child: Icon(
+                  Icons.arrow_back_ios_sharp,
+                  size: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RichText(
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  text: TextSpan(children: [
+                    EnrolledExitChilrenTab.childName != null
+                        ? TextSpan(
+                            text: '${EnrolledExitChilrenTab.childName!}',
+                            style: Styles.white145)
+                        : TextSpan(text: ''),
+                    Global.validString(widget.childId)
+                        ? TextSpan(
+                            text:
+                                ' ${EnrolledExitChilrenTab.childName != null ? '-' : ''} ${widget.childId}',
+                            style: Styles.white145)
+                        : TextSpan(text: '')
+                  ]),
+                )
+              ],
+            ),
+            centerTitle: true,
+            bottom: TabBar(
+              indicatorColor: Color(0xffF26BA3),
+              unselectedLabelColor: Colors.grey.shade300,
+              unselectedLabelStyle: Styles.white124P,
+              labelColor: Colors.white,
+              onTap: (index) {
+                if (_tabController.indexIsChanging) {
+                  _tabController.index = _tabController.previousIndex;
+                  print("object $index");
+                  handleTabChange(index);
+                } else {
+                  print("object 1 $index");
+                  return;
+                }
+              },
+              controller: _tabController,
+              isScrollable: tabIsScrollable,
+              labelPadding: EdgeInsets.zero,
+              // tabAlignment: TabAlignment.start,
+              tabAlignment: tabIsScrollable ? TabAlignment.start : null,
+              tabs: tabController(),
+            ),
           ),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RichText(
-                maxLines: 2,
-                textAlign: TextAlign.center,
-                text: TextSpan(children: [
-                  EnrolledExitChilrenTab.childName != null
-                      ? TextSpan(
-                          text: '${EnrolledExitChilrenTab.childName!}',
-                          style: Styles.white145)
-                      : TextSpan(text: ''),
-                  Global.validString(widget.childId)
-                      ? TextSpan(
-                          text:
-                              ' ${EnrolledExitChilrenTab.childName != null ? '-' : ''} ${widget.childId}',
-                          style: Styles.white145)
-                      : TextSpan(text: '')
-                ]),
-              )
-            ],
-          ),
-          centerTitle: true,
-          bottom: TabBar(
-            indicatorColor: Colors.white,
-            unselectedLabelColor: Colors.grey.shade300,
-            unselectedLabelStyle: Styles.white124P,
-            labelColor: Colors.white,
-            onTap: (index) {
-              if (_tabController.indexIsChanging) {
-                _tabController.index = _tabController.previousIndex;
-                print("object $index");
-                handleTabChange(index);
-              } else {
-                print("object 1 $index");
-                return;
-              }
-            },
-            controller: _tabController,
-            isScrollable: true,
-            tabs: tabController(),
-          ),
+          body: Column(children: [
+            Expanded(
+                child: TabBarView(
+              controller: _tabController,
+              physics: NeverScrollableScrollPhysics(),
+              children: tabControllerScreen(),
+            ))
+          ]),
         ),
-        body: Column(children: [
-          Expanded(
-              child: TabBarView(
-            controller: _tabController,
-            physics: NeverScrollableScrollPhysics(),
-            children: tabControllerScreen(),
-          ))
-        ]),
       );
     }
   }
@@ -235,15 +250,20 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
   List<Widget> tabController() {
     List<Widget> tabItem = [];
     tabBreakItems.forEach((element) {
-      bool isSelected = tabIndex == tabBreakItems.indexOf(element);
       Widget tabLabel = Text(
         Global.returnTrLable(translatsLabel, element.label!, lng),
-        style: TextStyle(
-            fontSize: isSelected ? 16.0 : 13.0,
-            color: isSelected ? Colors.white : Colors.grey.shade300),
       );
-      tabItem.add(Tab(
-        child: tabLabel,
+      tabItem.add(Container(
+        width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
+        // padding: EdgeInsets.only(left: 10, right: 10),
+        padding: EdgeInsets.only(
+            left: tabIsScrollable ? 10 : 0, right: tabIsScrollable ? 10 : 0),
+        decoration: BoxDecoration(
+            color: Color(0xff369A8D),
+            border: Border(
+                right: BorderSide(
+                    color: Colors.white, width: 1, style: BorderStyle.solid))),
+        child: Tab(child: tabLabel),
       ));
     });
     return tabItem;
@@ -325,8 +345,17 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
     }
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
+    List<String> tabLabelTranslats = [];
+    tabBreakItems.forEach((element) {
+      if (Global.validString(element.label))
+        tabLabelTranslats.add(element.label!);
+    });
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelTranslats)
+        .then((value) => translatsLabel.addAll(value));
     // _tabController.addListener(handleTabChange);
-
+    screenWidth = MediaQuery.of(context).size.width;
+    tabIsScrollable = tabWidth * tabBreakItems.length > screenWidth;
     var record = await EnrolledExitChilrenResponceHelper()
         .callChildrenResponce(widget.EnrolledChilGUID);
     if (record.isNotEmpty) {
@@ -338,8 +367,8 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
   }
 
   @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     initializeData();
   }
 

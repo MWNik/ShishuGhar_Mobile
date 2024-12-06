@@ -36,6 +36,8 @@ class _CashBookExpensesListingSCreenState
   String lng = 'en';
   double walletToal = 0.0;
   String? role;
+  DateTime applicableDate = Validate().stringToDate("2024-12-31");
+  DateTime now = DateTime.parse(Validate().currentDate());
 
   void initState() {
     super.initState();
@@ -46,6 +48,8 @@ class _CashBookExpensesListingSCreenState
     role = (await Validate().readString(Validate.role))!;
     translats.clear();
     lng = (await Validate().readString(Validate.sLanguage))!;
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -56,7 +60,10 @@ class _CashBookExpensesListingSCreenState
       CustomText.Search,
       CustomText.Village,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.BalanceAmount,
+      CustomText.DateS,
+      CustomText.amount
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -88,8 +95,10 @@ class _CashBookExpensesListingSCreenState
                     String cashbookGuid = '';
                     if (!Global.validString(cashbookGuid)) {
                       cashbookGuid = Validate().randomGuid();
-                      var backDate = DateTime.parse(Validate().currentDate())
-                          .subtract(Duration(days: 7));
+                      var backDate = now.isBefore(applicableDate)
+                          ? DateTime(1992)
+                          : DateTime.parse(Validate().currentDate())
+                              .subtract(Duration(days: 7));
                       if (minDate != null) {
                         if (minDate!.isBefore(backDate)) {
                           minDate = backDate;
@@ -122,17 +131,19 @@ class _CashBookExpensesListingSCreenState
           : SizedBox(),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+        child: Global.validString(role)?Column(
+          // mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: role == CustomText.crecheSupervisor
-                  ? MainAxisAlignment.spaceBetween
-                  : MainAxisAlignment.start,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-                  decoration: BoxDecoration(
+            Container(
+              child: Row(
+                mainAxisAlignment: role == CustomText.crecheSupervisor.trim()
+                    ? MainAxisAlignment.spaceBetween // Space between left and right widgets
+                    : MainAxisAlignment.start,
+                children: [
+                  // Left Widget
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                    decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
                           color: Color(0xff5A5A5A).withOpacity(0.2),
@@ -143,39 +154,43 @@ class _CashBookExpensesListingSCreenState
                       ],
                       color: Colors.white,
                       border: Border.all(color: Colors.grey.shade700),
-                      borderRadius: BorderRadius.circular(5.r)),
-                  child: RichText(
-                    text: TextSpan(
-                      text:
-                          '${Global.returnTrLable(translats, CustomText.BalanceAmount, lng).trim()}',
-                      style: Styles.black124,
-                      children: [
-                        TextSpan(
-                            text: ' :₹ ${walletToal}', style: Styles.blue125),
-                      ],
+                      borderRadius: BorderRadius.circular(5.r),
+                    ),
+                    child: RichText(
+                      text: TextSpan(
+                        text: '${Global.returnTrLable(translats, CustomText.BalanceAmount, lng).trim()}',
+                        style: Styles.black124,
+                        children: [
+                          TextSpan(
+                            text: ' :₹ ${walletToal}',
+                            style: Styles.blue125,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Spacer(),
-                role == CustomText.crecheSupervisor.trim()
-                    ? Expanded(
-                        child: AnimatedRollingSwitch(
-                          title1: Global.returnTrLable(
-                              translats, CustomText.all, lng),
-                          title2: Global.returnTrLable(
-                              translats, CustomText.unsynched, lng),
-                          isOnlyUnsynched: isOnlyUnsynched ?? false,
-                          onChange: (value) async {
-                            setState(() {
-                              isOnlyUnsynched = value;
-                            });
-                            await fetchCashbookData();
-                          },
-                        ),
-                      )
-                    : SizedBox(),
-              ],
-            ),
+                  // Add space between the widgets (optional)
+                  if (role == CustomText.crecheSupervisor.trim()) Spacer(),
+                  // Right Widget
+                  role == CustomText.crecheSupervisor.trim()
+                      ? Container(
+                    child: AnimatedRollingSwitch(
+                      title1: Global.returnTrLable(translats, CustomText.all, lng),
+                      title2: Global.returnTrLable(translats, CustomText.unsynched, lng),
+                      isOnlyUnsynched: isOnlyUnsynched ?? false,
+                      onChange: (value) async {
+                        setState(() {
+                          isOnlyUnsynched = value;
+                        });
+                        await fetchCashbookData();
+                      },
+                    ),
+                  )
+                      : SizedBox(),
+                ],
+              ),
+            )
+            ,
             (expensesData.length > 0)
                 ? Expanded(
                     child: ListView.builder(
@@ -188,8 +203,9 @@ class _CashBookExpensesListingSCreenState
                             onTap: () async {
                               var cashbookGuid =
                                   expensesData[index].cashbook_guid;
-                              var backDate =
-                                  DateTime.parse(Validate().currentDate())
+                              var backDate = now.isBefore(applicableDate)
+                                  ? DateTime(1992)
+                                  : DateTime.parse(Validate().currentDate())
                                       .subtract(Duration(days: 7));
                               if (minDate != null) {
                                 if (minDate!.isBefore(backDate)) {
@@ -209,30 +225,30 @@ class _CashBookExpensesListingSCreenState
                                   .isAfter(
                                       DateTime.parse(Validate().currentDate()));
                               if (isEditable) {
-                                isEditable = role == CustomText.crecheSupervisor;
+                                isEditable =
+                                    role == CustomText.crecheSupervisor;
                               }
 
-                              var refStatus = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) => isEditable
-                                          ? CashbookExpensesDetailsScreen(
-                                              creche_id: widget.creche_id,
-                                              cashbook_guid: cashbookGuid!,
-                                              minDate: minDate,
-                                              reqAmount: walletToal +
-                                                  Global.stringToDouble(
-                                                      Global.getItemValues(
-                                                          expensesData[index]
-                                                              .responces!,
-                                                          'expense_amount')))
-                                          : CashbookExpensesDetailsViewScreen(
-                                              creche_id: widget.creche_id,
-                                              cashbook_guid: cashbookGuid!,
-                                              reqAmount: walletToal +
-                                                  Global.stringToDouble(
-                                                      Global.getItemValues(
-                                                          expensesData[index].responces!,
-                                                          'expense_amount')))));
+                              var refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (BuildContext context) => (now
+                                              .isBefore(applicableDate)
+                                          ? true
+                                          : isEditable)
+                                      ? CashbookExpensesDetailsScreen(
+                                          creche_id: widget.creche_id,
+                                          cashbook_guid: cashbookGuid!,
+                                          minDate: minDate,
+                                          reqAmount: walletToal +
+                                              Global.stringToDouble(
+                                                  Global.getItemValues(
+                                                      expensesData[index]
+                                                          .responces!,
+                                                      'expense_amount')))
+                                      : CashbookExpensesDetailsViewScreen(
+                                          creche_id: widget.creche_id,
+                                          cashbook_guid: cashbookGuid!,
+                                          reqAmount: walletToal +
+                                              Global.stringToDouble(Global.getItemValues(expensesData[index].responces!, 'expense_amount')))));
                               if (refStatus == 'itemRefresh') {
                                 await fetchCashbookData();
                               }
@@ -269,11 +285,11 @@ class _CashBookExpensesListingSCreenState
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${Global.returnTrLable(translats, 'Date', lng).trim()} :',
+                                            '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} :',
                                             style: Styles.black104,
                                           ),
                                           Text(
-                                            '${Global.returnTrLable(translats, 'Amount', lng).trim()} :',
+                                            '${Global.returnTrLable(translats,CustomText.amount, lng).trim()} :',
                                             style: Styles.black104,
                                             strutStyle: StrutStyle(height: 1.2),
                                           )
@@ -343,7 +359,7 @@ class _CashBookExpensesListingSCreenState
                     ),
                   ),
           ],
-        ),
+        ):SizedBox(),
       ),
     );
   }

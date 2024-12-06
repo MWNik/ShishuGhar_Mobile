@@ -29,23 +29,28 @@ class StrockColorCirclePainter extends CustomPainter {
     final angleWithSpacing = angle + spacing;
 
     // First color stroke segment (Red)  weight_for_age  SUW
-    paint.color = weight_for_age==1.0?Color(0xffF35858):Color(0xffffffff);
+    paint.color = weight_for_age==1.0?Color(0xffF35858):weight_for_age! >1.0?Color(0xff8BF649):Color(0xffffffff);
     // paint.color = Color(0xffF35858);
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), 0, angle, false, paint);
 
     // Second color stroke segment (Green)  weight_for_height Sam
-    paint.color = weight_for_height==1.0?Color(0xffF35858):Color(0xffffffff);
+    paint.color = weight_for_height==1.0?Color(0xffF35858):weight_for_height ! >1.0?Color(0xff8BF649):Color(0xffffffff);
     // paint.color = Color(0xffF35858);
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), angleWithSpacing, angle, false, paint);
 
     // Third color stroke segment (Blue)
-    paint.color = weight_for_height==2.0?Color(0xffF4B81D):Color(0xffffffff);
+    paint.color = weight_for_height==2.0?Color(0xffF4B81D):weight_for_height ! >2.0?Color(0xff8BF649):Color(0xffffffff);
     // paint.color = Color(0xffF4B81D);
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), angleWithSpacing * 2, angle, false, paint);
 
     // Fourth color stroke segment (Yellow)
-    paint.color = mdical_condition==1.0?Color(0xffF35858):Color(0xffffffff);
+    // paint.color = mdical_condition==1.0?Color(0xffF35858):Color(0xffffffff);
+    if(mdical_condition!=null){
+      paint.color = mdical_condition==1.0?Color(0xffF35858):Color(0xff8BF649);
+    }else paint.color=Color(0xffffffff);
     // paint.color = Color(0xffF35858);
+
+
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), angleWithSpacing * 3, angle, false, paint);
   }
 

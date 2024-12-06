@@ -7,10 +7,15 @@ class ChildEventMetaFieldsHelper {
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     databaseHelper.openDb();
     if (houseFieldItem.isNotEmpty) {
-      for (var element in houseFieldItem) {
-        await DatabaseHelper.database!
-            .insert('tab_child_event', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        for(var element in houseFieldItem){
+          await txn.insert('tab_child_event',element.toJson());
+        }
+      });
+      // for (var element in houseFieldItem) {
+      //   await DatabaseHelper.database!
+      //       .insert('tab_child_event', element.toJson());
+      // }
     }
   }
 

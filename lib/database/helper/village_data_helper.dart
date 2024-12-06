@@ -1,5 +1,6 @@
 
 
+import 'package:flutter/material.dart';
 import 'package:shishughar/model/databasemodel/tabVillage_model.dart';
 
 import '../database_helper.dart';
@@ -35,9 +36,20 @@ class VillageDataHelper {
       List<TabVillage> villageList) async {
     await DatabaseHelper.database!.delete('tabVillage');
     if (villageList.isNotEmpty) {
-      for (var element in villageList) {
-        await DatabaseHelper.database!.insert('tabVillage', element.toJson());
+      try {
+        await DatabaseHelper.database!.transaction((txn) async {
+          var batch = txn.batch();
+          for (var element in villageList) {
+            batch.insert('tabVillage', element.toJson());
+          }
+          await batch.commit(noResult: true);
+        });
+      } catch (e) {
+        debugPrint("Error inserting master District ${e.toString()}");
       }
+      // for (var element in villageList) {
+      //   await DatabaseHelper.database!.insert('tabVillage', element.toJson());
+      // }
     }
   }
 

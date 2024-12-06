@@ -27,8 +27,10 @@ import 'child_refferal_tab_screen.dart';
 
 class ChildReferralListingScreen extends StatefulWidget {
   String tabTitle;
-   ChildReferralListingScreen({super.key,required this.tabTitle,
-   });
+  ChildReferralListingScreen({
+    super.key,
+    required this.tabTitle,
+  });
 
   @override
   State<ChildReferralListingScreen> createState() =>
@@ -53,6 +55,8 @@ class _ChildReferralListingScreenState
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<OptionsModel> creches = [];
   String? selectedCreche;
+  var applicableDate = Validate().stringToDate("2024-12-31");
+  var now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -61,6 +65,8 @@ class _ChildReferralListingScreenState
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -77,7 +83,11 @@ class _ChildReferralListingScreenState
       CustomText.Village,
       CustomText.ChildId,
       CustomText.Creche_Name,
-      CustomText.schduleDate
+      CustomText.schduleDate,
+      CustomText.Filter,
+      CustomText.Creches,
+      CustomText.clear
+      
     ];
 
     await TranslationDataHelper()
@@ -85,12 +95,10 @@ class _ChildReferralListingScreenState
         .then((value) => translats.addAll(value));
 
     crecheData = await CrecheDataHelper().getCrecheResponce();
-    creches =
-    await OptionsModelHelper().callCrechInOptionAll('Creche');
+    creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
 
     await fetchAllAnthroRecords();
   }
-
 
   Future<void> allChildWithlatest(
       List<ChildGrowthMetaResponseModel> childAnthro) async {
@@ -100,37 +108,42 @@ class _ChildReferralListingScreenState
 
     Map<String, dynamic> allAnthroWithChild = {};
     childAnthro.forEach((element) {
-      allAnthroWithChild[Global.getItemValues(element.responces!, 'measurement_date')]=jsonDecode(element.responces!)['anthropromatic_details'];
+      allAnthroWithChild[
+              Global.getItemValues(element.responces!, 'measurement_date')] =
+          jsonDecode(element.responces!)['anthropromatic_details'];
     });
     DateFormat dateFormat = DateFormat('yyyy-MM-dd');
 
     // Sort the entries by date keys
-    List<MapEntry<String, dynamic>> sortedEntries = allAnthroWithChild.entries.toList()
-      ..sort((e1, e2) => dateFormat.parse(e1.key).compareTo(dateFormat.parse(e2.key)));
+    List<MapEntry<String, dynamic>> sortedEntries = allAnthroWithChild.entries
+        .toList()
+      ..sort((e1, e2) =>
+          dateFormat.parse(e1.key).compareTo(dateFormat.parse(e2.key)));
 
     // Create a new map from the sorted entries
     Map<String, dynamic> sortedMap = Map.fromEntries(sortedEntries);
-    Map<String, dynamic> childWith={};
+    Map<String, dynamic> childWith = {};
     sortedMap.forEach((key, value) {
       List<dynamic> childItem = value as List<dynamic>;
       childItem.forEach((element) {
-        if(Global.stringToDouble(element['weight_for_height'].toString())==1 ||
-            Global.stringToDouble(element['weight_for_height'].toString()) ==2 ||
-            Global.stringToInt(element['any_medical_major_illness'].toString())==1||
-            Global.stringToDouble(element['weight_for_age'].toString())==1
-        ) {
-
-          Map<String, dynamic> growthData={};
-          growthData['childenrollguid']=element['childenrollguid'];
-          growthData['cgmguid']=element['cgmguid'];
+        if (Global.stringToDouble(
+                    element['weight_for_height'].toString()) ==
+                1 ||
+            Global.stringToDouble(element['weight_for_height'].toString()) ==
+                2 ||
+            Global.stringToInt(
+                    element['any_medical_major_illness'].toString()) ==
+                1 ||
+            Global.stringToDouble(element['weight_for_age'].toString()) == 1) {
+          Map<String, dynamic> growthData = {};
+          growthData['childenrollguid'] = element['childenrollguid'];
+          growthData['cgmguid'] = element['cgmguid'];
           childWith['$key#!${element['childenrollguid']}'] = growthData;
-
         }
       });
-
     });
     childWith.forEach((key, value) {
-      var enrolChilGUID=value['childenrollguid'];
+      var enrolChilGUID = value['childenrollguid'];
       childrenIdList.add(enrolChilGUID);
       growthGuidByDate[key] = value;
     });
@@ -139,62 +152,70 @@ class _ChildReferralListingScreenState
     enrolledChildrenList = await EnrolledExitChilrenResponceHelper()
         .callEnrollChildrenforByMultiEnrollGuid(childrenIdList);
 
-    reffrelChildrenList = await ChildReferralTabResponseHelper()
-        .callAllReffralsWithoutExit();
+    reffrelChildrenList =
+        await ChildReferralTabResponseHelper().callAllReffralsWithoutExit();
 
-    List<String> tempFoeRemove=[];
+    List<String> tempFoeRemove = [];
     growthGuidByDate.forEach((key, value) {
-      var enrolledGUID=value['childenrollguid'];
-      var cgmguid=value['cgmguid'];
-      var filterItem=reffrelChildrenList.where((element) =>
-      (element.childenrolledguid==enrolledGUID && element.cgmguid==cgmguid)).toList();
-      if(filterItem.length>0){
+      var enrolledGUID = value['childenrollguid'];
+      var cgmguid = value['cgmguid'];
+      var filterItem = reffrelChildrenList
+          .where((element) => (element.childenrolledguid == enrolledGUID &&
+              element.cgmguid == cgmguid))
+          .toList();
+      if (filterItem.length > 0) {
         tempFoeRemove.add(key);
-      }else{
-        var extedItem=enrolledChildrenList.where((element) =>
-        (element.ChildEnrollGUID==enrolledGUID && Global.validString(element.date_of_exit))).toList();
-        if(extedItem.length>0){
+      } else {
+        var extedItem = enrolledChildrenList
+            .where((element) => (element.ChildEnrollGUID == enrolledGUID &&
+                Global.validString(element.date_of_exit)))
+            .toList();
+        if (extedItem.length > 0) {
           tempFoeRemove.add(key);
         }
       }
-
     });
     tempFoeRemove.forEach((element) {
       growthGuidByDate.remove(element);
     });
     filteredGrowthGuidByDate = growthGuidByDate;
 
-
     setState(() {});
-
   }
-
 
   Future<void> fetchAllAnthroRecords() async {
     childAnthro = await ChildGrowthResponseHelper().allAnthormentryDisableOCT();
     crecheData = await CrecheDataHelper().getCrecheResponce();
-    if(childAnthro.length>0) {
+    if (childAnthro.length > 0) {
       allChildWithlatest(childAnthro);
     }
   }
+
   void cleaAllFilter() {
     filteredGrowthGuidByDate = growthGuidByDate;
     selectedCreche = null;
-    
-    setState((){});
-  }
-  filteredGetData(
-      BuildContext mContext,
-      ) async {
-    if (selectedCreche != null) {
-      filteredGrowthGuidByDate = Map.fromEntries(growthGuidByDate.entries.where((entry) => callDataByKey(entry.key, 'creche_id').toString() == selectedCreche.toString()) );
-      setState((){});
-    }
 
+    setState(() {});
   }
+
+  filteredGetData(
+    BuildContext mContext,
+  ) async {
+    if (selectedCreche != null) {
+      filteredGrowthGuidByDate = Map.fromEntries(growthGuidByDate.entries.where(
+          (entry) =>
+              callDataByKey(entry.key, 'creche_id').toString() ==
+              selectedCreche.toString()));
+      setState(() {});
+    }
+  }
+
   filterDataQu(String entry) {
     if (entry.length > 0) {
-      filteredGrowthGuidByDate = Map.fromEntries(growthGuidByDate.entries.where((element) => callDataByKey(element.key, 'child_name').toLowerCase().startsWith(entry.toLowerCase())));
+      filteredGrowthGuidByDate = Map.fromEntries(growthGuidByDate.entries.where(
+          (element) => callDataByKey(element.key, 'child_name')
+              .toLowerCase()
+              .startsWith(entry.toLowerCase())));
     } else {
       filteredGrowthGuidByDate = growthGuidByDate;
     }
@@ -230,7 +251,8 @@ class _ChildReferralListingScreenState
                             width: 10.w,
                           ),
                           Text(
-                            CustomText.Filter,
+                            Global.returnTrLable(
+                                translats, CustomText.Filter, lng),
                             style: Styles.labelcontrollerfont,
                           ),
                           Spacer(),
@@ -300,19 +322,20 @@ class _ChildReferralListingScreenState
           Row(
             children: [
               Expanded(
-                  child: CustomTextFieldRow(
-                    controller: Searchcontroller,
-                    onChanged: (value) {
-                      print(value);
-                      filterDataQu(value);
-                    },
-                    hintText: Global.returnTrLable(
-                        translats, CustomText.Search, lng),
-                    prefixIcon: Image.asset(
-                      "assets/search.png",
-                      scale: 2.4,
-                    ),
-                  ),),
+                child: CustomTextFieldRow(
+                  controller: Searchcontroller,
+                  onChanged: (value) {
+                    print(value);
+                    filterDataQu(value);
+                  },
+                  hintText:
+                      Global.returnTrLable(translats, CustomText.Search, lng),
+                  prefixIcon: Image.asset(
+                    "assets/search.png",
+                    scale: 2.4,
+                  ),
+                ),
+              ),
               SizedBox(
                 width: 10.w,
               ),
@@ -328,7 +351,7 @@ class _ChildReferralListingScreenState
             ],
           ),
           Expanded(
-            child: (filteredGrowthGuidByDate.keys.toList().length>0)
+            child: (filteredGrowthGuidByDate.keys.toList().length > 0)
                 ? ListView.builder(
                     itemCount: filteredGrowthGuidByDate.keys.toList().length,
                     shrinkWrap: true,
@@ -337,63 +360,77 @@ class _ChildReferralListingScreenState
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                          var childId = Global.stringToInt(
-                              callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
-                                  'name'));
+                          var childId = Global.stringToInt(callDataByKey(
+                              filteredGrowthGuidByDate.keys.toList()[index],
+                              'name'));
                           var childIdGen =
-                              '${ callDataByKey(filteredGrowthGuidByDate.keys.toList()[index], 'child_id')}';
+                              '${callDataByKey(filteredGrowthGuidByDate.keys.toList()[index], 'child_id')}';
                           var childName =
                               '${callDataByKey(filteredGrowthGuidByDate.keys.toList()[index], 'child_name')}';
 
-                          var creche_id = Global.stringToInt(
-                              callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
-                                  'creche_id'));
-                          List<String> keyParts = filteredGrowthGuidByDate.keys.toList()[index].toString().split('#!');
-                          var backDate = DateTime.parse(Validate().currentDate()).subtract(Duration(days: 7));
-                          if(backDate.isAfter(DateTime.parse(keyParts[0]))){
+                          var creche_id = Global.stringToInt(callDataByKey(
+                              filteredGrowthGuidByDate.keys.toList()[index],
+                              'creche_id'));
+                          List<String> keyParts = filteredGrowthGuidByDate.keys
+                              .toList()[index]
+                              .toString()
+                              .split('#!');
+                          var backDate = now.isBefore(applicableDate)
+                              ? DateTime(1992)
+                              : DateTime.parse(Validate().currentDate())
+                                  .subtract(Duration(days: 7));
+                          if (backDate.isAfter(DateTime.parse(keyParts[0]))) {
                             minDate = backDate;
-                          }else {
+                          } else {
                             minDate = DateTime.parse(keyParts[0]);
                           }
-                          if(minDate != null){
-                            List<int> parts = Validate().currentDate().split('-').map(int.parse).toList();
-                            if(DateTime(minDate!.year,minDate!.month).isBefore(DateTime(parts[0],parts[1]))){
-                              minDate = DateTime(parts[0],parts[1],1);
+                          if (minDate != null) {
+                            List<int> parts = Validate()
+                                .currentDate()
+                                .split('-')
+                                .map(int.parse)
+                                .toList();
+                            if (DateTime(minDate!.year, minDate!.month)
+                                .isBefore(DateTime(parts[0], parts[1]))) {
+                              minDate = DateTime(parts[0], parts[1], 1);
                             }
                           }
 
-                          var child_referral_guid ='';
+                          var child_referral_guid = '';
                           if (!Global.validString(child_referral_guid)) {
                             child_referral_guid = Validate().randomGuid();
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        ChildReferralTabScreen(
-                                          tabTitle: widget.tabTitle,
-                                          GrowthMonitoringGUID:callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
-                                              'cgmguid'),
-                                          enrolChildGuid: callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
-                                              'childenrollguid'),
-                                          creche_id: creche_id,
-                                          ChildDOB: callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
-                                              'child_dob'),
-                                          enrollDate: callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
-                                              'date_of_enrollment'),
-                                          child_id: childId,
-                                          child_referral_guid:
-                                              child_referral_guid,
-                                          childName: childName,
-                                          childId: childIdGen,
-                                            scheduleDate: keyParts[0],
-                                            minDate: minDate!,
-                                            isEditable:true,
-                                            isDischarge: false
-                                        )));
+                                    builder: (BuildContext context) => ChildReferralTabScreen(
+                                        tabTitle: widget.tabTitle,
+                                        GrowthMonitoringGUID: callDataByKey(
+                                            filteredGrowthGuidByDate.keys
+                                                .toList()[index],
+                                            'cgmguid'),
+                                        enrolChildGuid: callDataByKey(
+                                            filteredGrowthGuidByDate.keys
+                                                .toList()[index],
+                                            'childenrollguid'),
+                                        creche_id: creche_id,
+                                        ChildDOB: callDataByKey(
+                                            filteredGrowthGuidByDate.keys
+                                                .toList()[index],
+                                            'child_dob'),
+                                        enrollDate: callDataByKey(
+                                            filteredGrowthGuidByDate.keys.toList()[index],
+                                            'date_of_enrollment'),
+                                        child_id: childId,
+                                        child_referral_guid: child_referral_guid,
+                                        childName: childName,
+                                        childId: childIdGen,
+                                        scheduleDate: keyParts[0],
+                                        minDate: minDate,
+                                        isEditable: true,
+                                        isDischarge: false)));
 
                             if (refStatus == 'itemRefresh') {
                               await fetchAllAnthroRecords();
                             }
-
 
                             if (refStatus == 'itemRefresh') {
                               await fetchAllAnthroRecords();
@@ -468,30 +505,37 @@ class _ChildReferralListingScreenState
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                         callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],'child_name')
-                                            ,
+                                            callDataByKey(
+                                                filteredGrowthGuidByDate.keys
+                                                    .toList()[index],
+                                                'child_name'),
                                             style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
-                                            callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
+                                            callDataByKey(
+                                                filteredGrowthGuidByDate.keys
+                                                    .toList()[index],
                                                 'child_id'),
                                             style: Styles.cardBlue10,
-                                          strutStyle: StrutStyle(height: 1.2),
+                                            strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
-                                            callCrecheNameName(
-                                                callDataByKey(filteredGrowthGuidByDate.keys.toList()[index],
-                                                    'creche_id')),
+                                            callCrecheNameName(callDataByKey(
+                                                filteredGrowthGuidByDate.keys
+                                                    .toList()[index],
+                                                'creche_id')),
                                             style: Styles.cardBlue10,
-                                          strutStyle: StrutStyle(height: 1.2),
+                                            strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
-                                            Validate().displeDateFormate(filteredGrowthGuidByDate.keys.toList()[index]),
+                                            Validate().displeDateFormate(
+                                                filteredGrowthGuidByDate.keys
+                                                    .toList()[index]),
                                             style: Styles.cardBlue10,
-                                          strutStyle: StrutStyle(height: 1.2),
+                                            strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ],
@@ -532,21 +576,21 @@ class _ChildReferralListingScreenState
     return returnValue;
   }
 
-
-
-  String callDataByKey(String key,valueKey){
+  String callDataByKey(String key, valueKey) {
     String returnValue = '';
-    var growthData=growthGuidByDate[key];
-    var enrolledGUID=growthData['childenrollguid'];
-    var cgmguid=growthData['cgmguid'];
-    if(valueKey!='cgmguid'){
-      var reffItems=enrolledChildrenList.where((element) => element.ChildEnrollGUID==enrolledGUID).toList();
-      if(reffItems.length>0){
-        returnValue=Global.getItemValues(reffItems.first.responces, valueKey);
+    var growthData = growthGuidByDate[key];
+    var enrolledGUID = growthData['childenrollguid'];
+    var cgmguid = growthData['cgmguid'];
+    if (valueKey != 'cgmguid') {
+      var reffItems = enrolledChildrenList
+          .where((element) => element.ChildEnrollGUID == enrolledGUID)
+          .toList();
+      if (reffItems.length > 0) {
+        returnValue = Global.getItemValues(reffItems.first.responces, valueKey);
       }
-    }else returnValue=cgmguid;
+    } else
+      returnValue = cgmguid;
 
     return returnValue;
   }
-  
 }

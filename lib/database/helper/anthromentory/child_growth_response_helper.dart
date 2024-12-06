@@ -31,12 +31,13 @@ class ChildGrowthResponseHelper {
     return houseHoldFieldItem;
   }
 
-
-  Future<List<ChildGrowthMetaResponseModel>> anthormentryByCreche(int creche_id) async {
-    var query = 'Select * from  child_anthormentry_responce  where creche_id=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
+  Future<List<ChildGrowthMetaResponseModel>> anthormentryByCreche(
+      int creche_id) async {
+    var query =
+        'Select * from  child_anthormentry_responce  where creche_id=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
 
     List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery(query,[creche_id]);
+        await DatabaseHelper.database!.rawQuery(query, [creche_id]);
 
     List<ChildGrowthMetaResponseModel> items = [];
     result.forEach((itemMap) {
@@ -46,16 +47,13 @@ class ChildGrowthResponseHelper {
     return items;
   }
 
-
-
-
-
-
-  Future<List<ChildGrowthMetaResponseModel>> anthormentryByCrecheINChild(int creche_id) async {
-    var query = 'Select * from  child_anthormentry_responce  where creche_id=? and responces NOTNULL ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
+  Future<List<ChildGrowthMetaResponseModel>> anthormentryByCrecheINChild(
+      int creche_id) async {
+    var query =
+        'Select * from  child_anthormentry_responce  where creche_id=? and responces NOTNULL ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
 
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query,[creche_id]);
+        await DatabaseHelper.database!.rawQuery(query, [creche_id]);
 
     List<ChildGrowthMetaResponseModel> items = [];
     result.forEach((itemMap) {
@@ -65,13 +63,12 @@ class ChildGrowthResponseHelper {
     return items;
   }
 
-
-
-  Future<List<ChildGrowthMetaResponseModel>> callAnthropometryByGuid(String cgmGuid) async {
+  Future<List<ChildGrowthMetaResponseModel>> callAnthropometryByGuid(
+      String cgmGuid) async {
     var query = 'Select * from  child_anthormentry_responce where cgmguid=?';
 
     List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery(query,[cgmGuid]);
+        await DatabaseHelper.database!.rawQuery(query, [cgmGuid]);
 
     List<ChildGrowthMetaResponseModel> items = [];
     result.forEach((itemMap) {
@@ -81,12 +78,13 @@ class ChildGrowthResponseHelper {
     return items;
   }
 
-
-  Future<List<ChildGrowthMetaResponseModel>> callChildGrowthResponsesForUpload() async {
-    var query = 'Select * from  child_anthormentry_responce where is_edited=1 and responces NOTNULL';
+  Future<List<ChildGrowthMetaResponseModel>>
+      callChildGrowthResponsesForUpload() async {
+    var query =
+        'Select * from  child_anthormentry_responce where is_edited=1 and responces NOTNULL';
 
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery(query);
+        await DatabaseHelper.database!.rawQuery(query);
 
     List<ChildGrowthMetaResponseModel> items = [];
     result.forEach((itemMap) {
@@ -96,8 +94,14 @@ class ChildGrowthResponseHelper {
     return items;
   }
 
-  Future<void> insertUpdate(String cgmguid,String? measurementDate,
-      int? name,int? creche_name, String? responces, String userId, String? created_at) async {
+  Future<void> insertUpdate(
+      String cgmguid,
+      String? measurementDate,
+      int? name,
+      int? creche_name,
+      String? responces,
+      String userId,
+      String? created_at) async {
     var item = ChildGrowthMetaResponseModel(
         cgmguid: cgmguid,
         responces: responces,
@@ -114,42 +118,102 @@ class ChildGrowthResponseHelper {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-
   Future<void> childGrowthMetaData(Map<String, dynamic> item) async {
     List<Map<String, dynamic>> growth =
-    List<Map<String, dynamic>>.from(item['Data']);
-    print(growth);
-    growth.forEach((element) async {
+        List<Map<String, dynamic>>.from(item['Data']);
+
+    // List to hold child growth data models
+    List<ChildGrowthMetaResponseModel> growthItems = [];
+
+    // Prepare data
+    for (var element in growth) {
       var growthData = element['Child Growth Monitoring'];
 
       var name = growthData['name'];
-      var creche_id = growthData['creche_id'];
+      var crecheId = growthData['creche_id'];
       var cgmguid = growthData['cgmguid'];
       var appCreatedOn = growthData['created_on'];
-      var appcreated_by = growthData['created_by'];
-      var app_updated_by = growthData['updated_by'];
-      var app_updated_on = growthData['updated_on'];
-      var measurement_date = growthData['measurement_date'];
+      var appCreatedBy = growthData['created_by'];
+      var appUpdatedBy = growthData['updated_by'];
+      var appUpdatedOn = growthData['updated_on'];
+      var measurementDate = growthData['measurement_date'];
       var finalHHData = Validate().keyesFromResponce(growthData);
-      var hhDtaResponce = jsonEncode(finalHHData);
+      var hhDataResponse = jsonEncode(finalHHData);
 
-      var items = ChildGrowthMetaResponseModel(
-        cgmguid: cgmguid,
-        name: name,
-        is_uploaded: 1,
-        is_edited: 0,
-        is_deleted: 0,
-        creche_id: Global.stringToInt(creche_id),
-        update_at: app_updated_on,
-        updated_by: app_updated_by,
-        created_at: appCreatedOn,
-        created_by: appcreated_by,
-        measurement_date: measurement_date,
-        responces: hhDtaResponce,
+      // Add the growth data model to the list
+      growthItems.add(
+        ChildGrowthMetaResponseModel(
+          cgmguid: cgmguid,
+          name: name,
+          is_uploaded: 1,
+          is_edited: 0,
+          is_deleted: 0,
+          creche_id: Global.stringToInt(crecheId),
+          update_at: appUpdatedOn,
+          updated_by: appUpdatedBy,
+          created_at: appCreatedOn,
+          created_by: appCreatedBy,
+          measurement_date: measurementDate,
+          responces: hhDataResponse,
+        ),
       );
-      await inserts(items);
+    }
+
+    // Commit data in a transaction using batch
+    await DatabaseHelper.database!.transaction((txn) async {
+      var batch = txn.batch();
+
+      // Add all growth items to the batch
+      for (var item in growthItems) {
+        batch.insert(
+          'child_anthormentry_responce',
+          item.toJson(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      // Commit the batch
+      await batch.commit(noResult: true);
     });
+
+    print('Child Growth Meta data successfully inserted.');
   }
+
+  // Future<void> childGrowthMetaData(Map<String, dynamic> item) async {
+  //   List<Map<String, dynamic>> growth =
+  //   List<Map<String, dynamic>>.from(item['Data']);
+  //   print(growth);
+  //   growth.forEach((element) async {
+  //     var growthData = element['Child Growth Monitoring'];
+
+  //     var name = growthData['name'];
+  //     var creche_id = growthData['creche_id'];
+  //     var cgmguid = growthData['cgmguid'];
+  //     var appCreatedOn = growthData['created_on'];
+  //     var appcreated_by = growthData['created_by'];
+  //     var app_updated_by = growthData['updated_by'];
+  //     var app_updated_on = growthData['updated_on'];
+  //     var measurement_date = growthData['measurement_date'];
+  //     var finalHHData = Validate().keyesFromResponce(growthData);
+  //     var hhDtaResponce = jsonEncode(finalHHData);
+
+  //     var items = ChildGrowthMetaResponseModel(
+  //       cgmguid: cgmguid,
+  //       name: name,
+  //       is_uploaded: 1,
+  //       is_edited: 0,
+  //       is_deleted: 0,
+  //       creche_id: Global.stringToInt(creche_id),
+  //       update_at: app_updated_on,
+  //       updated_by: app_updated_by,
+  //       created_at: appCreatedOn,
+  //       created_by: appcreated_by,
+  //       measurement_date: measurement_date,
+  //       responces: hhDtaResponce,
+  //     );
+  //     await inserts(items);
+  //   });
+  // }
 
   Future<List<ChildGrowthMetaResponseModel>> callChildGrowthResponses() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
@@ -177,39 +241,43 @@ class ChildGrowthResponseHelper {
     return items;
   }
 
-
   Future<void> updateUploadedChildGrowthResponce(
-      Map<String, dynamic> item,String dataResponce) async {
-    Map<String, dynamic> CiData = item['data'];
+      Map<String, dynamic> item, String dataResponce) async {
+    Map<String, dynamic> CiData = item['Data'];
 
     var name = CiData['name'];
     var cgmguid = CiData['cgmguid'];
-    List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(CiData['anthropromatic_details']);
-    Map<String, dynamic> uploadeData =jsonDecode(dataResponce);
-    List<Map<String, dynamic>> uploadedChild = List<Map<String, dynamic>>.from(uploadeData['anthropromatic_details']);
-    uploadeData['name']=name;
-    List<dynamic> finalChild=[];
+    List<Map<String, dynamic>> children =
+        List<Map<String, dynamic>>.from(CiData['anthropromatic_details']);
+    Map<String, dynamic> uploadeData = jsonDecode(dataResponce);
+    List<Map<String, dynamic>> uploadedChild =
+        List<Map<String, dynamic>>.from(uploadeData['anthropromatic_details']);
+    uploadeData['name'] = name;
+    List<dynamic> finalChild = [];
     children.forEach((element) {
-      var childName=element['name'];
-      var childenrollguid=element['childenrollguid'];
-      var filChildItem=uploadedChild.where((element) => element['childenrollguid']==childenrollguid).toList();
-      if(filChildItem.length>0){
-        var childMap=filChildItem[0];
-        childMap['name']=childName;
+      var childName = element['name'];
+      var childenrollguid = element['childenrollguid'];
+      var filChildItem = uploadedChild
+          .where((element) => element['childenrollguid'] == childenrollguid)
+          .toList();
+      if (filChildItem.length > 0) {
+        var childMap = filChildItem[0];
+        childMap['name'] = childName;
         finalChild.add(childMap);
       }
     });
-    uploadeData['anthropromatic_details']=finalChild;
-    var jsonF=jsonEncode(uploadeData);
-   print('uploadReturnJson $jsonF');
+    uploadeData['anthropromatic_details'] = finalChild;
+    var jsonF = jsonEncode(uploadeData);
+    print('uploadReturnJson $jsonF');
 
     await DatabaseHelper.database!.rawQuery(
         'UPDATE child_anthormentry_responce SET name = ?  ,responces = ?  , is_uploaded=1 , is_edited=0 where cgmguid=?',
-        [name,jsonF,cgmguid]);
+        [name, jsonF, cgmguid]);
   }
 
   Future<List<ChildGrowthMetaResponseModel>> allAnthormentry() async {
-    var query = 'Select * from  child_anthormentry_responce where responces NOTNULL';
+    var query =
+        'Select * from  child_anthormentry_responce where responces NOTNULL';
 
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
       query,
@@ -222,26 +290,13 @@ class ChildGrowthResponseHelper {
 
     return items;
   }
+
   Future<List<ChildGrowthMetaResponseModel>> allAnthormentryDisableOCT() async {
-    var query = 'Select * from  child_anthormentry_responce where responces NOTNULL and measurement_date >=?';
+    var query =
+        'Select * from  child_anthormentry_responce where responces NOTNULL and measurement_date >=?';
 
-    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-      query,['2024-10-01']
-    );
-
-    List<ChildGrowthMetaResponseModel> items = [];
-    result.forEach((itemMap) {
-      items.add(ChildGrowthMetaResponseModel.fromJson(itemMap));
-    });
-
-    return items;
-  }
-
-  Future<List<ChildGrowthMetaResponseModel>> anthroByReferral(String child_referral_guid) async {
-    var query = 'select * from child_anthormentry_responce where cgmguid = (select cgmguid from child_referral_responce where child_referral_guid=?) ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
-
-    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-      query,[child_referral_guid]);
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery(query, ['2024-10-01']);
 
     List<ChildGrowthMetaResponseModel> items = [];
     result.forEach((itemMap) {
@@ -251,11 +306,29 @@ class ChildGrowthResponseHelper {
     return items;
   }
 
-  Future<List<ChildGrowthMetaResponseModel>> lastAnthroRecord(String childenrolledguid,String lastRecordDate) async {
-    var query = '''select * from child_anthormentry_responce where cgmguid =(select cgmguid from child_referral_responce WHERE strftime('%Y-%m-%d', date_of_referral) < ? and childenrolledguid=?  ORDER BY strftime('%Y-%m-%d', date_of_referral) DESC limit 1)''';
+  Future<List<ChildGrowthMetaResponseModel>> anthroByReferral(
+      String child_referral_guid) async {
+    var query =
+        'select * from child_anthormentry_responce where cgmguid = (select cgmguid from child_referral_responce where child_referral_guid=?) ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
 
-    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-      query,[lastRecordDate,childenrolledguid]);
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery(query, [child_referral_guid]);
+
+    List<ChildGrowthMetaResponseModel> items = [];
+    result.forEach((itemMap) {
+      items.add(ChildGrowthMetaResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
+  Future<List<ChildGrowthMetaResponseModel>> lastAnthroRecord(
+      String childenrolledguid, String lastRecordDate) async {
+    var query =
+        '''select * from child_anthormentry_responce where cgmguid =(select cgmguid from child_referral_responce WHERE strftime('%Y-%m-%d', date_of_referral) < ? and childenrolledguid=?  ORDER BY strftime('%Y-%m-%d', date_of_referral) DESC limit 1)''';
+
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery(query, [lastRecordDate, childenrolledguid]);
 
     List<ChildGrowthMetaResponseModel> items = [];
     result.forEach((itemMap) {

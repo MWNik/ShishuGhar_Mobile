@@ -15,6 +15,16 @@ class CrecheCareGiverHelper {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
+  Future<void> insertWhole(List<CareGiverResponceModel> careGiversList) async {
+    await DatabaseHelper.database!.transaction((txn) async{
+      var batch = txn.batch();
+      for (var item in careGiversList) {
+        batch.insert('tab_caregiver_response',item.toJson(),conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+      await batch.commit(noResult: true);
+    });
+  }
+
 
 
   Future<List<CareGiverResponceModel>> getCareGiverResponce(int parentName) async {

@@ -7,10 +7,15 @@ class ChildGrowthMetaFieldsHelper {
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     databaseHelper.openDb();
     if (houseFieldItem.isNotEmpty) {
-      for (var element in houseFieldItem) {
-        await DatabaseHelper.database!
-            .insert('tabChildGrowthMeta', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        for(var element in houseFieldItem){
+          await txn.insert('tabChildGrowthMeta', element.toJson());
+        }
+      });
+      // for (var element in houseFieldItem) {
+      //   await DatabaseHelper.database!
+      //       .insert('tabChildGrowthMeta', element.toJson());
+      // }
     }
   }
 

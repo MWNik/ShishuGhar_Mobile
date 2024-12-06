@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
+import 'package:shishughar/model/apimodel/creche_database_responce_model.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
+import 'package:shishughar/utils/intent_utils.dart';
 import 'package:shishughar/utils/validate.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/database/helper/creche_data_helper.dart';
@@ -18,15 +20,18 @@ class CresheTabScreen extends StatefulWidget {
   final int name;
   final String crechedCode;
   final bool isUpdate;
-  CresheTabScreen({super.key, required this.name,
-    required this.crechedCode,required this.isUpdate});
+  CresheTabScreen(
+      {super.key,
+      required this.name,
+      required this.crechedCode,
+      required this.isUpdate});
 
   @override
   _CresheTabScreenState createState() => _CresheTabScreenState();
 }
 
-class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderStateMixin {
-
+class _CresheTabScreenState extends State<CresheTabScreen>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   int tabIndex = 0;
   List<Widget> tabTitleItem = [];
@@ -35,13 +40,17 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
   bool _isLoading = true;
   String? role;
   String? lng;
-  List<Translation> labelControlls=[];
-
+  List<Translation> labelControlls = [];
+  double? lat;
+  double? long;
+  double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
 
   @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    await callScrenControllers(CustomText.Creches);
+  void initState() {
+    super.initState();
+    callScrenControllers(CustomText.Creches);
   }
 
   @override
@@ -50,10 +59,9 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
     } else {
@@ -79,31 +87,64 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
                 ),
               ),
             ),
-            title:  Text(lng!=null?Global.returnTrLable(labelControlls,CustomText.CrecheProfileView,lng!):"",style: Styles.white145,),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: InkWell(
+                  onTap: () async {
+                    if (lat != null && long != null) {
+                      await IntentUtils.launchGoogleMaps(lat!, long!);
+                    } else {
+                      Validate().singleButtonPopup(
+                          Global.returnTrLable(labelControlls,
+                              CustomText.locationNotAvailable, lng!),
+                          Global.returnTrLable(
+                              labelControlls, CustomText.ok, lng!),
+                          false,
+                          context);
+                    }
+                  },
+                  child: Icon(
+                    lat != null && long != null
+                        ? Icons.place
+                        : Icons.place_outlined,
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            ],
+            title: Text(
+              lng != null
+                  ? Global.returnTrLable(
+                      labelControlls, CustomText.CrecheProfileView, lng!)
+                  : "",
+              style: Styles.white145,
+            ),
             centerTitle: true,
             bottom: _isLoading
                 ? null
                 : TabBar(
-              indicatorColor: Colors.white,
-              unselectedLabelColor: Colors.grey.shade300,
-              unselectedLabelStyle: Styles.white124P,
-              labelColor: Colors.white,
-              controller: _tabController,
-              // isScrollable: true,
-              tabs: tabTitleItem,
-              onTap: (index) {
-                if (_tabController.indexIsChanging) {
-                  _tabController.index = _tabController.previousIndex;
+                    indicatorColor: Color(0xffF26BA3),
+                    unselectedLabelColor: Colors.grey.shade300,
+                    unselectedLabelStyle: Styles.white124P,
+                    labelColor: Colors.white,
+                    controller: _tabController,
+                    isScrollable: tabIsScrollable,
+                    labelPadding: EdgeInsets.zero,
+                    // tabAlignment: TabAlignment.start,
+                    tabAlignment: tabIsScrollable ? TabAlignment.start : null,
+                    tabs: tabTitleItem,
+                    onTap: (index) {
+                      if (_tabController.indexIsChanging) {
+                        _tabController.index = _tabController.previousIndex;
 
-                  handleTabChange(index,_tabController.previousIndex);
-                } else {
-                  print("object 1 $index");
-                  return;
-
-                }
-              },
-            ),
-
+                        handleTabChange(index, _tabController.previousIndex);
+                      } else {
+                        print("object 1 $index");
+                        return;
+                      }
+                    },
+                  ),
           ),
           body: Column(
             children: [
@@ -121,12 +162,10 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
     }
   }
 
-
-
   Future<void> callScrenControllers(screen_type) async {
     List<HouseHoldFielItemdModel> allItems = [];
     List<HouseHoldFielItemdModel> tempBreakDown = [];
-    role=await Validate().readString(Validate.role);
+    role = await Validate().readString(Validate.role);
     await CrecheFieldHelper()
         .getCrecheFieldsForm(screen_type)
         .then((value) async {
@@ -160,8 +199,8 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
       if (i < (tabBreakItems.length) - 1) {
         var filtredItem = allItems
             .where((element) =>
-        element.idx! > tabBreakItems[i].idx! &&
-            element.idx! < tabBreakItems[i + 1].idx!)
+                element.idx! > tabBreakItems[i].idx! &&
+                element.idx! < tabBreakItems[i + 1].idx!)
             .toList();
         itemScreenItems[tabBreakItems[i].name!] = filtredItem;
       } else {
@@ -173,8 +212,7 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
     }
     if (tempBreakDown.length > 0) {
       var chil = tempBreakDown
-          .where((element) =>
-      element.fieldname == 'caregiver_details')
+          .where((element) => element.fieldname == 'caregiver_details')
           .toList();
       if (chil.length > 0) {
         tabBreakItems.add(chil[0]);
@@ -183,23 +221,34 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
 
     await tabController();
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
-    // _tabController.addListener(handleTabChange);
+    tabIsScrollable = tabWidth * tabBreakItems.length > screenWidth;
 
-  await setLabelTextData();
+    // _tabController.addListener(handleTabChange);
+    await fetchLatLong();
+    await setLabelTextData();
     setState(() {
       _isLoading = false;
     });
   }
 
-
   Future tabController() async {
     tabBreakItems.forEach((element) async {
       lng = await Validate().readString(Validate.sLanguage);
       var verifiLable =
-      await TranslationDataHelper().getTranslation(element.label!, lng!);
-      tabTitleItem.add(Tab(icon: Container(child: Text(verifiLable))));
+          await TranslationDataHelper().getTranslation(element.label!, lng!);
+      tabTitleItem.add(Container(
+        width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
+        // padding: EdgeInsets.only(left: 10, right: 10),
+        padding: EdgeInsets.only(
+            left: tabIsScrollable ? 10 : 0, right: tabIsScrollable ? 10 : 0),
+        decoration: BoxDecoration(
+            color: Color(0xff369A8D),
+            border: Border(
+                right: BorderSide(
+                    color: Colors.white, width: 1, style: BorderStyle.solid))),
+        child: Tab(child: Text(verifiLable)),
+      ));
     });
-
   }
 
   List<Widget> tabControllerScreen() {
@@ -243,15 +292,20 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
 
   Future<void> setLabelTextData() async {
     lng = await Validate().readString(Validate.sLanguage);
-    List<String> valueNames = [CustomText.CrecheProfileView];
+    List<String> valueNames = [
+      CustomText.CrecheProfileView,
+      CustomText.location,
+      CustomText.ok
+    ];
     // tabBreakItems.forEach((element){
     //   valueNames.add(element.label!);
     // });
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls=value);
+        .then((value) => labelControlls = value);
   }
-  void handleTabChange(int index,int previus) async {
+
+  void handleTabChange(int index, int previus) async {
     // bool shouldChangeTab =
     await checkConditionsBeforeChangingTab(index).then((value) {
       if (value) {
@@ -261,7 +315,6 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
         });
       }
       // Navigator.pop(context);
-
     });
     // if (!shouldChangeTab) {
     //   // If conditions are not met, revert back to the previous tab index
@@ -279,12 +332,13 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
   }
 
   Future<bool> checkConditionsBeforeChangingTab(int index) async {
-    bool returnStatus=false;
-    if(index==1){
+    bool returnStatus = false;
+    if (index == 1) {
       var alredRecord =
-      await CrecheDataHelper().getCrecheResponceItem(widget.name);
+          await CrecheDataHelper().getCrecheResponceItem(widget.name);
       if (alredRecord.isNotEmpty) {
-        Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
+        Map<String, dynamic> responseData =
+            jsonDecode(alredRecord[0].responces!);
         var items = itemScreenItems[itemScreenItems.keys.first];
         if (items != null && items.isNotEmpty) {
           for (int i = 0; i < items.length; i++) {
@@ -296,7 +350,8 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
           }
         }
       }
-    }else returnStatus=true;
+    } else
+      returnStatus = true;
 
     // if (alredRecord.isNotEmpty) {
     //   Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
@@ -326,5 +381,16 @@ class _CresheTabScreenState extends State<CresheTabScreen> with TickerProviderSt
     // }else returnStatus= true;
     // Return false if conditions are not met
     return returnStatus;
+  }
+
+  Future<void> fetchLatLong() async {
+    List<CresheDatabaseResponceModel> crecheRecord =
+        await CrecheDataHelper().getCrecheResponceItem(widget.name);
+    if (crecheRecord.isNotEmpty) {
+      lat = Global.stringToDouble(
+          Global.getItemValues(crecheRecord.first.responces, 'latitude'));
+      long = Global.stringToDouble(
+          Global.getItemValues(crecheRecord.first.responces, 'longitude'));
+    }
   }
 }

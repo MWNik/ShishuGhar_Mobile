@@ -9,6 +9,7 @@ import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_customdat
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';
+import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
@@ -81,6 +82,8 @@ class _CrecheMonitorTabItemForAddState
   List<TabVillage> allVillageRecords = [];
   List<TabDistrict> allDistrictRecord = [];
   List<TabBlock> allBlockRecords = [];
+  var applicableDate = Validate().stringToDate(Validate.date);
+  var now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -90,8 +93,8 @@ class _CrecheMonitorTabItemForAddState
 
   Future<List<String>> fetchDatesList(String creche_id) async {
     List<CrecheMonitorResponseModel> cmcRespose =
-    await CrecheMonitorResponseHelper()
-        .getCrecheResponseWithCrecheId(creche_id);
+        await CrecheMonitorResponseHelper()
+            .getCrecheResponseWithCrecheId(creche_id);
     List<String> visitdatesListString = [];
     cmcRespose.forEach((element) {
       visitdatesListString
@@ -105,19 +108,30 @@ class _CrecheMonitorTabItemForAddState
   }
 
   Future<void> _initData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     _role = await Validate().readString(Validate.role);
     username = (await Validate().readString(Validate.userName))!;
-    allDistrictRecord= await DistrictDataHelper().getTabDistrictList();
-    allBlockRecords= await BlockDataHelper().getTabBlockList();
-    allGpRecords= await GramPanchayatDataHelper().getTabGramPanchayatList();
-    allVillageRecords= await VillageDataHelper().getTabVillageList();
+    allDistrictRecord = await DistrictDataHelper().getTabDistrictList();
+    allBlockRecords = await BlockDataHelper().getTabBlockList();
+    allGpRecords = await GramPanchayatDataHelper().getTabGramPanchayatList();
+    allVillageRecords = await VillageDataHelper().getTabVillageList();
 
     List<String> valueNames = [
       CustomText.Creches,
       CustomText.Next,
       CustomText.back,
       CustomText.ok,
-      CustomText.ChildEnrollsuccess
+      CustomText.ChildEnrollsuccess,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.dataSaveSuc,
+      CustomText.plsFilManForm,
+      CustomText.Save,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.Submit,
+      CustomText.visitNoteAlrdyExists
     ];
 
     final items = widget.screenItem[widget.tabBreakItem.name!]!;
@@ -127,6 +141,10 @@ class _CrecheMonitorTabItemForAddState
         valueNames.add(element.label!);
       }
     });
+    await TranslationDataHelper()
+        .callTranslateString(valueNames)
+        .then((value) => _translation.addAll(value));
+
     allCrecheRecords = await CrecheDataHelper().getCrecheResponce();
     await updateExistingFields();
 
@@ -141,7 +159,7 @@ class _CrecheMonitorTabItemForAddState
 
     Map<String, dynamic> responseData = {};
     List<HouseHoldFielItemdModel> items =
-    widget.screenItem[widget.tabBreakItem.name!]!;
+        widget.screenItem[widget.tabBreakItem.name!]!;
 
     List<String> defaultCommon = [];
     List<String> logicFields = [];
@@ -166,7 +184,7 @@ class _CrecheMonitorTabItemForAddState
           } else if (items[i].options == 'Partner') {
             await OptionsModelHelper()
                 .getPartnerMstCommonOptions(
-                items[i].options!.trim(), responseData)
+                    items[i].options!.trim(), responseData)
                 .then((data) {
               _options.addAll(data);
             });
@@ -174,7 +192,7 @@ class _CrecheMonitorTabItemForAddState
           } else {
             await OptionsModelHelper()
                 .getLocationData(
-                items[i].options!.trim(), responseData, _language)
+                    items[i].options!.trim(), responseData, _language)
                 .then((data) {
               _options.addAll(data);
             });
@@ -197,7 +215,7 @@ class _CrecheMonitorTabItemForAddState
     });
 
     var dateOfVi =
-    items.where((element) => element.fieldname == 'date_of_visit').toList();
+        items.where((element) => element.fieldname == 'date_of_visit').toList();
 
     if (dateOfVi.length > 0 && Global.validString(_myMap['creche_id'])) {
       unpicableDates = await fetchDatesList(_myMap['creche_id']);
@@ -231,7 +249,7 @@ class _CrecheMonitorTabItemForAddState
     List<CresheDatabaseResponceModel> filteredRecords = [];
     filteredRecords = allCrecheRecords
         .where((element) =>
-    Global.getItemValues(element.responces!, 'village_id') == villageId)
+            Global.getItemValues(element.responces!, 'village_id') == villageId)
         .toList();
     List<OptionsModel> crecheOptionsList = [];
     filteredRecords.forEach((element) {
@@ -249,8 +267,8 @@ class _CrecheMonitorTabItemForAddState
     List<TabDistrict> filteredDistricList = [];
     filteredDistricList = allDistrictRecord
         .where((element) =>
-    Global.stringToInt(element.stateId.toString()) ==
-        Global.stringToInt(state_id))
+            Global.stringToInt(element.stateId.toString()) ==
+            Global.stringToInt(state_id))
         .toList();
     List<OptionsModel> DistrictOptions = [];
     filteredDistricList.forEach((element) {
@@ -268,8 +286,8 @@ class _CrecheMonitorTabItemForAddState
     List<TabBlock> filteredBlockList = [];
     filteredBlockList = allBlockRecords
         .where((element) =>
-    Global.stringToInt(element.districtId.toString()) ==
-        Global.stringToInt(districtId))
+            Global.stringToInt(element.districtId.toString()) ==
+            Global.stringToInt(districtId))
         .toList();
     List<OptionsModel> blockOptionsList = [];
     filteredBlockList.forEach((element) {
@@ -286,8 +304,8 @@ class _CrecheMonitorTabItemForAddState
     List<TabGramPanchayat> filteredGp = [];
     filteredGp = allGpRecords
         .where((element) =>
-    Global.stringToInt(element.blockId.toString()) ==
-        Global.stringToInt(blockId))
+            Global.stringToInt(element.blockId.toString()) ==
+            Global.stringToInt(blockId))
         .toList();
     List<OptionsModel> GpOptionsList = [];
     filteredGp.forEach((element) {
@@ -304,8 +322,8 @@ class _CrecheMonitorTabItemForAddState
     List<TabVillage> filteredVillage = [];
     filteredVillage = allVillageRecords
         .where((element) =>
-    Global.stringToInt(element.gpId.toString()) ==
-        Global.stringToInt(GpId))
+            Global.stringToInt(element.gpId.toString()) ==
+            Global.stringToInt(GpId))
         .toList();
     List<OptionsModel> VillageOptionList = [];
     filteredVillage.forEach((element) {
@@ -348,7 +366,6 @@ class _CrecheMonitorTabItemForAddState
     return CItem;
   }
 
-
   Widget _widgetTypeWidget(int index, HouseHoldFielItemdModel quesItem) {
     switch (quesItem.fieldtype) {
       case 'Link':
@@ -367,6 +384,8 @@ class _CrecheMonitorTabItemForAddState
           _myMap[quesItem.fieldname!] = items.first.name;
         }
         return DynamicCustomDropdownField(
+          hintText: Global.returnTrLable(
+              _translation, CustomText.select_here, _language),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1
@@ -375,10 +394,9 @@ class _CrecheMonitorTabItemForAddState
           items: items,
           selectedItem: _myMap[quesItem.fieldname],
           isVisible:
-          DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
           onChanged: (value) async {
-            if (quesItem.fieldname == 'village_id' && value!.name != null)
-            {
+            if (quesItem.fieldname == 'village_id' && value!.name != null) {
               _myMap.remove('creche_id');
             } else if (quesItem.fieldname == 'block_id' &&
                 value!.name != null) {
@@ -415,20 +433,22 @@ class _CrecheMonitorTabItemForAddState
           fieldName: quesItem.fieldname,
           // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
           minDate: quesItem.fieldname == 'date_of_visit'
-              ? DateTime.now().subtract(Duration(days: 7))
+              ? now.isBefore(applicableDate)
+                  ? null
+                  : DateTime.now().subtract(Duration(days: 7))
               : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           calenderValidate:
-          DependingLogic().calenderValidation(_logics, _myMap, quesItem),
+              DependingLogic().calenderValidation(_logics, _myMap, quesItem),
           onChanged: (value) async {
             if (quesItem.fieldname == 'date_of_visit') {
               if (unpicableDates.contains(value)) {
                 _myMap.remove(quesItem.fieldname);
                 setState(() {});
                 Validate().singleButtonPopup(
-                    'A Visit Note already exists for the selected Date "${value}"',
+                    '${Global.returnTrLable(_translation, CustomText.visitNoteAlrdyExists, _language)} "${value}"',
                     Global.returnTrLable(
                         _translation, CustomText.ok, _language),
                     false,
@@ -461,13 +481,13 @@ class _CrecheMonitorTabItemForAddState
           initialvalue: _myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           keyboard:
-          DependingLogic().keyBoardLogic(quesItem.fieldname!, _logics),
+              DependingLogic().keyBoardLogic(quesItem.fieldname!, _logics),
           readable:
-          DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
           hintText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           isVisible:
-          DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               _myMap[quesItem.fieldname!] = value;
@@ -477,6 +497,8 @@ class _CrecheMonitorTabItemForAddState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(
+              _translation, CustomText.typehere, _language),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -484,11 +506,11 @@ class _CrecheMonitorTabItemForAddState
           maxlength: quesItem.length,
           initialvalue: _myMap[quesItem.fieldname!],
           readable:
-          DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           isVisible:
-          DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
@@ -516,7 +538,7 @@ class _CrecheMonitorTabItemForAddState
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           isVisible:
-          DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
           onChanged: (value) {
             _myMap[quesItem.fieldname!] = value;
             var logData = DependingLogic()
@@ -543,9 +565,9 @@ class _CrecheMonitorTabItemForAddState
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           readable:
-          DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
           isVisible:
-          DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             _myMap[quesItem.fieldname!] = value;
@@ -563,11 +585,11 @@ class _CrecheMonitorTabItemForAddState
           initialvalue: _myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable:
-          DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
           hintText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           isVisible:
-          DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               _myMap[quesItem.fieldname!] = value;
@@ -583,7 +605,7 @@ class _CrecheMonitorTabItemForAddState
               : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           maxlength: quesItem.length,
           readable:
-          DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           initialvalue: _myMap[quesItem.fieldname!],
@@ -606,7 +628,7 @@ class _CrecheMonitorTabItemForAddState
               : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
           maxlength: quesItem.length,
           readable:
-          DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
           initialvalue: _myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -620,8 +642,6 @@ class _CrecheMonitorTabItemForAddState
         return SizedBox();
     }
   }
-
-
 
   nextTab(int type, BuildContext mContext) async {
     if (type == 1) {
@@ -681,7 +701,7 @@ class _CrecheMonitorTabItemForAddState
               _myMap.remove(element.fieldname);
               setState(() {});
               Validate().singleButtonPopup(
-                  'A Visit Note already exists for the selected Date "${values}"',
+                  '${Global.returnTrLable(_translation, CustomText.visitNoteAlrdyExists, _language)} "${values}"',
                   Global.returnTrLable(_translation, CustomText.ok, _language),
                   false,
                   context);
@@ -691,7 +711,7 @@ class _CrecheMonitorTabItemForAddState
           }
         }
         var validationMsg =
-        DependingLogic().validationMessge(_logics, _myMap, element);
+            DependingLogic().validationMessge(_logics, _myMap, element,_translation,_language);
 
         if (Global.validString(validationMsg)) {
           Validate()
@@ -748,35 +768,35 @@ class _CrecheMonitorTabItemForAddState
       print(responsesJs);
       var items = (type == 1)
           ? CrecheMonitorResponseModel(
-          cmguid: widget.cmgUid,
-          name: _myMap['name'],
-          is_deleted: 0,
-          is_edited: isLastIndex
-              ? 1
-              : widget.isEdit == false
-              ? 2
-              : isEditFromExisting,
-          is_uploaded: 0,
-          responces: responsesJs,
-          created_by: _myMap['appcreated_by'],
-          created_at: _myMap['appcreated_on'],
-          update_at: _myMap['app_updated_by'],
-          updated_by: _myMap['app_updated_by'],
-          creche_id: Global.stringToInt(_myMap['creche_id']))
+              cmguid: widget.cmgUid,
+              name: _myMap['name'],
+              is_deleted: 0,
+              is_edited: isLastIndex
+                  ? 1
+                  : widget.isEdit == false
+                      ? 2
+                      : isEditFromExisting,
+              is_uploaded: 0,
+              responces: responsesJs,
+              created_by: _myMap['appcreated_by'],
+              created_at: _myMap['appcreated_on'],
+              update_at: _myMap['app_updated_by'],
+              updated_by: _myMap['app_updated_by'],
+              creche_id: Global.stringToInt(_myMap['creche_id']))
           : CrecheMonitorResponseModel(
-          cmguid: widget.cmgUid,
-          responces: responsesJs,
-          name: _myMap['name'],
-          is_deleted: 0,
-          is_edited: isLastIndex
-              ? 1
-              : (widget.isEdit == false ? 2 : isEditFromExisting),
-          is_uploaded: 0,
-          created_by: _myMap['appcreated_by'],
-          created_at: _myMap['appcreated_on'],
-          update_at: _myMap['app_updated_by'],
-          updated_by: _myMap['app_updated_by'],
-          creche_id: Global.stringToInt(_myMap['creche_id']));
+              cmguid: widget.cmgUid,
+              responces: responsesJs,
+              name: _myMap['name'],
+              is_deleted: 0,
+              is_edited: isLastIndex
+                  ? 1
+                  : (widget.isEdit == false ? 2 : isEditFromExisting),
+              is_uploaded: 0,
+              created_by: _myMap['appcreated_by'],
+              created_at: _myMap['appcreated_on'],
+              update_at: _myMap['app_updated_by'],
+              updated_by: _myMap['app_updated_by'],
+              creche_id: Global.stringToInt(_myMap['creche_id']));
       await CrecheMonitorResponseHelper().insertResponse(items);
     }
   }
@@ -787,7 +807,7 @@ class _CrecheMonitorTabItemForAddState
 
     if (records.isNotEmpty) {
       final Map<String, dynamic> responseData =
-      jsonDecode(records.first.responces!);
+          jsonDecode(records.first.responces!);
       responseData.forEach((key, value) => _myMap[key] = value);
       isEditFromExisting = records[0].is_edited;
 
@@ -861,7 +881,7 @@ class _CrecheMonitorTabItemForAddState
                       nextTab(0, context);
                     },
                     text: Global.returnTrLable(
-                        _translation, CustomText.back, _language)
+                            _translation, CustomText.back, _language)
                         .trim(),
                   ),
                 ),
@@ -869,23 +889,23 @@ class _CrecheMonitorTabItemForAddState
                 SizedBox(width: 10),
                 _role == 'Creche Supervisor'
                     ? widget.tabIndex == (widget.totalTab - 1)
-                    ? SizedBox()
-                    : Expanded(
-                  child: CElevatedButton(
-                    color: Color(0xff5979AA),
-                    onPressed: () => saveOnly(1),
-                    text: Global.returnTrLable(
-                        _translation, 'Save', _language)
-                        .trim(),
-                  ),
-                )
+                        ? SizedBox()
+                        : Expanded(
+                            child: CElevatedButton(
+                              color: Color(0xff5979AA),
+                              onPressed: () => saveOnly(1),
+                              text: Global.returnTrLable(
+                                      _translation, CustomText.Save, _language)
+                                  .trim(),
+                            ),
+                          )
                     : SizedBox(),
                 // ]
                 // ),
                 _role == 'Creche Supervisor'
                     ? widget.tabIndex == (widget.totalTab - 1)
-                    ? SizedBox()
-                    : SizedBox(width: 10)
+                        ? SizedBox()
+                        : SizedBox(width: 10)
                     : SizedBox(),
                 Expanded(
                   child: CElevatedButton(
@@ -896,9 +916,9 @@ class _CrecheMonitorTabItemForAddState
                     },
                     text: widget.tabIndex == (widget.totalTab - 1)
                         ? Global.returnTrLable(
-                        _translation, CustomText.Submit, _language)
+                            _translation, CustomText.Submit, _language)
                         : Global.returnTrLable(
-                        _translation, CustomText.Next, _language),
+                            _translation, CustomText.Next, _language),
                   ),
                 ),
               ],

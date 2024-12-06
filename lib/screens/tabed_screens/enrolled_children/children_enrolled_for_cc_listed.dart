@@ -84,7 +84,14 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
       CustomText.all,
       CustomText.unsynched,
       CustomText.careGiverName,
-      CustomText.ChildId
+      CustomText.ChildId,
+      CustomText.Filter,
+      CustomText.minAgeInMonthEn,
+      CustomText.maxAgeInMonthEn,
+      CustomText.Gender,
+      CustomText.Creches,
+      CustomText.clear,
+      CustomText.enrolled_children
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -143,7 +150,8 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
                               width: 10.w,
                             ),
                             Text(
-                              CustomText.Filter,
+                              Global.returnTrLable(
+                                  translats, CustomText.Filter, lng),
                               style: Styles.labelcontrollerfont,
                             ),
                             Spacer(),

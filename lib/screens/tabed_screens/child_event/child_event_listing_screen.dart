@@ -48,6 +48,8 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
   DateTime? lastDate;
   bool isOnlyUnsyched = false;
   String? role;
+  DateTime applicableDate = Validate().stringToDate("2024-12-31");
+  var now = DateTime.parse(Validate().currentDate());
 
   // DateTime? maxDate;
 
@@ -57,6 +59,8 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     role = (await Validate().readString(Validate.role))!;
     List<int> dateParts =
         widget.dateOfEnrollment.split('-').map(int.parse).toList();
@@ -141,7 +145,9 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
                                 enName: widget.enName!,
                                 chilenrolledGUID: widget.chilenrolledGUID!,
                                 creche_id: widget.creche_id,
-                                lastDate: lastDate,
+                                lastDate: now.isBefore(applicableDate)
+                                    ? null
+                                    : lastDate,
                                 childId: widget.childId,
                                 childName: widget.childName,
                                 existingDates: existingDates,
@@ -205,6 +211,9 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
                                       DateTime.parse(Validate().currentDate()))
                                   : true;
 
+                          if (now.isBefore(applicableDate)) {
+                            isUnEditable = false;
+                          }
                           if (existingDates.contains(Global.getItemValues(
                               filterEventData[index].responces, 'date'))) {
                             var currentRecordDate = Global.getItemValues(
@@ -241,7 +250,10 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
                                                   filterEventData[index]
                                                       .childenrolledguid,
                                               creche_id: widget.creche_id,
-                                              lastDate: lastDate,
+                                              lastDate:
+                                                  now.isBefore(applicableDate)
+                                                      ? null
+                                                      : lastDate,
                                               // maxDate:maxDate,
                                               childId: widget.childId,
                                               childName: widget.childName,

@@ -90,6 +90,9 @@ class _EnrolledChilrenTabItemViewState
       CustomText.ok,
       CustomText.ChildEnrollsuccess,
       CustomText.enrolled,
+      CustomText.ChildProfile,
+      CustomText.Yes,
+      CustomText.No
     ];
 
     // await EnrolledChildrenFieldHelper()
@@ -111,7 +114,7 @@ class _EnrolledChilrenTabItemViewState
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
 
     multselectItemTab =
         await EnrolledChildrenFieldHelper().callMultiSelectTabItem();
@@ -480,6 +483,14 @@ class _EnrolledChilrenTabItemViewState
         }
       }
     }
+
+    List<String> fieldlabelList = [];
+    itemsList!.forEach((element) {
+      if (Global.validString(element.label)) fieldlabelList.add(element.label!);
+    });
+    await TranslationDataHelper()
+        .callTranslateString(fieldlabelList)
+        .then((value) => translats.addAll(value));
 
     await OptionsModelHelper()
         .getAllMstCommonNotINOptions(defaultCommon, lng)

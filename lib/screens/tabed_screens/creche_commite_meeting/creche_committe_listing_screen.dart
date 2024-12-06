@@ -39,6 +39,8 @@ class _CrecheCommitteListingScreenState
   String lng = 'en';
   DateTime? minDate;
   String? role;
+  var applicableDate = Validate().stringToDate(Validate.date);
+  var now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -47,6 +49,8 @@ class _CrecheCommitteListingScreenState
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     role = (await Validate().readString(Validate.role))!;
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
@@ -121,7 +125,9 @@ class _CrecheCommitteListingScreenState
                                   creche_id: widget.creche_id,
                                   ccGuid: ccGuid,
                                   isImageUpdate: false,
-                                  minDate: minDate,
+                                  minDate: now.isBefore(applicableDate)
+                                      ? null
+                                      : minDate,
                                   existingList: existingDate)));
                   if (refStatus == 'itemRefresh') {
                     await fetchCommittieMeetingrecords();
@@ -189,6 +195,10 @@ class _CrecheCommitteListingScreenState
                             existingDate.remove(currentRecordDate);
                           }
 
+                          if (now.isBefore(applicableDate)) {
+                            isUneditable = false;
+                          }
+
                           var ccGuid = filterData[index].ccguid;
                           if (Global.validString(ccGuid)) {
                             var refStatus = await Navigator.of(context).push(
@@ -202,7 +212,10 @@ class _CrecheCommitteListingScreenState
                                             : CrecheCommitteDetailsScreen(
                                                 creche_id: widget.creche_id,
                                                 ccGuid: ccGuid,
-                                                minDate: minDate,
+                                                minDate:
+                                                    now.isBefore(applicableDate)
+                                                        ? null
+                                                        : minDate,
                                                 existingList: existingDate,
                                                 isImageUpdate:
                                                     Global.validString(

@@ -48,6 +48,8 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
   DateTime? lastDate;
   bool isOnlyUnsyched = false;
   String? role;
+  DateTime applicableDate = Validate().stringToDate("2024-12-31");
+  var now = DateTime.parse(Validate().currentDate());
   // DateTime? maxDate;
 
   void initState() {
@@ -56,6 +58,8 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     role = (await Validate().readString(Validate.role))!;
     List<int> dateParts =
         widget.dateofEnrollment.split('-').map(int.parse).toList();
@@ -96,7 +100,7 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
       CustomText.ChildHealth,
       CustomText.all,
       CustomText.unsynched,
-      CustomText.ChildHealthDetail
+      CustomText.ChildHealthDetail,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -137,7 +141,9 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                                   enName: widget.enName!,
                                   creche_id: widget.creche_id,
                                   chilenrolledGUID: widget.chilenrolledGUID,
-                                  lastDate: lastDate,
+                                  lastDate: now.isBefore(applicableDate)
+                                      ? null
+                                      : lastDate,
                                   childName: widget.childName,
                                   childId: widget.childId,
                                   existingDates: existingDates)));
@@ -202,6 +208,10 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                                       DateTime.parse(Validate().currentDate()))
                                   : true;
 
+                          if (now.isBefore(applicableDate)) {
+                            isUnEditable = false;
+                          }
+
                           if (existingDates.contains(Global.getItemValues(
                               filterhealthData[index].responces, 'date'))) {
                             var currentRecordDate = Global.getItemValues(
@@ -232,7 +242,10 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                                               creche_id: widget.creche_id,
                                               chilenrolledGUID:
                                                   widget.chilenrolledGUID,
-                                              lastDate: lastDate,
+                                              lastDate:
+                                                  now.isBefore(applicableDate)
+                                                      ? null
+                                                      : lastDate,
                                               childId: widget.childId,
                                               childName: widget.childName,
                                               existingDates: existingDates)));

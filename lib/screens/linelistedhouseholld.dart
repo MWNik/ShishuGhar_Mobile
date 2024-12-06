@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
@@ -346,7 +347,8 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                                   width: 10.w,
                                 ),
                                 Text(
-                                  CustomText.Filter,
+                                  Global.returnTrLable(hhlistingControlls,
+                                      CustomText.Filter, lng!),
                                   style: Styles.labelcontrollerfont,
                                 ),
                                 Spacer(),
@@ -515,6 +517,10 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                                 },
                               ),
                               DynamicCustomDropdownField(
+                                hintText: Global.returnTrLable(
+                                    hhlistingControlls,
+                                    CustomText.select_here,
+                                    lng!),
                                 isRequred: 0,
                                 titleText: Global.returnTrLable(
                                     hhlistingControlls,
@@ -537,6 +543,10 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                                 },
                               ),
                               DynamicCustomDropdownField(
+                                hintText: Global.returnTrLable(
+                                    hhlistingControlls,
+                                    CustomText.select_here,
+                                    lng!),
                                 titleText: Global.returnTrLable(
                                     hhlistingControlls,
                                     CustomText.Village,
@@ -1037,200 +1047,259 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                             },
                             child: Padding(
                               padding: EdgeInsets.symmetric(vertical: 5.h),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(
-                                          0.2), // Shadow color with opacity
-                                      offset: Offset(0,
-                                          3), // Horizontal and vertical offset
-                                      blurRadius: 6, // Blur radius
-                                      spreadRadius: 0, // Spread radius
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xff5A5A5A).withOpacity(
+                                              0.2), // Shadow color with opacity
+                                          offset: Offset(0,
+                                              3), // Horizontal and vertical offset
+                                          blurRadius: 6, // Blur radius
+                                          spreadRadius: 0, // Spread radius
+                                        ),
+                                      ],
+                                      color: Colors.white,
+                                      border:
+                                          Border.all(color: Color(0xffE7F0FF)),
+                                      borderRadius: BorderRadius.circular(10.r),
                                     ),
-                                  ],
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w,
-                                    vertical: 8.h,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 10.w,
+                                        vertical: 8.h,
+                                      ),
+                                      child: Row(
+                                        // mainAxisAlignment: MainAxisAlignment.start,
+                                        // crossAxisAlignment:
+                                        //     CrossAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            Global.returnTrLable(
-                                                    hhlistingControlls,
-                                                    CustomText.hhID,
-                                                    lng!) +
-                                                " : ",
-                                            style: Styles.black104,
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            // mainAxisAlignment:
+                                            //     MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                Global.returnTrLable(
+                                                        hhlistingControlls,
+                                                        CustomText.hhID,
+                                                        lng!) +
+                                                    " : ",
+                                                style: Styles.black104,
+                                              ),
+                                              Text(
+                                                Global.returnTrLable(
+                                                        hhlistingControlls,
+                                                        CustomText
+                                                            .RespondentName,
+                                                        lng!) +
+                                                    " : ",
+                                                style: Styles.black104,
+                                              ),
+                                              Text(
+                                                Global.returnTrLable(
+                                                        hhlistingControlls,
+                                                        CustomText.hhNameS,
+                                                        lng!) +
+                                                    " : ",
+                                                style: Styles.black104,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                              ),
+                                              Text(
+                                                Global.returnTrLable(
+                                                        hhlistingControlls,
+                                                        CustomText.datevisit,
+                                                        lng!) +
+                                                    " : ",
+                                                style: Styles.black104,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                              ),
+                                              Text(
+                                                Global.returnTrLable(
+                                                        hhlistingControlls,
+                                                        CustomText.Village,
+                                                        lng!) +
+                                                    " : ",
+                                                style: Styles.black104,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                              ),
+                                              Text(
+                                                Global.returnTrLable(
+                                                        hhlistingControlls,
+                                                        CustomText.Status,
+                                                        lng!) +
+                                                    " : ",
+                                                style: Styles.black104,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            Global.returnTrLable(
-                                                    hhlistingControlls,
-                                                    CustomText.RespondentName,
-                                                    lng!) +
-                                                " : ",
-                                            style: Styles.black104,
+                                          SizedBox(width: 10),
+                                          VerticalDivider(
+                                            color: Color(0xffE6E6E6),
+                                            width: 2,
+                                            thickness: 2,
                                           ),
-                                          Text(
-                                            Global.returnTrLable(
-                                                    hhlistingControlls,
-                                                    CustomText.hhNameS,
-                                                    lng!) +
-                                                " : ",
-                                            style: Styles.black104,
-                                            strutStyle: StrutStyle(height: 1.2),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    getItemValues(
+                                                        filterData[index]
+                                                            .responces!,
+                                                        'hhid'),
+                                                    style: Styles.cardBlue10,
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                                Text(
+                                                    getItemValues(
+                                                        filterData[index]
+                                                            .responces!,
+                                                        'respondent_name'),
+                                                    style: Styles.cardBlue10,
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                                Text(
+                                                    getItemValues(
+                                                        filterData[index]
+                                                            .responces!,
+                                                        'hosuehold_head_name'),
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                                Text(
+                                                    Validate().displeDateFormate(
+                                                        getItemValues(
+                                                            filterData[index]
+                                                                .responces!,
+                                                            'date_of_visit')),
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                                Text(
+                                                    callVillageName(
+                                                        filterData[index]
+                                                            .responces!),
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                                Text(
+                                                    getfindStatusValues(
+                                                        getItemValues(
+                                                            filterData[index]
+                                                                .responces!,
+                                                            'verification_status')),
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                              ],
+                                            ),
                                           ),
-                                          Text(
-                                            Global.returnTrLable(
-                                                    hhlistingControlls,
-                                                    CustomText.datevisit,
-                                                    lng!) +
-                                                " : ",
-                                            style: Styles.black104,
-                                            strutStyle: StrutStyle(height: 1.2),
-                                          ),
-                                          Text(
-                                            Global.returnTrLable(
-                                                    hhlistingControlls,
-                                                    CustomText.Village,
-                                                    lng!) +
-                                                " : ",
-                                            style: Styles.black104,
-                                            strutStyle: StrutStyle(height: 1.2),
-                                          ),
-                                          Text(
-                                            Global.returnTrLable(
-                                                    hhlistingControlls,
-                                                    CustomText.Status,
-                                                    lng!) +
-                                                " : ",
-                                            style: Styles.black104,
-                                            strutStyle: StrutStyle(height: 1.2),
-                                          ),
+                                          SizedBox(width: 5),
+                                          ((Global.stringToInt(Global.getItemValues(
+                                                      filterData[index]
+                                                          .responces!,
+                                                      'verification_status')) ==
+                                                  3))
+                                              ? Image.asset(
+                                                  "assets/sync.png",
+                                                  scale: 1.5,
+                                                )
+                                              : ((Global.stringToInt(
+                                                          Global.getItemValues(
+                                                              filterData[index]
+                                                                  .responces!,
+                                                              'verification_status')) ==
+                                                      1)
+                                                  ? SizedBox()
+                                                  // Icon(
+                                                  //     Icons.error_outline,
+                                                  //     color:
+                                                  //         Colors.red.shade500,
+                                                  //     shadows: [
+                                                  //       BoxShadow(
+                                                  //           spreadRadius: 2,
+                                                  //           blurRadius: 4,
+                                                  //           color: Colors
+                                                  //               .red.shade200)
+                                                  //     ],
+                                                  //   )
+                                                  : Image.asset(
+                                                      "assets/sync_gray.png",
+                                                      scale: 1.5,
+                                                    ))
                                         ],
                                       ),
-                                      SizedBox(width: 10),
-                                      SizedBox(
-                                        height: 65.h,
-                                        width: 2,
-                                        child: VerticalDivider(
-                                          color: Color(0xffE6E6E6),
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                                getItemValues(
-                                                    filterData[index]
-                                                        .responces!,
-                                                    'hhid'),
-                                                style: Styles.cardBlue10,
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                            Text(
-                                                getItemValues(
-                                                    filterData[index]
-                                                        .responces!,
-                                                    'respondent_name'),
-                                                style: Styles.cardBlue10,
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                            Text(
-                                                getItemValues(
-                                                    filterData[index]
-                                                        .responces!,
-                                                    'hosuehold_head_name'),
-                                                style: Styles.cardBlue10,
-                                                strutStyle:
-                                                    StrutStyle(height: 1.2),
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                            Text(
-                                                Validate().displeDateFormate(
-                                                    getItemValues(
-                                                        filterData[index]
-                                                            .responces!,
-                                                        'date_of_visit')),
-                                                style: Styles.cardBlue10,
-                                                strutStyle:
-                                                    StrutStyle(height: 1.2),
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                            Text(
-                                                callVillageName(
-                                                    filterData[index]
-                                                        .responces!),
-                                                style: Styles.cardBlue10,
-                                                strutStyle:
-                                                    StrutStyle(height: 1.2),
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                            Text(
-                                                getfindStatusValues(
-                                                    getItemValues(
-                                                        filterData[index]
-                                                            .responces!,
-                                                        'verification_status')),
-                                                style: Styles.cardBlue10,
-                                                strutStyle:
-                                                    StrutStyle(height: 1.2),
-                                                overflow:
-                                                    TextOverflow.ellipsis),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(width: 5),
-                                      (filterData[index].is_edited == 0 &&
-                                              filterData[index].is_uploaded ==
-                                                  1)
-                                          ? Image.asset(
-                                              "assets/sync.png",
-                                              scale: 1.5,
-                                            )
-                                          : ((Global.stringToInt(
-                                                      Global.getItemValues(
-                                                          filterData[index]
-                                                              .responces!,
-                                                          'verification_status')) ==
-                                                  1)
-                                              ? Icon(
-                                                  Icons.error_outline,
-                                                  color: Colors.red.shade500,
-                                                  shadows: [
-                                                    BoxShadow(
-                                                        spreadRadius: 2,
-                                                        blurRadius: 4,
-                                                        color:
-                                                            Colors.red.shade200)
-                                                  ],
-                                                )
-                                              : Image.asset(
-                                                  "assets/sync_gray.png",
-                                                  scale: 1.5,
-                                                ))
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                  Visibility(
+                                      visible: Global.stringToInt(
+                                              Global.getItemValues(
+                                                  filterData[index].responces!,
+                                                  'verification_status')) ==
+                                          1,
+                                      child: Positioned(
+                                        top: 24,
+                                        right: 10,
+                                        child: InkWell(
+                                          onTap: () async {
+                                            showDeleteDialog(filterData[index]);
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                color: Colors.red),
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 2.h, horizontal: 2.w),
+                                            child: Icon(
+                                              Icons.delete_rounded,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      )),
+                                  Visibility(
+                                      visible: Global.stringToInt(
+                                              Global.getItemValues(
+                                                  filterData[index].responces!,
+                                                  'verification_status')) ==
+                                          1,
+                                      child: Positioned(
+                                          bottom: 24,
+                                          right: 8,
+                                          child: Icon(
+                                            Icons.error_outline,
+                                            color: Colors.red,
+                                            shadows: [
+                                              BoxShadow(
+                                                  spreadRadius: 2,
+                                                  blurRadius: 4,
+                                                  color: Colors.red.shade200)
+                                            ],
+                                          )))
+                                ],
                               ),
                             ),
                           );
@@ -1263,6 +1332,26 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
     filterData = isOnlyUnsynched ? unsynchedList : allList;
     _selectedItem = null;
     setState(() {});
+  }
+
+  showDeleteDialog(HouseHoldTabResponceMosdel record) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return CustomDoubleButton(
+              message: Global.returnTrLable(
+                  hhlistingControlls, CustomText.areSureToDelete, lng ?? 'en'),
+              posButton: Global.returnTrLable(
+                  hhlistingControlls, CustomText.delete, lng ?? 'en'),
+              negButton: Global.returnTrLable(
+                  hhlistingControlls, CustomText.Cancel, lng ?? 'en'),
+              onPositive: () async {
+                await HouseHoldTabResponceHelper().deleteDraftRecords(record);
+                await fetchHhDataList();
+                Navigator.of(context).pop(true);
+                setState(() {});
+              });
+        });
   }
 
   String getItemValues(String response, String key) {
@@ -1396,12 +1485,19 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
       CustomText.nointernetconnectionavailable,
       CustomText.ok,
       CustomText.pleaseSelectStartDate,
-      CustomText.Selecthere,
+      CustomText.select_here,
       CustomText.IAgree,
       CustomText.PrivacyPolicy,
       CustomText.PrivacyPolicyDescription,
       CustomText.all,
-      CustomText.usynchedAndDraft
+      CustomText.usynchedAndDraft,
+      CustomText.totalHH,
+      CustomText.hhID,
+      CustomText.Filter,
+      CustomText.clear,
+      CustomText.Cancel,
+      CustomText.areSureToDelete,
+      CustomText.delete
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)

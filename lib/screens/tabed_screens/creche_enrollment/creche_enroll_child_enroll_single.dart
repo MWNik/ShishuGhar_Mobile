@@ -73,7 +73,11 @@ class _CrecheEnrollChildEnrollScreenState
       CustomText.NorecordAvailable,
       CustomText.Search,
       CustomText.Village,
-      CustomText.creche_enrollement
+      CustomText.creche_enrollement,
+      'Creche Name',
+      'Date of Exit',
+      "Age on the month of Enroll",
+      'Date of Enrollment'
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -153,7 +157,7 @@ class _CrecheEnrollChildEnrollScreenState
                                       //
                                       ExitEnrolledChilrenTab(
                                           isForExitList: false,
-                                        isForCrecheEnrollment: true,
+                                          isForCrecheEnrollment: true,
                                           CHHGUID: crecheEnrollChild[index]
                                               ['CHHGUID'],
                                           HHGUID: Global.getItemValues(

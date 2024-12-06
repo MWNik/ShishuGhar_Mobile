@@ -45,6 +45,7 @@ class _ChildFollowUpsListingScreenState
   List<Translation> translats = [];
   String lng = 'en';
   List<CresheDatabaseResponceModel> crecheData = [];
+  var applicableDate = Validate().stringToDate(Validate().currentDate());
 
   @override
   void initState() {
@@ -137,10 +138,12 @@ class _ChildFollowUpsListingScreenState
                               .map(int.parse)
                               .toList();
                           var date = DateTime(parts[0], parts[1], parts[2]);
-                          var backDate =
-                              DateTime.parse(Validate().currentDate())
+                          var backDate = currentDate.isBefore(applicableDate)
+                              ? DateTime(1992)
+                              : DateTime.parse(Validate().currentDate())
                                   .subtract(Duration(days: 7));
                           var backDateSD = date.subtract(Duration(days: 7));
+
                           if (Global.validString(child_followup_guid)) {
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
@@ -169,7 +172,10 @@ class _ChildFollowUpsListingScreenState
                                           minDate: backDate.isBefore(backDateSD)
                                               ? backDateSD
                                               : backDate,
-                                          isEditable: isEditable,
+                                          isEditable: currentDate
+                                                  .isBefore(applicableDate)
+                                              ? true
+                                              : isEditable,
                                         )));
 
                             if (refStatus == 'itemRefresh') {
@@ -257,7 +263,7 @@ class _ChildFollowUpsListingScreenState
                                                         .responces,
                                                     'followup_visit_date')),
                                             style: Styles.cardBlue10,
-                                          strutStyle: StrutStyle(height: 1.2),
+                                            strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
 
@@ -273,7 +279,7 @@ class _ChildFollowUpsListingScreenState
                                                 followUpsList[index].responces,
                                                 'weight'),
                                             style: Styles.cardBlue10,
-                                          strutStyle: StrutStyle(height: 1.2),
+                                            strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ],

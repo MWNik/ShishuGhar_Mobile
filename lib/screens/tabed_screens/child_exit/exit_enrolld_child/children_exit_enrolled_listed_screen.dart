@@ -83,7 +83,12 @@ class _EnrolledChildrenListedScreenState
       CustomText.childPresent,
       CustomText.childCount,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.minAgeInMonthEn,
+      CustomText.maxAgeInMonthEn,
+      CustomText.Gender,
+      CustomText.clear,
+      CustomText.Filter
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -302,6 +307,7 @@ class _EnrolledChildrenListedScreenState
                           var selectedItem = filterData[index];
                           var childName = Global.getItemValues(
                               selectedItem['responces'], 'child_name');
+
                           var refStatus = await Navigator.of(context).push(
                               MaterialPageRoute(
                                   builder: (BuildContext context) =>

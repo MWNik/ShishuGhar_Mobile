@@ -8,6 +8,7 @@ import 'package:shishughar/screens/child_Enrolled.dart';
 import 'package:shishughar/screens/children_enrollment_profile.dart';
 import 'package:shishughar/screens/home_replica_screen.dart';
 import 'package:shishughar/screens/synchronization_screen.dart';
+import 'package:shishughar/screens/synchronization_screen_new.dart';
 import 'package:shishughar/screens/tabed_screens/creshe/cereche_listed_screen.dart';
 import 'package:shishughar/screens/tabed_screens/enrolled_children/children_enrolled_for_cc_listed.dart';
 import 'package:shishughar/screens/visit_notes.dart';
@@ -40,18 +41,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ChildAttendanceScreen(),
     AddDailyAttendanceScreen(),
     ChildProfileScreen(),
-    SynchronizationScreen(),
+    SynchronizationScreenNew(),
     CrecheListedScreen()
   ];
-  String? lng;
+  String lng="en";
   List<Translation> dashboardControlls = [];
   String? role;
 
-
   @override
   Widget build(BuildContext context) {
-    return (dashboardControlls.length > 0)
-        ? Scaffold(
+    // return (dashboardControlls.length > 0)
+    //     ?
+      return Scaffold(
             body: pages[widget.index!],
             bottomNavigationBar: BottomNavigationBar(
               useLegacyColorScheme: true,
@@ -71,32 +72,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
               items: initBottomBar(),
             ),
-          )
-        : SizedBox();
+          );
+        // : Scaffold(
+        // body:Center(
+        // child: Text('please wait')));
   }
 
   Future<void> initializeData() async {
-    lng = await Validate().readString(Validate.sLanguage);
+    lng = (await Validate().readString(Validate.sLanguage))!;
     role = await Validate().readString(Validate.role);
     List<String> valueNames = [
       CustomText.Home,
       CustomText.checkIN,
       CustomText.More,
       CustomText.Report,
-      CustomText.enrolledChild,
+      CustomText.enrolled_children,
       CustomText.Dashboard,
-      CustomText.sync
+      CustomText.sync,
+      CustomText.pleaseWait
     ];
-
+    showLoaderDialog(context);
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => dashboardControlls = value);
-
+        .then((value) => dashboardControlls.addAll(value));
+    Navigator.pop(context);
     setState(() {});
   }
 
   Future setOnClick(int index) async {
-    String refreshStatus='';
+    String refreshStatus = '';
     // if (_currentIndex == 1) {
     //   if (role == 'Creche Supervisor') {
     //     Navigator.pushReplacement(
@@ -123,16 +127,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // Navigator.of(context).push(MaterialPageRoute(
       //     builder: (BuildContext context) => DashboardScreen(index: 0)));
     } else if (_currentIndex == 1) {
-      refreshStatus=await Navigator.of(context).push(MaterialPageRoute(
+      refreshStatus = await Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => EnrolledChildrenForCC()));
-    }else if (_currentIndex == 4) {
-      if(HomeReplicaScreen.scaffoldKey!=null){
+    } else if (_currentIndex == 4) {
+      if (HomeReplicaScreen.scaffoldKey != null) {
         HomeReplicaScreen.scaffoldKey!.currentState?.openDrawer();
         setState(() {
           _currentIndex = 0;
         });
       }
-
     }
 
     if (refreshStatus == 'itemRefresh') {
@@ -165,12 +168,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       icon: Padding(
         padding: EdgeInsets.only(bottom: 5.h),
         child: Image.asset(
-            'assets/creche_profile/enrolled_child_new.png',
+          'assets/creche_profile/enrolled_child_new.png',
           scale: 2.7,
           color: _currentIndex == 1 ? Color(0xff5979AA) : Color(0xffAAAAAA),
         ),
       ),
-      label: Global.returnTrLable(dashboardControlls, CustomText.enrolledChild, lng!),
+      label: Global.returnTrLable(
+          dashboardControlls, CustomText.enrolled_children, lng!),
     ));
     bottomItem.add(BottomNavigationBarItem(
       icon: Padding(
@@ -181,7 +185,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           color: _currentIndex == 2 ? Color(0xff5979AA) : Color(0xffAAAAAA),
         ),
       ),
-      label: Global.returnTrLable(dashboardControlls, CustomText.Dashboard, lng!),
+      label:
+          Global.returnTrLable(dashboardControlls, CustomText.Dashboard, lng!),
     ));
     bottomItem.add(BottomNavigationBarItem(
       icon: Padding(
@@ -228,5 +233,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
     //   label: Global.returnTrLable(dashboardControlls, 'Synchronization', lng!),
     // ));
     return bottomItem;
+  }
+
+  showLoaderDialog(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                SizedBox(height: 10.h),
+                Text(Global.returnTrLable(
+                    dashboardControlls, CustomText.pleaseWait, lng!)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

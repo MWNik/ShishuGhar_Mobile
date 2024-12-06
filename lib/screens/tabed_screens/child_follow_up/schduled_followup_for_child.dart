@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/utils/globle_method.dart';
@@ -20,7 +19,7 @@ class SchudleFollowUpsForChildListingScreen extends StatefulWidget {
   final String childId;
   final String childName;
 
-   SchudleFollowUpsForChildListingScreen({
+  SchudleFollowUpsForChildListingScreen({
     super.key,
     required this.tabTitle,
     required this.childenrollguid,
@@ -40,6 +39,8 @@ class _ChildFollowUpsListingScreenState
   List<ChildFollowUpTabResponceModel> followUpsList = [];
   List<Translation> translats = [];
   String lng = 'en';
+  DateTime applicableDate = Validate().stringToDate("2024-12-31");
+  var now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -53,6 +54,8 @@ class _ChildFollowUpsListingScreenState
     if (lngtr != null) {
       lng = lngtr;
     }
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -92,7 +95,8 @@ class _ChildFollowUpsListingScreenState
                           var child_followup_guid =
                               followUpsList[index].child_followup_guid;
                           if (Global.validString(child_followup_guid)) {
-                            var followUpDate = followUpsList[index].followup_visit_date!
+                            var followUpDate = followUpsList[index]
+                                .followup_visit_date!
                                 .split('-')
                                 .map(int.parse)
                                 .toList();
@@ -100,28 +104,51 @@ class _ChildFollowUpsListingScreenState
                                 followUpDate[1], followUpDate[2]);
                             // if (date.subtract(Duration(days: 1)).isBefore(
                             //     DateTime.parse(Validate().currentDate()))) {
-                            if (date.subtract(Duration(days: 7)).isBefore(DateTime.parse(Validate().currentDate())) && date.isAfter(DateTime.parse(Validate().currentDate()).subtract(Duration(days: 8)))) {
-                              var backDate = DateTime.parse(Validate().currentDate()).subtract(Duration(days: 7));
+                            if (date.subtract(Duration(days: 7)).isBefore(
+                                    DateTime.parse(Validate().currentDate())) &&
+                                date.isAfter(
+                                    DateTime.parse(Validate().currentDate())
+                                        .subtract(Duration(days: 8)))) {
+                              var backDate = now.isBefore(applicableDate)
+                                  ? DateTime(1992)
+                                  : DateTime.parse(Validate().currentDate())
+                                      .subtract(Duration(days: 7));
                               var backDateSD = date.subtract(Duration(days: 7));
-                              var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                                builder: (BuildContext context) => ChildFollowUpTabScreen(
-                                    tabTitle: widget.tabTitle,
-                                    child_referral_guid: followUpsList[index].child_referral_guid!,
-                                    discharge_date: "",
-                                    followup_visit_date: followUpsList[index].followup_visit_date!,
-                                    schedule_date: followUpsList[index].followup_visit_date!,
-                                    enrollChildGuid: widget.childenrollguid,
-                                    creche_id: widget.creche_id,
-                                    child_id: widget.childNameId,
-                                    child_followup_guid: child_followup_guid!,
-                                    childId: widget.childId,
-                                    childName: widget.childName,
-                                    minDate: backDate.isBefore(backDateSD)?backDateSD:backDate,
-                                    isEditable: true)));
-                            if (refStatus == 'itemRefresh') {
-                              await callFolloupData();
+                              var refStatus = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder:
+                                          (BuildContext context) =>
+                                              ChildFollowUpTabScreen(
+                                                  tabTitle: widget.tabTitle,
+                                                  child_referral_guid:
+                                                      followUpsList[index]
+                                                          .child_referral_guid!,
+                                                  discharge_date: "",
+                                                  followup_visit_date:
+                                                      followUpsList[
+                                                              index]
+                                                          .followup_visit_date!,
+                                                  schedule_date: followUpsList[
+                                                          index]
+                                                      .followup_visit_date!,
+                                                  enrollChildGuid:
+                                                      widget.childenrollguid,
+                                                  creche_id: widget.creche_id,
+                                                  child_id: widget.childNameId,
+                                                  child_followup_guid:
+                                                      child_followup_guid!,
+                                                  childId: widget.childId,
+                                                  childName: widget.childName,
+                                                  minDate: backDate
+                                                          .isBefore(backDateSD)
+                                                      ? backDateSD
+                                                      : backDate,
+                                                  isEditable: true)));
+                              if (refStatus == 'itemRefresh') {
+                                await callFolloupData();
+                              }
                             }
-                          }}
+                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),
@@ -183,10 +210,10 @@ class _ChildFollowUpsListingScreenState
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-
                                           Text(
                                             Validate().displeDateFormate(
-                                                followUpsList[index].followup_visit_date!),
+                                                followUpsList[index]
+                                                    .followup_visit_date!),
                                             style: Styles.cardBlue10,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -243,9 +270,8 @@ class _ChildFollowUpsListingScreenState
   }
 
   Future callFolloupData() async {
-    followUpsList =
-        await ChildFollowUpTabResponseHelper().callSchudledReffralForChild(widget.childenrollguid);
+    followUpsList = await ChildFollowUpTabResponseHelper()
+        .callSchudledReffralForChild(widget.childenrollguid);
     setState(() {});
   }
-
 }

@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:shishughar/database/helper/child_attendence/attendance_responce_helper.dart';
+import 'package:shishughar/database/helper/child_attendence/child_attendance_helper_responce.dart';
 import 'package:shishughar/model/apimodel/auth_login_model.dart';
 import 'package:shishughar/model/apimodel/login_model.dart';
+import 'package:shishughar/model/databasemodel/child_attendance_responce_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -43,12 +46,14 @@ class DatabaseHelper {
       }
       if (oldVersion == 2 && newVersion > 2) {
         try {
-          await updateColoumnName(db,'tabWeightforAgeGirls','age_in_days','age_in_months');
-          await updateColoumnName(db,'tabWeightforAgeBoys','age_in_days','age_in_months');
-          await updateColoumnName(db,'tabHeightforAgeBoys','age_in_days','age_in_months');
-          await updateColoumnName(db,'tabHeightforAgeGirls','age_in_days','age_in_months');
-
-
+          await updateColoumnName(
+              db, 'tabWeightforAgeGirls', 'age_in_days', 'age_in_months');
+          await updateColoumnName(
+              db, 'tabWeightforAgeBoys', 'age_in_days', 'age_in_months');
+          await updateColoumnName(
+              db, 'tabHeightforAgeBoys', 'age_in_days', 'age_in_months');
+          await updateColoumnName(
+              db, 'tabHeightforAgeGirls', 'age_in_days', 'age_in_months');
 
           await db.execute('''CREATE TABLE tabPartner_Stock (
             name INTEGER PRIMARY KEY,
@@ -95,6 +100,99 @@ class DatabaseHelper {
     });
   }
 
+  Future deleteAllUsynchedRecords() async {
+    await openDb();
+    try {
+      await database!.transaction((txn) async {
+        await txn.delete('child_anthormentry_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+        await txn.delete('child_attendance_responce',
+            where: "(is_edited = ? OR is_edited = ?)AND is_uploaded = ?",
+            whereArgs: [1, 2, 0]);
+
+        List<ChildAttendanceResponceModel> chilAttendence =
+            await ChildAttendanceResponceHelper()
+                .callChildAttendencesAllForUpoad();
+        for (ChildAttendanceResponceModel element in chilAttendence) {
+          await txn.delete('child_attendence',
+              where: "childattenguid = ?", whereArgs: [element.childattenguid]);
+        }
+
+        await txn.delete('child_event_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('child_exit_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('grievances_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('child_referral_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('creche_committie_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('child_health_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+        await txn.delete('child_immunization_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('tab_creche_response',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+        await txn.delete('tab_caregiver_response',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+        await txn.delete('child_followup_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+        await txn.delete('house_hold_children',
+            where: "is_edited = ? AND is_uploaded = ?", whereArgs: [1, 0]);
+        await txn.delete('house_hold_responce',
+            where: "(is_edited = ? OR is_edited = ?) AND is_uploaded = ?",
+            whereArgs: [1, 2, 0]);
+
+        await txn.delete('enrollred_chilren_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('check_in_response',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('tabCreche_Monitering_Checklist_ALM_response',
+            where: '(is_edited = ? OR is_edited = ?) AND is_uploaded = ?',
+            whereArgs: [1, 2, 0]);
+        await txn.delete('tabCreche_Monitering_Checklist_CBM_response',
+            where: '(is_edited = ? OR is_edited = ?) AND is_uploaded = ?',
+            whereArgs: [1, 0]);
+
+        await txn.delete('tab_cashbook_expences_response',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+        await txn.delete('tab_cashbook_receipt_response',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('tab_creche_monitoring_response',
+            where: '(is_edited = ? OR is_edited = ?) AND is_uploaded = ?',
+            whereArgs: [1, 2, 0]);
+
+        await txn.delete('tabCreche_Monitering_Checklist_CC_response',
+            where: '(is_edited = ? OR is_edited = ?) AND is_uploaded = ?',
+            whereArgs: [1, 2, 0]);
+        // await txn.delete('tab_image_file');
+
+        await txn.delete('tabVillage_response',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+        await txn.delete('enrollred_exit_child_responce',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+
+        await txn.delete('tabCreche_requisition_response',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+        await txn.delete('tabCreche_stock_response',
+            where: 'is_edited = ? AND is_uploaded = ?', whereArgs: [1, 0]);
+      });
+      print("Successfullt deleted Usynched records");
+    } catch (e) {
+      print("Failed deleting usynched records - $e");
+    }
+  }
+   
   Future deleteAllRecords() async {
     await openDb();
     await database!.delete('sqlite_sequence');
@@ -178,9 +276,10 @@ class DatabaseHelper {
     await database!.delete('tabMaster_Stock');
   }
 
-  Future updateColoumnName(Database db,String tableName,String columnName,String oldColmnName) async{
-    try{
-      var tempTableName='$tableName'+'New';
+  Future updateColoumnName(Database db, String tableName, String columnName,
+      String oldColmnName) async {
+    try {
+      var tempTableName = '$tableName' + 'New';
       await db.execute('''CREATE TABLE $tempTableName (
           name INTEGER PRIMARY KEY,
           $columnName INTEGER,
@@ -190,15 +289,12 @@ class DatabaseHelper {
           yellow_min NUMERIC
           );''');
 
-      await db.execute('INSERT INTO $tempTableName (name, $columnName, green,red,yellow_max,yellow_min) SELECT name, $oldColmnName, green,red,yellow_max,yellow_min FROM $tableName');
+      await db.execute(
+          'INSERT INTO $tempTableName (name, $columnName, green,red,yellow_max,yellow_min) SELECT name, $oldColmnName, green,red,yellow_max,yellow_min FROM $tableName');
       await db.execute('DROP TABLE $tableName');
       await db.execute('ALTER TABLE $tempTableName RENAME TO $tableName');
-    }catch(e){
+    } catch (e) {
       print(e);
     }
-
-
-
   }
-
 }

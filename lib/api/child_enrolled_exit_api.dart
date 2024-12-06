@@ -84,7 +84,7 @@ class ChildEnrolledExitApi {
     var responseJs = jsonEncode(responseMap);
 
     try {
-      await Validate().createUploadedJson("Token $token\n\n$json");
+      await Validate().createUploadedJson("Token $token\n\n$responseJs");
       var response = await http.put(url, body: responseJs, headers: headers);
       return response;
     } catch (e) {

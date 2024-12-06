@@ -433,7 +433,7 @@ class _EnrolledChildDetailsState extends State<ChildEventDetailsViewScreen> {
           // }
         }
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,labelControlls,lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(

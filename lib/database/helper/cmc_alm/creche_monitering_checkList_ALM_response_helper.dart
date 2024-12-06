@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 import 'package:sqflite/sqflite.dart';
@@ -15,6 +16,18 @@ class CmcALMTabResponseHelper {
         conflictAlgorithm: ConflictAlgorithm.replace);
 
     print("object");
+  }
+
+  Future<void> deleteDraftRecords(CmcALMResponseModel record) async {
+    try{
+      await DatabaseHelper.database!.delete(
+        'tabCreche_Monitering_Checklist_ALM_response',
+        where: 'is_edited = ? AND name IS NULL AND almguid = ?',
+        whereArgs: [2,record.almguid]
+      );
+    } catch (e) {
+      debugPrint("Error deleting draft record : $e");
+    }
   }
 
   Future<List<CmcALMResponseModel>> getCrecheCommittieResponcewithGuid(

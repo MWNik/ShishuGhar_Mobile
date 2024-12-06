@@ -29,9 +29,17 @@ class MstCommonHelper {
     databaseHelper.openDb();
     await DatabaseHelper.database!.delete('mstCommon');
     if (mstCommonList.isNotEmpty) {
-      for (var element in mstCommonList) {
-        await DatabaseHelper.database!.insert('mstCommon', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        var batch = txn.batch();
+
+        for(var element in mstCommonList){
+          batch.insert('mstCommon', element.toJson());
+        }
+        await batch.commit(noResult: true);
+      });
+      // for (var element in mstCommonList) {
+      //   await DatabaseHelper.database!.insert('mstCommon', element.toJson());
+      // }
     }
   }
 

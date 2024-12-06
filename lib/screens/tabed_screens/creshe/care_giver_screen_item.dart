@@ -348,7 +348,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         return DynamicCustomYesNoCheckboxWithLabel(
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: myMap[quesItem.fieldname],
-          labelControlls: translats,
+          labelControlls: labelControlls,
           lng: lng,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -565,8 +565,8 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
@@ -668,7 +668,10 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
       CustomText.back,
       CustomText.Save,
       CustomText.plsFilManForm,
-      CustomText.dataSaveSuc
+      CustomText.dataSaveSuc,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.Submit
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)

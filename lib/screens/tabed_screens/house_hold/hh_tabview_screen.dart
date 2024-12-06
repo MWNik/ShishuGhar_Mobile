@@ -37,17 +37,26 @@ class _HHTabScreenState extends State<HHTabScreen>
   List<HouseHoldFielItemdModel> tabBreakItems = [];
   Map<String, List<HouseHoldFielItemdModel>> itemScreenItems = {};
   bool _isLoading = true;
-  String? hhNameTitle=CustomText.hhHeadName;
+  String? hhNameTitle = CustomText.hhHeadName;
   String? hhName;
   String? role;
   String? lng;
   List<Translation> labelControlls = [];
+  double screenWidth = 0.0;
+  double tabWidth = 100.0; // Approximate width of each tab
+  bool tabIsScrollable = false;
 
   @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    await callScrenControllers('Household Form');
+  void initState() {
+    super.initState();
+    callScrenControllers('Household Form');
   }
+
+  // @override
+  // void didChangeDependencies() async {
+  //   super.didChangeDependencies();
+  //   await callScrenControllers('Household Form');
+  // }
 
   @override
   void dispose() {
@@ -62,7 +71,7 @@ class _HHTabScreenState extends State<HHTabScreen>
     } else {
       return WillPopScope(
         onWillPop: () async {
-          Navigator.pop(context, 'itemRefresh');
+          Validate().showExitDialog(context, labelControlls, lng!);
           return false;
         },
         child: Scaffold(
@@ -73,7 +82,7 @@ class _HHTabScreenState extends State<HHTabScreen>
               padding: EdgeInsets.only(left: 10),
               child: GestureDetector(
                 onTap: () {
-                  Navigator.pop(context, 'itemRefresh');
+                  Validate().showExitDialog(context, labelControlls, lng!);
                 },
                 child: Icon(
                   Icons.arrow_back_ios_sharp,
@@ -141,22 +150,25 @@ class _HHTabScreenState extends State<HHTabScreen>
             bottom: _isLoading
                 ? null
                 : TabBar(
-                    indicatorColor: Colors.white,
+                    indicatorColor: Color(0xffF26BA3),
                     unselectedLabelColor: Colors.grey.shade300,
                     unselectedLabelStyle: Styles.white124P,
                     labelColor: Colors.white,
                     controller: _tabController,
-                    isScrollable: true,
+                    isScrollable: tabIsScrollable,
+                    labelPadding: EdgeInsets.zero,
+                    // tabAlignment: TabAlignment.start,
+                    tabAlignment: tabIsScrollable ? TabAlignment.start : null,
+
                     tabs: tabTitleItem,
                     onTap: (index) {
                       if (_tabController.indexIsChanging) {
                         _tabController.index = _tabController.previousIndex;
 
-                        handleTabChange(index,_tabController.previousIndex);
+                        handleTabChange(index, _tabController.previousIndex);
                       } else {
                         print("object 1 $index");
                         return;
-
                       }
                     },
                   ),
@@ -181,6 +193,7 @@ class _HHTabScreenState extends State<HHTabScreen>
     List<HouseHoldFielItemdModel> allItems = [];
     List<HouseHoldFielItemdModel> tempBreakDown = [];
     role = await Validate().readString(Validate.role);
+
     await HouseHoldFieldHelper()
         .getHouseHoldFieldsForm(screen_type)
         .then((value) async {
@@ -235,45 +248,68 @@ class _HHTabScreenState extends State<HHTabScreen>
       }
     }
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
-    // _tabController.addListener(handleTabChange);
-    // var hhNL = allItems
-    //     .where((element) => element.fieldname == 'hosuehold_head_name')
-    //     .toList();
-    // if (hhNL.length > 0) {
-    //   hhNameTitle = hhNL[0].label;
-    // }
     checkConditionsBeforeChangingTab(0);
+
+    lng = await Validate().readString(Validate.sLanguage);
+    List<String> valueNames = [
+      'HH Detail',
+      hhNameTitle!,
+      CustomText.ok,
+      CustomText.shouldExit,
+      CustomText.exit,
+      CustomText.Cancel
+    ];
+    tabBreakItems.forEach((element) async {
+      valueNames.add(element.label!);
+    });
+    await TranslationDataHelper()
+        .callTranslateString(valueNames)
+        .then((value) => labelControlls = value);
+    tabWidth = 0;
+    for (int i = 0; i < tabBreakItems.length; i++) {
+      final textPainter = TextPainter(
+        text: TextSpan(
+            text: Global.returnTrLable(
+                labelControlls, tabBreakItems[i].label!, lng!),
+            style: Styles.white124P),
+        maxLines: 1, // Single line text
+        textDirection: TextDirection.ltr,
+      );
+
+      // Layout the text (this step is required to calculate the width)
+      textPainter.layout();
+      double textWidth = textPainter.width + 20;
+      tabWidth = tabWidth + textWidth;
+      print(textWidth);
+    }
+    screenWidth = MediaQuery.of(context).size.width;
+    // tabIsScrollable = tabWidth * tabBreakItems.length >= screenWidth;
+    tabIsScrollable = tabWidth > screenWidth;
+
     await tabController();
-    await setLabelTextData();
 
     setState(() {
       _isLoading = false;
     });
   }
 
-  // List<Widget> tabController() {
-  //   List<Widget> tabItem = [];
-  //   tabBreakItems.forEach((element) async {
-  //     var lngtr = await Validate().readString(Validate.sLanguage);
-  //     var verifiLable = await TranslationDataHelper().getTranslation(element.label!, lngtr!);
-  //     tabItem.add(Tab(icon: Container(child: Text(verifiLable))));
-  //   });
-  //
-  //
-  //   return tabItem;
-  // }
-
   Future tabController() async {
-    // List<Widget> tabItem = [];
     tabBreakItems.forEach((element) async {
-      var lngtr = await Validate().readString(Validate.sLanguage);
-      var verifiLable =
-          await TranslationDataHelper().getTranslation(element.label!, lngtr!);
-      // print(verifiLable);
-      tabTitleItem.add(Tab(icon: Container(child: Text(verifiLable))));
+      tabTitleItem.add(Container(
+        width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
+        // padding: EdgeInsets.only(left: 10, right: 10),
+        padding: EdgeInsets.only(
+            left: tabIsScrollable ? 10 : 0, right: tabIsScrollable ? 10 : 0),
+        decoration: BoxDecoration(
+            color: Color(0xff369A8D),
+            border: Border(
+                right: BorderSide(
+                    color: Colors.white, width: 1, style: BorderStyle.solid))),
+        child: Tab(
+            child: Text(
+                Global.returnTrLable(labelControlls, element.label!, lng!))),
+      ));
     });
-    // print('TabItem 3rd - ${tabTitleItem[2]}');
-    // return tabTitleItem;
   }
 
   List<Widget> tabControllerScreen() {
@@ -304,18 +340,17 @@ class _HHTabScreenState extends State<HHTabScreen>
           _tabController.animateTo(tabIndex);
         });
       }
-    }
-    else if (tabIndex < tabBreakItems.length) {
+    } else if (tabIndex < tabBreakItems.length) {
       setState(() {
         tabIndex++;
         _tabController.animateTo(tabIndex);
       });
     }
-     checkConditionsBeforeChangingTab(index);
+    checkConditionsBeforeChangingTab(index);
   }
 
   Future<bool> checkConditionsBeforeChangingTab(int index) async {
-    bool returnStatus=false;
+    bool returnStatus = false;
     var alredRecord =
         await HouseHoldTabResponceHelper().getHouseHoldResponce(widget.hhGuid);
     if (alredRecord.isNotEmpty) {
@@ -328,18 +363,18 @@ class _HHTabScreenState extends State<HHTabScreen>
       //   if (children != null) return true;
       // }
       // else {
-        var items = itemScreenItems[tabBreakItems[index].name];
-        if (items != null && items.isNotEmpty) {
-          for (int i = 0; i < items.length; i++) {
-            if (responseData.containsKey(items[i].fieldname) ) {
-              print("Condition met for tab $index");
-              returnStatus=true;
-              break;
-            }
+      var items = itemScreenItems[tabBreakItems[index].name];
+      if (items != null && items.isNotEmpty) {
+        for (int i = 0; i < items.length; i++) {
+          if (responseData.containsKey(items[i].fieldname)) {
+            print("Condition met for tab $index");
+            returnStatus = true;
+            break;
           }
         }
+      }
       // }
-      if(!returnStatus) {
+      if (!returnStatus) {
         var nextco = (_tabController.index + 1);
         if (nextco == index) {
           var items = itemScreenItems[tabBreakItems[_tabController.index].name];
@@ -352,13 +387,12 @@ class _HHTabScreenState extends State<HHTabScreen>
           }
         }
       }
-
     }
     // Return false if conditions are not met
     return returnStatus;
   }
 
-  void handleTabChange(int index,int previus) async {
+  void handleTabChange(int index, int previus) async {
     // bool shouldChangeTab =
     //     await checkConditionsBeforeChangingTab(_tabController.index);
     print("index $index ${_tabController.index}");
@@ -371,7 +405,6 @@ class _HHTabScreenState extends State<HHTabScreen>
         });
       }
       Navigator.pop(context);
-
     });
     // _tabController.index = tabIndex;
 
@@ -409,8 +442,8 @@ class _HHTabScreenState extends State<HHTabScreen>
   }
 
   Future<void> updateVerificationStatus(BuildContext context) async {
-    var varyItem =
-        await OptionsModelHelper().getMstCommonOptions('Verfication Status',lng!);
+    var varyItem = await OptionsModelHelper()
+        .getMstCommonOptions('Verfication Status', lng!);
     varyItem = varyItem
         .where((element) => (element.name == '5') || (element.name == '4'))
         .toList();
@@ -427,66 +460,64 @@ class _HHTabScreenState extends State<HHTabScreen>
           content: Container(
               height: 180,
               child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    DynamicCustomDropdownField(
-                      titleText: verifiLable,
-                      isRequred: 0,
-                      items: varyItem,
-                      onChanged: (value) async {
-                        selectItem=value;
-                      },
-                    ),
-                    SizedBox(height: 5,),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: CElevatedButton(
-                            text: CustomText.Cancel,
-                            color: Color(0xffDB4B73),
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                            },
-                          ),
+                child: Column(children: [
+                  DynamicCustomDropdownField(
+                    titleText: verifiLable,
+                    isRequred: 0,
+                    items: varyItem,
+                    onChanged: (value) async {
+                      selectItem = value;
+                    },
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: CElevatedButton(
+                          text: CustomText.Cancel,
+                          color: Color(0xffDB4B73),
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                          },
                         ),
-                      SizedBox(width: 5,),
-                        Expanded(
-                          flex: 1,
-                          child: CElevatedButton(
-                            text: CustomText.Submit,
-                            color: Color(0xff369A8D),
-                            onPressed: () async {
-                              if(selectItem!=null){
-                                await updateVerification(selectItem);
-                                Navigator.of(context).pop();
-                                Validate().singleButtonPopup(
-                                    Global.returnTrLable(labelControlls,
-                                        CustomText.statusUpdateSuccssFully, lng!),
-                                    Global.returnTrLable(
-                                        labelControlls, CustomText.ok, lng!),
-                                    true,
-                                    context);
-                              }else{
-                                Validate().singleButtonPopup(
-                                    Global.returnTrLable(labelControlls,
-                                        CustomText.selectVerifyStatus, lng!),
-                                    Global.returnTrLable(
-                                        labelControlls, CustomText.ok, lng!),
-                                    false,
-                                    context);
-                              }
-
-
-
-                            },
-                          ),
-                        )
-                      ],
-                    )
-                  ]
-
-                ),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: CElevatedButton(
+                          text: CustomText.Submit,
+                          color: Color(0xff369A8D),
+                          onPressed: () async {
+                            if (selectItem != null) {
+                              await updateVerification(selectItem);
+                              Navigator.of(context).pop();
+                              Validate().singleButtonPopup(
+                                  Global.returnTrLable(labelControlls,
+                                      CustomText.statusUpdateSuccssFully, lng!),
+                                  Global.returnTrLable(
+                                      labelControlls, CustomText.ok, lng!),
+                                  true,
+                                  context);
+                            } else {
+                              Validate().singleButtonPopup(
+                                  Global.returnTrLable(labelControlls,
+                                      CustomText.selectVerifyStatus, lng!),
+                                  Global.returnTrLable(
+                                      labelControlls, CustomText.ok, lng!),
+                                  false,
+                                  context);
+                            }
+                          },
+                        ),
+                      )
+                    ],
+                  )
+                ]),
               )),
         );
       },
@@ -507,18 +538,10 @@ class _HHTabScreenState extends State<HHTabScreen>
       responseData['verified_by'] = userName;
       responseData['verified_on'] = Validate().currentDateTime();
       var responcesJs = jsonEncode(responseData);
-      var dateOfVisit=responseData['date_of_visit'];
-      await HouseHoldTabResponceHelper()
-          .insertUpdate(widget.hhGuid, dateOfVisit, name,creche_id, responcesJs, userName);
+      var dateOfVisit = responseData['date_of_visit'];
+      await HouseHoldTabResponceHelper().insertUpdate(
+          widget.hhGuid, dateOfVisit, name, creche_id, responcesJs, userName);
     }
-  }
-
-  Future<void> setLabelTextData() async {
-    lng = await Validate().readString(Validate.sLanguage);
-    List<String> valueNames = ['HH Detail', hhNameTitle!, CustomText.ok];
-    await TranslationDataHelper()
-        .callTranslateString(valueNames)
-        .then((value) => labelControlls = value);
   }
 
   showLoaderDialog(BuildContext context) {
@@ -527,21 +550,21 @@ class _HHTabScreenState extends State<HHTabScreen>
       context: context,
       builder: (BuildContext context) {
         return WillPopScope(
-            onWillPop: () async => false,
-        child:AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              SizedBox(height: 10),
-              const Text("Please wait..."),
-            ],
-          ),),
+          onWillPop: () async => false,
+          child: AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                SizedBox(height: 10),
+                const Text("Please wait..."),
+              ],
+            ),
+          ),
         );
       },
     );
   }
-
 
   // Future<void> updateVerificationStatusRadio(BuildContext mContext) async {
   //   var varyItem =
@@ -625,8 +648,8 @@ class _HHTabScreenState extends State<HHTabScreen>
   //   );
   // }
   Future<void> updateVerificationStatusRadio(BuildContext mContext) async {
-    var varyItem =
-    await OptionsModelHelper().getMstCommonOptions('Verfication Status',lng!);
+    var varyItem = await OptionsModelHelper()
+        .getMstCommonOptions('Verfication Status', lng!);
     varyItem = varyItem
         .where((element) => (element.name == '5') || (element.name == '4'))
         .toList();
@@ -635,98 +658,110 @@ class _HHTabScreenState extends State<HHTabScreen>
       context: mContext,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          contentPadding: EdgeInsets.zero,
-          content: StatefulBuilder(
-    builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              width: double.maxFinite,
-              height: MediaQuery.of(context).size.height * 0.35,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      height: 40,
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Color(0xff5979AA),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(5.0),
-                          topRight: Radius.circular(5.0),
-                        ),
-                      ),
-                      child: Center(
-                          child:
-                          Text(CustomText.SHISHUGHAR, style: Styles.white126P)),
-                    ),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
-                    Container(child: Text('Verification Status', style: Styles.black128)),
-                     ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: varyItem.length,
-                      itemBuilder: (context, i) {
-                        return RadioListTile<OptionsModel>(
-                          title: Text(varyItem[i].values ?? ''),
-                          value: varyItem[i],
-                          groupValue: selectItem,
-                          onChanged: (value) {
-                            setState(() {
-                              selectItem = value;
-                            });
-                            print('Selected: ${value?.values}');
-                          },
-                          activeColor: Colors.black,
-                        );
-                      },
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: CElevatedButton(
-                              text:  Global.returnTrLable(labelControlls,CustomText.Cancel,lng!),
-                              color: Color(0xffDB4B73),
-                              onPressed: () {
-                                Navigator.of(mContext).pop();
-                              },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            contentPadding: EdgeInsets.zero,
+            content: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return Container(
+                  width: double.maxFinite,
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Container(
+                          height: 40,
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Color(0xff5979AA),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(5.0),
+                              topRight: Radius.circular(5.0),
                             ),
                           ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: CElevatedButton(
-                              text: Global.returnTrLable(labelControlls,CustomText.Submit,lng!),
-                              color: Color(0xff369A8D),
-                              onPressed: () async {
-                                if(selectItem!=null){
-                                  await updateVerification(selectItem);
-                                  Navigator.of(context).pop();
-                                  Validate().singleButtonPopup(
-                                      Global.returnTrLable(labelControlls,
-                                          CustomText.statusUpdateSuccssFully, lng!),
-                                      Global.returnTrLable(
-                                          labelControlls, CustomText.ok, lng!),
-                                      true,
-                                      context);
-                                }else{
-                                  Validate().singleButtonPopup(
-                                      Global.returnTrLable(labelControlls,
-                                          CustomText.selectVerifyStatus, lng!),
-                                      Global.returnTrLable(
-                                          labelControlls, CustomText.ok, lng!),
-                                      false,
-                                      context);
-                                }
+                          child: Center(
+                              child: Text(CustomText.SHISHUGHAR,
+                                  style: Styles.white126P)),
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.01,
+                        ),
+                        Container(
+                            child: Text('Verification Status',
+                                style: Styles.black128)),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: varyItem.length,
+                          itemBuilder: (context, i) {
+                            return RadioListTile<OptionsModel>(
+                              title: Text(varyItem[i].values ?? ''),
+                              value: varyItem[i],
+                              groupValue: selectItem,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectItem = value;
+                                });
+                                print('Selected: ${value?.values}');
                               },
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  ]));})
-        );
+                              activeColor: Colors.black,
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      labelControlls, CustomText.Cancel, lng!),
+                                  color: Color(0xffDB4B73),
+                                  onPressed: () {
+                                    Navigator.of(mContext).pop();
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      labelControlls, CustomText.Submit, lng!),
+                                  color: Color(0xff369A8D),
+                                  onPressed: () async {
+                                    if (selectItem != null) {
+                                      await updateVerification(selectItem);
+                                      Navigator.of(context).pop();
+                                      Validate().singleButtonPopup(
+                                          Global.returnTrLable(
+                                              labelControlls,
+                                              CustomText
+                                                  .statusUpdateSuccssFully,
+                                              lng!),
+                                          Global.returnTrLable(labelControlls,
+                                              CustomText.ok, lng!),
+                                          true,
+                                          context);
+                                    } else {
+                                      Validate().singleButtonPopup(
+                                          Global.returnTrLable(
+                                              labelControlls,
+                                              CustomText.selectVerifyStatus,
+                                              lng!),
+                                          Global.returnTrLable(labelControlls,
+                                              CustomText.ok, lng!),
+                                          false,
+                                          context);
+                                    }
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ]));
+            }));
       },
     );
   }

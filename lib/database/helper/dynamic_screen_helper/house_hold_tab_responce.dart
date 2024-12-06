@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
 import 'package:shishughar/utils/globle_method.dart';
@@ -20,6 +21,15 @@ class HouseHoldTabResponceHelper {
   Future<void> insertsChild(HouseHoldChildrenModel items) async {
     await DatabaseHelper.database!.insert('house_hold_children', items.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> deleteDraftRecords(HouseHoldTabResponceMosdel record) async {
+    try {
+      await DatabaseHelper.database!.delete('house_hold_responce',
+          where: 'HHGUID = ? AND name IS NULL', whereArgs: [record.HHGUID]);
+    } catch (e) {
+      debugPrint("Error deleting draft record : $e");
+    }
   }
 
   Future<void> insertUpdate(String hhGuid, String? dateOfVisit, int? name,
@@ -78,9 +88,10 @@ class HouseHoldTabResponceHelper {
     return items;
   }
 
-  Future<List<HouseHoldTabResponceMosdel>> getHouseHoldItemsEditOrDarft() async {
-    List<Map<String, dynamic>> result = await DatabaseHelper.database!
-        .rawQuery('select * from house_hold_responce where is_edited=1 or is_edited=2');
+  Future<List<HouseHoldTabResponceMosdel>>
+      getHouseHoldItemsEditOrDarft() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from house_hold_responce where is_edited=1 or is_edited=2');
     List<HouseHoldTabResponceMosdel> items = [];
 
     result.forEach((itemMap) {
@@ -129,7 +140,7 @@ class HouseHoldTabResponceHelper {
       int creche_id) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'SELECT hhData.*, COALESCE(child.child_count, 0) AS children_count FROM house_hold_responce AS hhData LEFT JOIN(SELECT HHGUID, COUNT(*) AS child_count FROM house_hold_children GROUP BY HHGUID) AS child ON hhData.HHGUID = child.HHGUID where hhData.creche_id=? ORDER BY LOWER( SUBSTR(hhData.responces, INSTR(hhData.responces, ?) + LENGTH(?) ) ) asc',
-        [creche_id,'respondent_name":"','respondent_name":"']);
+        [creche_id, 'respondent_name":"', 'respondent_name":"']);
     List<HouseHoldTabResponceMosdel> items = [];
     result.forEach((itemMap) {
       items.add(HouseHoldTabResponceMosdel.fromJson(itemMap));
@@ -272,15 +283,87 @@ class HouseHoldTabResponceHelper {
     });
   }
 
+  // Future<void> downloadUpdateData(Map<String, dynamic> item) async {
+  //   List<Map<String, dynamic>> hhData =
+  //       List<Map<String, dynamic>>.from(item['Data']);
+  //   hhData.forEach((element) async {
+  //     var hhData = element['Household Form'];
+  //     if (hhData != null) {
+  //       List<Map<String, dynamic>> children =
+  //           List<Map<String, dynamic>>.from(hhData['children']);
+  //       hhData.remove('children');
+  //       var hhguid = hhData['hhguid'];
+  //       var name = hhData['name'];
+  //       var appCreatedby = hhData['app_created_by'];
+  //       var appCreatedOn = hhData['app_created_on'];
+  //       var appUpdatedby = hhData['app_updated_by'];
+  //       var appUpdatedOn = hhData['app_updated_on'];
+  //       var dateOfVisit = hhData['date_of_visit'];
+  //       var creche_id = hhData['creche_id'];
+  //       var finalHHData = Validate().keyesFromResponce(hhData);
+  //       var hhDtaResponce = jsonEncode(finalHHData);
+
+  //       var item = HouseHoldTabResponceMosdel(
+  //           HHGUID: hhguid,
+  //           date_of_visit: dateOfVisit,
+  //           responces: hhDtaResponce,
+  //           is_uploaded: 1,
+  //           is_edited: 0,
+  //           is_deleted: 0,
+  //           name: name,
+  //           update_at: appUpdatedOn,
+  //           updated_by: appUpdatedby,
+  //           created_by: appCreatedby,
+  //           creche_id: Global.stringToIntNull(creche_id.toString()),
+  //           created_at: appCreatedOn);
+  //       await inserts(item);
+
+  //       children.forEach((element) async {
+  //         var chName = element['name'];
+  //         var chGUID = element['hhguid'];
+  //         var chCGUID = element['hhcguid'];
+  //         var chappCreatedOn = element['appcreated_on'];
+  //         var chappCreatedBy = element['appcreated_by'];
+  //         var chappUpdatedOn = element['appupdated_on'];
+  //         var chappUpdatedby = element['appupdated_on'];
+  //         var finalCHHData = Validate().keyesFromResponce(element);
+  //         var cHHDtaResponce = jsonEncode(finalCHHData);
+
+  //         var item = HouseHoldChildrenModel(
+  //             HHGUID: chGUID,
+  //             CHHGUID: chCGUID,
+  //             responces: cHHDtaResponce,
+  //             is_uploaded: 1,
+  //             is_edited: 0,
+  //             is_deleted: 0,
+  //             name: chName,
+  //             parent: name,
+  //             update_at: chappUpdatedOn,
+  //             updated_by: chappUpdatedby,
+  //             created_by: chappCreatedBy,
+  //             created_at: chappCreatedOn);
+  //         await insertsChild(item);
+  //       });
+  //     }
+  //   });
+  // }
+
   Future<void> downloadUpdateData(Map<String, dynamic> item) async {
     List<Map<String, dynamic>> hhData =
         List<Map<String, dynamic>>.from(item['Data']);
-    hhData.forEach((element) async {
+
+    // Lists to collect household and child data
+    List<HouseHoldTabResponceMosdel> householdList = [];
+    List<HouseHoldChildrenModel> childrenList = [];
+
+    // Process household data
+    for (var element in hhData) {
       var hhData = element['Household Form'];
       if (hhData != null) {
         List<Map<String, dynamic>> children =
             List<Map<String, dynamic>>.from(hhData['children']);
         hhData.remove('children');
+
         var hhguid = hhData['hhguid'];
         var name = hhData['name'];
         var appCreatedby = hhData['app_created_by'];
@@ -292,48 +375,106 @@ class HouseHoldTabResponceHelper {
         var finalHHData = Validate().keyesFromResponce(hhData);
         var hhDtaResponce = jsonEncode(finalHHData);
 
-        var item = HouseHoldTabResponceMosdel(
-            HHGUID: hhguid,
-            date_of_visit: dateOfVisit,
-            responces: hhDtaResponce,
+        // Create household model
+        var householdItem = HouseHoldTabResponceMosdel(
+          HHGUID: hhguid,
+          date_of_visit: dateOfVisit,
+          responces: hhDtaResponce,
+          is_uploaded: 1,
+          is_edited: 0,
+          is_deleted: 0,
+          name: name,
+          update_at: appUpdatedOn,
+          updated_by: appUpdatedby,
+          created_by: appCreatedby,
+          creche_id: Global.stringToIntNull(creche_id.toString()),
+          created_at: appCreatedOn,
+        );
+
+        // Add to household list
+        householdList.add(householdItem);
+
+        // Process child data
+        for (var childElement in children) {
+          var chName = childElement['name'];
+          var chGUID = childElement['hhguid'];
+          var chCGUID = childElement['hhcguid'];
+          var chappCreatedOn = childElement['appcreated_on'];
+          var chappCreatedBy = childElement['appcreated_by'];
+          var chappUpdatedOn = childElement['appupdated_on'];
+          var chappUpdatedby = childElement['appupdated_by'];
+          var finalCHHData = Validate().keyesFromResponce(childElement);
+          var cHHDtaResponce = jsonEncode(finalCHHData);
+
+          // Create child model
+          var childItem = HouseHoldChildrenModel(
+            HHGUID: chGUID,
+            CHHGUID: chCGUID,
+            responces: cHHDtaResponce,
             is_uploaded: 1,
             is_edited: 0,
             is_deleted: 0,
-            name: name,
-            update_at: appUpdatedOn,
-            updated_by: appUpdatedby,
-            created_by: appCreatedby,
-            creche_id: Global.stringToIntNull(creche_id.toString()),
-            created_at: appCreatedOn);
-        await inserts(item);
+            name: chName,
+            parent: name,
+            update_at: chappUpdatedOn,
+            updated_by: chappUpdatedby,
+            created_by: chappCreatedBy,
+            created_at: chappCreatedOn,
+          );
 
-        children.forEach((element) async {
-          var chName = element['name'];
-          var chGUID = element['hhguid'];
-          var chCGUID = element['hhcguid'];
-          var chappCreatedOn = element['appcreated_on'];
-          var chappCreatedBy = element['appcreated_by'];
-          var chappUpdatedOn = element['appupdated_on'];
-          var chappUpdatedby = element['appupdated_on'];
-          var finalCHHData = Validate().keyesFromResponce(element);
-          var cHHDtaResponce = jsonEncode(finalCHHData);
-
-          var item = HouseHoldChildrenModel(
-              HHGUID: chGUID,
-              CHHGUID: chCGUID,
-              responces: cHHDtaResponce,
-              is_uploaded: 1,
-              is_edited: 0,
-              is_deleted: 0,
-              name: chName,
-              parent: name,
-              update_at: chappUpdatedOn,
-              updated_by: chappUpdatedby,
-              created_by: chappCreatedBy,
-              created_at: chappCreatedOn);
-          await insertsChild(item);
-        });
+          // Add to child list
+          childrenList.add(childItem);
+        }
       }
-    });
+    }
+
+    try {
+      // Perform batch insert for households and children
+      await DatabaseHelper.database!.transaction((txn) async {
+        // Insert household data in batches of 500
+        for (int i = 0; i < householdList.length; i += 500) {
+          var batchHousehold = txn.batch();
+          var batchItems = householdList.sublist(
+              i,
+              (i + 500) > householdList.length
+                  ? householdList.length
+                  : (i + 500));
+
+          for (var household in batchItems) {
+            batchHousehold.insert(
+              'house_hold_responce',
+              household.toJson(),
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          }
+
+          // Commit batch for household data
+          await batchHousehold.commit(noResult: true);
+        }
+
+        // Insert child data in batches of 500
+        for (int i = 0; i < childrenList.length; i += 500) {
+          var batchChildren = txn.batch();
+          var batchChildItems = childrenList.sublist(
+              i,
+              (i + 500) > childrenList.length
+                  ? childrenList.length
+                  : (i + 500));
+
+          for (var child in batchChildItems) {
+            batchChildren.insert(
+              'house_hold_children',
+              child.toJson(),
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          }
+
+          // Commit batch for child data
+          await batchChildren.commit(noResult: true);
+        }
+      });
+    } catch (e) {
+      debugPrint("Error inserting HH data: $e");
+    }
   }
 }

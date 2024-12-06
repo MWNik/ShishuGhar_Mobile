@@ -99,7 +99,22 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
       CustomText.Search,
       CustomText.Village,
       CustomText.anthropomertry,
-      CustomText.childAgeInDaysbrac
+      CustomText.childAgeInDaysbrac,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      'Measurement Date',
+      "Height",
+      'Weight',
+      'Measurement Equipment',
+      'Measurement taken',
+      'Z Score',
+      'Weight for age',
+      'Weight for Height',
+      'Height for Age',
+      CustomText.Severe,
+      CustomText.Moderate,
+      CustomText.Normal
     ];
     tabHeightforageBoys =
         await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
@@ -113,9 +128,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
         await HeightWeightBoysGirlsHelper().callWeightToHeightBoys();
     tabWeightToHeightGirls =
         await HeightWeightBoysGirlsHelper().callWeightToHeightGirls();
-    await TranslationDataHelper()
-        .callTranslateString(valueItems)
-        .then((value) => translats.addAll(value));
+
     mesureMentEqupmet = await OptionsModelHelper()
         .getMstCommonOptions('Measurement Equipment', lng);
     inless = await OptionsModelHelper().getMstCommonOptions('Illness', lng);
@@ -131,11 +144,20 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
         .toList();
     List<String> defaultCommon = [];
 
+    formItem.forEach((element) {
+      if (Global.validString(element.label))
+        valueItems.add(element.label!.trim());
+    });
+    await TranslationDataHelper()
+        .callTranslateString(valueItems)
+        .then((value) => translats.addAll(value));
+
     for (int i = 0; i < formItem.length; i++) {
       if (Global.validString(formItem[i].options)) {
         defaultCommon.add('tab${formItem[i].options!.trim()}');
       }
     }
+
     await OptionsModelHelper()
         .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((data) {
@@ -489,15 +511,15 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                               'weight_for_age'),
                                                           style: Styles.red85,
                                                         ),
-                                                        Text(
-                                                          callColorNameAvg(
-                                                              childResponce(
-                                                                  childHHData[
-                                                                          index]
-                                                                      .responces!),
-                                                              'weight_for_age'),
-                                                          style: Styles.red85,
-                                                        ),
+                                                        // Text(
+                                                        //   callColorNameAvg(
+                                                        //       childResponce(
+                                                        //           childHHData[
+                                                        //                   index]
+                                                        //               .responces!),
+                                                        //       'weight_for_age'),
+                                                        //   style: Styles.red85,
+                                                        // ),
                                                       ],
                                                     ),
                                                   ),
@@ -535,15 +557,15 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                             'weight_for_height'),
                                                         style: Styles.red85,
                                                       ),
-                                                      Text(
-                                                        callColorNameAvg(
-                                                            childResponce(
-                                                                childHHData[
-                                                                        index]
-                                                                    .responces!),
-                                                            'weight_for_height'),
-                                                        style: Styles.red85,
-                                                      ),
+                                                      // Text(
+                                                      //   callColorNameAvg(
+                                                      //       childResponce(
+                                                      //           childHHData[
+                                                      //                   index]
+                                                      //               .responces!),
+                                                      //       'weight_for_height'),
+                                                      //   style: Styles.red85,
+                                                      // ),
                                                     ],
                                                   )),
                                                   Expanded(
@@ -580,15 +602,15 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                             'height_for_age'),
                                                         style: Styles.red85,
                                                       ),
-                                                      Text(
-                                                        callColorNameAvg(
-                                                            childResponce(
-                                                                childHHData[
-                                                                        index]
-                                                                    .responces!),
-                                                            'height_for_age'),
-                                                        style: Styles.red85,
-                                                      ),
+                                                      // Text(
+                                                      //   callColorNameAvg(
+                                                      //       childResponce(
+                                                      //           childHHData[
+                                                      //                   index]
+                                                      //               .responces!),
+                                                      //       'height_for_age'),
+                                                      //   style: Styles.red85,
+                                                      // ),
                                                     ],
                                                   ))
                                                 ],
@@ -738,11 +760,14 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
     if (colorD == 0) {
       colorName = '';
     } else if (colorD == 1) {
-      colorName = '(Severe)';
+      colorName =
+          '(${Global.returnTrLable(translats, CustomText.Severe, lng)})';
     } else if (colorD == 2) {
-      colorName = '(Moderate)';
+      colorName =
+          '(${Global.returnTrLable(translats, CustomText.Moderate, lng)})';
     } else if (colorD == 3) {
-      colorName = '(Normal)';
+      colorName =
+          '(${Global.returnTrLable(translats, CustomText.Normal, lng)})';
     }
     return colorName;
   }
@@ -758,8 +783,8 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
         key,
         widget.gender,
         responce);
-    if(Global.validString(grothValue)){
-      grothValue='(${grothValue})';
+    if (Global.validString(grothValue)) {
+      grothValue = '(${grothValue})';
     }
     return grothValue;
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
@@ -38,6 +39,8 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
   bool isOnlyUnsynched = false;
   List<CmcALMResponseModel> unsynchedList = [];
   List<CmcALMResponseModel> allList = [];
+  DateTime applicableDate = Validate().stringToDate(Validate.date);
+  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -46,6 +49,8 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     translats.clear();
     lng = (await Validate().readString(Validate.sLanguage))!;
     List<String> valueItems = [
@@ -58,7 +63,10 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
       CustomText.NorecordAvailable,
       CustomText.clear,
       CustomText.all,
-      CustomText.usynchedAndDraft
+      CustomText.usynchedAndDraft,
+      CustomText.areSureToDelete,
+      CustomText.Cancel,
+      CustomText.delete
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -268,7 +276,10 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                                                       filterData[index]
                                                           .responces,
                                                       'date_of_visit'),
-                                              isViewScreen: isViewScreen)));
+                                              isViewScreen:
+                                                  now.isBefore(applicableDate)
+                                                      ? false
+                                                      : isViewScreen)));
 
                               if (refStatus == 'itemRefresh') {
                                 await fetchCmcCBMRecords();
@@ -277,121 +288,180 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 5.h),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(
-                                          0.2), // Shadow color with opacity
-                                      offset: Offset(0,
-                                          3), // Horizontal and vertical offset
-                                      blurRadius: 6, // Blur radius
-                                      spreadRadius: 0, // Spread radius
-                                    ),
-                                  ],
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w, vertical: 8.h),
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.Creches, lng)} : ',
-                                            style: Styles.black104,
-                                          ),
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.datevisit, lng).trim()} : ',
-                                            style: Styles.black104,
-                                            strutStyle: StrutStyle(height: 1.2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xff5A5A5A).withOpacity(
+                                                0.2), // Shadow color with opacity
+                                            offset: Offset(0,
+                                                3), // Horizontal and vertical offset
+                                            blurRadius: 6, // Blur radius
+                                            spreadRadius: 0, // Spread radius
                                           ),
                                         ],
-                                      ),
-                                      SizedBox(width: 10),
-                                      SizedBox(
-                                        height: 30.h,
-                                        width: 2,
-                                        child: VerticalDivider(
-                                          color: Color(0xffE6E6E6),
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                        color: Colors.white,
+                                        border: Border.all(
+                                            color: Color(0xffE7F0FF)),
+                                        borderRadius:
+                                            BorderRadius.circular(10.r)),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w, vertical: 8.h),
+                                      child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
-                                            Text(
-                                              callCreCheName(
-                                                  Global.getItemValues(
-                                                      filterData[index]
-                                                          .responces,
-                                                      'creche_id')),
-                                              style: Styles.cardBlue10,
-                                              overflow: TextOverflow.ellipsis,
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${Global.returnTrLable(translats, CustomText.Creches, lng)} : ',
+                                                  style: Styles.black104,
+                                                ),
+                                                Text(
+                                                  '${Global.returnTrLable(translats, CustomText.datevisit, lng).trim()} : ',
+                                                  style: Styles.black104,
+                                                  strutStyle:
+                                                      StrutStyle(height: 1.2),
+                                                ),
+                                              ],
                                             ),
-                                            Text(
-                                              (Global.validString(
-                                                      Global.getItemValues(
-                                                          filterData[index]
-                                                              .responces,
-                                                          'date_of_visit')))
-                                                  ? Validate()
-                                                      .displeDateFormate(
-                                                          Global.getItemValues(
-                                                              filterData[index]
-                                                                  .responces,
-                                                              'date_of_visit'))
-                                                  : '',
-                                              style: Styles.cardBlue10,
-                                              overflow: TextOverflow.ellipsis,
-                                              strutStyle:
-                                                  StrutStyle(height: 1.2),
+                                            SizedBox(width: 10),
+                                            VerticalDivider(
+                                              color: Color(0xffE6E6E6),
+                                              width: 2,
+                                              thickness: 2,
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(width: 5),
-                                      (filterData[index].is_edited == 0 &&
-                                              filterData[index].is_uploaded ==
-                                                  1)
-                                          ? Image.asset(
-                                              "assets/sync.png",
-                                              scale: 1.5,
-                                            )
-                                          : (filterData[index].is_edited == 1 &&
-                                                  filterData[index]
-                                                          .is_uploaded ==
-                                                      0)
-                                              ? Image.asset(
-                                                  "assets/sync_gray.png",
-                                                  scale: 1.5,
-                                                )
-                                              : Icon(
-                                                  Icons.error_outline_outlined,
-                                                  color: Colors.red.shade700,
-                                                  shadows: [
-                                                    BoxShadow(
-                                                        spreadRadius: 2,
-                                                        blurRadius: 4,
-                                                        color:
-                                                            Colors.red.shade200)
-                                                  ],
-                                                )
-                                    ]),
-                              ),
+                                            SizedBox(width: 10),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    callCreCheName(
+                                                        Global.getItemValues(
+                                                            filterData[index]
+                                                                .responces,
+                                                            'creche_id')),
+                                                    style: Styles.cardBlue10,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  Text(
+                                                    (Global.validString(Global
+                                                            .getItemValues(
+                                                                filterData[
+                                                                        index]
+                                                                    .responces,
+                                                                'date_of_visit')))
+                                                        ? Validate().displeDateFormate(
+                                                            Global.getItemValues(
+                                                                filterData[
+                                                                        index]
+                                                                    .responces,
+                                                                'date_of_visit'))
+                                                        : '',
+                                                    style: Styles.cardBlue10,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(width: 5),
+                                            (filterData[index].is_edited == 0 &&
+                                                    filterData[index]
+                                                            .is_uploaded ==
+                                                        1)
+                                                ? Image.asset(
+                                                    "assets/sync.png",
+                                                    scale: 1.5,
+                                                  )
+                                                : (filterData[index]
+                                                                .is_edited ==
+                                                            1 &&
+                                                        filterData[index]
+                                                                .is_uploaded ==
+                                                            0)
+                                                    ? Image.asset(
+                                                        "assets/sync_gray.png",
+                                                        scale: 1.5,
+                                                      )
+                                                    : Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .error_outline_outlined,
+                                                            color: Colors
+                                                                .red,
+                                                            shadows: [
+                                                              BoxShadow(
+                                                                spreadRadius: 2,
+                                                                blurRadius: 4,
+                                                                color: Colors
+                                                                    .red
+                                                                    .shade200,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          InkWell(
+                                                            onTap: () async {
+                                                              showDeleteDialog(
+                                                                  filterData[
+                                                                      index]);
+                                                              // setState(() {});
+                                                            },
+                                                            child: Container(
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      left: 8
+                                                                          .w), // Optional spacing from content
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            50),
+                                                                color: Colors
+                                                                    .red
+                                                                    .shade300,
+                                                              ),
+                                                              child: Padding(
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            2.w,
+                                                                        vertical:
+                                                                            2.h),
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .delete_rounded,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 16,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                          ]),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         );
@@ -411,6 +481,26 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
     filterData = isOnlyUnsynched ? unsynchedList : allList;
     selectedCreche = null;
     setState(() {});
+  }
+
+  showDeleteDialog(CmcALMResponseModel record) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return CustomDoubleButton(
+              message: Global.returnTrLable(
+                  translats, CustomText.areSureToDelete, lng),
+              posButton:
+                  Global.returnTrLable(translats, CustomText.delete, lng),
+              negButton:
+                  Global.returnTrLable(translats, CustomText.Cancel, lng),
+              onPositive: () async {
+                await CmcALMTabResponseHelper().deleteDraftRecords(record);
+                await fetchCmcCBMRecords();
+                Navigator.of(context).pop(true);
+                setState(() {});
+              });
+        });
   }
 
   filteredGetData(

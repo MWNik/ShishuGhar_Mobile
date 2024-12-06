@@ -74,7 +74,10 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
       CustomText.Status,
       CustomText.Description,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.ChildGrievances,
+      CustomText.clear,
+      CustomText.Filter
     ];
     await callmstCommons();
     await TranslationDataHelper()
@@ -108,13 +111,15 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
             String child_grievances_guid = '';
             if (!(Global.validString(child_grievances_guid))) {
               child_grievances_guid = Validate().randomGuid();
-              var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => ChildGrievancesDetailScreen(
-                        child_grievances_guid: child_grievances_guid,
-                        // enName: widget.enName!,
-                        creche_id: widget.creche_id,
-                        // chilenrolledGUID: widget.chilenrolledGUID,
-                      )));
+              var refStatus = await Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          ChildGrievancesDetailScreen(
+                            child_grievances_guid: child_grievances_guid,
+                            // enName: widget.enName!,
+                            creche_id: widget.creche_id,
+                            // chilenrolledGUID: widget.chilenrolledGUID,
+                          )));
               if (refStatus == 'itemRefresh') {
                 fetchChildgrievance();
               }
@@ -127,7 +132,8 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
           ),
         ),
         appBar: CustomAppbar(
-          text: Global.returnTrLable(translats, CustomText.ChildGrievances, lng),
+          text:
+              Global.returnTrLable(translats, CustomText.ChildGrievances, lng),
           subTitle: widget.crecheName,
           onTap: () => Navigator.pop(context, 'itemRefresh'),
         ),
@@ -155,7 +161,8 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
                               width: 10.w,
                             ),
                             Text(
-                              CustomText.Filter,
+                              Global.returnTrLable(
+                                  translats, CustomText.Filter, lng),
                               style: Styles.labelcontrollerfont,
                             ),
                             Spacer(),
@@ -219,8 +226,10 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
                       Padding(
                         padding: EdgeInsets.only(top: 25),
                         child: AnimatedRollingSwitch(
-                          title1: Global.returnTrLable(translats, CustomText.all, lng),
-                          title2: Global.returnTrLable(translats, CustomText.unsynched, lng),
+                          title1: Global.returnTrLable(
+                              translats, CustomText.all, lng),
+                          title2: Global.returnTrLable(
+                              translats, CustomText.unsynched, lng),
                           isOnlyUnsynched: isOnlyUnsyched,
                           onChange: (value) async {
                             setState(() {
@@ -289,8 +298,8 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
                                     BoxShadow(
                                       color: Color(0xff5A5A5A).withOpacity(
                                           0.2), // Shadow color with opacity
-                                      offset: Offset(
-                                          0, 3), // Horizontal and vertical offset
+                                      offset: Offset(0,
+                                          3), // Horizontal and vertical offset
                                       blurRadius: 6, // Blur radius
                                       spreadRadius: 0, // Spread radius
                                     ),
@@ -308,7 +317,8 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Text(
                                           '${Global.returnTrLable(translats, CustomText.GrievanceCategory, lng).trim()} : ',
@@ -381,7 +391,8 @@ class _ChildGrievancesListingState extends State<ChildGrievancesListing> {
                                     ),
                                     SizedBox(width: 5),
                                     (filtredGirevData[index].is_edited == 0 &&
-                                            filtredGirevData[index].is_uploaded ==
+                                            filtredGirevData[index]
+                                                    .is_uploaded ==
                                                 1)
                                         ? Image.asset(
                                             "assets/sync.png",

@@ -598,7 +598,7 @@ class _StockExpendableDetailScreenState
               if (quesItem.fieldname == 'wastage' ||
                   quesItem.fieldname == 'usage') {
                 var validationMessge = DependingLogic()
-                    .validationMessge(logics, itemFields, quesItem);
+                    .validationMessge(logics, itemFields, quesItem,translats,lng);
                 if (!Global.validString(validationMessge)) {
                   if (quesItem.fieldname == 'wastage') {
                     var logData = DependingLogic()
@@ -755,8 +755,8 @@ class _StockExpendableDetailScreenState
             validStatus = false;
             break;
           }
-          var validationMsg = DependingLogic()
-              .validationMessge(logics, itemMap[name]!, element);
+          var validationMsg = DependingLogic().validationMessge(
+              logics, itemMap[name]!, element, translats, lng);
           if (Global.validString(validationMsg)) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(translats, validationMsg, lng!),

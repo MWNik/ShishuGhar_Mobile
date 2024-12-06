@@ -12,12 +12,13 @@ import 'children_enrolled_exit_listed_screen.dart';
 class EnrolledExitChildListingTab extends StatefulWidget {
   final int creCheId;
   final String village_id;
+  final String creCheName;
 
-  const EnrolledExitChildListingTab({
-    super.key,
-    required this.creCheId,
-    required this.village_id,
-  });
+  const EnrolledExitChildListingTab(
+      {super.key,
+      required this.creCheId,
+      required this.village_id,
+      required this.creCheName});
 
   @override
   _EnrolledChildrenListingTabState createState() =>
@@ -74,50 +75,66 @@ class _EnrolledChildrenListingTabState
                       labelControlls, CustomText.Enrolledchildren, lng),
                   style: Styles.white145,
                 ),
-                // Text(
-                //  widget.creCheName,
-                //   style: Styles.white145,
-                // ),
+                Text(
+                  widget.creCheName,
+                  style: Styles.white126P,
+                ),
               ],
             ),
             centerTitle: true,
             bottom: _isLoading
                 ? null
-                :TabBar(
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelPadding: EdgeInsets.zero,
-              indicator: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Color(0xffF26BA3),
-                    width: 3.0,
-                  ),
-                ),
-              ),
-              controller: _tabController,
-              unselectedLabelColor: Color(0xff369A8D),
-              tabs: [
-                Container(
-                  color: Color(0xff369A8D),
-                  width: double.infinity,
-                  child: Tab(
-                    child: Text(
-                      Global.returnTrLable(labelControlls, CustomText.Enrolled, lng),
-                      style: TextStyle(color: Colors.white),
+                : TabBar(
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    labelPadding: EdgeInsets.zero,
+                    indicator: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Color(0xffF26BA3),
+                          width: 3.0,
+                        ),
+                      ),
                     ),
+                    controller: _tabController,
+                    unselectedLabelColor: Color(0xff369A8D),
+                    tabs: [
+                      Container(
+                        // color: Color(0xff369A8D),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: Color(0xff369A8D),
+                            border: Border(
+                                right: BorderSide(
+                                    color: Colors.white,
+                                    width: 1,
+                                    style: BorderStyle.solid))),
+                        child: Tab(
+                          child: Text(
+                            Global.returnTrLable(
+                                labelControlls, CustomText.Enrolled, lng),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        // color: Color(0xff369A8D),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: Color(0xff369A8D),
+                            border: Border(
+                                right: BorderSide(
+                                    color: Colors.white,
+                                    width: 1,
+                                    style: BorderStyle.solid))),
+                        child: Tab(
+                            child: Text(
+                          Global.returnTrLable(
+                              labelControlls, CustomText.NotEnroll, lng),
+                          style: TextStyle(color: Colors.white),
+                        )),
+                      ),
+                    ],
                   ),
-                ),
-                Container(
-                  color: Color(0xff369A8D),
-                  width: double.infinity,
-                  child: Tab(
-                      child: Text(
-                        Global.returnTrLable(labelControlls, CustomText.NotEnroll, lng),
-                        style: TextStyle(color: Colors.white),
-                      )),
-                ),
-              ],
-            ),
             /* TabBar(
                     indicatorColor: Colors.white,
                     unselectedLabelColor: Colors.grey.shade300,
@@ -144,7 +161,6 @@ class _EnrolledChildrenListingTabState
     }
   }
 
-
   List<Widget> tabControllerScreen() {
     List<Widget> tabItem = [];
     for (int i = 0; i < tabCount; i++) {
@@ -157,7 +173,6 @@ class _EnrolledChildrenListingTabState
     }
     return tabItem;
   }
-
 
   tabController() {
     _tabController = TabController(length: tabCount, vsync: this);

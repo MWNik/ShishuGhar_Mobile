@@ -53,6 +53,7 @@ class _NotEnrolledChildrenListedScreenState
   int? maxAgeLimit;
   int? minAgeLimit;
   bool isOnlyUnsynched = false;
+  bool isExited = false;
   List<Map<String, dynamic>> unsynchedList = [];
   String? role;
   List<Map<String, dynamic>> allList = [];
@@ -88,7 +89,15 @@ class _NotEnrolledChildrenListedScreenState
       CustomText.ageInMonthEn,
       CustomText.childCount,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.freshChild,
+      CustomText.exitedChild,
+      CustomText.Dob,
+      CustomText.Filter,
+      CustomText.minAgeInMonthEn,
+      CustomText.maxAgeInMonthEn,
+      CustomText.clear,
+      CustomText.Gender
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -98,15 +107,28 @@ class _NotEnrolledChildrenListedScreenState
     setState(() {});
   }
 
+  String getGender(int gender_id) {
+    var result = genderList
+        .where((element) => Global.stringToInt(element.name) == gender_id)
+        .toList();
+    return result.first.values!;
+  }
+
   Future<void> fetchChildHHDataList() async {
-    childHHData = await EnrolledExitChilrenResponceHelper()
-        .getNotEnrollChildren(widget.village_id);
+    if (isExited) {
+      childHHData = await EnrolledExitChilrenResponceHelper()
+          .getNotEnrollChildrenExited(widget.village_id);
+    } else {
+      childHHData = await EnrolledExitChilrenResponceHelper()
+          .getNotEnrollChildren(widget.village_id);
+    }
 
     childHHData = childHHData.where((element) {
       var isdobavail =
           Global.getItemValues(element['responces'], 'is_dob_available');
       return Global.stringToInt(isdobavail.toString()) == 1;
     }).toList();
+
     allList = childHHData;
     unsynchedList =
         childHHData.where((element) => element['is_edited'] == 1).toList();
@@ -232,7 +254,8 @@ class _NotEnrolledChildrenListedScreenState
                             width: 10.w,
                           ),
                           Text(
-                            CustomText.Filter,
+                            Global.returnTrLable(
+                                translats, CustomText.Filter, lng),
                             style: Styles.labelcontrollerfont,
                           ),
                           Spacer(),
@@ -397,17 +420,32 @@ class _NotEnrolledChildrenListedScreenState
           Padding(
             padding: EdgeInsets.only(top: 10),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                role == CustomText.crecheSupervisor
+                    ? AnimatedRollingSwitch(
+                        title1: Global.returnTrLable(
+                            translats, CustomText.freshChild, lng),
+                        title2: Global.returnTrLable(
+                            translats, CustomText.exitedChild, lng),
+                        isOnlyUnsynched: isExited ?? false,
+                        onChange: (value) async {
+                          setState(() {
+                            isExited = value;
+                          });
+                          await fetchChildHHDataList();
+                        },
+                      )
+                    : SizedBox(),
                 Text(
                   '${Global.returnTrLable(translats, CustomText.childCount, lng)}: ${filterData.length}',
                   style: Styles.black12700,
-                )
+                ),
               ],
             ),
           ),
           SizedBox(
-            height: 10.h,
+            height: 4.h,
           ),
           Expanded(
             child: (filterData.length > 0)
@@ -423,39 +461,53 @@ class _NotEnrolledChildrenListedScreenState
                           if (role == CustomText.crecheSupervisor) {
                             String refStatus = '';
                             String enrolledChildGuid = '';
-                            String? minDate = await callDateOfExit(
+                            if (isDateInRange(Validate().stringToDate(
                                 Global.getItemValues(
-                                    selectedItem['responces'], 'hhcguid'));
-                            if (!Global.validString(enrolledChildGuid)) {
-                              enrolledChildGuid = Validate().randomGuid();
-                              EnrolledExitChilrenTab.childName =
+                                    selectedItem['responces'], 'child_dob')))) {
+                              String? minDate = await callDateOfExit(
                                   Global.getItemValues(
-                                      selectedItem['responces'], 'child_name');
-                              refStatus = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) => EnrolledExitChilrenTab(
-                                          isEditable: role ==
-                                                  CustomText.crecheSupervisor
-                                                      .trim()
-                                              ? true
-                                              : false,
-                                          CHHGUID: Global.getItemValues(
-                                              selectedItem['responces'],
-                                              'hhcguid'),
-                                          HHGUID: Global.getItemValues(
-                                              selectedItem['hhResponce'],
-                                              'hhguid'),
-                                          HHname: Global.stringToInt(
-                                              selectedItem['name'].toString()),
-                                          EnrolledChilGUID: enrolledChildGuid,
-                                          crecheId: widget.crecheId,
-                                          minDate: minDate,
-                                          isNew: 0,
-                                          isImageUpdate: false)));
-                            }
-                            if (refStatus == 'itemRefresh') {
-                              await fetchChildHHDataList();
-                            }
+                                      selectedItem['responces'], 'hhcguid'));
+                              if (!Global.validString(enrolledChildGuid)) {
+                                enrolledChildGuid = Validate().randomGuid();
+                                EnrolledExitChilrenTab.childName =
+                                    Global.getItemValues(
+                                        selectedItem['responces'],
+                                        'child_name');
+                                refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        EnrolledExitChilrenTab(
+                                            isEditable: role ==
+                                                    CustomText.crecheSupervisor
+                                                        .trim()
+                                                ? true
+                                                : false,
+                                            CHHGUID: Global.getItemValues(
+                                                selectedItem['responces'],
+                                                'hhcguid'),
+                                            HHGUID: Global.getItemValues(
+                                                selectedItem['hhResponce'],
+                                                'hhguid'),
+                                            HHname: Global.stringToInt(
+                                                selectedItem['name'].toString()),
+                                            EnrolledChilGUID: enrolledChildGuid,
+                                            crecheId: widget.crecheId,
+                                            minDate: minDate,
+                                            isNew: 0,
+                                            isImageUpdate: false)));
+                              }
+                              if (refStatus == 'itemRefresh') {
+                                await fetchChildHHDataList();
+                              }
+                            } else
+                              Validate().singleButtonPopup(
+                                  Global.returnTrLable(
+                                      translats,
+                                      CustomText.childDobIsNotValidForEnrolled,
+                                      lng),
+                                  Global.returnTrLable(
+                                      translats, CustomText.ok, lng),
+                                  false,
+                                  context);
                           }
                         },
                         child: Padding(
@@ -496,11 +548,16 @@ class _NotEnrolledChildrenListedScreenState
                                         style: Styles.black104,
                                         strutStyle: StrutStyle(height: 1.2),
                                       ),
-                                      // Text(
-                                      //   '${Global.returnTrLable(translats, CustomText.ageInMonth, lng).trim()} : ',
-                                      //   style: Styles.black104,
-                                      //   strutStyle: StrutStyle(height: 1),
-                                      // ),
+                                      Text(
+                                        '${Global.returnTrLable(translats, CustomText.Gender, lng).trim()} : ',
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
+                                      Text(
+                                        '${Global.returnTrLable(translats, CustomText.Dob, lng).trim()} : ',
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
                                       Text(
                                         '${Global.returnTrLable(translats, CustomText.Village, lng).trim()} : ',
                                         style: Styles.black104,
@@ -539,14 +596,24 @@ class _NotEnrolledChildrenListedScreenState
                                           strutStyle: StrutStyle(height: 1.2),
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        // Text(
-                                        //   Global.getItemValues(
-                                        //       selectedItem['responces'],
-                                        //       'child_age'),
-                                        //   style: Styles.cardBlue10,
-                                        //   strutStyle: StrutStyle(height: .5),
-                                        //   overflow: TextOverflow.ellipsis,
-                                        // ),
+                                        Text(
+                                          getGender(Global.stringToInt(
+                                              Global.getItemValues(
+                                                  selectedItem['responces'],
+                                                  "gender_id"))),
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: .5),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          Validate().displeDateFormate(
+                                              Global.getItemValues(
+                                                  selectedItem['responces'],
+                                                  "child_dob")),
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: .5),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                         Text(
                                           callVillageName(
                                               selectedItem['hhResponce']),
@@ -669,5 +736,18 @@ class _NotEnrolledChildrenListedScreenState
 
   Future<String?> callDateOfExit(String CHHGUID) async {
     return await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
+  }
+
+  bool isDateInRange(DateTime targetDate) {
+    // Get the current date
+    DateTime currentDate = DateTime.now();
+
+    // Calculate the difference in months
+    int differenceInMonths = (currentDate.year - targetDate.year) * 12 +
+        currentDate.month -
+        targetDate.month;
+
+    // Check if the difference is between 6 and 36 months
+    return differenceInMonths >= 6 && differenceInMonths <= 36;
   }
 }

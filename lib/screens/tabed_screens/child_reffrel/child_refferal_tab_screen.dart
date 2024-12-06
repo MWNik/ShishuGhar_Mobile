@@ -28,7 +28,7 @@ class ChildReferralTabScreen extends StatefulWidget {
   final int? child_id;
   final int creche_id;
   final bool isDischarge;
-  final DateTime minDate;
+  final DateTime? minDate;
   final String scheduleDate;
   final bool isEditable;
 
@@ -329,7 +329,7 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
                 tabIndex: i,
                 totalTab: tabBreakItems.length,
                 scheduleDate: widget.scheduleDate,
-                minDate: widget.minDate)
+                minDate: widget.minDate??null)
             : ChildReferralTabItemsViewScreen(
                 scheduleDate: widget.scheduleDate,
                 enrollDate: widget.enrollDate,

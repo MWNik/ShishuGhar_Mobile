@@ -55,7 +55,8 @@ class ChildHealthDetailViewScreen extends StatefulWidget {
       _ChildHealthDetailViewScreenState();
 }
 
-class _ChildHealthDetailViewScreenState extends State<ChildHealthDetailViewScreen> {
+class _ChildHealthDetailViewScreenState
+    extends State<ChildHealthDetailViewScreen> {
   List<TabFormsLogic> logics = [];
   List<HouseHoldFielItemdModel> allItems = [];
   Map<String, dynamic> myMap = {};
@@ -213,7 +214,7 @@ class _ChildHealthDetailViewScreenState extends State<ChildHealthDetailViewScree
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           // minDate: widget.lastDate,
           // maxDate: widget.maxDate,
-         
+
           calenderValidate: [],
           readable: true,
           onChanged: (value) {
@@ -407,7 +408,6 @@ class _ChildHealthDetailViewScreenState extends State<ChildHealthDetailViewScree
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -429,20 +429,21 @@ class _ChildHealthDetailViewScreenState extends State<ChildHealthDetailViewScree
     }
 
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
       logics.addAll(data);
     });
-     List<String> labelItems = [];
+    List<String> labelItems = [];
     allItems.forEach((element) {
-     if(Global.validString(element.label)){
-      labelItems.add(element.label!);
-     }
+      if (Global.validString(element.label)) {
+        labelItems.add(element.label!);
+      }
     });
-    await TranslationDataHelper().callTranslateString(labelItems).then((value) => labelControlls.addAll(value));
-
+    await TranslationDataHelper()
+        .callTranslateString(labelItems)
+        .then((value) => labelControlls.addAll(value));
 
     setState(() {
       _isLoading = false;
@@ -472,7 +473,7 @@ class _ChildHealthDetailViewScreenState extends State<ChildHealthDetailViewScree
                 context);
             validStatus = false;
             break;
-          } 
+          }
           // else if (element.fieldname == 'date') {
           //   if (widget.existingDates.contains(valuees)) {
           //     myMap.remove(element.fieldname);
@@ -487,8 +488,8 @@ class _ChildHealthDetailViewScreenState extends State<ChildHealthDetailViewScree
           //   }
           // }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, labelControlls, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(labelControlls, validationMsg, lng!),

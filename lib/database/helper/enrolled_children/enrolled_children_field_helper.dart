@@ -53,10 +53,15 @@ class EnrolledChildrenFieldHelper {
   Future<void> insertsChildrenEnrolledField(
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     if (houseFieldItem.isNotEmpty) {
-      for (var element in houseFieldItem) {
-        await DatabaseHelper.database!
-            .insert('tabchildprofilefield', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        for (var element in houseFieldItem) {
+          await txn.insert('tabchildprofilefield', element.toJson());
+        }
+      });
+      // for (var element in houseFieldItem) {
+      //   await DatabaseHelper.database!
+      //       .insert('tabchildprofilefield', element.toJson());
+      // }
     }
   }
 

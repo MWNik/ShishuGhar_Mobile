@@ -76,7 +76,8 @@ class _AddAttendanceState extends State<AddAttendance> {
       CustomText.markAllPresent,
       CustomText.DateofAttendance,
       CustomText.childCount,
-      CustomText.childPresent
+      CustomText.childPresent,
+      CustomText.Save
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -105,8 +106,7 @@ class _AddAttendanceState extends State<AddAttendance> {
       childHHData = await EnrolledExitChilrenResponceHelper()
           .enrolledChildByCrecheByAttendeGUID(
               widget.ChildAttenGUID!, widget.crecheId);
-    }
-    else {
+    } else {
       _selectAll = false;
       childHHData = await EnrolledExitChilrenResponceHelper()
           .enrolledChildByCrecheWithDateOfExit(widget.crecheId, attendeceDate!);
@@ -122,7 +122,7 @@ class _AddAttendanceState extends State<AddAttendance> {
         return false;
       }).toList();
     }
-    filterdData=childHHData;
+    filterdData = childHHData;
     // if(_selectAll==null){
     //   _selectAll=false;
     // }
@@ -154,8 +154,7 @@ class _AddAttendanceState extends State<AddAttendance> {
               filterDataQu(value);
             },
             hintText: (lng != null)
-                ? Global.returnTrLable(
-                translats, 'Search', lng!)
+                ? Global.returnTrLable(translats, 'Search', lng!)
                 : '',
             prefixIcon: Image.asset(
               "assets/search.png",
@@ -196,7 +195,6 @@ class _AddAttendanceState extends State<AddAttendance> {
                   ],
                 )
               : SizedBox(),
-
           Expanded(
             child: (filterdData.length > 0)
                 ? ListView.builder(
@@ -317,7 +315,7 @@ class _AddAttendanceState extends State<AddAttendance> {
                                                               'child_dob')))
                                                   .toString()
                                               : Global.getItemValues(
-                                              filterdData[index].responces,
+                                                  filterdData[index].responces,
                                                   'age_at_enrollment_in_months'),
                                           style: Styles.cardBlue10,
                                           strutStyle: StrutStyle(height: 1.2),
@@ -543,9 +541,9 @@ class _AddAttendanceState extends State<AddAttendance> {
     if (entry.length > 0) {
       filterdData = childHHData
           .where((element) =>
-      (Global.getItemValues(element.responces!, 'child_name'))
-          .toLowerCase()
-          .startsWith(entry.toLowerCase()))
+              (Global.getItemValues(element.responces!, 'child_name'))
+                  .toLowerCase()
+                  .startsWith(entry.toLowerCase()))
           .toList();
     } else {
       filterdData = childHHData;
@@ -553,14 +551,13 @@ class _AddAttendanceState extends State<AddAttendance> {
     setState(() {});
   }
 
-  int callPresentChild(){
+  int callPresentChild() {
     List<String> childPresent = checkedItem.entries
         .where((entry) => entry.value == true)
         .map((entry) => entry.key)
         .toList();
-    var items=filterdData.where((entry) => childPresent.contains(entry.ChildEnrollGUID));
+    var items = filterdData
+        .where((entry) => childPresent.contains(entry.ChildEnrollGUID));
     return items.length;
   }
-
-
 }

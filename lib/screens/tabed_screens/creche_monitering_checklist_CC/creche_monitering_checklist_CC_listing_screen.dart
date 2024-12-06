@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
@@ -33,6 +34,8 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
   List<Translation> translats = [];
   String lng = 'en';
   bool isOnlyUnsyched = false;
+  DateTime applicableDate = Validate().stringToDate(Validate.date);
+  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -41,6 +44,8 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -61,7 +66,10 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
       CustomText.datevisit,
       CustomText.VisitNotes,
       CustomText.all,
-      CustomText.usynchedAndDraft
+      CustomText.usynchedAndDraft,
+      CustomText.areSureToDelete,
+      CustomText.Cancel,
+      CustomText.delete
     ];
 
     await TranslationDataHelper()
@@ -76,8 +84,9 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
   Future<void> fetchCmcCCRecords() async {
     cmcCCData = await CmcCCTabResponseHelper()
         .childALMChild(Global.stringToInt(widget.creche_id));
-    usynchedList =
-        cmcCCData.where((element) => element.is_edited == 1 || element.is_edited == 2).toList();
+    usynchedList = cmcCCData
+        .where((element) => element.is_edited == 1 || element.is_edited == 2)
+        .toList();
     allList = cmcCCData;
     filterCCdata = isOnlyUnsyched ? usynchedList : allList;
     setState(() {});
@@ -117,14 +126,15 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
         onTap: () => Navigator.pop(context, 'itemRefresh'),
       ),
       body: Padding(
-        padding: EdgeInsets.only(left: 20.w,right: 20.w, bottom:10.h),
+        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
         child: Column(children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               AnimatedRollingSwitch(
                 title1: Global.returnTrLable(translats, CustomText.all, lng),
-                title2: Global.returnTrLable(translats, CustomText.usynchedAndDraft, lng),
+                title2: Global.returnTrLable(
+                    translats, CustomText.usynchedAndDraft, lng),
                 isOnlyUnsynched: isOnlyUnsyched,
                 onChange: (value) async {
                   setState(() {
@@ -164,7 +174,10 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
                                             creche_id: Global.stringToInt(
                                                 widget.creche_id),
                                             isEdit: false,
-                                            isViewScreen: isViewScreen,
+                                            isViewScreen:
+                                                now.isBefore(applicableDate)
+                                                    ? false
+                                                    : isViewScreen,
                                             date_of_visit: Global.getItemValues(
                                                 filterCCdata[index].responces!,
                                                 'date_of_visit'))));
@@ -247,27 +260,67 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
                                     ),
                                     SizedBox(width: 5),
                                     (filterCCdata[index].is_edited == 0 &&
-                                          filterCCdata[index].is_uploaded == 1)
-                                      ? Image.asset(
-                                          "assets/sync.png",
-                                          scale: 1.5,
-                                        )
-                                      : (filterCCdata[index].is_edited == 1 &&
-                                              filterCCdata[index].is_uploaded == 0)
-                                          ? Image.asset(
-                                              "assets/sync_gray.png",
-                                              scale: 1.5,
-                                            )
-                                          : Icon(
-                                              Icons.error_outline_outlined,
-                                              color: Colors.red.shade700,
-                                              shadows: [
-                                                BoxShadow(
-                                                    spreadRadius: 2,
-                                                    blurRadius: 4,
-                                                    color: Colors.red.shade200)
-                                              ],
-                                            )
+                                            filterCCdata[index].is_uploaded ==
+                                                1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : (filterCCdata[index].is_edited == 1 &&
+                                                filterCCdata[index]
+                                                        .is_uploaded ==
+                                                    0)
+                                            ? Image.asset(
+                                                "assets/sync_gray.png",
+                                                scale: 1.5,
+                                              )
+                                            : Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons
+                                                        .error_outline_outlined,
+                                                    color: Colors.red,
+                                                    shadows: [
+                                                      BoxShadow(
+                                                          spreadRadius: 2,
+                                                          blurRadius: 4,
+                                                          color: Colors
+                                                              .red.shade200)
+                                                    ],
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      showDeleteDialog(
+                                                          filterCCdata[index]);
+                                                      // setState(() {});
+                                                    },
+                                                    child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 8
+                                                              .w), // Optional spacing from content
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        color:
+                                                            Colors.red,
+                                                      ),
+                                                      child: Padding(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 2.w,
+                                                                vertical: 2.h),
+                                                        child: Icon(
+                                                          Icons.delete_rounded,
+                                                          color: Colors
+                                                              .white,
+                                                          size: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
                                   ]),
                             ),
                           ),
@@ -282,5 +335,25 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
         ]),
       ),
     );
+  }
+
+  showDeleteDialog(CmcCCResponseModel record) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return CustomDoubleButton(
+              message: Global.returnTrLable(
+                  translats, CustomText.areSureToDelete, lng),
+              posButton:
+                  Global.returnTrLable(translats, CustomText.delete, lng),
+              negButton:
+                  Global.returnTrLable(translats, CustomText.Cancel, lng),
+              onPositive: () async {
+                await CmcCCTabResponseHelper().deleteDraftRecords(record);
+                await fetchCmcCCRecords();
+                Navigator.of(context).pop(true);
+                setState(() {});
+              });
+        });
   }
 }

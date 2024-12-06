@@ -31,7 +31,7 @@ class CashbookExpensesDetailsScreen extends StatefulWidget {
   final String creche_id;
   final String cashbook_guid;
   final double reqAmount;
-   DateTime? minDate;
+  DateTime? minDate;
 
   CashbookExpensesDetailsScreen({
     super.key,
@@ -83,7 +83,11 @@ class _CashbookExpensesDetailsScreenState
       CustomText.Next,
       CustomText.back,
       CustomText.Submit,
-      CustomText.Selecthere
+      CustomText.Selecthere,
+      CustomText.plsFilManForm,
+      CustomText.plsFillLessOrEqual,
+      CustomText.CashBookExpences,
+      CustomText.ok
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -97,7 +101,8 @@ class _CashbookExpensesDetailsScreenState
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppbar(
-          text: Global.returnTrLable(translats, CustomText.CashBookExpences, lng!),
+          text: Global.returnTrLable(
+              translats, CustomText.CashBookExpences, lng!),
           onTap: () => Navigator.pop(context, 'itemRefresh'),
         ),
         body: _isLoading
@@ -168,7 +173,8 @@ class _CashbookExpensesDetailsScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-          
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng!),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
@@ -190,7 +196,7 @@ class _CashbookExpensesDetailsScreenState
         return CustomDatepickerDynamic(
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          minDate: quesItem.fieldname=='date'?widget.minDate:null,
+          minDate: quesItem.fieldname == 'date' ? widget.minDate : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
@@ -243,7 +249,6 @@ class _CashbookExpensesDetailsScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-      
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
@@ -321,6 +326,7 @@ class _CashbookExpensesDetailsScreenState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng!),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -347,7 +353,6 @@ class _CashbookExpensesDetailsScreenState
               }
             } else {
               myMap.remove(quesItem.fieldname);
-
             }
           },
         );
@@ -357,7 +362,6 @@ class _CashbookExpensesDetailsScreenState
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    
     lng = (await Validate().readString(Validate.sLanguage))!;
     await CashbookExpencesMetaFieldsHelper()
         .getCashbookMetaFieldsbyScreenType(screen_type)
@@ -369,13 +373,21 @@ class _CashbookExpensesDetailsScreenState
         .toList();
 
     List<String> defaultCommon = [];
+    List<String> fieldlabelTranslats = [];
+
     for (int i = 0; i < allItems.length; i++) {
       if (Global.validString(allItems[i].options)) {
         defaultCommon.add('tab${allItems[i].options!.trim()}');
       }
+      if (Global.validString(allItems[i].label))
+        fieldlabelTranslats.add(allItems[i].label!.trim());
     }
+
+    await TranslationDataHelper()
+        .callTranslateString(fieldlabelTranslats)
+        .then((value) => translats.addAll(value));
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
@@ -404,8 +416,8 @@ class _CashbookExpensesDetailsScreenState
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(translats, validationMsg, lng!),
@@ -416,15 +428,19 @@ class _CashbookExpensesDetailsScreenState
           break;
         }
 
-        if(element.fieldname=='expense_amount' && Global.stringToDouble(myMap[element.fieldname].toString())>widget.reqAmount){
+        if (element.fieldname == 'expense_amount' &&
+            Global.stringToDouble(myMap[element.fieldname].toString()) >
+                widget.reqAmount) {
           Validate().singleButtonPopup(
-              Global.returnTrLable(translats,"Please enter amount less than or equal ₹${widget.reqAmount}", lng!),
+              Global.returnTrLable(
+                  translats,
+                  "${Global.returnTrLable(translats, CustomText.plsFillLessOrEqual, lng!)} ₹${widget.reqAmount}",
+                  lng!),
               Global.returnTrLable(translats, CustomText.ok, lng!),
               false,
               context);
           validStatus = false;
         }
-
       }
       ;
     } else {
@@ -516,7 +532,6 @@ class _CashbookExpensesDetailsScreenState
       if (creCheDetails.length > 0) {
         myMap['appcreated_by'] = userName;
         myMap['appcreated_on'] = Validate().currentDateTime();
-
 
         myMap['creche_id'] = widget.creche_id.toString();
         myMap['partner_id'] =

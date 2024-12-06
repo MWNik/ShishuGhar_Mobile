@@ -53,22 +53,32 @@ class _MultiLineChartState extends State<MultiLineChart> {
   @override
   void initState() {
     super.initState();
-
+    initializeData();
   }
 
   Future<void> initializeData() async {
     String? lngtr = await Validate().readString(Validate.sLanguage);
-    if(lngtr != null){
+    if (lngtr != null) {
       lng = lngtr;
     }
     List<String> valueNames = [
       CustomText.WeightforAge,
       CustomText.WeightforHeight,
       CustomText.HeightforAge,
-    
+      CustomText.Moderate,
+      CustomText.Severe,
+      CustomText.Normal,
+      CustomText.boy,
+      CustomText.girl,
+      CustomText.other,
+      widget.bottomName,
+      widget.leftName
     ];
 
-    await TranslationDataHelper().callTranslateString(valueNames).then((value) => translats.addAll(value));
+    await TranslationDataHelper()
+        .callTranslateString(valueNames)
+        .then((value) => translats.addAll(value));
+    setState(() {});
   }
 
   @override
@@ -81,31 +91,36 @@ class _MultiLineChartState extends State<MultiLineChart> {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
           child: Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            WeightforAgeBoysGirlsScreen(
-                              childId: widget.childId,
-                              gender_id: widget.gender,
-                              childenrollguid: widget.childenrollguid,
-                              childName: widget.childName,
-                            ))),
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                      color: widget.heading == CustomText.WeightforAge
-                          ? Colors.lightGreen.shade900
-                          : Colors.white,
-                      border: Border.all(
-                          width: 1, color: Colors.lightGreen.shade900)),
-                  child: Text(
-                    Global.returnTrLable(translats, CustomText.WeightforAge, lng),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: widget.heading == CustomText.WeightforAge
-                          ? Colors.white
-                          : Colors.lightGreen.shade900,
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              WeightforAgeBoysGirlsScreen(
+                                childId: widget.childId,
+                                gender_id: widget.gender,
+                                childenrollguid: widget.childenrollguid,
+                                childName: widget.childName,
+                              ))),
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                        color: widget.heading == CustomText.WeightforAge
+                            ? Colors.lightGreen.shade900
+                            : Colors.white,
+                        border: Border.all(
+                            width: 1, color: Colors.lightGreen.shade900)),
+                    child: Text(
+                      Global.returnTrLable(
+                          translats, CustomText.WeightforAge, lng),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: widget.heading == CustomText.WeightforAge
+                            ? Colors.white
+                            : Colors.lightGreen.shade900,
+                      ),
+                      // overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                 ),
@@ -113,63 +128,75 @@ class _MultiLineChartState extends State<MultiLineChart> {
               SizedBox(
                 width: 8,
               ),
-              GestureDetector(
-                onTap: () => Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            HeightforAgeBoysGirlsScreen(
-                              childId: widget.childId,
-                              gender_id: widget.gender,
-                              childenrollguid: widget.childenrollguid,
-                              childName: widget.childName,
-                            ))),
-                child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                        color: widget.heading == CustomText.HeightforAge
-                            ? Colors.lightGreen.shade900
-                            : Colors.white,
-                        border: Border.all(
-                            width: 1, color: Colors.lightGreen.shade900)),
-                    child: Text(
-                      Global.returnTrLable(translats,CustomText.HeightforAge, lng),
-                      style: TextStyle(
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              HeightforAgeBoysGirlsScreen(
+                                childId: widget.childId,
+                                gender_id: widget.gender,
+                                childenrollguid: widget.childenrollguid,
+                                childName: widget.childName,
+                              ))),
+                  child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          color: widget.heading == CustomText.HeightforAge
+                              ? Colors.lightGreen.shade900
+                              : Colors.white,
+                          border: Border.all(
+                              width: 1, color: Colors.lightGreen.shade900)),
+                      child: Text(
+                        Global.returnTrLable(
+                            translats, CustomText.HeightforAge, lng),
+                        style: TextStyle(
                           color: widget.heading == CustomText.HeightforAge
                               ? Colors.white
                               : Colors.lightGreen.shade900,
-                          fontSize: 12),
-                    )),
+                          fontSize: 12,
+                        ),
+                        // overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      )),
+                ),
               ),
               SizedBox(
                 width: 8,
               ),
-              GestureDetector(
-                onTap: () => Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            WeightToHeightBoysGirlsScreen(
-                              childId: widget.childId,
-                              gender_id: widget.gender,
-                              childenrollguid: widget.childenrollguid,
-                              childName: widget.childName,
-                            ))),
-                child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                        color: widget.heading == CustomText.WeightforHeight
-                            ? Colors.lightGreen.shade900
-                            : Colors.white,
-                        border: Border.all(
-                            width: 1, color: Colors.lightGreen.shade900)),
-                    child: Text(
-                      Global.returnTrLable(translats, CustomText.WeightforHeight, lng),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: widget.heading == CustomText.WeightforHeight
-                            ? Colors.white
-                            : Colors.lightGreen.shade900,
-                      ),
-                    )),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              WeightToHeightBoysGirlsScreen(
+                                childId: widget.childId,
+                                gender_id: widget.gender,
+                                childenrollguid: widget.childenrollguid,
+                                childName: widget.childName,
+                              ))),
+                  child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          color: widget.heading == CustomText.WeightforHeight
+                              ? Colors.lightGreen.shade900
+                              : Colors.white,
+                          border: Border.all(
+                              width: 1, color: Colors.lightGreen.shade900)),
+                      child: Text(
+                        Global.returnTrLable(
+                            translats, CustomText.WeightforHeight, lng),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: widget.heading == CustomText.WeightforHeight
+                              ? Colors.white
+                              : Colors.lightGreen.shade900,
+                        ),
+                        // overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                      )),
+                ),
               ),
             ],
           ),
@@ -177,7 +204,7 @@ class _MultiLineChartState extends State<MultiLineChart> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
           child: Text(
-            "${widget.heading} - (${Global.returnTrLable(translats,(widget.gender == 1 ? CustomText.boy :widget.gender == 2? CustomText.girl:CustomText.other),lng)})",
+            "${Global.returnTrLable(translats, widget.heading, lng)} - (${Global.returnTrLable(translats, (widget.gender == 1 ? CustomText.boy : widget.gender == 2 ? CustomText.girl : CustomText.other), lng)})",
             style: TextStyle(fontSize: 19),
           ),
         ),
@@ -188,32 +215,6 @@ class _MultiLineChartState extends State<MultiLineChart> {
             children: [
               Row(
                 children: [
-                  // Container(
-                  //   color: Colors.black,
-                  //   width: 10,
-                  //   height: 10,
-                  // ),
-                  // SizedBox(
-                  //   width: 5,
-
-                  // ),
-                  // Text(CustomText.measurment),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    color: Colors.green,
-                    width: 10,
-                    height: 10,
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Text("Normal"),
-                ],
-              ),
-              Row(
-                children: [
                   Container(
                     color: Colors.orange,
                     width: 10,
@@ -222,7 +223,8 @@ class _MultiLineChartState extends State<MultiLineChart> {
                   SizedBox(
                     width: 5,
                   ),
-                  Text("Moderator"),
+                  Text(Global.returnTrLable(
+                      translats, CustomText.Moderate, lng)),
                   SizedBox(
                     width: 10,
                   ),
@@ -234,9 +236,21 @@ class _MultiLineChartState extends State<MultiLineChart> {
                   SizedBox(
                     width: 5,
                   ),
-                  Text("Severe"),
+                  Text(Global.returnTrLable(translats, CustomText.Severe, lng)),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Container(
+                    color: Colors.green,
+                    width: 10,
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(Global.returnTrLable(translats, CustomText.Normal, lng)),
                 ],
-              )
+              ),
             ],
           ),
         )
@@ -267,7 +281,7 @@ class _MultiLineChartState extends State<MultiLineChart> {
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
                   axisNameWidget: Text(
-                    widget.bottomName,
+                    Global.returnTrLable(translats, widget.bottomName, lng),
                     style: TextStyle(fontSize: 10),
                   ),
                   axisNameSize: 15,
@@ -282,12 +296,12 @@ class _MultiLineChartState extends State<MultiLineChart> {
                         ),
                       );
                     },
-                    interval: widget.bottomName=='Age'?400:10,
+                    interval: widget.bottomName == 'Age' ? 400 : 10,
                     reservedSize: 18,
                   )),
               leftTitles: AxisTitles(
                   axisNameWidget: Text(
-                    widget.leftName,
+                    Global.returnTrLable(translats, widget.leftName, lng),
                     style: TextStyle(fontSize: 10),
                   ),
                   axisNameSize: 15,
@@ -314,7 +328,7 @@ class _MultiLineChartState extends State<MultiLineChart> {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           // (value + 0.5).toDouble().toString(),
-                          (value ).toDouble().toString(),
+                          (value).toDouble().toString(),
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 10,

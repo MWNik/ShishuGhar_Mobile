@@ -34,10 +34,15 @@ class CrecheFieldHelper {
   Future<void> insertCrecheField(
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     if (houseFieldItem.isNotEmpty) {
-      for (var element in houseFieldItem) {
-        // if(element.fieldtype.contains(other))
-        await DatabaseHelper.database!.insert('tabCrechefield', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        for(var element in houseFieldItem){
+          await txn.insert('tabCrechefield', element.toJson());
+        }
+      });
+      // for (var element in houseFieldItem) {
+      //   // if(element.fieldtype.contains(other))
+      //   await DatabaseHelper.database!.insert('tabCrechefield', element.toJson());
+      // }
     }
   }
 

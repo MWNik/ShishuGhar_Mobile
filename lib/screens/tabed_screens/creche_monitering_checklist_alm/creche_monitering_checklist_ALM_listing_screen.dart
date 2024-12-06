@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
 import '../../../custom_widget/custom_text.dart';
@@ -31,6 +32,8 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
   bool isOnlyUnsyched = false;
   List<CmcALMResponseModel> usynchedList = [];
   List<CmcALMResponseModel> allList = [];
+  DateTime applicableDate = Validate().stringToDate(Validate.date);
+  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -39,6 +42,8 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
   }
 
   Future<void> initializeData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -56,7 +61,10 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
       CustomText.EntryTime,
       CustomText.ExitTime,
       CustomText.all,
-      CustomText.usynchedAndDraft
+      CustomText.usynchedAndDraft,
+      CustomText.areSureToDelete,
+      CustomText.Cancel,
+      CustomText.delete
     ];
 
     await TranslationDataHelper()
@@ -166,7 +174,10 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
                                                 cmcALMData[index].responces!,
                                                 'date_of_visit'),
                                             isEdit: true,
-                                            isViewScreen: isViewScreen)));
+                                            isViewScreen:
+                                                now.isBefore(applicableDate)
+                                                    ? false
+                                                    : isViewScreen)));
 
                             if (refStatus == 'itemRefresh') {
                               await fetchCmcCBMRecords();
@@ -259,17 +270,54 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
                                                 "assets/sync_gray.png",
                                                 scale: 1.5,
                                               )
-                                            : Icon(
-                                                Icons.error_outline_outlined,
-                                                color: Colors.red.shade700,
-                                                shadows: [
-                                                  BoxShadow(
-                                                      spreadRadius: 2,
-                                                      blurRadius: 4,
-                                                      color:
-                                                          Colors.red.shade200)
+                                            : Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons
+                                                        .error_outline_outlined,
+                                                    color: Colors.red,
+                                                    shadows: [
+                                                      BoxShadow(
+                                                        spreadRadius: 2,
+                                                        blurRadius: 4,
+                                                        color:
+                                                            Colors.red.shade200,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      showDeleteDialog(
+                                                          cmcALMData[index]);
+                                                      // setState(() {});
+                                                    },
+                                                    child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 8
+                                                              .w), // Optional spacing from content
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        color:
+                                                            Colors.red,
+                                                      ),
+                                                      child: Padding(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 2.w,
+                                                                vertical: 2.h),
+                                                        child: Icon(
+                                                          Icons.delete_rounded,
+                                                          color: Colors
+                                                              .white,
+                                                          size: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ],
-                                              )
+                                              ),
                                   ]),
                             ),
                           ),
@@ -284,5 +332,25 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
         ]),
       ),
     );
+  }
+
+  showDeleteDialog(CmcALMResponseModel record) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return CustomDoubleButton(
+              message: Global.returnTrLable(
+                  translats, CustomText.areSureToDelete, lng),
+              posButton:
+                  Global.returnTrLable(translats, CustomText.delete, lng),
+              negButton:
+                  Global.returnTrLable(translats, CustomText.Cancel, lng),
+              onPositive: () async {
+                await CmcALMTabResponseHelper().deleteDraftRecords(record);
+                await fetchCmcCBMRecords();
+                Navigator.of(context).pop(true);
+                setState(() {});
+              });
+        });
   }
 }

@@ -16,8 +16,6 @@ class UserManualFieldsHelper {
     }
   }
 
-
-
   Future<List<UserManualResponsesModel>> getResponsebylang(String lang) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'select * from tab_user_manual_responses where  language=?', [lang]);
@@ -30,10 +28,16 @@ class UserManualFieldsHelper {
     return userMaualData;
   }
 
-  Future<void> inserts(UserManualResponsesModel items) async {
-    await DatabaseHelper.database!.insert(
-        'tab_user_manual_responses', items.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+  Future<void> inserts(List<UserManualResponsesModel> items) async {
+    await DatabaseHelper.database!.delete('tab_user_manual_responses');
+
+    if (items.isNotEmpty) {
+      for (UserManualResponsesModel element in items) {
+        await DatabaseHelper.database!.insert(
+            'tab_user_manual_responses', element.toJson(),
+            conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+    }
 
     print("object");
   }
@@ -41,17 +45,18 @@ class UserManualFieldsHelper {
   Future<void> userManualDownloadData(Map<String, dynamic> item) async {
     try {
       List<dynamic> data = item['Data'];
-
+      List<UserManualResponsesModel> manuals = [];
       for (var element in data) {
         if (element is List &&
             element.isNotEmpty &&
             element[0] is Map<String, dynamic>) {
           UserManualResponsesModel items =
               UserManualResponsesModel.fromJson(element[0]);
-          await inserts(
-              items); // Assuming inserts is an async method to save data
+          manuals.add(items);
         }
       }
+      await inserts(
+          manuals); // Assuming inserts is an async method to save data
     } catch (e) {
       print('Error parsing data: $e');
     }

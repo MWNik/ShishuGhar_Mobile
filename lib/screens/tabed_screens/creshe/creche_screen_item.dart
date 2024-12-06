@@ -79,6 +79,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
     super.initState();
     calinitialScreen();
     var items = widget.screenItem[widget.tabBreakItem.name]!;
+
     for (var elements in items) {
       _focusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
     }
@@ -206,6 +207,8 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -327,6 +330,8 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
       case 'Attach':
         return CustomImageDynamicReplica(
           // isDelitable: widget.isUpdate == true ? false : true,
+          translats: translats,
+          lng: lng,
           isDelitable: true,
           docType: CustomText.Creches,
           child_guid: widget.name.toString(),
@@ -451,7 +456,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         return CElevatedButton(
           text: (isNew == true)
               ? Global.returnTrLable(translats, quesItem.label!.trim(), lng)
-              : CustomText.UpdateLocation,
+              : Global.returnTrLable(translats, CustomText.UpdateLocation, lng),
           onPressed: () {
             if (isOnlyView == false) {
               checkPermissionStatus(quesItem.fieldname!);
@@ -549,6 +554,15 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         .then((data) {
       options.addAll(data);
     });
+    List<String> labelTranslats = [];
+    for (var element in items) {
+      if (Global.validString(element.label)) {
+        labelTranslats.add(element.label!);
+      }
+    }
+    await TranslationDataHelper()
+        .callTranslateString(labelTranslats)
+        .then((value) => translats.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
       logics.addAll(data);
@@ -669,8 +683,8 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
@@ -763,8 +777,17 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
       CustomText.Next,
       CustomText.plsFilManForm,
       CustomText.dataSaveSuc,
-      CustomText.ok
+      CustomText.ok,
+      CustomText.Save,
+      CustomText.UpdateLocation,
+      CustomText.select_here,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.SelectOneoption,
+      CustomText.Camera,
+      CustomText.Gallery
     ];
+
     await TranslationDataHelper()
         .callTranslateString(valueNames)
         .then((value) => translats.addAll(value));
@@ -794,7 +817,6 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
     }
   }
 
-
   Future<Position> getCurrentPositionWithTimeout() async {
     int retryCount = 0;
 
@@ -804,17 +826,18 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         // Attempt to get the current position with a 10-second timeout
         var position = await Geolocator.getCurrentPosition()
             .timeout(Duration(seconds: 10));
-        return position;  // If successful, return the position
+        return position; // If successful, return the position
       } catch (e) {
         if (e is TimeoutException) {
           retryCount++;
           print('Timeout reached, retrying... ($retryCount)');
-          await Future.delayed(Duration(seconds: 1));  // Wait before retrying
+          await Future.delayed(Duration(seconds: 1)); // Wait before retrying
         } else {
           try {
             // Fallback to Location package if Geolocator fails
             final locationData = await Location().getLocation();
-            if (locationData.latitude != null && locationData.longitude != null) {
+            if (locationData.latitude != null &&
+                locationData.longitude != null) {
               return Position(
                 latitude: locationData.latitude ?? 0.0,
                 longitude: locationData.longitude ?? 0.0,
@@ -825,7 +848,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
                 speedAccuracy: locationData.speedAccuracy ?? 0.0,
                 timestamp: locationData.time != null
                     ? DateTime.fromMillisecondsSinceEpoch(
-                    locationData.time!.toInt())
+                        locationData.time!.toInt())
                     : DateTime.now(),
                 altitudeAccuracy: locationData.accuracy ?? 0.0,
                 headingAccuracy: locationData.accuracy ?? 0.0,
@@ -833,21 +856,21 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
             } else {
               // If Location package fails, fallback to last known position
               Position? lastKnownPosition =
-              await Geolocator.getLastKnownPosition();
+                  await Geolocator.getLastKnownPosition();
               if (lastKnownPosition != null) {
-                return lastKnownPosition;  // Return the last known position if available
-              }else
-                rethrow;  // Rethrow if no valid data found
+                return lastKnownPosition; // Return the last known position if available
+              } else
+                rethrow; // Rethrow if no valid data found
             }
           } catch (e) {
             print('Error using Location package: $e');
             // Try to get the last known position as a final fallback
             Position? lastKnownPosition =
-            await Geolocator.getLastKnownPosition();
+                await Geolocator.getLastKnownPosition();
             if (lastKnownPosition != null) {
-              return lastKnownPosition;  // Return last known position
-            }else
-              rethrow;  // If all options fail, rethrow the error
+              return lastKnownPosition; // Return last known position
+            } else
+              rethrow; // If all options fail, rethrow the error
           }
         }
       }

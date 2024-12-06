@@ -122,7 +122,11 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
       CustomText.Next,
       CustomText.back,
       CustomText.Submit,
-      CustomText.checkIN
+      CustomText.checkIN,
+      CustomText.ChildPicture,
+      CustomText.Plsselecimgoption,
+      CustomText.Camera,
+      CustomText.Gallery,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -244,12 +248,20 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           defaultDisableDailog(allItems[i].fieldname!, allItems[i].options!);
         } else {
           if (allItems[i].ismultiselect == 1) {
-            defaultCommon.add('tab${allItems[i].multiselectlink!.trim()}');
+            defaultCommonMulti.add('tab${allItems[i].multiselectlink!.trim()}');
           } else
             defaultCommon.add('tab${allItems[i].options!.trim()}');
         }
       }
     }
+    List<String> labelList = [];
+    allItems.forEach((element) {
+      if (Global.validString(element.label))
+        labelList.add(element.label!.trim());
+    });
+    await TranslationDataHelper()
+        .callTranslateString(labelList)
+        .then((value) => translats.addAll(value));
     await OptionsModelHelper()
         .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
@@ -293,8 +305,8 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(translats, validationMsg, lng!),
@@ -870,7 +882,10 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
                                                 height: 10.h,
                                               ),
                                               Text(
-                                                CustomText.ChildPicture,
+                                                Global.returnTrLable(
+                                                    translats,
+                                                    CustomText.ChildPicture,
+                                                    lng!),
                                                 style: Styles.Grey104,
                                                 textAlign: TextAlign.center,
                                               )
@@ -1299,9 +1314,6 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
     );
   }
 
-
-
-
   Future<Position> getCurrentPositionWithTimeout() async {
     int retryCount = 0;
 
@@ -1311,17 +1323,18 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         // Attempt to get the current position with a 10-second timeout
         var position = await Geolocator.getCurrentPosition()
             .timeout(Duration(seconds: 10));
-        return position;  // If successful, return the position
+        return position; // If successful, return the position
       } catch (e) {
         if (e is TimeoutException) {
           retryCount++;
           print('Timeout reached, retrying... ($retryCount)');
-          await Future.delayed(Duration(seconds: 1));  // Wait before retrying
+          await Future.delayed(Duration(seconds: 1)); // Wait before retrying
         } else {
           try {
             // Fallback to Location package if Geolocator fails
             final locationData = await Location().getLocation();
-            if (locationData.latitude != null && locationData.longitude != null) {
+            if (locationData.latitude != null &&
+                locationData.longitude != null) {
               return Position(
                 latitude: locationData.latitude ?? 0.0,
                 longitude: locationData.longitude ?? 0.0,
@@ -1332,7 +1345,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
                 speedAccuracy: locationData.speedAccuracy ?? 0.0,
                 timestamp: locationData.time != null
                     ? DateTime.fromMillisecondsSinceEpoch(
-                    locationData.time!.toInt())
+                        locationData.time!.toInt())
                     : DateTime.now(),
                 altitudeAccuracy: locationData.accuracy ?? 0.0,
                 headingAccuracy: locationData.accuracy ?? 0.0,
@@ -1340,21 +1353,21 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
             } else {
               // If Location package fails, fallback to last known position
               Position? lastKnownPosition =
-              await Geolocator.getLastKnownPosition();
+                  await Geolocator.getLastKnownPosition();
               if (lastKnownPosition != null) {
-                return lastKnownPosition;  // Return the last known position if available
-              }else
-              rethrow;  // Rethrow if no valid data found
+                return lastKnownPosition; // Return the last known position if available
+              } else
+                rethrow; // Rethrow if no valid data found
             }
           } catch (e) {
             print('Error using Location package: $e');
             // Try to get the last known position as a final fallback
             Position? lastKnownPosition =
-            await Geolocator.getLastKnownPosition();
+                await Geolocator.getLastKnownPosition();
             if (lastKnownPosition != null) {
-              return lastKnownPosition;  // Return last known position
-            }else
-            rethrow;  // If all options fail, rethrow the error
+              return lastKnownPosition; // Return last known position
+            } else
+              rethrow; // If all options fail, rethrow the error
           }
         }
       }
@@ -1364,8 +1377,6 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
     throw TimeoutException(
         'Failed to get current position after $retryCount retries and no valid last known position.');
   }
-
-
 
   Future<void> _getLocation(bool shouldProceed) async {
     if (shouldProceed) {
@@ -1383,9 +1394,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         }
       } catch (e) {
         // if (e is TimeoutException) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Location is not captured. Please try again.")));
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Location is not captured. Please try again.")));
         // }
       } finally {
         Navigator.pop(context);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
+import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/database/helper/child_attendence/child_attendence_helper.dart';
 import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
@@ -48,6 +49,8 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
   DateTime? minDate;
   bool isOnlyUnsynched = false;
   String? role;
+  DateTime applicableDate = Validate().stringToDate("2024-12-31");
+  var now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -62,6 +65,8 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
     if (lngtr != null) {
       lng = lngtr;
     }
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
 
     List<String> valueItems = [
       CustomText.Enrolled,
@@ -79,7 +84,10 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
       CustomText.AttenList,
       CustomText.attendanceCount,
       CustomText.all,
-      CustomText.usynchedAndDraft
+      CustomText.usynchedAndDraft,
+      CustomText.areSureToDelete,
+      CustomText.Cancel,
+      CustomText.delete
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -104,15 +112,18 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
           maxDate = maxDate!.subtract(Duration(days: 1));
         } else if (maxDate!.isBefore(DateTime.parse(Validate().currentDate())
             .subtract(Duration(days: 10)))) {
-          maxDate = DateTime.parse(Validate().currentDate())
-              .subtract(Duration(days: 10));
+          maxDate = now.isBefore(applicableDate)
+              ? null
+              : DateTime.parse(Validate().currentDate())
+                  .subtract(Duration(days: 10));
         }
       }
     } else {
       existingDates = fetchExistingDates(childAttendance);
     }
-    maxDate =
-        DateTime.parse(Validate().currentDate()).subtract(Duration(days: 10));
+    maxDate = now.isBefore(applicableDate)
+        ? null
+        : DateTime.parse(Validate().currentDate()).subtract(Duration(days: 10));
 
     unsynchedList = childAttendance
         .where((element) => element.is_edited == 1 || element.is_edited == 2)
@@ -228,7 +239,7 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
                   ),
                 )
               : Padding(
-                  padding: EdgeInsets.only( right: 5),
+                  padding: EdgeInsets.only(right: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -261,6 +272,12 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
                           if (existingDates.contains(currentRecordDate)) {
                             existingDates.remove(currentRecordDate);
                           }
+                          var createdAtDate =
+                              DateTime.parse(selecteItem.created_at!);
+                          bool isEditable = DateTime(createdAtDate.year,
+                                  createdAtDate.month, createdAtDate.day)
+                              .add(Duration(days: 2))
+                              .isAfter(now);
 
                           String refStatus = '';
 
@@ -286,134 +303,193 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff5A5A5A).withOpacity(
-                                        0.2), // Shadow color with opacity
-                                    offset: Offset(
-                                        0, 3), // Horizontal and vertical offset
-                                    blurRadius: 6, // Blur radius
-                                    spreadRadius: 0, // Spread radius
-                                  ),
-                                ],
-                                color: Colors.white,
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 8.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.DateofAttendance, lng).trim()} : ',
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.TotalChildren, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.PresChild, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.SubOn, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10),
-                                  SizedBox(
-                                    height: 40.h,
-                                    width: 2,
-                                    child: VerticalDivider(
-                                      color: Color(0xffE6E6E6),
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xff5A5A5A).withOpacity(
+                                              0.2), // Shadow color with opacity
+                                          offset: Offset(0,
+                                              3), // Horizontal and vertical offset
+                                          blurRadius: 6, // Blur radius
+                                          spreadRadius: 0, // Spread radius
+                                        ),
+                                      ],
+                                      color: Colors.white,
+                                      border:
+                                          Border.all(color: Color(0xffE7F0FF)),
+                                      borderRadius:
+                                          BorderRadius.circular(10.r)),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10.w, vertical: 8.h),
+                                    child: Row(
+                                      // mainAxisAlignment: MainAxisAlignment.start,
+                                      // crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          Validate().displeDateFormate(
-                                              Global.getItemValues(
-                                                  FilteredAttendance[index]
-                                                      .responces!,
-                                                  'date_of_attendance')),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          // mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${Global.returnTrLable(translats, CustomText.DateofAttendance, lng).trim()} : ',
+                                              style: Styles.black104,
+                                            ),
+                                            Text(
+                                              '${Global.returnTrLable(translats, CustomText.TotalChildren, lng).trim()} : ',
+                                              style: Styles.black104,
+                                              strutStyle:
+                                                  StrutStyle(height: 1.2),
+                                            ),
+                                            Text(
+                                              '${Global.returnTrLable(translats, CustomText.PresChild, lng).trim()} : ',
+                                              style: Styles.black104,
+                                              strutStyle:
+                                                  StrutStyle(height: 1.2),
+                                            ),
+                                            Text(
+                                              '${Global.returnTrLable(translats, CustomText.SubOn, lng).trim()} : ',
+                                              style: Styles.black104,
+                                              strutStyle:
+                                                  StrutStyle(height: 1.2),
+                                            ),
+                                          ],
                                         ),
-                                        Text(
-                                          '${attentcedChild.where((element) => element.childattenguid == FilteredAttendance[index].childattenguid).toList().length}',
-                                          style: Styles.cardBlue10,
-                                          strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
+                                        SizedBox(width: 10),
+                                        VerticalDivider(
+                                          color: Color(0xffE6E6E6),
+                                          width: 2,
+                                          thickness: 2,
                                         ),
-                                        Text(
-                                          '${attentcedChild.where((element) => element.childattenguid == FilteredAttendance[index].childattenguid && element.attendance == 1).toList().length}',
-                                          style: Styles.cardBlue10,
-                                          strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
+                                        SizedBox(width: 10),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                Validate().displeDateFormate(
+                                                    Global.getItemValues(
+                                                        FilteredAttendance[
+                                                                index]
+                                                            .responces!,
+                                                        'date_of_attendance')),
+                                                style: Styles.cardBlue10,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                '${attentcedChild.where((element) => element.childattenguid == FilteredAttendance[index].childattenguid).toList().length}',
+                                                style: Styles.cardBlue10,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                '${attentcedChild.where((element) => element.childattenguid == FilteredAttendance[index].childattenguid && element.attendance == 1).toList().length}',
+                                                style: Styles.cardBlue10,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                Validate()
+                                                    .displeDateFormateMobileDateTimeFormate(
+                                                        FilteredAttendance[
+                                                                index]
+                                                            .created_at!),
+                                                style: Styles.cardBlue10,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        Text(
-                                          Validate()
-                                              .displeDateFormateMobileDateTimeFormate(
-                                                  FilteredAttendance[index]
-                                                      .created_at!),
-                                          style: Styles.cardBlue10,
-                                          strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        SizedBox(width: 5),
+                                        (FilteredAttendance[index].is_edited ==
+                                                    0 &&
+                                                FilteredAttendance[index]
+                                                        .is_uploaded ==
+                                                    1)
+                                            ? Image.asset(
+                                                "assets/sync.png",
+                                                scale: 1.5,
+                                              )
+                                            : FilteredAttendance[index]
+                                                            .is_edited ==
+                                                        1 &&
+                                                    FilteredAttendance[index]
+                                                            .is_uploaded ==
+                                                        0
+                                                ? Image.asset(
+                                                    "assets/sync_gray.png",
+                                                    scale: 1.5,
+                                                  )
+                                                : Column(
+                                                    children: [
+                                                      InkWell(
+                                                        onTap: () async {
+                                                          showDeleteDialog(
+                                                              FilteredAttendance[
+                                                                  index]);
+                                                        },
+                                                        child: Container(
+                                                          // Optional spacing from content
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50),
+                                                            color: Colors.red,
+                                                          ),
+                                                          child: Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        2.w,
+                                                                    vertical:
+                                                                        2.h),
+                                                            child: Icon(
+                                                              Icons
+                                                                  .delete_rounded,
+                                                              color:
+                                                                  Colors.white,
+                                                              size: 16,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Icon(
+                                                        Icons.error_outline,
+                                                        color: Colors.red,
+                                                        shadows: [
+                                                          BoxShadow(
+                                                              spreadRadius: 2,
+                                                              blurRadius: 4,
+                                                              color: Colors
+                                                                  .red.shade200)
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  )
                                       ],
                                     ),
                                   ),
-                                  SizedBox(width: 5),
-                                  (FilteredAttendance[index].is_edited == 0 &&
-                                          FilteredAttendance[index]
-                                                  .is_uploaded ==
-                                              1)
-                                      ? Image.asset(
-                                          "assets/sync.png",
-                                          scale: 1.5,
-                                        )
-                                      : FilteredAttendance[index].is_edited ==
-                                                  1 &&
-                                              FilteredAttendance[index]
-                                                      .is_uploaded ==
-                                                  0
-                                          ? Image.asset(
-                                              "assets/sync_gray.png",
-                                              scale: 1.5,
-                                            )
-                                          : Icon(
-                                              Icons.error_outline,
-                                              color: Colors.red.shade500,
-                                              shadows: [
-                                                BoxShadow(
-                                                    spreadRadius: 2,
-                                                    blurRadius: 4,
-                                                    color: Colors.red.shade200)
-                                              ],
-                                            )
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
                       );
@@ -443,6 +519,26 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
     } else
       FilteredAttendance = childAttendance;
     setState(() {});
+  }
+
+  showDeleteDialog(ChildAttendanceResponceModel record) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return CustomDoubleButton(
+              message: Global.returnTrLable(
+                  translats, CustomText.areSureToDelete, lng),
+              posButton:
+                  Global.returnTrLable(translats, CustomText.delete, lng),
+              negButton:
+                  Global.returnTrLable(translats, CustomText.Cancel, lng),
+              onPositive: () async {
+                await AttendanceResponnceHelper().deleteDraftRecords(record);
+                await attendeceChildRecord();
+                Navigator.of(context).pop(true);
+                setState(() {});
+              });
+        });
   }
 
   String callVillageName(String crecheItem) {

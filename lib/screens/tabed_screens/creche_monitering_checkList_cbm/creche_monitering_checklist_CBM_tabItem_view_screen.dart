@@ -578,7 +578,7 @@ class _CmcCBMTabItemViewSCreenState extends State<CmcCBMTabItemViewSCreen> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(_logics, _myMap, element);
+            DependingLogic().validationMessge(_logics, _myMap, element,_translation,_language);
         if (Global.validString(validationMsg)) {
           Validate()
               .singleButtonPopup(validationMsg!, CustomText.ok, false, context);

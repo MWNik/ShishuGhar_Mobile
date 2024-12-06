@@ -48,17 +48,18 @@ class ChildGrowthExpendedFormScreen extends StatefulWidget {
   DateTime? minGrowthDate;
   String? createdAt;
   bool isNew;
+  bool isView;
 
-  ChildGrowthExpendedFormScreen({
-    super.key,
-    required this.creche_nameId,
-    required this.creche_name,
-    required this.cgmguid,
-    this.lastGrowthDate,
-    this.minGrowthDate,
-    this.createdAt,
-    required this.isNew,
-  });
+  ChildGrowthExpendedFormScreen(
+      {super.key,
+      required this.creche_nameId,
+      required this.creche_name,
+      required this.cgmguid,
+      this.lastGrowthDate,
+      this.minGrowthDate,
+      this.createdAt,
+      required this.isNew,
+      this.isView = false});
 
   @override
   State<ChildGrowthExpendedFormScreen> createState() =>
@@ -163,11 +164,24 @@ class _ChildGrowthExpendedFormState
       CustomText.back,
       CustomText.zScrore,
       CustomText.Submit,
-      CustomText.noEnrolledChild
+      CustomText.noEnrolledChild,
+      CustomText.GrowthMonitoring,
+      'Search',
+      'Name',
+      CustomText.ChildId,
+      CustomText.Gender,
+      CustomText.ageInDays,
+      CustomText.shouldExit,
+      CustomText.exit,
+      CustomText.Cancel,
+      CustomText.TotalChildren,
+      CustomText.MeasuredChildren,
+      CustomText.Yes,
+      CustomText.No
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translatsLabel = value);
+        .then((value) => translatsLabel.addAll(value));
     var alredRecord = await ChildGrowthResponseHelper()
         .callAnthropometryByGuid(widget.cgmguid);
 
@@ -197,170 +211,188 @@ class _ChildGrowthExpendedFormState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: CustomAppbar(
-            text: Global.returnTrLable(
-                translatsLabel, CustomText.GrowthMonitoring, lng),
-            subTitle: widget.creche_name,
-            onTap: () => Navigator.pop(context)),
-        body: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Column(
-                children: [
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return WillPopScope(
+      onWillPop: () async {
+        Validate().showExitDialog(context, translatsLabel, lng);
+        return false;
+      },
+      child: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Scaffold(
+              appBar: CustomAppbar(
+                  text: Global.returnTrLable(
+                      translatsLabel, CustomText.GrowthMonitoring, lng),
+                  subTitle: widget.creche_name,
+                  onTap: () =>
+                      Validate().showExitDialog(context, translatsLabel, lng)),
+              body: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Column(
                       children: [
-                        Expanded(
-                          child: RichText(
-                            text: TextSpan(
-                              text: CustomText.TotalChildren,
-                              style: Styles.black124,
-                              children: [
-                                TextSpan(
-                                  text: ' : ${enrolledChild.length}',
-                                  style: Styles.red145,
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.w),
+                          child: Row(
+                            // mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              // Expanded(
+                              //   child: RichText(
+                              //     text: TextSpan(
+                              //       text: Global.returnTrLable(translatsLabel,
+                              //           CustomText.TotalChildren, lng),
+                              //       style: Styles.black124,
+                              //       children: [
+                              //         TextSpan(
+                              //           text: ' : ${enrolledChild.length}',
+                              //           style: Styles.red145,
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   ),
+                              // ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Spacer(),
+                              RichText(
+                                text: TextSpan(
+                                  text: Global.returnTrLable(translatsLabel,
+                                      CustomText.MeasuredChildren, lng),
+                                  style: Styles.black124,
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          ' : ${countMesuredChildren()}/${enrolledChild.length}',
+                                      style: Styles.red145,
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              )
+                            ],
+                          ),
+                        ),
+                        // SizedBox(height: 10),
+                        measurement_date != null
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w, vertical: 2.h),
+                                child: CustomDatepickerDynamic(
+                                  calenderValidate: [],
+                                  initialvalue:
+                                      myMap[measurement_date!.fieldname!],
+                                  fieldName: measurement_date!.fieldname,
+                                  isRequred: measurement_date!.reqd,
+                                  minDate: widget.lastGrowthDate,
+                                  maxDate: widget.minGrowthDate,
+                                  // minDate: callMinMeasurementGrwthDate(  for back dated entery
+                                  //     myMap[measurement_date!.fieldname!] != null
+                                  //         ? myMap[measurement_date!.fieldname!]
+                                  //         : Validate().currentDate())!.subtract(Duration(days: 1)),
+                                  // maxDate: callMaxMeasurementGrwthDate(
+                                  //     myMap[measurement_date!.fieldname!] != null
+                                  //         ? myMap[measurement_date!.fieldname!]
+                                  //         : Validate()
+                                  //             .currentDate()), //widget.minGrowthDate,
+                                  readable: widget.isNew,
+                                  onChanged: (value) {
+                                    myMap[measurement_date!.fieldname!] = value;
+                                    var logData = DependingLogic()
+                                        .callDateDiffrenceLogic(
+                                            logics, myMap, measurement_date!);
+                                    if (logData.isNotEmpty) {
+                                      if (logData.keys.length > 0) {
+                                        myMap.addEntries([
+                                          MapEntry(logData.keys.first,
+                                              logData.values.first)
+                                        ]);
+                                      }
+                                    }
+                                    callEnrollementChildList(value);
+                                  },
+                                ),
+                              )
+                            : SizedBox(),
+                        // Padding(
+                        //     padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        //     child: Divider()),
+                        Padding(
+                          padding: EdgeInsets.only(left: 20, right: 20),
+                          child: CustomTextFieldRow(
+                            controller: Searchcontroller,
+                            onChanged: (value) {
+                              // print(value);
+                              filterDataQu(value);
+                            },
+                            hintText: (lng != null)
+                                ? Global.returnTrLable(
+                                    translatsLabel, 'Search', lng!)
+                                : '',
+                            prefixIcon: Image.asset(
+                              "assets/search.png",
+                              scale: 2.4,
                             ),
                           ),
                         ),
                         Expanded(
-                            child: RichText(
-                          text: TextSpan(
-                            text: CustomText.MeasuredChildren,
-                            style: Styles.black124,
-                            children: [
-                              TextSpan(
-                                text: ' : ${countMesuredChildren()}',
-                                style: Styles.red145,
-                              ),
-                            ],
-                          ),
-                        ))
-                      ],
-                    ),
-                  ),
-                  // SizedBox(height: 10),
-                  measurement_date != null
-                      ? Padding(
+                            child: Padding(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 20.w, vertical: 2.h),
-                          child: CustomDatepickerDynamic(
-                            calenderValidate: [],
-                            initialvalue: myMap[measurement_date!.fieldname!],
-                            fieldName: measurement_date!.fieldname,
-                            isRequred: measurement_date!.reqd,
-                            minDate: widget.lastGrowthDate,
-                            maxDate: widget.minGrowthDate,
-                            // minDate: callMinMeasurementGrwthDate(  for back dated entery
-                            //     myMap[measurement_date!.fieldname!] != null
-                            //         ? myMap[measurement_date!.fieldname!]
-                            //         : Validate().currentDate())!.subtract(Duration(days: 1)),
-                            // maxDate: callMaxMeasurementGrwthDate(
-                            //     myMap[measurement_date!.fieldname!] != null
-                            //         ? myMap[measurement_date!.fieldname!]
-                            //         : Validate()
-                            //             .currentDate()), //widget.minGrowthDate,
-                            readable: widget.isNew,
-                            onChanged: (value) {
-                              myMap[measurement_date!.fieldname!] = value;
-                              var logData = DependingLogic()
-                                  .callDateDiffrenceLogic(
-                                      logics, myMap, measurement_date!);
-                              if (logData.isNotEmpty) {
-                                if (logData.keys.length > 0) {
-                                  myMap.addEntries([
-                                    MapEntry(logData.keys.first,
-                                        logData.values.first)
-                                  ]);
-                                }
-                              }
-                              callEnrollementChildList(value);
-                            },
+                              horizontal: 20.w, vertical: 5.h),
+                          child: SingleChildScrollView(
+                            // controller: _scrollScontroller,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              // children: cWidget(),
+                              children: cParentWidget(),
+                            ),
                           ),
-                        )
-                      : SizedBox(),
-                  // Padding(
-                  //     padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  //     child: Divider()),
-                  Padding(
-                    padding: EdgeInsets.only(left: 20,right: 20),
-                    child: CustomTextFieldRow(
-                      controller: Searchcontroller,
-                      onChanged: (value) {
-                        print(value);
-                        filterDataQu(value);
-                      },
-                      hintText: (lng != null)
-                          ? Global.returnTrLable(
-                          translatsLabel, 'Search', lng!)
-                          : '',
-                      prefixIcon: Image.asset(
-                        "assets/search.png",
-                        scale: 2.4,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                      child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-                    child: SingleChildScrollView(
-                      // controller: _scrollScontroller,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        // children: cWidget(),
-                        children: cParentWidget(),
-                      ),
-                    ),
-                  )),
-                  // Spacer(),
-                  Divider(),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xffF26BA3),
-                            onPressed: () {
-                              // ch(2);
-                              Navigator.pop(context);
-                            },
-                            text: Global.returnTrLable(
-                                    translatsLabel, CustomText.back, lng)
-                                .trim(),
-                          ),
-                        ),
-                        // Row(children: [
-                        role == CustomText.crecheSupervisor
-                            ? SizedBox(width: 10)
-                            : SizedBox(),
-                        role == CustomText.crecheSupervisor
-                            ? Expanded(
+                        )),
+                        // Spacer(),
+                        Divider(),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20.w, vertical: 5.h),
+                          child: Row(
+                            children: [
+                              Expanded(
                                 child: CElevatedButton(
-                                  color: Color(0xff369A8D),
+                                  color: Color(0xffF26BA3),
                                   onPressed: () {
-                                    print('$attepmtChild');
-                                    saveMeta(1, context);
+                                    // ch(2);
+                                    Navigator.pop(context);
                                   },
-                                  text: Global.returnTrLable(translatsLabel,
-                                          CustomText.Submit, lng)
+                                  text: Global.returnTrLable(
+                                          translatsLabel, CustomText.back, lng)
                                       .trim(),
                                 ),
-                              )
-                            : SizedBox(),
-                        // ]
-                        // ),
+                              ),
+                              // Row(children: [
+                              role == CustomText.crecheSupervisor
+                                  ? SizedBox(width: 10)
+                                  : SizedBox(),
+                              role == CustomText.crecheSupervisor
+                                  ? Expanded(
+                                      child: CElevatedButton(
+                                        color: Color(0xff369A8D),
+                                        onPressed: () {
+                                          // print('$attepmtChild');
+                                          saveMeta(1, context);
+                                        },
+                                        text: Global.returnTrLable(
+                                                translatsLabel,
+                                                CustomText.Submit,
+                                                lng)
+                                            .trim(),
+                                      ),
+                                    )
+                                  : SizedBox(),
+                              // ]
+                              // ),
+                            ],
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
-                ],
-              ));
+                    )),
+    );
   }
 
   List<Widget> cWidgetInputType(
@@ -390,7 +422,7 @@ class _ChildGrowthExpendedFormState
           ));
         }
         if (!isvible) {
-          print('remo3 ${inputItem[i].fieldname}');
+          // print('remo3 ${inputItem[i].fieldname}');
           cWidgetDatamap.remove(inputItem[i].fieldname);
         }
       }
@@ -439,13 +471,16 @@ class _ChildGrowthExpendedFormState
           colorName = '';
         } else if (colorD == 1) {
           itemC = Color(0xffF35858);
-          colorName = '(Severe)';
+          colorName =
+              '(${Global.returnTrLable(translatsLabel, 'Severe', lng)})';
         } else if (colorD == 2) {
           itemC = Color(0xffF4B81D);
-          colorName = '(Moderate)';
+          colorName =
+              '(${Global.returnTrLable(translatsLabel, 'Moderate', lng)})';
         } else if (colorD == 3) {
           itemC = Color(0xff8BF649);
-          colorName = '(Normal)';
+          colorName =
+              '(${Global.returnTrLable(translatsLabel, 'Normal', lng)})';
         }
         countMesuredChildren();
         cWidgetDatamap[inputItem[i].fieldname!] = colorD;
@@ -470,17 +505,17 @@ class _ChildGrowthExpendedFormState
                 colorName,
                 style: Styles.red85,
               ),
-              Global.validString(grothValue)
-                  ? Text(
-                      '($grothValue)',
-                      style: Styles.red85,
-                    )
-                  : SizedBox(),
+              // Global.validString(grothValue)
+              //     ? Text(
+              //         '($grothValue)',
+              //         style: Styles.red85,
+              //       )
+              //     : SizedBox(),
             ],
           ));
         }
         if (!isvible) {
-          print('remo4 ${inputItem[i].fieldname}');
+          // print('remo4 ${inputItem[i].fieldname}');
           cWidgetDatamap.remove(inputItem[i].fieldname);
         }
       }
@@ -550,7 +585,7 @@ class _ChildGrowthExpendedFormState
           .add(widgetTypeWidget(element, cWidgetDatamap, ChildEnrollGUID));
       // screenItems.add(SizedBox(height: 5.h));
       if (!isvible) {
-        print('remo1 ${element.fieldname}');
+        // print('remo1 ${element.fieldname}');
         cWidgetDatamap.remove(element.fieldname);
         updateItemsForChildren(cWidgetDatamap, ChildEnrollGUID);
       }
@@ -656,9 +691,18 @@ class _ChildGrowthExpendedFormState
                               Global.stringToDouble(
                                   cWidgetDatamap['weight_for_height']
                                       .toString()),
-                              Global.stringToDouble(
-                                  cWidgetDatamap['any_medical_major_illness']
-                                      .toString())),
+                              Global.stringToInt(cWidgetDatamap[
+                                              'do_you_have_height_weight']
+                                          .toString()) ==
+                                      0
+                                  ? null
+                                  : cWidgetDatamap[
+                                              'any_medical_major_illness'] !=
+                                          null
+                                      ? Global.stringToDouble(cWidgetDatamap[
+                                              'any_medical_major_illness']
+                                          .toString())
+                                      : null),
                           child: Center(
                             child: Icon(
                               Icons.person,
@@ -678,7 +722,8 @@ class _ChildGrowthExpendedFormState
                               RichText(
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
-                                      text: '${CustomText.ChildId} : ',
+                                      text:
+                                          '${Global.returnTrLable(translatsLabel, CustomText.ChildId, lng)} : ',
                                       style: Styles.black124r,
                                       children: [
                                         TextSpan(
@@ -691,7 +736,8 @@ class _ChildGrowthExpendedFormState
                                   strutStyle: StrutStyle(height: 1.h),
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
-                                      text: CustomText.Name,
+                                      text:
+                                          '${Global.returnTrLable(translatsLabel, 'Name', lng)} :',
                                       style: Styles.black124r,
                                       children: [
                                         TextSpan(
@@ -704,7 +750,8 @@ class _ChildGrowthExpendedFormState
                                   strutStyle: StrutStyle(height: 1.h),
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
-                                      text: '${CustomText.Gender} : ',
+                                      text:
+                                          '${Global.returnTrLable(translatsLabel, CustomText.Gender, lng)} : ',
                                       style: Styles.black124r,
                                       children: [
                                         TextSpan(
@@ -718,7 +765,8 @@ class _ChildGrowthExpendedFormState
                                   strutStyle: StrutStyle(height: 1.h),
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
-                                      text: '${CustomText.ageInDays} : ',
+                                      text:
+                                          '${Global.returnTrLable(translatsLabel, CustomText.ageInDays, lng)} : ',
                                       style: Styles.black124r,
                                       children: [
                                         TextSpan(
@@ -762,27 +810,20 @@ class _ChildGrowthExpendedFormState
                           ),
                         ),
                         do_you_have_height_weight != null
-                            ? widgetTypeWidget(
-                                do_you_have_height_weight!,
-                                cWidgetDatamap,
-                            filterdData[i].ChildEnrollGUID!)
+                            ? widgetTypeWidget(do_you_have_height_weight!,
+                                cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
                         measurement_taken_date != null
-                            ? widgetTypeWidget(
-                                measurement_taken_date!,
-                                cWidgetDatamap,
-                            filterdData[i].ChildEnrollGUID!)
+                            ? widgetTypeWidget(measurement_taken_date!,
+                                cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
                         measurement_equipment != null
-                            ? widgetTypeWidget(
-                                measurement_equipment!,
-                                cWidgetDatamap,
-                            filterdData[i].ChildEnrollGUID!)
+                            ? widgetTypeWidget(measurement_equipment!,
+                                cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
                         Row(
                           children: cWidgetInputType(
-                              filterdData[i].ChildEnrollGUID!,
-                              cWidgetDatamap),
+                              filterdData[i].ChildEnrollGUID!, cWidgetDatamap),
                         ),
                         SizedBox(
                           height: 5.h,
@@ -897,7 +938,8 @@ class _ChildGrowthExpendedFormState
       List<dynamic> childValues = [];
 
       enrolledChild.forEach((element) {
-        var item = attepmtChild[element.ChildEnrollGUID];
+        var item = Validate()
+            .keyesFromResponce(attepmtChild[element.ChildEnrollGUID]!);
         if (item != null) {
           item['childenrollguid'] = element.ChildEnrollGUID;
           item['chhguid'] = element.CHHGUID;
@@ -918,7 +960,7 @@ class _ChildGrowthExpendedFormState
             item.remove('height');
             item.remove('weight');
             item['do_you_have_height_weight'] = 0;
-            print(item['height']);
+            // print(item['height']);
           } else {
             var gender = Global.getItemValues(element.responces, 'gender_id');
             var weightForAge = DependingLogic().AutoColorCreateByHeightWight(
@@ -964,7 +1006,7 @@ class _ChildGrowthExpendedFormState
       var measurementDate = myMap['measurement_date'];
       var responcesJs = jsonEncode(myMap);
       var name = myMap['name'];
-      print("itemsDetails $responcesJs");
+      // print("itemsDetails $responcesJs");
       await ChildGrowthResponseHelper().insertUpdate(
           widget.cgmguid,
           measurementDate,
@@ -993,7 +1035,7 @@ class _ChildGrowthExpendedFormState
             if (item != null) {
               var element = formItem[i];
               var validationMsg =
-                  DependingLogic().validationMessge(logics, item, element);
+                  DependingLogic().validationMessge(logics, item, element,translatsLabel,lng);
               if (isMesurement(myMap[measurement_date!.fieldname]) == false &&
                   (element.fieldname == 'height' ||
                       element.fieldname == 'measurement_equipment') &&
@@ -1171,7 +1213,7 @@ class _ChildGrowthExpendedFormState
     });
     await TranslationDataHelper()
         .callTranslateString(tranlatItems)
-        .then((value) => translatsLabel = value);
+        .then((value) => translatsLabel.addAll(value));
 
     setState(() {
       _isLoading = false;
@@ -1185,6 +1227,7 @@ class _ChildGrowthExpendedFormState
         List<OptionsModel> items = options
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
+        // print("Current Link Field Type ======> ${quesItem.label}");
         return DynamicCustomDropdownField(
           // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
@@ -1201,7 +1244,7 @@ class _ChildGrowthExpendedFormState
               ? DependingLogic()
                   .callReadableLogic(logics, itemsAnswred, quesItem)
               : true,
-          selectedItem: itemsAnswred[quesItem.fieldname!],
+          selectedItem: itemsAnswred[quesItem.fieldname!].toString(),
           isVisible: DependingLogic()
               .callDependingLogic(logics, itemsAnswred, quesItem),
           onChanged: (value) {
@@ -1300,7 +1343,7 @@ class _ChildGrowthExpendedFormState
           isVisible: DependingLogic()
               .callDependingLogic(logics, itemsAnswred, quesItem),
           onChanged: (value) {
-            print('Entered text: $value');
+            // print('Entered text: $value');
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
               var logData = DependingLogic()
@@ -1354,7 +1397,7 @@ class _ChildGrowthExpendedFormState
           isVisible: DependingLogic()
               .callDependingLogic(logics, itemsAnswred, quesItem),
           onChanged: (value) {
-            print('yesNo $value');
+            // print('yesNo $value');
             itemsAnswred[quesItem.fieldname!] = value;
             updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
             setState(() {});
@@ -1401,7 +1444,7 @@ class _ChildGrowthExpendedFormState
                   .callReadableLogic(logics, itemsAnswred, quesItem)
               : true,
           onChanged: (value) {
-            print('Entered text: $value');
+            // print('Entered text: $value');
             if (value != null)
               itemsAnswred[quesItem.fieldname!] = value;
             else {
@@ -1426,7 +1469,7 @@ class _ChildGrowthExpendedFormState
               : true,
           initialvalue: itemsAnswred[quesItem.fieldname!],
           onChanged: (value) {
-            print('Entered text: $value');
+            // print('Entered text: $value');
             if (value.isNotEmpty)
               itemsAnswred[quesItem.fieldname!] = value;
             else
@@ -1458,7 +1501,7 @@ class _ChildGrowthExpendedFormState
               .callDependingLogic(logics, itemsAnswred, quesItem),
           fieldName: quesItem.fieldname!,
           onChanged: (value) {
-            print('Entered text: $value');
+            // print('Entered text: $value');
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
               var logData = DependingLogic()
@@ -1609,7 +1652,7 @@ class _ChildGrowthExpendedFormState
           isVisible: DependingLogic()
               .callDependingLogic(logics, itemsAnswred, quesItem),
           onChanged: (value) {
-            print('Entered text: $value');
+            // print('Entered text: $value');
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
               var logData = DependingLogic()
@@ -1658,7 +1701,7 @@ class _ChildGrowthExpendedFormState
           isVisible: DependingLogic()
               .callDependingLogic(logics, itemsAnswred, quesItem),
           onChanged: (value) {
-            print('yesNo $value');
+            // print('yesNo $value');
             itemsAnswred[quesItem.fieldname!] = value;
             updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
             setState(() {});
@@ -1676,7 +1719,7 @@ class _ChildGrowthExpendedFormState
               .callReadableLogic(logics, itemsAnswred, quesItem),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           onChanged: (value) {
-            print('Entered text: $value');
+            // print('Entered text: $value');
             if (value != null)
               itemsAnswred[quesItem.fieldname!] = value;
             else {
@@ -1698,7 +1741,7 @@ class _ChildGrowthExpendedFormState
               .callReadableLogic(logics, itemsAnswred, quesItem),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           onChanged: (value) {
-            print('Entered text: $value');
+            // print('Entered text: $value');
             if (value.isNotEmpty)
               itemsAnswred[quesItem.fieldname!] = value;
             else
@@ -1722,7 +1765,7 @@ class _ChildGrowthExpendedFormState
               .callDependingLogic(logics, itemsAnswred, quesItem),
           fieldName: quesItem.fieldname!,
           onChanged: (value) {
-            print('Entered text: $value');
+            // print('Entered text: $value');
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
               var logData = DependingLogic()
@@ -1874,7 +1917,7 @@ class _ChildGrowthExpendedFormState
         }
       }
     });
-    print('mesuCunt $mesuCunt');
+    // print('mesuCunt $mesuCunt');
     return mesuCunt;
   }
 
@@ -1890,7 +1933,7 @@ class _ChildGrowthExpendedFormState
         }
       }
     });
-    print('mesuCunt $mesuCunt');
+    // print('mesuCunt $mesuCunt');
     return mesuCunt;
   }
 
@@ -2019,9 +2062,9 @@ class _ChildGrowthExpendedFormState
     if (entry.length > 0) {
       filterdData = enrolledChild
           .where((element) =>
-          (Global.getItemValues(element.responces!, 'child_name'))
-              .toLowerCase()
-              .startsWith(entry.toLowerCase()))
+              (Global.getItemValues(element.responces!, 'child_name'))
+                  .toLowerCase()
+                  .startsWith(entry.toLowerCase()))
           .toList();
     } else {
       filterdData = enrolledChild;

@@ -63,6 +63,8 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
   List<TabFormsLogic> _logics = [];
   List<Translation> _translation = [];
   bool _isLoading = true;
+  var applicableDate = Validate().stringToDate(Validate.date);
+  var now = DateTime.parse(Validate().currentDate());
 
   Map<String, dynamic> _myMap = {};
   int? isEditExisting;
@@ -73,6 +75,8 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
   }
 
   Future<void> _initData() async {
+    var date = await Validate().readString(Validate.date);
+    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     _role = await Validate().readString(Validate.role);
     username = (await Validate().readString(Validate.userName))!;
 
@@ -288,7 +292,9 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
         return CustomDatepickerDynamic(
           initialvalue: _myMap[quesItem.fieldname!],
           minDate: quesItem.fieldname == 'date_of_visit'
-              ? DateTime.now().subtract(Duration(days: 7))
+              ? now.isBefore(applicableDate)
+                  ? null
+                  : DateTime.now().subtract(Duration(days: 7))
               : null,
           fieldName: quesItem.fieldname,
           // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
@@ -567,7 +573,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(_logics, _myMap, element);
+            DependingLogic().validationMessge(_logics, _myMap, element,_translation,_language);
         if (Global.validString(validationMsg)) {
           Validate()
               .singleButtonPopup(validationMsg!, CustomText.ok, false, context);

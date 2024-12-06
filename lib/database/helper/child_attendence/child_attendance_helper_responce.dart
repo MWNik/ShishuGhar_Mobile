@@ -79,10 +79,11 @@ class ChildAttendanceResponceHelper {
 
     return items;
   }
+
   Future<List<ChildAttendanceResponceModel>>
       callChildAttendencesAllForUpoadEditDarft() async {
-    List<Map<String, dynamic>> result = await DatabaseHelper.database!
-        .rawQuery('select * from child_attendance_responce where is_edited=1 or is_edited=2');
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from child_attendance_responce where is_edited=1 or is_edited=2');
 
     List<ChildAttendanceResponceModel> items = [];
 
@@ -95,12 +96,12 @@ class ChildAttendanceResponceHelper {
 
   Future<void> updateUploadedChildAttendanceItem(
       Map<String, dynamic> item) async {
-    var cProfileItm = item['data'];
-    var name = cProfileItm['name'];
+    var cProfileItm = item['Data'];
+    int? name = cProfileItm['name'] ?? null;
     var guid = cProfileItm['childattenguid'];
 
     await DatabaseHelper.database!.rawQuery(
-        'UPDATE child_attendance_responce SET name = ?  , is_uploaded=1 , is_edited=0 where childattenguid=?',
+        'UPDATE child_attendance_responce SET name = ? ,is_uploaded=1 , is_edited=0 where childattenguid=?',
         [name, guid]);
   }
 
@@ -156,10 +157,8 @@ class ChildAttendanceResponceHelper {
     return result;
   }
 
-
   Future<List<Map<String, dynamic>>> callLastAttendenceMaxChildCount(
       int creche_id, int month, int year) async {
-
     String Year = '';
     String Month = formatter.format(month);
     var years = await OptionsModelHelper().getYearOptions();
@@ -169,12 +168,11 @@ class ChildAttendanceResponceHelper {
       }
     });
 
-
-    var selctedDate='$Year-$Month-01';
-    var dateformate='%Y-%m';
+    var selctedDate = '$Year-$Month-01';
+    var dateformate = '%Y-%m';
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'SELECT atre.*,max(COALESCE(chilAt.atn_count, 0)) AS children_count FROM child_attendance_responce atre LEFT JOIN (SELECT childattenguid, COUNT(*) AS atn_count,date_of_attendance FROM child_attendence where attendance=1 GROUP BY childattenguid) AS chilAt ON chilAt.childattenguid = atre.childattenguid  WHERE chilAt.atn_count IS NOT NULL and atre.creche_id=? and strftime(?, atre.date_of_attendance) = ( SELECT strftime(?, date_of_attendance)  FROM child_attendance_responce  WHERE date_of_attendance <strftime(?, ?) ORDER BY date_of_attendance DESC  LIMIT 1)',
-        [creche_id,dateformate,dateformate,dateformate, selctedDate]);
+        [creche_id, dateformate, dateformate, dateformate, selctedDate]);
 
     return result;
   }

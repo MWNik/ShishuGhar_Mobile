@@ -6,10 +6,15 @@ class CrecheMoniteringCheckListALMFieldsHelper {
   Future<void> insertcmcALMMeta(
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     if (houseFieldItem.isNotEmpty) {
-      for (var element in houseFieldItem) {
-        await DatabaseHelper.database!
-            .insert('tabCreche_Monitering_CheckList_ALM', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        for(var element in houseFieldItem) {
+          await txn.insert('tabCreche_Monitering_CheckList_ALM', element.toJson());
+        }
+      });
+      // for (var element in houseFieldItem) {
+      //   await DatabaseHelper.database!
+      //       .insert('tabCreche_Monitering_CheckList_ALM', element.toJson());
+      // }
     }
   }
 

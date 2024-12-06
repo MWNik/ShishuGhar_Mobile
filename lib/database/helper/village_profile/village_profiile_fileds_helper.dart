@@ -6,10 +6,15 @@ class VillageProfileFieldsHelper {
   Future<void> insertVillageProfile(
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     if (houseFieldItem.isNotEmpty) {
-      for (var element in houseFieldItem) {
-        await DatabaseHelper.database!
-            .insert('tab_village_profile_meta', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        for(var element in houseFieldItem){
+          await txn.insert('tab_village_profile_meta', element.toJson());
+        }
+      });
+      // for (var element in houseFieldItem) {
+      //   await DatabaseHelper.database!
+      //       .insert('tab_village_profile_meta', element.toJson());
+      // }
     }
   }
 

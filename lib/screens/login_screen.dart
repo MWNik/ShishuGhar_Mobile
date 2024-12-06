@@ -11,6 +11,7 @@ import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_radio_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/custom_textfield.dart';
+import 'package:shishughar/database/database_helper.dart';
 import 'package:shishughar/database/helper/auth_login_helper.dart';
 import 'package:shishughar/database/helper/block_data_helper.dart';
 import 'package:shishughar/database/helper/district_data_helper.dart';
@@ -21,6 +22,7 @@ import 'package:shishughar/database/helper/partner_stock_helper.dart';
 
 import 'package:shishughar/database/helper/state_data_helper.dart';
 import 'package:shishughar/database/helper/village_data_helper.dart';
+import 'package:shishughar/model/apimodel/device_change_model.dart';
 import 'package:shishughar/model/databasemodel/auth_model.dart';
 import 'package:shishughar/model/apimodel/login_model.dart';
 import 'package:shishughar/model/databasemodel/tabBlock_model.dart';
@@ -28,9 +30,9 @@ import 'package:shishughar/model/databasemodel/tabDistrict_model.dart';
 import 'package:shishughar/model/databasemodel/tabGramPanchayat_model.dart';
 import 'package:shishughar/model/databasemodel/tabVillage_model.dart';
 import 'package:shishughar/model/databasemodel/tabstate_model.dart';
-import 'package:shishughar/screens/dashboardscreen.dart';
 import 'package:shishughar/screens/reset_password_screen.dart';
 import 'package:shishughar/style/styles.dart';
+import 'package:shishughar/utils/device_services.dart';
 import 'package:shishughar/utils/secure_storage.dart';
 import 'package:shishughar/utils/validate.dart';
 import 'package:toast/toast.dart';
@@ -38,6 +40,7 @@ import '../api/creche_data_api.dart';
 import '../api/form_logic_api.dart';
 import '../api/language_translation_api.dart';
 import '../api/village_profile_meta_api.dart';
+import '../custom_widget/double_button_dailog.dart';
 import '../database/helper/creche_helper/creche_data_helper.dart';
 import '../database/helper/form_logic_helper.dart';
 import '../database/helper/height_weight_boys_girls_helper.dart';
@@ -53,8 +56,9 @@ import '../model/apimodel/mater_data_other_model.dart';
 import '../model/apimodel/translation_language_api_model.dart';
 import '../utils/constants.dart';
 import '../utils/globle_method.dart';
-import 'dashboardscreen_new.dart';
 import 'package:http/http.dart';
+
+import 'dashboardscreen_new.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -66,12 +70,15 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   TextEditingController mobileController = TextEditingController();
   TextEditingController passwordcontroller = TextEditingController();
-  String EnglishType = 'English';
+  String selectedlanguages = 'English';
   bool _isPasswordVisible = true;
   DateTime pre_backpress = DateTime.now();
   String? savedUsername;
   bool _keyboardVisible = false;
   String appVersionName = '';
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode2 = FocusNode();
 
   @override
   void initState() {
@@ -90,6 +97,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _focusNode.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -121,6 +129,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         }
       },
       child: Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           automaticallyImplyLeading: true,
           toolbarHeight: 0,
@@ -196,12 +205,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                   children: [
                                     CustomRadioButton(
                                       value: 'English',
-                                      groupValue: EnglishType,
+                                      groupValue: selectedlanguages,
                                       onChanged: (value) {
                                         Validate().saveString(
                                             Validate.sLanguage, 'en');
                                         setState(() {
-                                          EnglishType = value!;
+                                          selectedlanguages = value!;
                                         });
                                       },
                                       label: CustomText.English,
@@ -209,12 +218,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                     Spacer(),
                                     CustomRadioButton(
                                       value: 'Hindi',
-                                      groupValue: EnglishType,
+                                      groupValue: selectedlanguages,
                                       onChanged: (value) {
                                         Validate().saveString(
                                             Validate.sLanguage, 'hi');
                                         setState(() {
-                                          EnglishType = value!;
+                                          selectedlanguages = value!;
                                         });
                                       },
                                       label: CustomText.Hindi,
@@ -222,12 +231,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                     Spacer(),
                                     CustomRadioButton(
                                       value: 'Odiya',
-                                      groupValue: EnglishType,
+                                      groupValue: selectedlanguages,
                                       onChanged: (value) {
                                         Validate().saveString(
                                             Validate.sLanguage, 'od');
                                         setState(() {
-                                          EnglishType = value!;
+                                          selectedlanguages = value!;
                                         });
                                       },
                                       label: CustomText.Odiya,
@@ -240,6 +249,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                               padding: EdgeInsets.symmetric(
                                   horizontal: (_keyboardVisible) ? 15.w : 7.w),
                               child: CustomTextFieldRow(
+                                focusNode:_focusNode,
                                 controller: mobileController,
                                 keyboardtype: TextInputType.text,
                                 enabled: savedUsername == null ? true : false,
@@ -259,6 +269,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                   horizontal: (_keyboardVisible) ? 15.w : 7.w),
                               child: CustomTextFieldRow(
                                 maxlength: 20,
+                                focusNode:_focusNode2,
                                 controller: passwordcontroller,
                                 hintText: CustomText.Password,
                                 prefixIcon: Image.asset(
@@ -333,174 +344,21 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                         'ok',
                                         false,
                                         context);
-                                    // ScaffoldMessenger.of(context).showSnackBar(
-                                    //     const SnackBar(
-                                    //         content:
-                                    //             Text("User name required")));
                                   } else if (passwordcontroller.text.isEmpty) {
                                     Validate().singleButtonPopup(
                                         'Password required',
                                         'ok',
                                         false,
                                         context);
-                                    // ScaffoldMessenger.of(context).showSnackBar(
-                                    //     const SnackBar(
-                                    //         content:
-                                    //             Text("Password required")));
                                   } else {
-                                    showLoaderDialog(context);
-                                    var userName = await Validate()
-                                        .readString(Validate.loginName);
-                                    if (userName != null) {
-                                      var loginResponse =
-                                          await LoginApiService().loginUser(
-                                              mobileController.text.trim(),
-                                              passwordcontroller.text.trim());
-
-                                      if (loginResponse.statusCode == 200) {
-                                        LoginApiModel loginApiModel =
-                                            LoginApiModel.fromJson(json
-                                                .decode(loginResponse.body));
-
-                                        if (loginApiModel.auth != null) {
-                                          if (loginApiModel.auth!.apiKey !=
-                                              null) {
-                                            if (EnglishType == 'English') {
-                                              Validate().saveString(
-                                                  Validate.sLanguage, 'en');
-                                            } else if (EnglishType == 'Hindi') {
-                                              Validate().saveString(
-                                                  Validate.sLanguage, 'hi');
-                                            } else if (EnglishType == 'Odiya') {
-                                              Validate().saveString(
-                                                  Validate.sLanguage, 'od');
-                                            }
-                                            var key =
-                                                loginApiModel.auth!.apiKey!;
-                                            var secret =
-                                                loginApiModel.auth!.apiSecret!;
-                                            var token =
-                                                'token ' + key + ':' + secret;
-
-                                            Validate().saveString(
-                                                Validate.userName,
-                                                loginApiModel.auth!.username!);
-                                            Validate().saveString(
-                                                Validate.loginName,
-                                                mobileController.text.trim());
-                                            Validate().saveString(
-                                                Validate.Password,
-                                                passwordcontroller.text.trim());
-                                            print(
-                                                "******PASSWORD IS SAVED *******");
-                                            await SecureStorage
-                                                .writeStringValue(
-                                                    Validate.Password,
-                                                    passwordcontroller.text
-                                                        .trim());
-                                            Validate().saveString(
-                                                Validate.appToken, token);
-                                            Validate().saveString(Validate.role,
-                                                loginApiModel.auth!.role!);
-                                            Navigator.pop(context);
-                                            // if (loginApiModel.auth!.role ==
-                                            //     'Cluster Coordinator') {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (mContext) =>
-                                                      DashboardScreen(
-                                                    index: 0,
-                                                  ),
-                                                ));
-                                            // } else {
-                                            //   Navigator.pushReplacement(
-                                            //       context,
-                                            //       MaterialPageRoute(
-                                            //         builder: (mContext) =>
-                                            //             LocationScreen(),
-                                            //       ));
-                                            // }
-                                          }
-                                        } else {
-                                          Navigator.pop(context);
-                                          Validate().singleButtonPopup(
-                                              'Internal Server Error!',
-                                              'ok',
-                                              false,
-                                              context);
-                                          // ScaffoldMessenger.of(context)
-                                          //     .showSnackBar(const SnackBar(
-                                          //         content: Text(
-                                          //             "Internal Server Error!")));
-                                        }
-                                      } else {
-                                        Navigator.pop(context);
-                                        Validate().singleButtonPopup(
-                                            Global.errorBodyToString(
-                                                loginResponse.body, 'message'),
-                                            'ok',
-                                            false,
-                                            context);
-                                        // ScaffoldMessenger.of(context)
-                                        //     .showSnackBar(SnackBar(
-                                        //         content: Text(
-                                        //             Global.errorBodyToString(
-                                        //                 loginResponse.body,
-                                        //                 'message'))));
-                                      }
-                                    } else {
-                                      var loginResponse =
-                                          await LoginApiService().loginUser(
-                                              mobileController.text.trim(),
-                                              passwordcontroller.text.trim());
-
-                                      if (loginResponse.statusCode == 200) {
-                                        LoginApiModel loginApiModel =
-                                            LoginApiModel.fromJson(json
-                                                .decode(loginResponse.body));
-
-                                        if (loginApiModel != null) {
-                                          if (loginApiModel.auth != null) {
-                                            if (loginApiModel.auth!.apiKey !=
-                                                null) {
-                                              await initLoginAuth(
-                                                  context,
-                                                  loginApiModel,
-                                                  loginApiModel.auth!.username!,
-                                                  passwordcontroller.text
-                                                      .trim());
-                                            }
-                                          }
-                                        } else {
-                                          Navigator.pop(context);
-                                          Validate().singleButtonPopup(
-                                              'Internal Server Error!',
-                                              'ok',
-                                              false,
-                                              context);
-                                          // ScaffoldMessenger.of(context)
-                                          //     .showSnackBar(const SnackBar(
-                                          //         content: Text(
-                                          //             "Internal Server Error!")));
-                                        }
-                                      }
-                                      else {
-                                        Navigator.pop(context);
-                                        Validate().singleButtonPopup(
-                                            Global.errorBodyToString(
-                                                loginResponse.body, 'message'),
-                                            'ok',
-                                            false,
-                                            context);
-                                        // ScaffoldMessenger.of(context)
-                                        //     .showSnackBar(SnackBar(
-                                        //         content: Text(
-                                        //             Global.errorBodyToString(
-                                        //                 loginResponse.body,
-                                        //                 'message'))));
-                                      }
+                                    if (_focusNode.hasFocus) {
+                                      _focusNode.unfocus();
                                     }
+                                    if (_focusNode2.hasFocus) {
+                                      _focusNode2.unfocus();
+                                    }
+                                    await newLoginFlow(mobileController.text,
+                                        passwordcontroller.text, context);
                                   }
                                 } else {
                                   Validate().singleButtonPopup(
@@ -515,23 +373,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                             SizedBox(
                               height: 10,
                             ),
-                            // Center(
-                            //   child: RichText(
-                            //     text: TextSpan(
-                            //       text: CustomText.Version,
-                            //       style: Styles.black124,
-                            //       children: <TextSpan>[
-                            //         TextSpan(
-                            //             text: "$appVersionName", style: Styles.black126P),
-                            //         Constants.baseUrl=='https://uat.shishughar.in/api/'?
-                            //         TextSpan(text: "  (UAT)", style: Styles.red125)
-                            //             :Constants.baseUrl=='https://shishughar.in/api/'?
-                            //             TextSpan(  text: "  (PROD)", style: Styles.red125) :
-                            //         TextSpan(  text: "  (DEV)", style: Styles.red125),
-                            //       ],
-                            //     ),
-                            //   ),
-                            // ),
                             Center(
                               child: GestureDetector(
                                 onTap: () async {
@@ -676,17 +517,14 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   }
 
   Future<void> initLoginAuth(BuildContext mContext, LoginApiModel loginApiModel,
-      String userName, String password) async {
+      String enterdUserName, String userName, String password) async {
     ////master user auth
-    if (EnglishType == 'English') {
-      Validate().saveString(Validate.sLanguage, 'en');
-    } else if (EnglishType == 'Hindi') {
-      Validate().saveString(Validate.sLanguage, 'hi');
-    } else if (EnglishType == 'Odiya') {
-      Validate().saveString(Validate.sLanguage, 'od');
-    }
     if (loginApiModel.fullName != null) {
       Validate().saveString(Validate.fullName, loginApiModel.fullName!);
+    }
+    if (loginApiModel.auth!.houseHoldNumber != null) {
+      Validate()
+          .saveInt(Validate.household, loginApiModel.auth!.houseHoldNumber!);
     }
     var userRole = "";
     var key = loginApiModel.auth!.apiKey!;
@@ -719,7 +557,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           MstCommonModel.fromJson(json.decode(masterOtherDataResponse.body));
 
       await MstCommonHelper().insertMstCommonData(mstCommonModel.tabCommon!);
-
       await callApiLogicData(mContext, userName, password, token, userRole);
     } else {
       Navigator.pop(mContext);
@@ -728,9 +565,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           'ok',
           false,
           context);
-      // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
-      //     content: Text(Global.errorBodyToString(
-      //         masterOtherDataResponse.body, 'message'))));
     }
   }
 
@@ -738,11 +572,10 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       String password, String token, String userRole) async {
     var logisResponce =
         await FormLogicApiService().fetchLogicData(userName, password, token);
-
     if (logisResponce.statusCode == 200) {
       Map<String, dynamic> responseData = json.decode(logisResponce.body);
       await initFormLogic(FormLogicApiModel.fromJson(responseData));
-      await callApiTranslateData(mContext, userName, password, token, userRole);
+      await callMasterData(mContext, userName, password, token, userRole);
     } else {
       Navigator.pop(mContext);
       Validate().singleButtonPopup(
@@ -750,32 +583,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           'ok',
           false,
           context);
-      // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
-      //     content:
-      //         Text(Global.errorBodyToString(logisResponce.body, 'message'))));
-    }
-  }
-
-  Future<void> callApiTranslateData(BuildContext mContext, String userName,
-      String password, String token, String userRole) async {
-    var translateResponce =
-        await TranslationService().translateApi(userName, password, token);
-
-    if (translateResponce.statusCode == 200) {
-      Map<String, dynamic> responseData = json.decode(translateResponce.body);
-      await initTranslation(TranslationModel.fromJson(responseData));
-      await callMasterData(mContext, userName, password, token, userRole);
-      // await getCrecheData(mContext, userName, password, token, userRole);
-    } else {
-      Navigator.pop(mContext);
-      Validate().singleButtonPopup(
-          Global.errorBodyToString(translateResponce.body, 'message'),
-          'ok',
-          false,
-          context);
-      // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
-      //     content: Text(
-      //         Global.errorBodyToString(translateResponce.body, 'message'))));
     }
   }
 
@@ -802,16 +609,11 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> initTranslation(TranslationModel? translationModel) async {
-    if (translationModel != null) {
-      List<Translation>? translationList = translationModel.translation;
-      if (translationList != null) {
-        print("Insert translation data into the database");
-        await TranslationDataHelper()
-            .insertTranslationLanguage(translationList);
-      } else {
-        print("Not Insert translation data into the database");
-      }
+  Future<void> initTranslation(List<Translation>? translations) async {
+    if (translations != null) {
+      await TranslationDataHelper().insertTranslationLanguage(translations);
+    } else {
+      print("Not Insert translation data into the database");
     }
   }
 
@@ -889,8 +691,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           'ok',
           false,
           context);
-      // ScaffoldMessenger.of(mContext).showSnackBar(SnackBar(
-      //     content: Text(Global.errorBodyToString(response.body, 'message'))));
     }
   }
 
@@ -902,7 +702,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           .VillageProfileDownloadApi(userName, password, appToken);
       if (response.statusCode == 200) {
         await updateVillageProfiledata(response);
-        Navigator.pop(mContext);
         Validate().saveString(Validate.loginName, mobileController.text.trim());
         Validate().saveString(Validate.userName, userName);
         Validate().saveString(Validate.Password, password);
@@ -910,11 +709,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         Validate().saveString(Validate.appToken, appToken);
         Validate().saveString(
             Validate.msterDownloadDateTime, Validate().currentDateTime());
+        Navigator.pop(mContext);
 
         Navigator.pushReplacement(
             mContext,
             MaterialPageRoute(
-              builder: (mContext) => DashboardScreen(index: 0),
+              builder: (context) => DashboardScreen(index: 0),
             ));
       } else if (response.statusCode == 401) {
         Navigator.pop(mContext);
@@ -924,9 +724,9 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           SnackBar(content: Text(CustomText.token_expired)),
         );
         Navigator.pushReplacement(
-            context,
+            mContext,
             MaterialPageRoute(
-              builder: (mContext) => LoginScreen(),
+              builder: (context) => LoginScreen(),
             ));
       } else {
         Navigator.pop(mContext);
@@ -956,7 +756,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           villageListString, userName, password, appToken);
       if (response.statusCode == 200) {
         await updateVillageProfiledata(response);
-        Navigator.pop(mContext);
         Validate().saveString(Validate.loginName, mobileController.text.trim());
         Validate().saveString(Validate.userName, userName);
         Validate().saveString(Validate.Password, password);
@@ -964,11 +763,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         Validate().saveString(Validate.appToken, appToken);
         Validate().saveString(
             Validate.msterDownloadDateTime, Validate().currentDateTime());
+        Navigator.pop(mContext);
 
         Navigator.pushReplacement(
             mContext,
             MaterialPageRoute(
-              builder: (mContext) => DashboardScreen(index: 0),
+              builder: (context) => DashboardScreen(index: 0),
             ));
       } else if (response.statusCode == 401) {
         Navigator.pop(mContext);
@@ -978,9 +778,9 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           SnackBar(content: Text(CustomText.token_expired)),
         );
         Navigator.pushReplacement(
-            context,
+            mContext,
             MaterialPageRoute(
-              builder: (mContext) => LoginScreen(),
+              builder: (context) => LoginScreen(),
             ));
       } else {
         Navigator.pop(mContext);
@@ -1006,5 +806,179 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     } catch (e) {
       print("THE PROBLEM IS HERE: ${e.toString()}");
     }
+  }
+
+  Future<void> callApiTranslateData(
+      LoginApiModel loginApiModel,
+      String deviceId,
+      BuildContext mContext,
+      String userName,
+      String password,
+      String token,
+      String enterdUserName) async {
+    var translateResponce =
+        await TranslationService().translateApi(userName, password, token);
+    if (translateResponce.statusCode == 200) {
+      Map<String, dynamic> responseData = json.decode(translateResponce.body);
+      List<Translation>? translationList =
+          TranslationModel.fromJson(responseData).translation;
+      if (loginApiModel.auth!.isDeviceChanged == 1) {
+        Navigator.pop(mContext);
+        bool shouldProceed =
+            await LoginToNewDevice(mContext, deviceId, translationList);
+        if (shouldProceed) {
+          await deviceChangeApiCall(mContext, deviceId, loginApiModel, userName,
+              password, token, enterdUserName, translationList);
+        }
+      } else {
+        var userName = await Validate().readString(Validate.loginName);
+        if (userName != null) {
+
+          Navigator.pop(mContext);
+          Validate().saveString(Validate.Password, password);
+          Validate().saveString(Validate.appToken, token);
+          Navigator.pushReplacement(
+              mContext,
+              MaterialPageRoute(
+                builder: (context) => DashboardScreen(
+                  index: 0,
+                ),
+              ));
+        } else {
+          await initTranslation(translationList);
+          await initLoginAuth(mContext, loginApiModel, enterdUserName,
+              loginApiModel.auth!.username!, passwordcontroller.text.trim());
+        }
+      }
+    } else {
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(translateResponce.body, 'message'),
+          'Ok',
+          false,
+          context);
+    }
+  }
+
+  Future newLoginFlow(
+      String username, String pass, BuildContext mContext) async {
+    showLoaderDialog(mContext);
+    String? deviceId = await DeviceService.gteDeviceInfo();
+
+    var loginResponse = await LoginApiService().loginUser(
+        username, pass, Global.validToString(deviceId), appVersionName);
+    if (loginResponse.statusCode == 200) {
+      LoginApiModel loginApiModel =
+          LoginApiModel.fromJson(json.decode(loginResponse.body));
+      await setUpLogin(loginApiModel, username, pass,
+          Global.validToString(deviceId), mContext);
+    } else {
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(loginResponse.body, 'message'),
+          'ok',
+          false,
+          mContext);
+    }
+  }
+
+  Future setUpLogin(LoginApiModel loginApiModel, String enterdUserName,
+      String pass, String deviceId, BuildContext mContext) async {
+    if (loginApiModel.auth != null) {
+      if (loginApiModel.auth!.apiKey != null) {
+        var key = loginApiModel.auth!.apiKey!;
+        var secret = loginApiModel.auth!.apiSecret!;
+        var token = 'token ' + key + ':' + secret;
+        var oUserName = loginApiModel.auth!.username!;
+        var backDateDataEntry = loginApiModel.auth!.backDateDataEntry!;
+        Validate().saveString(Validate.date, backDateDataEntry);
+        if (selectedlanguages == 'English') {
+          Validate().saveString(Validate.sLanguage, 'en');
+        } else if (selectedlanguages == 'Hindi') {
+          Validate().saveString(Validate.sLanguage, 'hi');
+        } else if (selectedlanguages == 'Odiya') {
+          Validate().saveString(Validate.sLanguage, 'od');
+        }
+
+        await callApiTranslateData(loginApiModel, deviceId, mContext, oUserName,
+            pass, token, enterdUserName);
+      } else {
+        Navigator.pop(mContext);
+        Validate().singleButtonPopup(
+            'Login information is not valid.', 'ok', false, mContext);
+      }
+    } else {
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(
+          'Login information is not valid.', 'Ok', false, mContext);
+    }
+  }
+
+  Future<void> deviceChangeApiCall(
+      BuildContext mContext,
+      String deviceId,
+      LoginApiModel loginApiModel,
+      String userName,
+      String password,
+      String token,
+      String enterdUserName,
+      List<Translation>? translates) async {
+    showLoaderDialog(mContext);
+    var deviceChangeResponse = await LoginApiService()
+        .changeDeviceId(userName, password, deviceId, appVersionName);
+
+    if (deviceChangeResponse.statusCode == 200) {
+      DeviceChangeModel deviceChangeModel =
+          DeviceChangeModel.fromJson(json.decode(deviceChangeResponse.body));
+      if (deviceChangeModel.statusCode != null &&
+          deviceChangeModel.statusCode!.statusCode == 200) {
+        SharedPreferences pref = await SharedPreferences.getInstance();
+        await pref.clear();
+        await DatabaseHelper().deleteAllRecords();
+        if (selectedlanguages == 'English') {
+          Validate().saveString(Validate.sLanguage, 'en');
+        } else if (selectedlanguages == 'Hindi') {
+          Validate().saveString(Validate.sLanguage, 'hi');
+        } else if (selectedlanguages == 'Odiya') {
+          Validate().saveString(Validate.sLanguage, 'od');
+        }
+        await initTranslation(translates);
+        await initLoginAuth(mContext, loginApiModel, enterdUserName,
+            loginApiModel.auth!.username!, passwordcontroller.text.trim());
+      } else {
+        Navigator.pop(mContext);
+        Validate().singleButtonPopup(
+            Global.errorBodyToString(deviceChangeResponse.body, 'message'),
+            'Ok',
+            false,
+            context);
+      }
+    } else {
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(deviceChangeResponse.body, 'message'),
+          'ok',
+          false,
+          context);
+    }
+  }
+
+  Future<bool> LoginToNewDevice(BuildContext mContext, String deviceId,
+      List<Translation>? labelControlls) async {
+    var lng = await Validate().readString(Validate.sLanguage);
+    var shouldProceed = await showDialog(
+      context: mContext,
+      builder: (context) {
+        return DoubleButtonDailog(
+          posButton: Global.returnTrLable(
+              labelControlls!, CustomText.login, Global.validToString(lng)),
+          negButton: Global.returnTrLable(
+              labelControlls, CustomText.Cancel, Global.validToString(lng)),
+          message: Global.returnTrLable(labelControlls,
+              CustomText.deviceChangeMsg, Global.validToString(lng)),
+        );
+      },
+    );
+    return shouldProceed;
   }
 }

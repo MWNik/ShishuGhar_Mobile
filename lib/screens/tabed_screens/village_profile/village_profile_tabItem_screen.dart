@@ -87,6 +87,8 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
       CustomText.Submit,
       CustomText.ChildEnrollsuccess,
       CustomText.enrolled,
+      CustomText.Yes,
+      CustomText.No
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -662,8 +664,8 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate()
               .singleButtonPopup(validationMsg!, CustomText.ok, false, context);

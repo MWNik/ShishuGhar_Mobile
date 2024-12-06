@@ -47,10 +47,10 @@ class EnrolledChildDetailsSccreen extends StatefulWidget {
       required this.chilenrolledGUID,
       required this.childId,
       required this.childName,
-      required this.enName, this.lastDate,
-        this.maxDate,
-        required this.existingDates
-      });
+      required this.enName,
+      this.lastDate,
+      this.maxDate,
+      required this.existingDates});
 
   @override
   _EnrolledChildDetailsState createState() => _EnrolledChildDetailsState();
@@ -68,14 +68,16 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
   String? lng = 'en';
   List<Translation> labelControlls = [];
 
-  List<String> hiddens=[ 'partner_id',
+  List<String> hiddens = [
+    'partner_id',
     'state_id',
     'district_id',
     'block_id',
     'gp_id',
     'village_id',
     'creche_id',
-    'child_id'];
+    'child_id'
+  ];
 
   Future<void> initializeData() async {
     userName = (await Validate().readString(Validate.userName))!;
@@ -90,8 +92,9 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
       CustomText.dataSaveSuc,
       CustomText.pleaseWait,
       CustomText.eventALredyExistd,
-      CustomText.ChildEvents,
-      CustomText.back, CustomText.Submit
+      CustomText.ChildEventDetail,
+      CustomText.back,
+      CustomText.Submit
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -109,7 +112,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
     return Scaffold(
         appBar: CustomChildAppbar(
           text: Global.returnTrLable(
-              labelControlls, CustomText.ChildEvents, lng!),
+              labelControlls, CustomText.ChildEventDetail, lng!),
           subTitle1: widget.childName,
           subTitle2: widget.childId,
           onTap: () => Navigator.pop(context, 'itemRefresh'),
@@ -151,7 +154,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
                           nextTab(1, context);
                         },
                         text: Global.returnTrLable(
-                            labelControlls,  CustomText.Submit, lng!),
+                            labelControlls, CustomText.Submit, lng!),
                       ))
                     ]),
                   )
@@ -161,7 +164,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
 
   List<Widget> cWidget() {
     List<Widget> screenItems = [];
-    if (allItems.length>0) {
+    if (allItems.length > 0) {
       for (int i = 0; i < allItems.length; i++) {
         screenItems.add(widgetTypeWidget(i, allItems[i]));
         screenItems.add(SizedBox(height: 5.h));
@@ -180,13 +183,15 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-          titleText:
-          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          titleText: Global.returnTrLable(
+              labelControlls, quesItem.label!.trim(), lng!),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -201,12 +206,15 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
           fieldName: quesItem.fieldname,
           // readable: quesItem.fieldname=='date'?isDateReadable:null,
           readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          isVisible: DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           minDate: widget.lastDate,
           maxDate: widget.maxDate,
           calenderValidate:
-          DependingLogic().calenderValidation(logics, myMap, quesItem),
+              DependingLogic().calenderValidation(logics, myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
             var logData = DependingLogic()
@@ -223,22 +231,24 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
               setState(() {});
             }
           },
-          titleText:
-          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
+          titleText: Global.returnTrLable(
+              labelControlls, quesItem.label!.trim(), lng!),
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
-          titleText:
-          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          titleText: Global.returnTrLable(
+              labelControlls, quesItem.label!.trim(), lng!),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
           readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          hintText:
-          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
+          hintText: Global.returnTrLable(
+              labelControlls, quesItem.label!.trim(), lng!),
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -251,13 +261,15 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-          titleText:
-          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          titleText: Global.returnTrLable(
+              labelControlls, quesItem.label!.trim(), lng!),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -266,33 +278,34 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
             setState(() {});
           },
         );
-    // case 'Check':
-    //   return DynamicCustomCheckboxWithLabel(
-    //     label:
-    //         Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng),
-    //     initialValue: myMap[quesItem.fieldname!],
-    //     isVisible:
-    //         DependingLogic().callDependingLogic(logics, myMap, quesItem),
-    //     onChanged: (value) {
-    //       if (value > 0)
-    //         myMap[quesItem.fieldname!] = value;
-    //       else
-    //         myMap.remove(quesItem.fieldname);
-    //       setState(() {});
-    //     },
-    //   );
+      // case 'Check':
+      //   return DynamicCustomCheckboxWithLabel(
+      //     label:
+      //         Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng),
+      //     initialValue: myMap[quesItem.fieldname!],
+      //     isVisible:
+      //         DependingLogic().callDependingLogic(logics, myMap, quesItem),
+      //     onChanged: (value) {
+      //       if (value > 0)
+      //         myMap[quesItem.fieldname!] = value;
+      //       else
+      //         myMap.remove(quesItem.fieldname);
+      //       setState(() {});
+      //     },
+      //   );
       case 'Check':
         return DynamicCustomYesNoCheckboxWithLabel(
           label: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           initialValue: myMap[quesItem.fieldname],
-          labelControlls:labelControlls,
+          labelControlls: labelControlls,
           lng: lng!,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: DependingLogic()
-              .callReadableLogic(logics, myMap, quesItem),
-          isVisible: DependingLogic()
-              .callDependingLogic(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          isVisible:
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -307,14 +320,16 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
           maxline: 3,
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -325,14 +340,16 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
       case 'Int':
         return DynamicCustomTextFieldInt(
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          titleText:
-          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
+          titleText: Global.returnTrLable(
+              labelControlls, quesItem.label!.trim(), lng!),
           isVisible:
-          DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              DependingLogic().callDependingLogic(logics, myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
@@ -358,7 +375,6 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -369,7 +385,9 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
         .then((value) async {
       allItems = value;
     });
-    allItems=allItems.where((element) => !(hiddens.contains(element.fieldname))).toList();
+    allItems = allItems
+        .where((element) => !(hiddens.contains(element.fieldname)))
+        .toList();
 
     List<String> defaultCommon = [];
     for (int i = 0; i < allItems.length; i++) {
@@ -379,7 +397,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
     }
 
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
@@ -387,38 +405,39 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
     });
     List<String> labelItems = [];
     allItems.forEach((element) {
-     if(Global.validString(element.label)){
-      labelItems.add(element.label!);
-     }
+      if (Global.validString(element.label)) {
+        labelItems.add(element.label!);
+      }
     });
-    await TranslationDataHelper().callTranslateString(labelItems).then((value) => labelControlls.addAll(value));
+    await TranslationDataHelper()
+        .callTranslateString(labelItems)
+        .then((value) => labelControlls.addAll(value));
 
     setState(() {
       _isLoading = false;
     });
   }
 
-
   bool _checkValidation() {
     var validStatus = true;
-    if (allItems .length>0) {
+    if (allItems.length > 0) {
       for (int i = 0; i < allItems.length; i++) {
         var element = allItems[i];
         if (element.reqd == 1) {
           var valuees = myMap[element.fieldname];
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
-                 Global.returnTrLable(
+                Global.returnTrLable(
                     labelControlls, CustomText.plsFilManForm, lng!),
-                    Global.returnTrLable(labelControlls, CustomText.ok, lng!),false,context);
+                Global.returnTrLable(labelControlls, CustomText.ok, lng!),
+                false,
+                context);
             validStatus = false;
             break;
-          }
-          else if(element.fieldname == 'date'){
-            if(widget.existingDates.contains(valuees)){
+          } else if (element.fieldname == 'date') {
+            if (widget.existingDates.contains(valuees)) {
               myMap.remove(element.fieldname);
-              setState(() {
-              });
+              setState(() {});
               Validate().singleButtonPopup(
                   '${CustomText.eventALredyExistd} "${Validate().displeDateFormate(valuees)}"',
                   Global.returnTrLable(labelControlls, CustomText.ok, lng!),
@@ -430,12 +449,13 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
           }
         }
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,labelControlls,lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
-              Global.returnTrLable(
-                  labelControlls, validationMsg, lng!),
-              Global.returnTrLable(labelControlls, CustomText.ok, lng!),false,context);
+              Global.returnTrLable(labelControlls, validationMsg, lng!),
+              Global.returnTrLable(labelControlls, CustomText.ok, lng!),
+              false,
+              context);
           validStatus = false;
           break;
         }
@@ -477,7 +497,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
   }
 
   Future<void> saveDataInData() async {
-    if (allItems.length>0) {
+    if (allItems.length > 0) {
       Map<String, dynamic> responces = {};
       allItems.forEach((element) async {
         if (myMap[element.fieldname] != null) {
@@ -564,16 +584,17 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
       context: context,
       builder: (BuildContext context) {
         return WillPopScope(
-            onWillPop: () async => false,
-        child:AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              SizedBox(height: 10),
-              Text(CustomText.pleaseWait),
-            ],
-          ),),
+          onWillPop: () async => false,
+          child: AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                SizedBox(height: 10),
+                Text(CustomText.pleaseWait),
+              ],
+            ),
+          ),
         );
       },
     );

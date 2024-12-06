@@ -194,6 +194,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         //   myMap[quesItem.fieldname!] = items.first.name;
         // }
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(labelControlls, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -294,6 +296,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText:
+              Global.returnTrLable(labelControlls, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -416,7 +420,6 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-   
     var lngtr = await Validate().readString(Validate.sLanguage);
     await getInitLocation();
     var alredRecord =
@@ -433,7 +436,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
     await updateHiddenValue();
     await TranslationDataHelper()
         .callTranslate()
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
     List<String> defaultCommon = [];
     List<String> logicFields = [];
     for (int i = 0; i < items.length; i++) {
@@ -493,7 +496,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   }
 
   Future<void> calinitialScreen() async {
-     userName = (await Validate().readString(Validate.userName))!;
+    userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     await callScrenControllers('Household Form');
     allCrecheRecords = await CrecheDataHelper().getCrecheResponce();
@@ -643,8 +646,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+        var validationMsg = DependingLogic()
+            .validationMessge(logics, myMap, element, translats, lng!);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
@@ -809,11 +812,16 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       CustomText.Next,
       CustomText.plsFilManForm,
       CustomText.dataSaveSuc,
-      CustomText.ok
+      CustomText.ok,
+      CustomText.Save,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls = value);
+        .then((value) => labelControlls.addAll(value));
   }
 
   Future<void> getInitLocation() async {

@@ -67,13 +67,16 @@ class HHDataUploadApi {
     await Validate().createUploadedJson("Token $token\n\n$json");
     try {
       bool proceed = true;
+      int statusCode = 0;
+
       for (var element in childrenList) {
-        
         if (element['name'] != null) {
           var reasponceChildren = await uploadChildrenDataUpdate(token,
               element['name'], element); //child data passed in json format
           if (reasponceChildren.statusCode != 200) {
             proceed = false;
+            statusCode = reasponceChildren.statusCode;
+
             break;
           }
         } else {
@@ -84,6 +87,8 @@ class HHDataUploadApi {
           var reasponceChildren = await uploadHHChildrenData(token, element);
           if (reasponceChildren.statusCode != 200) {
             proceed = false;
+            statusCode = reasponceChildren.statusCode;
+
             break;
           }
         }
@@ -94,7 +99,7 @@ class HHDataUploadApi {
         print("body res ${response.body}");
         return response;
       } else {
-        return Response('Internal server error - ', 500);
+        return Response('Internal server error - ', statusCode);
       }
     } catch (e) {
       print('Internal server error: ${e}');
@@ -122,6 +127,7 @@ class HHDataUploadApi {
     await Validate().createUploadedJson("Token $token\n\n$json");
     try {
       bool proceed = true;
+      int statusCode = 0;
       for (var element in childrenList) {
         if (element['name'] != null) {
           if (sequenceType == 0) {
@@ -129,6 +135,7 @@ class HHDataUploadApi {
                 element['name'], element); //child data passed in json format
             if (reasponceChildren.statusCode != 200) {
               proceed = false;
+              statusCode = reasponceChildren.statusCode;
               break;
             }
           }
@@ -140,6 +147,7 @@ class HHDataUploadApi {
           var reasponceChildren = await uploadHHChildrenData(token, element);
           if (reasponceChildren.statusCode != 200) {
             proceed = false;
+            statusCode = reasponceChildren.statusCode;
             break;
           }
         }
@@ -150,7 +158,7 @@ class HHDataUploadApi {
         print("body res ${response.body}");
         return response;
       } else {
-        return Response('Internal server error - ', 500);
+        return Response('Internal server error - ', statusCode);
       }
     } catch (e) {
       print('Internal server error: ${e}');

@@ -14,7 +14,7 @@ class ChilProfileDataDownloadApi {
       'pwd': pwd,
     };
     try {
-      var responce = await http.post(url, headers: headers, body: parameters);
+      Response responce = await http.post(url, headers: headers, body: parameters);
       return responce;
     } catch (e) {
       return Response('Internal server error - $e', 500);

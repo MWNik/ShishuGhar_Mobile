@@ -580,7 +580,10 @@ class _ReplicaState extends State<Replica> {
                       .dependeOnMendotory(logics, itemFields, quesItem),
           // maxlength: quesItem.length,
 
-          fieldName: (quesItem.fieldname == 'usage' || quesItem.fieldname == 'wastage')?'weight':quesItem.fieldname!,
+          fieldName:
+              (quesItem.fieldname == 'usage' || quesItem.fieldname == 'wastage')
+                  ? 'weight'
+                  : quesItem.fieldname!,
           initialvalue: itemFields[quesItem.fieldname],
           readable: role == CustomText.crecheSupervisor
               ? DependingLogic().callReadableLogic(logics, itemFields, quesItem)
@@ -786,8 +789,8 @@ class _ReplicaState extends State<Replica> {
             validStatus = false;
             break;
           }
-          var validationMsg = DependingLogic()
-              .validationMessge(logics, itemMap[name]!, element);
+          var validationMsg = DependingLogic().validationMessge(
+              logics, itemMap[name]!, element, translats, lng);
           if (Global.validString(validationMsg)) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(translats, validationMsg, lng!),
@@ -999,16 +1002,18 @@ class _ReplicaState extends State<Replica> {
                               text: Global.returnTrLable(
                                   translats, CustomText.back, lng!),
                             )),
-                            widget.isEdit?SizedBox(width: 10):SizedBox(),
-                            widget.isEdit?Expanded(
-                                child: CElevatedButton(
-                              color: Color(0xff369A8D),
-                              onPressed: () {
-                                nextTab(1, context);
-                              },
-                              text: Global.returnTrLable(
-                                  translats, CustomText.Submit, lng!),
-                            )):SizedBox()
+                            widget.isEdit ? SizedBox(width: 10) : SizedBox(),
+                            widget.isEdit
+                                ? Expanded(
+                                    child: CElevatedButton(
+                                    color: Color(0xff369A8D),
+                                    onPressed: () {
+                                      nextTab(1, context);
+                                    },
+                                    text: Global.returnTrLable(
+                                        translats, CustomText.Submit, lng!),
+                                  ))
+                                : SizedBox()
                           ],
                         ))
                   ],

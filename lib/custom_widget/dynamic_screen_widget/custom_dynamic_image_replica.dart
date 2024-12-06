@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
 import '../../database/helper/image_file_tab_responce_helper.dart';
@@ -35,6 +36,8 @@ class CustomImageDynamicReplica extends StatefulWidget {
   bool? readable;
   final bool? isDelitable;
   final String docType;
+  List<Translation> translats;
+  String lng;
 
   CustomImageDynamicReplica({
     this.assetPath,
@@ -56,6 +59,8 @@ class CustomImageDynamicReplica extends StatefulWidget {
     required this.isDelitable,
     required this.docType,
     required this.onDelete,
+    required this.translats,
+    required this.lng
   });
 
   @override
@@ -325,7 +330,7 @@ class _CustomImageDynamicReplicaState extends State<CustomImageDynamicReplica> {
                                 style: Styles.white126P)),
                       ),
                       Center(
-                          child: Text(message,
+                          child: Text(Global.returnTrLable(widget.translats, message, widget.lng),
                               style: Styles.black3125,
                               textAlign: TextAlign.center)),
                       Padding(
@@ -335,7 +340,7 @@ class _CustomImageDynamicReplicaState extends State<CustomImageDynamicReplica> {
                           children: [
                             Expanded(
                               child: CElevatedButton(
-                                text: posButton,
+                                text: Global.returnTrLable(widget.translats, posButton, widget.lng),
                                 color: Color(0xffDB4B73),
                                 onPressed: () async {
                                   Navigator.of(context).pop(false);
@@ -348,7 +353,7 @@ class _CustomImageDynamicReplicaState extends State<CustomImageDynamicReplica> {
                             SizedBox(width: 10),
                             Expanded(
                               child: CElevatedButton(
-                                text: negButton,
+                                text: Global.returnTrLable(widget.translats,negButton , widget.lng),
                                 color: Color(0xff369A8D),
                                 onPressed: () async {
                                   Navigator.of(context).pop(false);

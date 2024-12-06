@@ -8,6 +8,10 @@ class Auth {
   List<Mapping>? mapping;
   String? partner;
   String? mobile_no;
+  String? AppDeviceId;
+  int? isDeviceChanged;
+  int? houseHoldNumber;
+  String? backDateDataEntry;
 
   Auth({
     this.apiKey,
@@ -17,20 +21,25 @@ class Auth {
     this.mapping,
     this.partner,
     this.mobile_no,
+    this.isDeviceChanged,
+    this.houseHoldNumber,
+    this.backDateDataEntry
   });
 
   factory Auth.fromJson(Map<String, dynamic> json) => Auth(
-        apiKey: json["api_key"],
-        apiSecret: json["api_secret"],
-        username: json["username"],
-        role: json["role"],
-        mobile_no: json["mobile_no"],
-        mapping: json["mapping"] == null
-            ? []
-            : List<Mapping>.from(
-                json["mapping"]!.map((x) => Mapping.fromJson(x))),
-        partner: json["partner"],
-      );
+      apiKey: json["api_key"],
+      apiSecret: json["api_secret"],
+      username: json["username"],
+      role: json["role"],
+      mobile_no: json["mobile_no"],
+      mapping: json["mapping"] == null
+          ? []
+          : List<Mapping>.from(
+              json["mapping"]!.map((x) => Mapping.fromJson(x))),
+      partner: json["partner"],
+      isDeviceChanged: json["is_device_changed"],
+      houseHoldNumber: json["household"],
+      backDateDataEntry: json["Back_data_entry_date"]);
 
   Map<String, dynamic> toJson() => {
         "api_key": apiKey,
@@ -42,5 +51,8 @@ class Auth {
             ? []
             : List<dynamic>.from(mapping!.map((x) => x.toJson())),
         "partner": partner,
+        "is_device_changed": isDeviceChanged,
+        "household": houseHoldNumber,
+        "Back_data_entry_date": backDateDataEntry
       };
 }

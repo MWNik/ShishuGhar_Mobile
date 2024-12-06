@@ -50,17 +50,17 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
     var checkChil = await checkChildrenLimit(hhChilddata.length);
     if (role == 'Creche Supervisor') {
       // if (!checkChil) {   for status child count > family under age 3 year in family tab
-        var alredRecord = await HouseHoldTabResponceHelper()
-            .getHouseHoldResponce(widget.hhGuid);
-        if (alredRecord.length > 0) {
-          if (alredRecord[0].is_edited == 1) {
-            var responce = jsonDecode(alredRecord[0].responces!);
-            responce['verification_status'] = '2';
-            var jsonReso = jsonEncode(responce);
-            await HouseHoldTabResponceHelper()
-                .updateResponce(jsonReso, widget.hhGuid);
-          }
+      var alredRecord = await HouseHoldTabResponceHelper()
+          .getHouseHoldResponce(widget.hhGuid);
+      if (alredRecord.length > 0) {
+        if (alredRecord[0].is_edited == 1) {
+          var responce = jsonDecode(alredRecord[0].responces!);
+          responce['verification_status'] = '2';
+          var jsonReso = jsonEncode(responce);
+          await HouseHoldTabResponceHelper()
+              .updateResponce(jsonReso, widget.hhGuid);
         }
+      }
       // }
     }
     setState(() {});
@@ -120,13 +120,19 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
                             DateTime.parse(Validate().currentDate()))) {
                           dobisReadable = true;
                         }
+                        var date = await Validate().readString(Validate.date);
+                        var applicableDate = Validate().stringToDate(date ?? "2024-12-31");
+                        var now = DateTime.parse(Validate().currentDate());
                         var refStatus = await Navigator.of(context).push(
                             MaterialPageRoute(
                                 builder: (BuildContext context) =>
                                     AddHouseholdScreenChildrenFromExpended(
                                         hhGuid: hhChilddata[index].HHGUID!,
                                         cHHGuid: hhChilddata[index].CHHGUID!,
-                                        dobisReadable: false)));
+                                        dobisReadable:
+                                            now.isBefore(applicableDate)
+                                                ? false
+                                                : dobisReadable)));
                         if (refStatus == 'itemRefresh') {
                           await fetchHhChildrenDataList();
                         }

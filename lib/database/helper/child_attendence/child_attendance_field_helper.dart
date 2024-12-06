@@ -9,10 +9,15 @@ class ChildAttendanceFieldHelper {
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     databaseHelper.openDb();
     if (houseFieldItem.isNotEmpty) {
-      for (var element in houseFieldItem) {
-        await DatabaseHelper.database!
-            .insert('tabChildAttendance', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async{
+        for(var element in houseFieldItem){
+          await txn.insert('tabChildAttendance', element.toJson());
+        }
+      });
+      // for (var element in houseFieldItem) {
+      //   await DatabaseHelper.database!
+      //       .insert('tabChildAttendance', element.toJson());
+      // }
     }
   }
 

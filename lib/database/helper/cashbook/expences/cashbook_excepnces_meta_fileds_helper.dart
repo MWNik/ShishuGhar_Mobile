@@ -6,20 +6,30 @@ class CashbookExpencesMetaFieldsHelper {
   Future<void> insertCashBookMeta(
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     if (houseFieldItem.isNotEmpty) {
-      for (var element in houseFieldItem) {
-        await DatabaseHelper.database!
-            .insert('tab_cashbook_expences_fields', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async {
+        for (var element in houseFieldItem) {
+          await txn.insert('tab_cashbook_expences_fields', element.toJson());
+        }
+      });
+      // for (var element in houseFieldItem) {
+      //   await DatabaseHelper.database!
+      //       .insert('tab_cashbook_expences_fields', element.toJson());
+      // }
     }
   }
 
   Future<void> insertCashBookReceipt(
       List<HouseHoldFielItemdModel> receiptItem) async {
     if (receiptItem.isNotEmpty) {
-      for (var element in receiptItem) {
-        await DatabaseHelper.database!
-            .insert('tab_cashbook_receipts_fields', element.toJson());
-      }
+      await DatabaseHelper.database!.transaction((txn) async {
+        for (var element in receiptItem) {
+          await txn.insert('tab_cashbook_receipts_fields', element.toJson());
+        }
+      });
+      // for (var element in receiptItem) {
+      //   await DatabaseHelper.database!
+      //       .insert('tab_cashbook_receipts_fields', element.toJson());
+      // }
     }
   }
 

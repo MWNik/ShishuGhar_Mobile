@@ -866,7 +866,7 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
         }
         var validationMsgother = otherTableDependCotrol(logics, myMap, element);
         var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element);
+            DependingLogic().validationMessge(logics, myMap, element,translats,lng);
         if (Global.validString(validationMsg) ||
             Global.validString(validationMsgother)) {
           if (Global.validString(validationMsg)) {

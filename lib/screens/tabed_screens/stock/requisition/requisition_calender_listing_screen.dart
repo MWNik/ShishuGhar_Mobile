@@ -64,7 +64,9 @@ class _RequisitionCalenderListingScreenState
       CustomText.addAttendance,
       CustomText.ok,
       CustomText.all,
-      CustomText.usynchedAndDraft
+      CustomText.usynchedAndDraft,
+      'Month',
+      'Year'
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -105,16 +107,20 @@ class _RequisitionCalenderListingScreenState
           calenderList.add(monthYear);
         }
       });
-      if (!calenderList.any((element) =>
-              element.month == now.month &&
-              element.Year == getNameFromOptionValue(now.year)) &&
-          role == CustomText.crecheSupervisor) {
-        calenderList.add(MonthYearModel(
-            month: now.month,
-            Year: getNameFromOptionValue(now.year),
-            is_edited: 0,
-            is_uploaded: 0));
+      List<MonthYearModel> missingList = findMissingMonths(calenderList);
+      if (missingList.isNotEmpty) {
+        calenderList.addAll(missingList);
       }
+      // if (!calenderList.any((element) =>
+      //         element.month == now.month &&
+      //         element.Year == getNameFromOptionValue(now.year)) &&
+      //     role == CustomText.crecheSupervisor) {
+      //   calenderList.add(MonthYearModel(
+      //       month: now.month,
+      //       Year: getNameFromOptionValue(now.year),
+      //       is_edited: 0,
+      //       is_uploaded: 0));
+      // }
     }
     if (calenderList.length > 1) {
       calenderList.sort((a, b) {
@@ -134,6 +140,51 @@ class _RequisitionCalenderListingScreenState
 
     filteredList = isOnlyUnsynched ? unsynchList : allList;
     setState(() {});
+  }
+
+  List<MonthYearModel> findMissingMonths(List<MonthYearModel> monthYearList) {
+    if (monthYearList.isEmpty) return [];
+
+    // Sort the list by the calculated year and month
+    monthYearList.sort((a, b) {
+      int yearDiff = a.Year!.compareTo(b.Year!);
+      return yearDiff == 0 ? a.month!.compareTo(b.month!) : yearDiff;
+    });
+
+    // Get the current date
+    DateTime now = DateTime.now();
+    int currentYear = getNameFromOptionValue(now.year);
+    int currentMonth = now.month;
+
+    // Get the latest year and month in the list
+    MonthYearModel latest = monthYearList.last;
+    int latestYear = latest.Year!;
+    int latestMonth = latest.month!;
+
+    List<MonthYearModel> missingMonths = [];
+    int year = latestYear;
+    int month = latestMonth;
+
+    // Loop from the current month to the latest month, adding missing months
+    while (currentYear > year ||
+        (currentYear == year &&
+            (currentMonth > month || currentMonth == month))) {
+      bool monthExists =
+          monthYearList.any((m) => m.Year == year && m.month == month);
+      if (!monthExists) {
+        missingMonths.add(MonthYearModel(
+            Year: year, month: month, is_edited: 0, is_uploaded: 0));
+      }
+
+      // Move to the next month
+      month++;
+      if (month > 12) {
+        month = 1;
+        year++;
+      }
+    }
+
+    return missingMonths;
   }
 
   @override
@@ -204,10 +255,11 @@ class _RequisitionCalenderListingScreenState
                             //     previousMonthMap[
                             //     previousMonthMap.keys.first]??0);
 
-                            var list=await ChildAttendanceResponceHelper().callLastAttendenceMaxChildCount(
-                                Global.stringToInt(widget.creche_id),
-                                filteredList[index].month!,
-                                filteredList[index].Year!);
+                            var list = await ChildAttendanceResponceHelper()
+                                .callLastAttendenceMaxChildCount(
+                                    Global.stringToInt(widget.creche_id),
+                                    filteredList[index].month!,
+                                    filteredList[index].Year!);
 
                             var requiRecord = await RequisitionResponseHelper()
                                 .getRequisitionByYearnMonth(
@@ -225,34 +277,39 @@ class _RequisitionCalenderListingScreenState
 
                             print(list.length);
                             if (list.isNotEmpty) {
-                              if(list.first['children_count']!=null){
-                                String childCount = list.first['children_count'].toString();
+                              if (list.first['children_count'] != null) {
+                                String childCount =
+                                    list.first['children_count'].toString();
 
-                                var refStatus = await Navigator.of(context).push(
-                                    MaterialPageRoute(
+                                var refStatus = await Navigator.of(context)
+                                    .push(MaterialPageRoute(
                                         builder: (BuildContext context) =>
-                                            RequisitionExpendedFormScreen(
+                                            RequisitionDetails(
                                                 child_count: childCount,
-                                                stockData: stockData.firstOrNull,
+                                                stockData:
+                                                    stockData.firstOrNull,
                                                 rguid: guid!,
-                                                month: filteredList[index].month!,
+                                                month:
+                                                    filteredList[index].month!,
                                                 year: filteredList[index].Year!,
                                                 creche_id: widget.creche_id,
-                                                name: requiRecord.firstOrNull?.name,
-                                                isEdit:role==CustomText.crecheSupervisor
-                                            )));
+                                                name: requiRecord
+                                                    .firstOrNull?.name,
+                                                isEdit: role ==
+                                                    CustomText
+                                                        .crecheSupervisor)));
 
                                 if (refStatus == 'itemRefresh') {
                                   fetchRequisitionData();
                                 }
-                              }else  Validate().singleButtonPopup(
-                                  Global.returnTrLable(
-                                      translats, CustomText.addAttendance, lng),
-                                  Global.returnTrLable(
-                                      translats, CustomText.ok, lng),
-                                  false,
-                                  context);
-
+                              } else
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(translats,
+                                        CustomText.addAttendance, lng),
+                                    Global.returnTrLable(
+                                        translats, CustomText.ok, lng),
+                                    false,
+                                    context);
                             } else
                               Validate().singleButtonPopup(
                                   Global.returnTrLable(
@@ -353,7 +410,7 @@ class _RequisitionCalenderListingScreenState
                                               )
                                             : Icon(
                                                 Icons.error_outline,
-                                                color: Colors.red.shade500,
+                                                color: Colors.red,
                                                 shadows: [
                                                   BoxShadow(
                                                       spreadRadius: 2,
@@ -387,14 +444,12 @@ class _RequisitionCalenderListingScreenState
       var list = yearList.where((element) {
         return Global.stringToInt(element.name) == name;
       });
-      if(list.length>0)
-      option = list.first.values!;
+      if (list.length > 0) option = list.first.values!;
     } else if (flag == 'Months') {
       var list = monthList.where((element) {
         return Global.stringToInt(element.name) == name;
       });
-      if(list.length>0)
-      option = list.first.values!;
+      if (list.length > 0) option = list.first.values!;
     }
     return option;
   }
@@ -404,10 +459,17 @@ class _RequisitionCalenderListingScreenState
     var list = yearList.where((element) {
       return Global.stringToInt(element.values) == value;
     });
-    name = Global.stringToInt(list.first.name);
+    if (list.isNotEmpty) {
+      name = Global.stringToInt(list.first.name);
+    } else {
+      Validate().singleButtonPopup(
+          Global.returnTrLable(translats, CustomText.requiCannotBeMadeYet, lng),
+          Global.returnTrLable(translats, CustomText.ok, lng),
+          true,
+          context);
+    }
     return name;
   }
-
 
   Map<int, int> fetchPreviousMoonthYear(int month, int year) {
     Map<int, int> monthYearmap = {};

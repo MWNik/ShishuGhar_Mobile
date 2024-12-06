@@ -106,37 +106,109 @@ class ChildGrievancesTabResponceHelper {
   }
 
   Future<void> childDownloadGrievanceData(Map<String, dynamic> item) async {
-    List<Map<String, dynamic>> growth =
-        List<Map<String, dynamic>>.from(item['Data']);
-    print(growth);
-    growth.forEach((element) async {
-      var growthData = element['Grievance'];
-      var name = growthData['name'];
-      // var chGuid = growthData['childenrolledguid'];
-      var creche_id = growthData['creche_id'];
-      var child_grievance_guid = growthData['grievance_guid'];
-      var appCreatedOn = growthData['appcreated_on'];
-      var appcreated_by = growthData['appcreated_by'];
-      var app_updated_by = growthData['app_updated_by'];
-      var app_updated_on = growthData['app_updated_on'];
-      var finalHHData = Validate().keyesFromResponce(growthData);
-      var hhDtaResponce = jsonEncode(finalHHData);
+  List<Map<String, dynamic>> growth =
+      List<Map<String, dynamic>>.from(item['Data']);
+  print(growth);
 
-      var items = ChildGrievancesResponceModel(
-        grievance_guid: child_grievance_guid,
-        name: name,
-        // childenrolledguid: chGuid,
-        is_uploaded: 1,
-        is_edited: 0,
-        is_deleted: 0,
-        creche_id: Global.stringToInt(creche_id.toString()),
-        update_at: app_updated_on,
-        updated_by: app_updated_by,
-        created_at: appCreatedOn,
-        created_by: appcreated_by,
-        responces: hhDtaResponce,
-      );
-      await inserts(items);
-    });
+  // List to collect ChildGrievancesResponceModel items
+  List<ChildGrievancesResponceModel> itemsList = [];
+
+  // Process data and add to list
+  for (var element in growth) {
+    var growthData = element['Grievance'];
+    var name = growthData['name'];
+    var creche_id = growthData['creche_id'];
+    var child_grievance_guid = growthData['grievance_guid'];
+    var appCreatedOn = growthData['appcreated_on'];
+    var appcreated_by = growthData['appcreated_by'];
+    var app_updated_by = growthData['app_updated_by'];
+    var app_updated_on = growthData['app_updated_on'];
+    var finalHHData = Validate().keyesFromResponce(growthData);
+    var hhDtaResponce = jsonEncode(finalHHData);
+
+    // Create model and add to items list
+    var item = ChildGrievancesResponceModel(
+      grievance_guid: child_grievance_guid,
+      name: name,
+      is_uploaded: 1,
+      is_edited: 0,
+      is_deleted: 0,
+      creche_id: Global.stringToInt(creche_id.toString()),
+      update_at: app_updated_on,
+      updated_by: app_updated_by,
+      created_at: appCreatedOn,
+      created_by: appcreated_by,
+      responces: hhDtaResponce,
+    );
+
+    itemsList.add(item);
   }
+
+  // If the list has more than 500 items, split it into batches
+  if (itemsList.length > 500) {
+    for (int i = 0; i < itemsList.length; i += 500) {
+      var batchItems = itemsList.sublist(i, (i + 500) > itemsList.length ? itemsList.length : (i + 500));
+
+      // Insert the batch
+      await _insertBatch(batchItems);
+    }
+  } else {
+    // If the list has 500 or fewer items, insert them all at once
+    await _insertBatch(itemsList);
+  }
+}
+
+// Helper function to insert a batch of items
+Future<void> _insertBatch(List<ChildGrievancesResponceModel> batchItems) async {
+  await DatabaseHelper.database!.transaction((txn) async {
+    var batch = txn.batch();
+
+    for (var item in batchItems) {
+      batch.insert(
+        'grievances_responce',
+        item.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    // Commit the batch insert
+    await batch.commit(noResult: true);
+  });
+}
+
+
+  // Future<void> childDownloadGrievanceData(Map<String, dynamic> item) async {
+  //   List<Map<String, dynamic>> growth =
+  //       List<Map<String, dynamic>>.from(item['Data']);
+  //   print(growth);
+  //   growth.forEach((element) async {
+  //     var growthData = element['Grievance'];
+  //     var name = growthData['name'];
+  //     // var chGuid = growthData['childenrolledguid'];
+  //     var creche_id = growthData['creche_id'];
+  //     var child_grievance_guid = growthData['grievance_guid'];
+  //     var appCreatedOn = growthData['appcreated_on'];
+  //     var appcreated_by = growthData['appcreated_by'];
+  //     var app_updated_by = growthData['app_updated_by'];
+  //     var app_updated_on = growthData['app_updated_on'];
+  //     var finalHHData = Validate().keyesFromResponce(growthData);
+  //     var hhDtaResponce = jsonEncode(finalHHData);
+
+  //     var items = ChildGrievancesResponceModel(
+  //       grievance_guid: child_grievance_guid,
+  //       name: name,
+  //       // childenrolledguid: chGuid,
+  //       is_uploaded: 1,
+  //       is_edited: 0,
+  //       is_deleted: 0,
+  //       creche_id: Global.stringToInt(creche_id.toString()),
+  //       update_at: app_updated_on,
+  //       updated_by: app_updated_by,
+  //       created_at: appCreatedOn,
+  //       created_by: appcreated_by,
+  //       responces: hhDtaResponce,
+  //     );
+  //     await inserts(items);
+  //   });
+  // }
 }

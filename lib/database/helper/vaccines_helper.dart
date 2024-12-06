@@ -1,4 +1,5 @@
 
+import 'package:flutter/material.dart';
 import 'package:shishughar/model/databasemodel/auth_model.dart';
 import 'package:shishughar/model/databasemodel/vaccines_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -25,10 +26,21 @@ class VaccinesDataHelper {
   Future insert(List<VaccineModel> vaccineModels) async {
     await DatabaseHelper.database!.delete('tabVaccines');
     if (vaccineModels.isNotEmpty) {
-      for (var element in vaccineModels) {
-        await DatabaseHelper.database!.insert('tabVaccines', element.toJson(),
-            conflictAlgorithm: ConflictAlgorithm.replace);
+      try{
+        await DatabaseHelper.database!.transaction((txn) async{
+          var batch = txn.batch();
+          for (var vaccine in vaccineModels) {
+            batch.insert('tabVaccines', vaccine.toJson(),conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+          await batch.commit(noResult: true);
+        });
+      }catch(e) {
+        debugPrint("Error inserting tabVaccines data -> ${e.toString()}");
       }
+      // for (var element in vaccineModels) {
+      //   await DatabaseHelper.database!.insert('tabVaccines', element.toJson(),
+      //       conflictAlgorithm: ConflictAlgorithm.replace);
+      // }
     }
   }
 

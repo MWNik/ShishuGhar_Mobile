@@ -237,7 +237,7 @@
 //           }
 //         }
 //         var validationMsg =
-//             DependingLogic().validationMessge(logics, myMap, element);
+//             DependingLogic().validationMessge(logics, myMap, element,translats,lng!);
 //         if (Global.validString(validationMsg)) {
 //           // ScaffoldMessenger.of(context).showSnackBar(
 //           //   SnackBar(content: Text(validationMsg!)),
