@@ -81,7 +81,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
       CustomText.Block,
       CustomText.GramPanchayat,
       CustomText.Village,
-      CustomText.Selecthere,
+      CustomText.select_here,
       CustomText.Generalfilter,
       CustomText.Locationfilter,
       CustomText.plSelect_state,
@@ -165,6 +165,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                     ),
                     SizedBox(),
                     DynamicCustomDropdownField(
+                      hintText: Global.returnTrLable(translats, CustomText.select_here, lng!),
                       titleText: Global.returnTrLable(
                           translats, CustomText.state, lng!),
                       items: mstStates,
@@ -201,6 +202,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                       },
                     ),
                     DynamicCustomDropdownField(
+                      hintText: Global.returnTrLable(translats, CustomText.select_here, lng!),
                       titleText: Global.returnTrLable(
                           translats, CustomText.District, lng!),
                       items: mstDistrict,
@@ -232,6 +234,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                       },
                     ),
                     DynamicCustomDropdownField(
+                      hintText: Global.returnTrLable(translats, CustomText.select_here, lng!),
                       titleText: Global.returnTrLable(
                           translats, CustomText.Block, lng!),
                       items: mstBlock,

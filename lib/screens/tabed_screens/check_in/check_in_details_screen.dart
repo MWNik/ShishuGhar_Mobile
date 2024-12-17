@@ -63,7 +63,7 @@ class CheckInDetailsScreen extends StatefulWidget {
 }
 
 class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<HouseHoldFielItemdModel> allItems = [];
   Map<String, dynamic> myMap = {};
   List<OptionsModel> options = [];
@@ -116,21 +116,51 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
     lng = (await Validate().readString(Validate.sLanguage))!;
     translats.clear();
     List<String> valueNames = [
+      CustomText.ok,
       CustomText.Save,
       CustomText.Creches,
       CustomText.CrecheCaregiver,
       CustomText.Next,
       CustomText.back,
       CustomText.Submit,
+      CustomText.permissionrequired,
+      CustomText.allowPermission,
+      CustomText.setting,
+      CustomText.locationNotCaptured,
+      CustomText.serviceNotEnabled,
       CustomText.checkIN,
+      CustomText.pleaseWait,
       CustomText.ChildPicture,
       CustomText.Plsselecimgoption,
       CustomText.Camera,
       CustomText.Gallery,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.dataSaveSuc,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
     multselectItemTab = await CheckInMetaHelper().callMultiSelectTabItem();
 
     checkItems =
@@ -248,7 +278,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           defaultDisableDailog(allItems[i].fieldname!, allItems[i].options!);
         } else {
           if (allItems[i].ismultiselect == 1) {
-            defaultCommonMulti.add('tab${allItems[i].multiselectlink!.trim()}');
+            defaultCommon.add('tab${allItems[i].multiselectlink!.trim()}');
           } else
             defaultCommon.add('tab${allItems[i].options!.trim()}');
         }
@@ -272,7 +302,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
     });
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(translats, data, lng!);
     });
 
     setState(() {
@@ -305,11 +335,10 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
             break;
           }
         }
-        var validationMsg = DependingLogic()
-            .validationMessge(logics, myMap, element, translats, lng!);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
-              Global.returnTrLable(translats, validationMsg, lng!),
+              validationMsg!,
               Global.returnTrLable(translats, CustomText.ok, lng!),
               false,
               context);
@@ -428,7 +457,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
       for (int i = 0; i < allItems.length; i++) {
         screenItems.add(widgetTypeWidget(i, allItems[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, allItems[i])) {
+        if (!logic!.callDependingLogic(myMap, allItems[i])) {
           myMap.remove(allItems[i].fieldname);
         }
       }
@@ -443,18 +472,18 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng!),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          readable: widget.isEdit
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          readable:
+              widget.isEdit ? true : logic!.callReadableLogic(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -470,13 +499,11 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           readable: true,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -517,22 +544,21 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           // initialvalue: myMap[quesItem.fieldname!],
           initialvalue: initialValue,
           maxlength: quesItem.length,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           readable: (quesItem.fieldname == 'longitude' ||
                   quesItem.fieldname == 'latitude' ||
                   quesItem.fieldname == 'checkin_location')
               ? true
               : widget.isEdit
                   ? true
-                  : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+                  : logic!.callReadableLogic(myMap, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -542,25 +568,23 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng!),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: widget.isEdit
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable:
+              widget.isEdit ? true : logic!.callReadableLogic(myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -592,14 +616,12 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           childRatio: 4,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
-          readable: widget.isEdit
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          readable:
+              widget.isEdit ? true : logic!.callReadableLogic(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           selectedItem: myMap[quesItem.fieldname],
           responceFieldName: itemResopnceField,
           onChanged: (value) {
@@ -619,12 +641,10 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           lng: lng!,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: widget.isEdit
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          readable:
+              widget.isEdit ? true : logic!.callReadableLogic(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -641,16 +661,14 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: widget.isEdit
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable:
+              widget.isEdit ? true : logic!.callReadableLogic(myMap, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -660,14 +678,14 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng!),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: widget.isEdit
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable:
+              widget.isEdit ? true : logic!.callReadableLogic(myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           initialvalue: myMap[quesItem.fieldname!],
@@ -687,9 +705,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -709,14 +727,12 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           fieldName: quesItem.fieldname!,
           initialvalue: myMap[quesItem.fieldname!],
           readable: widget.isEdit,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -737,7 +753,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
       //     Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
       //     isRequred: quesItem.reqd == 1
       //         ? quesItem.reqd
-      //         : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+      //         : logic!.dependeOnMendotory( myMap, quesItem),
       //     onChanged: (value) async {
       //     },
       //     onName: (value) async {
@@ -1200,15 +1216,18 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          title: Text('Permission Required'),
-          content: Text('Please allow location permission'),
+          title: Text(Global.returnTrLable(
+              translats, CustomText.permissionrequired, lng!)),
+          content: Text(Global.returnTrLable(
+              translats, CustomText.allowPermission, lng!)),
           actions: [
             TextButton(
               onPressed: () async {
                 await AppSettings.openAppSettings();
                 // Navigator.of(context).pop(true);
               },
-              child: Text('Settings'),
+              child: Text(
+                  Global.returnTrLable(translats, CustomText.setting, lng!)),
             ),
           ],
         );
@@ -1395,15 +1414,19 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
       } catch (e) {
         // if (e is TimeoutException) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Location is not captured. Please try again.")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(Global.returnTrLable(
+                translats, CustomText.locationNotCaptured, lng!))));
         // }
       } finally {
         Navigator.pop(context);
       }
     } else {
       Validate().singleButtonPopup(
-          "Service Not Enaled", CustomText.ok, false, context);
+          Global.returnTrLable(translats, CustomText.serviceNotEnabled, lng!),
+          Global.returnTrLable(translats, CustomText.ok, lng!),
+          false,
+          context);
     }
   }
 }

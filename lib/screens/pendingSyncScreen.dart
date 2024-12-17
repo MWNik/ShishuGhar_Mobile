@@ -406,7 +406,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                 syncCount > 0
                     ? selectAllOpt == 1
                         ? CElevatedButton(
-                            text: CustomText.uploadAll,
+                            text: Global.returnTrLable(locationControlls, CustomText.uploadAll , lng!),
                             color: Color(0xff369A8D),
                             onPressed: () async {
                               var checkInte =
@@ -1070,9 +1070,11 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             return;
           } else {
             Navigator.pop(mContext);
+            var msg = await TranslationDataHelper().getTranslation(
+                Global.errorBodyToStringFromList(responce.body), lng!);
             await callUploadData();
             Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
+                msg,
                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                 false,
                 context);
@@ -1123,9 +1125,11 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                 ));
           } else {
             Navigator.pop(mContext);
+            var msg = await TranslationDataHelper().getTranslation(
+                Global.errorBodyToStringFromList(responce.body), lng!);
             await callUploadData();
             Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
+                msg,
                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                 false,
                 context);
@@ -1926,6 +1930,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       CustomText.recordAvailable,
       CustomText.HHListing,
       CustomText.sync,
+      CustomText.uploadAll,
       CustomText.nothing_for_upload_msg,
       CustomText.data_upload_success_msg,
       CustomText.data_not_uploaded_msg,
@@ -1990,7 +1995,6 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       CustomText.selectAllForUpload,
       CustomText.all,
       CustomText.unsynched,
-      
     ];
     if (userRole == 'Creche Supervisor') {
       methods = [
@@ -2044,7 +2048,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => locationControlls = value);
+        .then((value) => locationControlls.addAll(value));
 
     Navigator.pop(context);
 
@@ -3528,9 +3532,11 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             //     context);
           } else {
             Navigator.pop(mContext);
+            var msg = await TranslationDataHelper().getTranslation(
+                Global.errorBodyToStringFromList(responce.body), lng!);
             await callUploadData();
             Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
+                msg,
                 Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                 false,
                 context);

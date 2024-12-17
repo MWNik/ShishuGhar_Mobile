@@ -81,7 +81,11 @@ class _CrecheMonitorTabForAddState extends State<CrecheMonitorTabForAdd>
       CustomText.shouldExit,
       CustomText.exit,
       CustomText.Cancel,
-      CustomText.VisitNote
+      CustomText.VisitNote,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
     ];
 
     await TranslationDataHelper()
@@ -399,7 +403,9 @@ class _CrecheMonitorTabForAddState extends State<CrecheMonitorTabForAdd>
     screenWidth = MediaQuery.of(context).size.width;
 
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {

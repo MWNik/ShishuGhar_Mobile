@@ -61,7 +61,7 @@ class StockDetails extends StatefulWidget {
 class _StockDetailsState extends State<StockDetails> {
   bool _isLoading = true;
   TextEditingController _textController = TextEditingController();
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<OptionsModel> monthsList = [];
   List<OptionsModel> yearList = [];
   // List<PartnerStockModel> partnerStockItemList = [];
@@ -110,14 +110,43 @@ class _StockDetailsState extends State<StockDetails> {
     translats.clear();
     lng = (await Validate().readString(Validate.sLanguage))!;
     List<String> valueNames = [
+      CustomText.stockDetails,
+      CustomText.noItemsAvail,
+      CustomText.Submit,
       CustomText.ChildName,
       CustomText.RelationshipChild,
       CustomText.ageInMonth,
       CustomText.hhNameS,
+      CustomText.opening,
+      CustomText.closing,
+      CustomText.received,
+      CustomText.usage,
+      CustomText.wstage,
+      CustomText.typehere,
       CustomText.NorecordAvailable,
       CustomText.Search,
+      CustomText.ok,
       CustomText.Village,
-      CustomText.back
+      CustomText.back,
+      CustomText.dataSaveSuc,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -243,7 +272,8 @@ class _StockDetailsState extends State<StockDetails> {
                       child: RichText(
                         text: TextSpan(children: [
                           TextSpan(
-                            text: 'Opening : ',
+                            text:
+                                '${Global.returnTrLable(translats, CustomText.opening, lng)} : ',
                             style: Styles.black124,
                           ),
                           TextSpan(
@@ -258,7 +288,8 @@ class _StockDetailsState extends State<StockDetails> {
                         child: RichText(
                             text: TextSpan(children: [
                       TextSpan(
-                        text: 'Received : ',
+                        text:
+                            '${Global.returnTrLable(translats, CustomText.received, lng)} : ',
                         style: Styles.black124,
                       ),
                       TextSpan(
@@ -271,13 +302,18 @@ class _StockDetailsState extends State<StockDetails> {
                 ),
                 SizedBox(height: 10),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: CustomTextfieldSidebyside(
-                        titleText: "Usage",
-                        fieldType: "Float",
+                      child: DynamicCustomTextFieldFloat(
+                        isCenterTitle: true,
+                        maxlength: 4,
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.typehere, lng),
+                        titleText: Global.returnTrLable(
+                            translats, CustomText.usage, lng),
+                        // fieldType: "Float",
                         initialvalue: itemMap[nameofItem.toString()]!['usage'],
                         onChanged: (value) {
                           if (value != null) {
@@ -311,9 +347,14 @@ class _StockDetailsState extends State<StockDetails> {
                       ),
                     ),
                     Expanded(
-                      child: CustomTextfieldSidebyside(
-                        titleText: "Wastage",
-                        fieldType: "Float",
+                      child: DynamicCustomTextFieldFloat(
+                        isCenterTitle: true,
+                        maxlength: 4,
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.typehere, lng),
+                        titleText: Global.returnTrLable(
+                            translats, CustomText.wstage, lng),
+                        // fieldType: "Float",
                         initialvalue:
                             itemMap[nameofItem.toString()]!['wastage'],
                         onChanged: (value) {
@@ -349,9 +390,14 @@ class _StockDetailsState extends State<StockDetails> {
                       ),
                     ),
                     Expanded(
-                      child: CustomTextfieldSidebyside(
-                        titleText: "Closing",
-                        fieldType: "Float",
+                      child: DynamicCustomTextFieldFloat(
+                        isCenterTitle: true,
+                        maxlength: 4,
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.typehere, lng),
+                        titleText: Global.returnTrLable(
+                            translats, CustomText.closing, lng),
+                        // fieldType: "Float",
                         initialvalue:
                             itemMap[nameofItem.toString()]!['closing_stock'],
                         readable: true,
@@ -375,8 +421,7 @@ class _StockDetailsState extends State<StockDetails> {
         screenItems
             .add(widgetTypeWidget(i, itemfields[i], itemName, itemFields));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic()
-            .callDependingLogic(logics, myMap, itemfields[i])) {
+        if (!logic!.callDependingLogic(myMap, itemfields[i])) {
           // myMap.remove(itemfields[i].fieldname);
           // itemMap[itemName]!.remove(itemfields[i].fieldname);
         }
@@ -403,13 +448,11 @@ class _StockDetailsState extends State<StockDetails> {
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           items: items,
           readable: role == CustomText.crecheSupervisor ? null : true,
           selectedItem: itemFields[quesItem.fieldname!],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             if (value != null) {
               if (itemMap.containsKey(itemName.toString())) {
@@ -432,23 +475,20 @@ class _StockDetailsState extends State<StockDetails> {
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemFields[quesItem.fieldname!],
           readable: role == CustomText.crecheSupervisor
-              ? DependingLogic().callReadableLogic(logics, itemFields, quesItem)
+              ? logic!.callReadableLogic(itemFields, quesItem)
               : true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               if (itemMap.containsKey(itemName.toString())) {
                 itemMap[itemName.toString()]![quesItem.fieldname!] = value;
               }
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, itemFields, quesItem);
+              var logData = logic!.callAutoGeneratedValue(itemFields, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   itemFields.addEntries(
@@ -468,15 +508,13 @@ class _StockDetailsState extends State<StockDetails> {
         return DynamicCustomYesNoCheckboxWithLabel(
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: itemFields[quesItem.fieldname],
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           labelControlls: translats,
           lng: lng,
           readable: role == CustomText.crecheSupervisor
-              ? DependingLogic().callReadableLogic(logics, itemFields, quesItem)
+              ? logic!.callReadableLogic(itemFields, quesItem)
               : true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -493,17 +531,15 @@ class _StockDetailsState extends State<StockDetails> {
           maxline: 3,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: role == CustomText.crecheSupervisor
-              ? DependingLogic().callReadableLogic(logics, itemFields, quesItem)
+              ? logic!.callReadableLogic(itemFields, quesItem)
               : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             if (value != null) {
               if (itemMap.containsKey(itemName.toString())) {
@@ -523,11 +559,10 @@ class _StockDetailsState extends State<StockDetails> {
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           maxlength: quesItem.length,
           readable: role == CustomText.crecheSupervisor
-              ? DependingLogic().callReadableLogic(logics, itemFields, quesItem)
+              ? logic!.callReadableLogic(itemFields, quesItem)
               : true,
           initialvalue: itemFields[quesItem.fieldname!],
           onChanged: (value) {
@@ -549,11 +584,10 @@ class _StockDetailsState extends State<StockDetails> {
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           maxlength: quesItem.length,
           readable: role == CustomText.crecheSupervisor
-              ? DependingLogic().callReadableLogic(logics, itemFields, quesItem)
+              ? logic!.callReadableLogic(itemFields, quesItem)
               : true,
           initialvalue: itemFields[quesItem.fieldname!],
           onChanged: (value) {
@@ -576,18 +610,16 @@ class _StockDetailsState extends State<StockDetails> {
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           maxlength: quesItem.length,
           readable: role == CustomText.crecheSupervisor
-              ? DependingLogic().callReadableLogic(logics, itemFields, quesItem)
+              ? logic!.callReadableLogic(itemFields, quesItem)
               : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             if (value != null) {
               if (itemMap.containsKey(itemName.toString())) {
@@ -608,20 +640,17 @@ class _StockDetailsState extends State<StockDetails> {
           initialvalue: itemFields[quesItem.fieldname],
           fieldName: quesItem.fieldname,
           readable: role == CustomText.crecheSupervisor
-              ? DependingLogic().callReadableLogic(logics, itemFields, quesItem)
+              ? logic!.callReadableLogic(itemFields, quesItem)
               : true,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic()
-                  .dependeOnMendotory(logics, itemFields, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, itemFields, quesItem),
+              : logic!.dependeOnMendotory(itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
+          calenderValidate: logic!.calenderValidation(itemFields, quesItem),
           onChanged: (value) {
             // myMap[quesItem.fieldname!] = value;
-            // var logData = DependingLogic()
-            //     .callDateDiffrenceLogic(logics, myMap, quesItem);
+            // var logData = logic!
+            //     .callDateDiffrenceLogic( myMap, quesItem);
             // if (logData.isNotEmpty) {
             //   if (logData.keys.length > 0) {
             //     // var item =myMap[logData.keys.first];
@@ -661,8 +690,7 @@ class _StockDetailsState extends State<StockDetails> {
               ? quesItem.reqd
               : quesItem.fieldname == 'usage' || quesItem.fieldname == 'wastage'
                   ? 1
-                  : DependingLogic()
-                      .dependeOnMendotory(logics, itemFields, quesItem),
+                  : logic!.dependeOnMendotory(itemFields, quesItem),
           // maxlength: quesItem.length,
 
           fieldName:
@@ -671,10 +699,9 @@ class _StockDetailsState extends State<StockDetails> {
                   : quesItem.fieldname!,
           initialvalue: itemFields[quesItem.fieldname],
           readable: role == CustomText.crecheSupervisor
-              ? DependingLogic().callReadableLogic(logics, itemFields, quesItem)
+              ? logic!.callReadableLogic(itemFields, quesItem)
               : true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
@@ -687,12 +714,12 @@ class _StockDetailsState extends State<StockDetails> {
 
               if (quesItem.fieldname == 'wastage' ||
                   quesItem.fieldname == 'usage') {
-                // var validationMessge = DependingLogic()
-                //     .validationMessge(logics, itemFields, quesItem);
+                // var validationMessge = logic!
+                //     .validationMessge( itemFields, quesItem);
                 // if (!Global.validString(validationMessge)) {
                 // if (quesItem.fieldname == 'wastage') {
-                var logData = DependingLogic()
-                    .callAutoGeneratedValue(logics, itemFields, quesItem);
+                var logData =
+                    logic!.callAutoGeneratedValue(itemFields, quesItem);
                 if (logData.isNotEmpty) {
                   if (logData.keys.length > 0) {
                     itemMap[itemName.toString()]![logData.keys.first
@@ -719,8 +746,8 @@ class _StockDetailsState extends State<StockDetails> {
               }
               if (quesItem.fieldname == 'wastage' ||
                   quesItem.fieldname == 'usage') {
-                var logData = DependingLogic()
-                    .callAutoGeneratedValue(logics, itemFields, quesItem);
+                var logData =
+                    logic!.callAutoGeneratedValue(itemFields, quesItem);
                 if (logData.isNotEmpty) {
                   if (logData.keys.length > 0) {
                     itemMap[itemName.toString()]![logData.keys.first
@@ -819,12 +846,13 @@ class _StockDetailsState extends State<StockDetails> {
     await OptionsModelHelper()
         .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
-
+    List<TabFormsLogic> logics = [];
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
       logics.addAll(data);
     });
     await FormLogicDataHelper().callFormLogic('Creche Stock').then((data) {
       logics.addAll(data);
+      logic = DependingLogic(translats, logics, lng);
     });
     for (var elements in allItems) {
       _foocusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
@@ -881,11 +909,10 @@ class _StockDetailsState extends State<StockDetails> {
             validStatus = false;
             break;
           }
-          var validationMsg = DependingLogic().validationMessge(
-              logics, itemMap[name]!, element, translats, lng);
+          var validationMsg = logic!.validationMessge(itemMap[name]!, element);
           if (Global.validString(validationMsg)) {
             Validate().singleButtonPopup(
-                Global.returnTrLable(translats, validationMsg, lng!),
+                validationMsg!,
                 Global.returnTrLable(translats, CustomText.ok, lng!),
                 false,
                 context);

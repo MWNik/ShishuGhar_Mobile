@@ -446,6 +446,7 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                               ),
                             ] else ...[
                               DynamicCustomDropdownField(
+        hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
                                 titleText: Global.returnTrLable(
                                     hhlistingControlls, CustomText.state, lng!),
                                 items: mstStates,
@@ -468,6 +469,7 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                                 },
                               ),
                               DynamicCustomDropdownField(
+                                hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
                                 titleText: Global.returnTrLable(
                                     hhlistingControlls,
                                     CustomText.District,
@@ -494,6 +496,7 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                                 },
                               ),
                               DynamicCustomDropdownField(
+                                hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
                                 titleText: Global.returnTrLable(
                                     hhlistingControlls, CustomText.Block, lng!),
                                 items: mstBlock,
@@ -1501,7 +1504,7 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => hhlistingControlls = value);
+        .then((value) => hhlistingControlls.addAll(value));
 
     setState(() {});
   }

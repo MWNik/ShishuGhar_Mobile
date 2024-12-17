@@ -98,7 +98,9 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {
@@ -549,6 +551,8 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
                   child: Column(
                 children: [
                   DynamicCustomDropdownField(
+                    hintText: Global.returnTrLable(
+                        translatsLabel, CustomText.select_here, lng!),
                     titleText: verifiable,
                     isRequred: 0,
                     items: varyItem,

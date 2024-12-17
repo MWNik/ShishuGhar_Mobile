@@ -31,39 +31,40 @@ class DynamicCustomTextFieldFloat extends StatefulWidget {
   final int? isRequred;
   final bool? isVisible;
   final FocusNode? focusNode;
+  final bool? isCenterTitle;
 
-  DynamicCustomTextFieldFloat({
-    this.focusNode,
-    this.errorText,
-    this.readable,
-    this.initialvalue,
-    this.titleText,
-    this.validator,
-    this.fillColor,
-    this.onTap,
-    this.height,
-    this.width,
-    this.suffixIcon,
-    this.onChanged,
-    this.hintText,
-    this.prefixIcon,
-    this.obscureText = false,
-    this.hintStyle,
-    this.keyboardtype,
-    this.labelstyle,
-    this.maxline,
-    this.maxlength,
-    this.isRequred,
-    this.isVisible,
-    this.fieldName,
-  });
+  DynamicCustomTextFieldFloat(
+      {this.focusNode,
+      this.errorText,
+      this.readable,
+      this.initialvalue,
+      this.titleText,
+      this.validator,
+      this.fillColor,
+      this.onTap,
+      this.height,
+      this.width,
+      this.suffixIcon,
+      this.onChanged,
+      this.hintText,
+      this.prefixIcon,
+      this.obscureText = false,
+      this.hintStyle,
+      this.keyboardtype,
+      this.labelstyle,
+      this.maxline,
+      this.maxlength,
+      this.isRequred,
+      this.isVisible,
+      this.fieldName,
+      this.isCenterTitle = false});
 
   @override
   _CustomTextFieldState createState() => _CustomTextFieldState();
 }
 
 class _CustomTextFieldState extends State<DynamicCustomTextFieldFloat> {
-  TextEditingController? controller=TextEditingController();
+  TextEditingController? controller = TextEditingController();
   // int decimal=5;
 
   // @override
@@ -76,7 +77,7 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldFloat> {
   @override
   void initState() {
     super.initState();
-    if (widget.initialvalue!=null) {
+    if (widget.initialvalue != null) {
       controller?.text = widget.initialvalue.toString();
     } else {
       controller?.text = '';
@@ -90,23 +91,27 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldFloat> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 2),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: widget.isCenterTitle!
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
           children: [
-            widget.titleText != null?RichText(
-              text: TextSpan(
-                text: widget.titleText ?? '',
-                style: Styles.black124,
-                children: widget.isRequred == 1
-                    ? [
-                        TextSpan(
-                          text: '*',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ]
-                    : [],
-              ),
-            ):SizedBox(),
-            widget.titleText != null?SizedBox(height: 3):SizedBox(),
+            widget.titleText != null
+                ? RichText(
+                    text: TextSpan(
+                      text: widget.titleText ?? '',
+                      style: Styles.black124,
+                      children: widget.isRequred == 1
+                          ? [
+                              TextSpan(
+                                text: '*',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ]
+                          : [],
+                    ),
+                  )
+                : SizedBox(),
+            widget.titleText != null ? SizedBox(height: 3) : SizedBox(),
             Container(
               alignment: Alignment.center,
               height: widget.height ?? 35.h,
@@ -133,25 +138,24 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldFloat> {
                   }
                 },
                 style: Styles.black124,
-                keyboardType:TextInputType.numberWithOptions(decimal: true), // Allow decimal numbers
-                inputFormatters:
-                (widget.fieldName=='height' ||
-                    widget.fieldName=='height_on_referral')
-                    ?<TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(
-                      RegExp(r'^\d{0,3}(?:\.\d{0,2})?')
-                  ), // Allow only digits and up to 2 decimal places
-                ]:(widget.fieldName=='weight' ||
-                  widget.fieldName=='weight_on_referral')?
-                <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(
-                      RegExp(r'^\d{0,5}(?:\.\d{0,3})?')
-                  ), // Allow only digits and up to 2 decimal places
-                ]:<TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(
-                      RegExp(r'^\d{0,2}(?:\.\d{0,3})?')
-                  ), // Allow only digits and up to 2 decimal places
-                ],
+                keyboardType: TextInputType.numberWithOptions(
+                    decimal: true), // Allow decimal numbers
+                inputFormatters: (widget.fieldName == 'height' ||
+                        widget.fieldName == 'height_on_referral')
+                    ? <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp(
+                            r'^\d{0,3}(?:\.\d{0,2})?')), // Allow only digits and up to 2 decimal places
+                      ]
+                    : (widget.fieldName == 'weight' ||
+                            widget.fieldName == 'weight_on_referral')
+                        ? <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow(RegExp(
+                                r'^\d{0,5}(?:\.\d{0,3})?')), // Allow only digits and up to 2 decimal places
+                          ]
+                        : <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow(RegExp(
+                                r'^\d{0,3}(?:\.\d{0,2})?')), // Allow only digits and up to 2 decimal places
+                          ],
 
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(10),
@@ -182,7 +186,9 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldFloat> {
                 ),
               ),
             ),
-            widget.titleText != null?SizedBox(height: 10):SizedBox(height: 5),
+            widget.titleText != null
+                ? SizedBox(height: 10)
+                : SizedBox(height: 5),
           ],
         ),
       ),
@@ -202,11 +208,10 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldFloat> {
   void didUpdateWidget(covariant DynamicCustomTextFieldFloat oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialvalue != widget.initialvalue) {
-      controller?.text = (widget.initialvalue != null ? widget.initialvalue.toString() : '');
-
+      controller?.text =
+          (widget.initialvalue != null ? widget.initialvalue.toString() : '');
     }
   }
-
 
   // @override
   // void dispose() {
@@ -217,7 +222,7 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldFloat> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.initialvalue!=null) {
+    if (widget.initialvalue != null) {
       controller?.text = widget.initialvalue.toString();
     } else {
       controller?.text = '';

@@ -57,6 +57,7 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
       CustomText.hhNameS,
       CustomText.NorecordAvailable,
       CustomText.Search,
+      CustomText.datevisit,
       CustomText.Village,
       CustomText.EntryTime,
       CustomText.ExitTime,
@@ -64,7 +65,8 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
       CustomText.usynchedAndDraft,
       CustomText.areSureToDelete,
       CustomText.Cancel,
-      CustomText.delete
+      CustomText.delete,
+      CustomText.VisitNotes
     ];
 
     await TranslationDataHelper()
@@ -299,8 +301,7 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(50),
-                                                        color:
-                                                            Colors.red,
+                                                        color: Colors.red,
                                                       ),
                                                       child: Padding(
                                                         padding: EdgeInsets
@@ -309,8 +310,7 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
                                                                 vertical: 2.h),
                                                         child: Icon(
                                                           Icons.delete_rounded,
-                                                          color: Colors
-                                                              .white,
+                                                          color: Colors.white,
                                                           size: 16,
                                                         ),
                                                       ),

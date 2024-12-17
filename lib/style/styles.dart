@@ -59,7 +59,7 @@ class Styles {
       fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xff333333));
   static TextStyle black123 = GoogleFonts.poppins(
       fontSize: 12, fontWeight: FontWeight.w300, color: Color(0xff000000));
-      static TextStyle black124r = GoogleFonts.poppins(
+  static TextStyle black124r = GoogleFonts.poppins(
       fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xff000000));
   static TextStyle black128 = GoogleFonts.poppins(
       fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xff000000));
@@ -79,6 +79,8 @@ class Styles {
       fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xff5979AA));
   static TextStyle cardBlue10 = GoogleFonts.poppins(
       fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xff5979AA));
+  static TextStyle cardBlue12 = GoogleFonts.poppins(
+      fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xff5979AA));
   static TextStyle black64 = GoogleFonts.poppins(
       fontSize: 6, fontWeight: FontWeight.w400, color: Color(0xff333333));
   static TextStyle black66 = GoogleFonts.poppins(
@@ -112,6 +114,8 @@ class Styles {
       fontSize: 8, fontWeight: FontWeight.w600, color: Color(0xff5A5A5A));
   static TextStyle listlablefont = GoogleFonts.poppins(
       fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xff333333));
+  static TextStyle roleLabe = GoogleFonts.poppins(
+      fontSize: 10, fontWeight: FontWeight.w400, color: Color(0xff333333));
   static TextStyle listitemavluefont = GoogleFonts.poppins(
       fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xff5979AA));
   static TextStyle buttonfont = GoogleFonts.poppins(

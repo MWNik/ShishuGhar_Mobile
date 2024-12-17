@@ -95,7 +95,7 @@ class TranslationDataHelper {
       [languageId, languageId, languageId, valueName],
     );
     // await db.close();
-    return result.isNotEmpty ? result.first['translation'] : null;
+    return result.isNotEmpty ? result.first['translation'] : valueName;
   }
 
   Future<List<Translation>> callTranslateString(List<String> valueNames) async {

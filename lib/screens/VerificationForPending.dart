@@ -424,7 +424,7 @@ class _VerficationForPendingState extends State<VerficationForPending> {
                         ),
                       ] else ...[
                         DynamicCustomDropdownField(
-                        
+                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
                           titleText: Global.returnTrLable(
                               hhlistingControlls, CustomText.state, lng!),
                           items: mstStates,
@@ -447,7 +447,7 @@ class _VerficationForPendingState extends State<VerficationForPending> {
                           },
                         ),
                         DynamicCustomDropdownField(
-                         
+                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
                           titleText: Global.returnTrLable(
                               hhlistingControlls,
                               CustomText.District,
@@ -471,7 +471,7 @@ class _VerficationForPendingState extends State<VerficationForPending> {
                           },
                         ),
                         DynamicCustomDropdownField(
-                      
+                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
                           titleText: Global.returnTrLable(
                               hhlistingControlls, CustomText.Block, lng!),
                           items: mstBlock,
@@ -492,7 +492,7 @@ class _VerficationForPendingState extends State<VerficationForPending> {
                           },
                         ),
                         DynamicCustomDropdownField(
-                      
+                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
                           isRequred: 0,
                           titleText: Global.returnTrLable(
                               hhlistingControlls,
@@ -515,7 +515,7 @@ class _VerficationForPendingState extends State<VerficationForPending> {
                           },
                         ),
                         DynamicCustomDropdownField(
-                      
+                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
                           titleText: Global.returnTrLable(
                               hhlistingControlls, CustomText.Village, lng!),
                           isRequred: 0,
@@ -1309,8 +1309,11 @@ class _VerficationForPendingState extends State<VerficationForPending> {
       CustomText.endDateMsg,
       CustomText.pleaseWait,
       CustomText.nointernetconnectionavailable,
+      CustomText.select_here,
       CustomText.ok,
-      CustomText.pleaseSelectStartDate,CustomText.Pendingforverify,CustomText.totalHH,CustomText.Selecthere
+      CustomText.pleaseSelectStartDate,
+      CustomText.Pendingforverify,
+      CustomText.totalHH,CustomText.Selecthere
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)

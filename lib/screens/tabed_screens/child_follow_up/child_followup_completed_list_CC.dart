@@ -177,7 +177,9 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? Center(child: CircularProgressIndicator())
+        ? Container(
+            color: Colors.white,
+            child: Center(child: CircularProgressIndicator()))
         : Scaffold(
             key: _scaffoldKey,
             appBar: widget.isHomeScreen
@@ -248,7 +250,8 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
                           ),
                           SizedBox(width: 10.w),
                           Text(
-                            Global.returnTrLable(translats, CustomText.Filter, lng),
+                            Global.returnTrLable(
+                                translats, CustomText.Filter, lng),
                             style: Styles.labelcontrollerfont,
                           ),
                           Spacer(),

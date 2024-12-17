@@ -132,11 +132,13 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
     tabIsScrollable = tabWidth * _tabBreakItems.length > screenWidth;
     List<String> tabLabelTranslats = [];
     _tabBreakItems.forEach((element) {
-      if(Global.validString(element.label)){
+      if (Global.validString(element.label)) {
         tabLabelTranslats.add(element.label!);
       }
     });
-    await TranslationDataHelper().callTranslateString(tabLabelTranslats).then((value) => _translation.addAll(value));
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelTranslats)
+        .then((value) => _translation.addAll(value));
 
     if (Global.validString(widget.dateOfVisit)) {
       List<int> parts =
@@ -157,10 +159,6 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
     List<Widget> tabItem = [];
 
     _tabBreakItems.forEach((element) {
-     
-
-    
-
       tabItem.add(Container(
         width: tabIsScrollable ? null : screenWidth / _tabBreakItems.length,
         // padding: EdgeInsets.only(left: 10, right: 10),
@@ -388,7 +386,9 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {

@@ -66,7 +66,7 @@ class RequisitionExpendedFormScreen extends StatefulWidget {
 class _RequisitionExpendedFormScreenState
     extends State<RequisitionExpendedFormScreen> {
   TextEditingController textController = TextEditingController();
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<OptionsModel> monthsList = [];
   List<OptionsModel> yearList = [];
   List<PartnerStockModel> partnerStockItemList = [];
@@ -125,7 +125,29 @@ class _RequisitionExpendedFormScreenState
       CustomText.Submit,
       CustomText.back,
       CustomText.plsFilManForm,
-      CustomText.dataSaveSuc
+      CustomText.dataSaveSuc,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
 
     await TranslationDataHelper()
@@ -229,7 +251,7 @@ class _RequisitionExpendedFormScreenState
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic=DependingLogic(translats, data, lng);
     });
     for (var element in allItems) {
       _foocusNode.addEntries([MapEntry(element.fieldname!, FocusNode())]);
@@ -375,7 +397,7 @@ class _RequisitionExpendedFormScreenState
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: _isLoading
           ? SizedBox()
-          : removedItemList.isEmpty || !widget.isEdit
+          : removedItemList.isEmpty||!widget.isEdit
               ? SizedBox()
               : Padding(
                   padding: EdgeInsets.only(bottom: 80),
@@ -468,18 +490,16 @@ class _RequisitionExpendedFormScreenState
                             text: Global.returnTrLable(
                                 translats, CustomText.back, lng!),
                           )),
-                          widget.isEdit ? SizedBox(width: 10) : SizedBox(),
-                          widget.isEdit
-                              ? Expanded(
-                                  child: CElevatedButton(
-                                  color: Color(0xff369A8D),
-                                  onPressed: () {
-                                    nextTab(1, context);
-                                  },
-                                  text: Global.returnTrLable(
-                                      translats, CustomText.Submit, lng!),
-                                ))
-                              : SizedBox()
+                          widget.isEdit?SizedBox(width: 10):SizedBox(),
+                          widget.isEdit?Expanded(
+                              child: CElevatedButton(
+                            color: Color(0xff369A8D),
+                            onPressed: () {
+                              nextTab(1, context);
+                            },
+                            text: Global.returnTrLable(
+                                translats, CustomText.Submit, lng!),
+                          )):SizedBox()
                         ],
                       ))
                 ],
@@ -505,11 +525,11 @@ class _RequisitionExpendedFormScreenState
           }
         }
 
-        var validationMsg = DependingLogic()
-            .validationMessge(logics, itemMap[name]!, element, translats, lng!);
+        var validationMsg =
+            logic!.validationMessge( itemMap[name]!, element);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
-              Global.returnTrLable(translats, validationMsg, lng!),
+              validationMsg!,
               Global.returnTrLable(translats, CustomText.ok, lng!),
               false,
               context);
@@ -658,8 +678,8 @@ class _RequisitionExpendedFormScreenState
         screenItems.add(widgetTypeWidget(i, itemfields[i], quant_required,
             itemName, itemFields, type, isItemReadable));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic()
-            .callDependingLogic(logics, myMap, itemfields[i])) {
+        if (!logic!
+            .callDependingLogic( myMap, itemfields[i])) {
           // myMap.remove(itemfields[i].fieldname);
           // itemMap[itemName]!.remove(itemfields[i].fieldname);
         }
@@ -684,7 +704,7 @@ class _RequisitionExpendedFormScreenState
         status = true;
       }
     }
-    if (role != CustomText.crecheSupervisor) {
+    if(role != CustomText.crecheSupervisor){
       status = true;
     }
     return status;
@@ -955,11 +975,11 @@ class _RequisitionExpendedFormScreenState
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+              logic!.dependeOnMendotory( itemFields, quesItem),
           items: items,
           selectedItem: itemFields[quesItem.fieldname!],
           isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+              logic!.callDependingLogic( itemFields, quesItem),
           readable: type == 1 ? true : isItemReadable,
           onChanged: (value) {
             if (value != null) {
@@ -985,17 +1005,17 @@ class _RequisitionExpendedFormScreenState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+              logic!.dependeOnMendotory( itemFields, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemFields[quesItem.fieldname!],
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!
+                      .callReadableLogic( itemFields, quesItem),
           isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+              logic!.callDependingLogic( itemFields, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
@@ -1003,8 +1023,8 @@ class _RequisitionExpendedFormScreenState
                 itemMap[itemName.toString()]!['quantity_required'] =
                     value.toString();
               }
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, itemFields, quesItem);
+              var logData = logic!
+                  .callAutoGeneratedValue( itemFields, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   itemFields.addEntries(
@@ -1025,17 +1045,17 @@ class _RequisitionExpendedFormScreenState
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: itemFields[quesItem.fieldname],
           isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+              logic!.dependeOnMendotory( itemFields, quesItem),
           labelControlls: translats,
           lng: lng,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!
+                      .callReadableLogic( itemFields, quesItem),
           isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+              logic!.callDependingLogic( itemFields, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -1054,19 +1074,19 @@ class _RequisitionExpendedFormScreenState
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+              logic!.dependeOnMendotory( itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!
+                      .callReadableLogic( itemFields, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+              logic!.callDependingLogic( itemFields, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty) {
               if (itemMap.containsKey(itemName.toString())) {
@@ -1088,14 +1108,14 @@ class _RequisitionExpendedFormScreenState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+              logic!.dependeOnMendotory( itemFields, quesItem),
           maxlength: quesItem.length,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!
+                      .callReadableLogic( itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -1117,14 +1137,14 @@ class _RequisitionExpendedFormScreenState
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+              logic!.dependeOnMendotory( itemFields, quesItem),
           maxlength: quesItem.length,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!
+                      .callReadableLogic( itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -1148,20 +1168,20 @@ class _RequisitionExpendedFormScreenState
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+              logic!.dependeOnMendotory( itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           maxlength: quesItem.length,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!
+                      .callReadableLogic( itemFields, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+              logic!.callDependingLogic( itemFields, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty) {
               if (itemMap.containsKey(itemName.toString())) {
@@ -1186,24 +1206,24 @@ class _RequisitionExpendedFormScreenState
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!
+                      .callReadableLogic( itemFields, quesItem),
           // isRequred: quesItem.reqd == 1
           //     ? quesItem.reqd
-          //     : DependingLogic()
-          //         .dependeOnMendotory(logics, itemFields, quesItem),
+          //     : logic!
+          //         .dependeOnMendotory( itemFields, quesItem),
           isRequred: (quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic()
-                  .dependeOnMendotory(logics, itemFields, quesItem)),
+              : logic!
+                  .dependeOnMendotory( itemFields, quesItem)),
           isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+              logic!.callDependingLogic( itemFields, quesItem),
           calenderValidate:
-              DependingLogic().calenderValidation(logics, itemFields, quesItem),
+              logic!.calenderValidation( itemFields, quesItem),
           onChanged: (value) {
             // myMap[quesItem.fieldname!] = value;
-            // var logData = DependingLogic()
-            //     .callDateDiffrenceLogic(logics, myMap, quesItem);
+            // var logData = logic!
+            //     .callDateDiffrenceLogic( myMap, quesItem);
             // if (logData.isNotEmpty) {
             //   if (logData.keys.length > 0) {
             //     // var item =myMap[logData.keys.first];
@@ -1241,12 +1261,10 @@ class _RequisitionExpendedFormScreenState
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic()
-                  .dependeOnMendotory(logics, itemFields, quesItem),
+              : logic!
+                  .dependeOnMendotory( itemFields, quesItem),
           // maxlength: quesItem.length,
-          fieldName: quesItem.fieldname == 'quantity_received'
-              ? 'weight'
-              : quesItem.fieldname!,
+          fieldName: quesItem.fieldname=='quantity_received'?'weight':quesItem.fieldname!,
           initialvalue: ((quesItem.fieldname == 'quantity_required')
               ? quatRequired
               : itemFields[quesItem.fieldname]),
@@ -1254,10 +1272,10 @@ class _RequisitionExpendedFormScreenState
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!
+                      .callReadableLogic( itemFields, quesItem),
           isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+              logic!.callDependingLogic( itemFields, quesItem),
           onChanged: (value) async {
             print('Entered text: $value');
             if (value != null) {
@@ -1269,8 +1287,8 @@ class _RequisitionExpendedFormScreenState
               }
               if (quesItem.fieldname == 'quantity_received') {
                 itemFields[quesItem.fieldname!] = value;
-                var validateMessage = await DependingLogic()
-                    .validationMessge(logics, itemFields, quesItem,translats,lng);
+                var validateMessage = await logic!
+                    .validationMessge( itemFields, quesItem);
                 if (Global.validString(validateMessage)) {
                   Validate().singleButtonPopup(
                       Global.returnTrLable(translats, validateMessage, lng),
@@ -1280,8 +1298,8 @@ class _RequisitionExpendedFormScreenState
                 }
               }
 
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, itemFields, quesItem);
+              var logData = logic!
+                  .callAutoGeneratedValue( itemFields, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   // myMap.addEntries(

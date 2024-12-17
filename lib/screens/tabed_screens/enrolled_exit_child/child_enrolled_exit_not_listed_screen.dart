@@ -97,7 +97,9 @@ class _NotEnrolledChildrenListedScreenState
       CustomText.minAgeInMonthEn,
       CustomText.maxAgeInMonthEn,
       CustomText.clear,
-      CustomText.Gender
+      CustomText.Gender,
+      CustomText.childDobIsNotValidForEnrolled,
+      CustomText.ok
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -597,10 +599,17 @@ class _NotEnrolledChildrenListedScreenState
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          getGender(Global.stringToInt(
-                                              Global.getItemValues(
-                                                  selectedItem['responces'],
-                                                  "gender_id"))),
+                                          Global.stringToInt(
+                                                      Global.getItemValues(
+                                                          selectedItem[
+                                                              'responces'],
+                                                          'gender_id')) >
+                                                  0
+                                              ? getGender(Global.stringToInt(
+                                                  Global.getItemValues(
+                                                      selectedItem['responces'],
+                                                      'gender_id')))
+                                              : '',
                                           style: Styles.cardBlue10,
                                           strutStyle: StrutStyle(height: .5),
                                           overflow: TextOverflow.ellipsis,

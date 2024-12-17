@@ -273,6 +273,8 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                           ),
                           SizedBox(height: 10.h),
                           DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(locationControlls,
+                                CustomText.select_here, lng!),
                             titleText: Global.returnTrLable(
                                 locationControlls, CustomText.state, lng!),
                             items: mstStates,
@@ -310,6 +312,8 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                             },
                           ),
                           DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(locationControlls,
+                                CustomText.select_here, lng!),
                             titleText: Global.returnTrLable(
                                 locationControlls, CustomText.District, lng!),
                             items: mstDistrict,
@@ -341,6 +345,8 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                             },
                           ),
                           DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(locationControlls,
+                                CustomText.select_here, lng!),
                             titleText: Global.returnTrLable(
                                 locationControlls, CustomText.Block, lng!),
                             items: mstBlock,
@@ -424,12 +430,21 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                                     Icons.arrow_drop_down,
                                     color: Colors.grey.shade700,
                                   ),
-                                  buttonText: Text(CustomText.SelectVillage),
+                                  buttonText: Text(Global.returnTrLable(
+                                      locationControlls,
+                                      CustomText.SelectVillage,
+                                      lng!)),
                                   items: villageList
                                       .map((e) =>
                                           MultiSelectItem(e, e.toString()))
                                       .toList(),
                                   listType: MultiSelectListType.LIST,
+                                  confirmText: Text(Global.returnTrLable(
+                                      locationControlls, CustomText.ok, lng!)),
+                                  cancelText: Text(Global.returnTrLable(
+                                      locationControlls,
+                                      CustomText.Cancel,
+                                      lng!)),
                                   onConfirm: (value) {
                                     setState(() {
                                       print(value);
@@ -555,6 +570,10 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
       CustomText.downloadData,
       CustomText.state,
       CustomText.District,
+      CustomText.pleaseWait,
+      CustomText.Cancel,
+      CustomText.SelectVillage,
+      CustomText.select_here,
       CustomText.Block,
       CustomText.GramPanchayat,
       CustomText.Village,
@@ -570,7 +589,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => locationControlls = value);
+        .then((value) => locationControlls.addAll(value));
   }
 
   callVillageFilterDataCC(BuildContext mContext, String villagesss) async {

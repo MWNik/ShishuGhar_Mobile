@@ -320,7 +320,7 @@ class _CrecheMonitorListingScreenState
                       );
                     },
                   )
-                : Center(child: Text(CustomText.NorecordAvailable)),
+                : Center(child: Text(Global.returnTrLable(translats, CustomText.NorecordAvailable, lng))),
           ),
         ]),
       ),

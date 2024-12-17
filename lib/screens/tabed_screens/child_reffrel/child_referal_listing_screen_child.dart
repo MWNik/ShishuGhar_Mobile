@@ -73,7 +73,10 @@ class _ChildReferralListingScreenState
       CustomText.hhNameS,
       CustomText.NorecordAvailable,
       CustomText.Search,
-      CustomText.Village
+      CustomText.Village,
+      CustomText.ChildId,
+      CustomText.Creche_Name,
+      CustomText.schduleDate
     ];
 
     await TranslationDataHelper()
@@ -173,7 +176,9 @@ class _ChildReferralListingScreenState
   @override
   Widget build(BuildContext context) {
     if (_isLoading)
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     else {
       return Scaffold(
         // appBar: CustomAppbar(

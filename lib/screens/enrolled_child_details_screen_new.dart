@@ -753,7 +753,7 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls = value);
+        .then((value) => labelControlls.addAll(value));
     text = [
       Global.returnTrLable(labelControlls, CustomText.ChildProfile, lng),
       Global.returnTrLable(labelControlls, CustomText.creche_enrollement, lng),

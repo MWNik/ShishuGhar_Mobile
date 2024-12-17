@@ -81,7 +81,9 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return Scaffold(
         appBar: AppBar(

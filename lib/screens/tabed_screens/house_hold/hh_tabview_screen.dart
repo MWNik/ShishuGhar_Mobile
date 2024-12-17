@@ -67,7 +67,9 @@ class _HHTabScreenState extends State<HHTabScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {

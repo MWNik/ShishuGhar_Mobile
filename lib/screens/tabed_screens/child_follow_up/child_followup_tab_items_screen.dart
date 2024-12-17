@@ -67,7 +67,7 @@ class ChildFollowupTabItemsScreen extends StatefulWidget {
 class _ChildFollowupTabItemsScreenState
     extends State<ChildFollowupTabItemsScreen> {
   List<OptionsModel> options = [];
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   Map<String, dynamic> myMap = {};
   List<Translation> translats = [];
   List<DateTime> datesList = [];
@@ -92,6 +92,8 @@ class _ChildFollowupTabItemsScreenState
     role = await Validate().readString(Validate.role);
     userName = (await Validate().readString(Validate.userName))!;
     List<String> valueNames = [
+      CustomText.futureDateNotAllowed,
+      CustomText.selecisChildavail,
       CustomText.Creches,
       CustomText.Next,
       CustomText.back,
@@ -103,7 +105,25 @@ class _ChildFollowupTabItemsScreenState
       CustomText.plsFilManForm,
       CustomText.dataSaveSuc,
       CustomText.Yes,
-      CustomText.No
+      CustomText.No,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -117,10 +137,6 @@ class _ChildFollowupTabItemsScreenState
         .callTranslateString(valueNames)
         .then((value) => translats.addAll(value));
 
-    // attendecedRecord = await ChildAttendenceHelper()
-    //     .callChildAttendencesByGuid(widget.ChildAttenGUID);
-    // await _fetchUnpicableDates();
-    // await fetchFollowUpsDateslist();
     await updateHiddenValue();
     await callScrenControllers('Child Follow up');
     if (widget.tabIndex == (widget.totalTab - 1)) {
@@ -151,7 +167,9 @@ class _ChildFollowupTabItemsScreenState
         return false;
       },
       child: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Container(
+              color: Colors.white,
+              child: Center(child: CircularProgressIndicator()))
           : Scaffold(
               body: Column(children: [
                 Divider(),
@@ -238,7 +256,7 @@ class _ChildFollowupTabItemsScreenState
       for (int i = 0; i < items.length; i++) {
         screenItems.add(widgetTypeWidget(i, items[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, items[i])) {
+        if (!logic!.callDependingLogic(myMap, items[i])) {
           myMap.remove(items[i].fieldname);
         }
       }
@@ -257,15 +275,14 @@ class _ChildFollowupTabItemsScreenState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           readable: role == 'Creche Supervisor' ? false : true,
           hintText: quesItem.fieldname == 'recoverd'
               ? Global.returnTrLable(translats, CustomText.Selecthere, lng)
-              : null,
+              : Global.returnTrLable(translats, CustomText.Selecthere, lng),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -284,16 +301,14 @@ class _ChildFollowupTabItemsScreenState
               : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           readable: role == 'Creche Supervisor'
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -315,18 +330,17 @@ class _ChildFollowupTabItemsScreenState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           maxline: (quesItem.length != 0) ? quesItem.length! % 35 : 1,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           readable: role == 'Creche Supervisor'
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -336,25 +350,24 @@ class _ChildFollowupTabItemsScreenState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           readable: role == 'Creche Supervisor'
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -371,7 +384,7 @@ class _ChildFollowupTabItemsScreenState
       //   return DynamicCustomCheckboxWithLabel(
       //     label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
       //     initialValue: myMap[quesItem.fieldname!],
-      //     isVisible: DependingLogic().callDependingLogic(logics,myMap,quesItem),
+      //     isVisible: logic!.callDependingLogic(myMap,quesItem),
       //     onChanged: (value) {
       //       if(value>0)
       //         myMap[quesItem.fieldname!] = value;
@@ -383,16 +396,15 @@ class _ChildFollowupTabItemsScreenState
         return DynamicCustomYesNoCheckboxWithLabel(
           isRequred: quesItem.fieldname == 'is_child_available'
               ? 1
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: myMap[quesItem.fieldname],
           labelControlls: translats,
           lng: lng,
           readable: role == 'Creche Supervisor'
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -406,16 +418,15 @@ class _ChildFollowupTabItemsScreenState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: role == 'Creche Supervisor'
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -425,13 +436,14 @@ class _ChildFollowupTabItemsScreenState
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: role == 'Creche Supervisor'
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -452,10 +464,10 @@ class _ChildFollowupTabItemsScreenState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: role == 'Creche Supervisor'
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
@@ -487,18 +499,16 @@ class _ChildFollowupTabItemsScreenState
           hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -533,11 +543,10 @@ class _ChildFollowupTabItemsScreenState
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element,translats,lng);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           Validate()
-              .singleButtonPopup(validationMsg!, CustomText.ok, false, context);
+              .singleButtonPopup(validationMsg!, Global.returnTrLable(translats, CustomText.ok, lng), false, context);
           validStatus = false;
           break;
         }
@@ -546,16 +555,18 @@ class _ChildFollowupTabItemsScreenState
             checkFlloupToCurrentDate(myMap['followup_visit_date']);
         if (dateValidation) {
           Validate().singleButtonPopup(
-              'Future date is not allowed in followup visit date',
-              CustomText.ok,
+              Global.returnTrLable(translats,CustomText.futureDateNotAllowed,lng),
+              Global.returnTrLable(
+                translats, CustomText.ok, lng),
               false,
               context);
           validStatus = false;
           break;
         }
         if (myMap['is_child_available'] == null) {
-          Validate().singleButtonPopup('Please select Is child available? ',
-              CustomText.ok, false, context);
+          Validate().singleButtonPopup(Global.returnTrLable(translats, CustomText.selecisChildavail, lng),
+              Global.returnTrLable(
+                translats, CustomText.ok, lng), false, context);
           validStatus = false;
           break;
         }
@@ -710,7 +721,7 @@ class _ChildFollowupTabItemsScreenState
       options.addAll(data);
     });
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(translats, data, lng);
     });
   }
 

@@ -49,20 +49,19 @@ class AttendanceTabItems extends StatefulWidget {
   final List<String> existingDates;
   DateTime? minDate;
 
-  AttendanceTabItems({
-    super.key,
-    required this.creche_nameId,
-    required this.isEdit,
-    required this.creche_name,
-    required this.ChildAttenGUID,
-    required this.tabBreakItem,
-    required this.screenItem,
-    required this.changeTab,
-    required this.tabIndex,
-    required this.totalTab,
-    required this.existingDates,
-    this.minDate,
-  });
+  AttendanceTabItems(
+      {super.key,
+      required this.creche_nameId,
+      required this.isEdit,
+      required this.creche_name,
+      required this.ChildAttenGUID,
+      required this.tabBreakItem,
+      required this.screenItem,
+      required this.changeTab,
+      required this.tabIndex,
+      required this.totalTab,
+      required this.existingDates,
+      this.minDate});
 
   @override
   State<AttendanceTabItems> createState() => _AttendanceTabItemsState();
@@ -73,6 +72,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
 
   // List<HouseHoldTabResponceHelper> retrivedList = [];
   List<OptionsModel> options = [];
+  DependingLogic? logic;
   List<TabFormsLogic> logics = [];
   Map<String, dynamic> myMap = {};
   List<Translation> translats = [];
@@ -124,7 +124,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       CustomText.back,
       CustomText.ok,
       CustomText.childrenCountVallidattion,
-      CustomText.Selecthere,
+      CustomText.select_here,
       CustomText.Save,
       CustomText.typehere,
       CustomText.Submit,
@@ -132,7 +132,25 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       CustomText.attenAlredyExist,
       CustomText.noEnrolledChild,
       CustomText.Yes,
-      CustomText.No
+      CustomText.No,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -144,7 +162,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
 
     attendecedRecord = await ChildAttendenceHelper()
         .callChildAttendencesByGuid(widget.ChildAttenGUID);
@@ -153,6 +171,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
     if (widget.tabIndex == (widget.totalTab - 1)) {
       saveNext = CustomText.saveEnrolled;
     }
+
     setState(() {
       _isLoading = false;
     });
@@ -166,7 +185,9 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           return false; // Change this according to your logic
         },
         child: _isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? Container(
+                color: Colors.white,
+                child: Center(child: CircularProgressIndicator()))
             : Scaffold(
                 body: Column(
                   children: [
@@ -255,7 +276,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       for (int i = 0; i < items.length; i++) {
         screenItems.add(widgetTypeWidget(i, items[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, items[i])) {
+        if (!logic!.callDependingLogic(myMap, items[i])) {
           myMap.remove(items[i].fieldname);
         }
       }
@@ -270,16 +291,17 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng!),
           focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -298,7 +320,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
               quesItem.fieldname == 'date_of_attendance' ? widget.isEdit : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           minDate: widget.minDate,
           maxDate: AddAttendanceScreenFormTab.minDate != null
               ? ((quesItem.fieldname == 'date_of_attendance')
@@ -307,8 +329,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
               : defaultMinDate,
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 myMap.addEntries(
@@ -327,15 +348,14 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -345,25 +365,23 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -382,7 +400,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
       //     label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
       //     initialValue: myMap[quesItem.fieldname!],
       //     isVisible:
-      //         DependingLogic().callDependingLogic(logics, myMap, quesItem),
+      //         logic!.callDependingLogic( myMap, quesItem),
       //     onChanged: (value) {
       //       myMap[quesItem.fieldname!] = value;
       //       setState(() {});
@@ -399,15 +417,12 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
                   ? 1
                   : quesItem.reqd == 1
                       ? quesItem.reqd
-                      : DependingLogic()
-                          .dependeOnMendotory(logics, myMap, quesItem),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+                      : logic!.dependeOnMendotory(myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
-
             setState(() {});
           },
         );
@@ -419,14 +434,13 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -436,15 +450,15 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialvalue: myMap[quesItem.fieldname!],
@@ -465,11 +479,10 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -485,13 +498,11 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           fieldName: quesItem.fieldname,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 myMap.addEntries(
@@ -586,6 +597,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
 
     await FormLogicDataHelper().callFormLogic('Child Attendance').then((data) {
       logics.addAll(data);
+      logic = DependingLogic(translats, data, lng);
     });
   }
 
@@ -967,7 +979,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
-                CustomText.ok,
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 mContext);
             validStatus = false;
@@ -976,8 +988,13 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
             if (widget.existingDates.contains(valuees)) {
               myMap.remove(element.fieldname);
               setState(() {});
+              var message = Global.returnTrLable(
+                  translats, CustomText.attenAlredyExist, lng);
+              var dateValue = Validate().displeDateFormate(valuees);
+              message = message.replaceAll(
+                  RegExp("@", caseSensitive: false), '$dateValue');
               Validate().singleButtonPopup(
-                  '${CustomText.attenAlredyExist} "${Validate().displeDateFormate(valuees)}"',
+                  message,
                   Global.returnTrLable(translats, CustomText.ok, lng!),
                   false,
                   context);
@@ -987,16 +1004,21 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
           }
         }
         var validationMsgother = otherTableDependCotrol(logics, myMap, element);
-        var validationMsg = DependingLogic()
-            .validationMessge(logics, myMap, element, translats, lng);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg) ||
             Global.validString(validationMsgother)) {
           if (Global.validString(validationMsg)) {
             Validate().singleButtonPopup(
-                validationMsg!, CustomText.ok, false, mContext);
+                validationMsg!,
+                Global.returnTrLable(translats, CustomText.ok, lng),
+                false,
+                mContext);
           } else {
             Validate().singleButtonPopup(
-                validationMsgother!, CustomText.ok, false, mContext);
+                validationMsgother!,
+                Global.returnTrLable(translats, CustomText.ok, lng),
+                false,
+                mContext);
           }
           validStatus = false;
           break;

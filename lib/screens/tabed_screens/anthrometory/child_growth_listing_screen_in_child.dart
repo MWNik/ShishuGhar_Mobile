@@ -108,7 +108,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
       'Weight',
       'Measurement Equipment',
       'Measurement taken',
-      'Z Score',
+      'Z - Score',
       'Weight for age',
       'Weight for Height',
       'Height for Age',
@@ -450,7 +450,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                   'do_you_have_height_weight') ==
                                               '1'
                                           ? Text(
-                                              '${Global.returnTrLable(translats, 'Z Score', lng).trim()}',
+                                              '${Global.returnTrLable(translats, 'Z - Score', lng).trim()}',
                                               style: Styles.black104,
                                             )
                                           : SizedBox(),
@@ -773,7 +773,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
   }
 
   String callColorNameAvg(Map<String, dynamic> responce, String key) {
-    String grothValue = DependingLogic().AutoColorCreateByHeightWightString(
+    String grothValue = DependingLogic.AutoColorCreateByHeightWightString(
         tabHeightforageBoys,
         tHeightforageGirls,
         tabWeightforageBoys,
@@ -844,6 +844,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText: Global.returnTrLable(translats, CustomText.select_here, lng!),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           items: items,

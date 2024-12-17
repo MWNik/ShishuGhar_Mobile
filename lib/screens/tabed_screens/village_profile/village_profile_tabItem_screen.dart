@@ -57,7 +57,7 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
   bool _isLoading = true;
   List<HouseHoldTabResponceHelper> retrivedList = [];
   List<OptionsModel> options = [];
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<HouseHoldFielItemdModel> multselectItemTab = [];
   Map<String, dynamic> myMap = {};
   List<Translation> translats = [];
@@ -88,19 +88,40 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
       CustomText.ChildEnrollsuccess,
       CustomText.enrolled,
       CustomText.Yes,
-      CustomText.No
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.dataSaveSuc,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
     items.forEach((element) {
       if (Global.validString(element.label)) {
-        valueNames.add(element.label!);
+        valueNames.add(element.label!.trim());
       }
     });
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
 
     multselectItemTab =
         await VillageProfileFieldsHelper().callMultiSelectTabItem();
@@ -123,7 +144,9 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
         return false; // Change this according to your logic
       },
       child: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Container(
+              color: Colors.white,
+              child: Center(child: CircularProgressIndicator()))
           : Scaffold(
               body: Column(
                 children: [
@@ -224,7 +247,7 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
     var items = widget.screenItem[itemId];
     if (items != null) {
       for (int i = 0; i < items.length; i++) {
-        if (!DependingLogic().callDependingLogic(logics, myMap, items[i])) {
+        if (!logic!.callDependingLogic(myMap, items[i])) {
           myMap.remove(items[i].fieldname);
         }
         screenItems.add(widgetTypeWidget(i, items[i]));
@@ -244,17 +267,18 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
           defaultDisableDailog(quesItem.fieldname!, 'tab${quesItem.options}');
         }
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng!),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           onChanged: (value) {
             if (value != null)
@@ -269,17 +293,15 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -301,17 +323,16 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -321,25 +342,24 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -369,13 +389,13 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
           items: items,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           selectedItem: myMap[quesItem.fieldname],
           responceFieldName: itemResopnceField,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           onChanged: (value) {
             if (value != null) myMap[quesItem.fieldname!] = value;
@@ -390,15 +410,14 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: myMap[quesItem.fieldname],
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           labelControlls: translats,
           lng: lng,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -412,16 +431,15 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -434,10 +452,10 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -458,10 +476,10 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
@@ -477,7 +495,7 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
       //     assetPath:myMap[quesItem.fieldname!],
       //     titleText:
       //     Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-      //     isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+      //     isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
       //     onChanged: (value) {
       //       print('Entered text: $value');
       //       myMap[quesItem.fieldname!] = value;
@@ -531,7 +549,7 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
       options.addAll(data);
     });
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(translats, data, lng);
     });
   }
 
@@ -657,18 +675,17 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
-                CustomText.ok,
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
             break;
           }
         }
-        var validationMsg = DependingLogic()
-            .validationMessge(logics, myMap, element, translats, lng!);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           Validate()
-              .singleButtonPopup(validationMsg!, CustomText.ok, false, context);
+              .singleButtonPopup(validationMsg!,Global.returnTrLable(translats, CustomText.ok, lng), false, context);
           validStatus = false;
           break;
         }

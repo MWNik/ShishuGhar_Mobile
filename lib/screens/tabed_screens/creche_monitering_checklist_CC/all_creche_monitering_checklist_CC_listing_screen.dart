@@ -73,7 +73,8 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
       CustomText.usynchedAndDraft,
       CustomText.areSureToDelete,
       CustomText.Cancel,
-      CustomText.delete
+      CustomText.delete,
+      CustomText.Filter
     ];
 
     await TranslationDataHelper()
@@ -153,7 +154,7 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
                               width: 10.w,
                             ),
                             Text(
-                              CustomText.Filter,
+                              Global.returnTrLable(translats, CustomText.Filter, lng),
                               style: Styles.labelcontrollerfont,
                             ),
                             Spacer(),

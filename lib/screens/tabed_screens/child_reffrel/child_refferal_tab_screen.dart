@@ -96,7 +96,9 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {
@@ -329,7 +331,7 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
                 tabIndex: i,
                 totalTab: tabBreakItems.length,
                 scheduleDate: widget.scheduleDate,
-                minDate: widget.minDate??null)
+                minDate: widget.minDate ?? null)
             : ChildReferralTabItemsViewScreen(
                 scheduleDate: widget.scheduleDate,
                 enrollDate: widget.enrollDate,

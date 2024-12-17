@@ -528,10 +528,7 @@ class _EnrolledChildrenListedScreenState
                                                     scale: 1.5,
                                                   )
                                                 : (selectedItem['is_edited'] ==
-                                                            1 &&
-                                                        selectedItem[
-                                                                'is_uploaded'] ==
-                                                            0)
+                                                        1)
                                                     ? Image.asset(
                                                         "assets/sync_gray.png",
                                                         scale: 1.5,
@@ -540,9 +537,8 @@ class _EnrolledChildrenListedScreenState
                                           ],
                                         ),
                                         Visibility(
-                                          visible: (selectedItem['is_edited'] ==
-                                                  2 &&
-                                              selectedItem['is_uploaded'] == 0),
+                                          visible:
+                                              (selectedItem['is_edited'] == 2),
                                           child: Positioned(
                                             top: 1,
                                             right: 2,
@@ -571,9 +567,8 @@ class _EnrolledChildrenListedScreenState
                                           ),
                                         ),
                                         Visibility(
-                                          visible: (selectedItem['is_edited'] ==
-                                                  2 &&
-                                              selectedItem['is_uploaded'] == 0),
+                                          visible:
+                                              (selectedItem['is_edited'] == 2),
                                           child: Positioned(
                                             bottom: 1,
                                             right: 2,
@@ -696,7 +691,7 @@ class _EnrolledChildrenListedScreenState
     var result = genderList
         .where((element) => Global.stringToInt(element.name) == gender_id)
         .toList();
-    return result.first.values!;
+    return result.length > 0 ? result.first.values! : '';
   }
 
   filteredGetData(BuildContext context) async {

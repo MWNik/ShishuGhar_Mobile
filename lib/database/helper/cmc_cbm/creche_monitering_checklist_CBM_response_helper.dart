@@ -22,7 +22,7 @@ class CmcCBMTabResponseHelper {
     try {
       await DatabaseHelper.database!.delete(
           'tabCreche_Monitering_Checklist_CBM_response',
-          where: 'is_edited = ? AND name IS NULL AND cmguid = ?',
+          where: 'is_edited = ? AND name IS NULL AND cbmguid = ?',
           whereArgs: [2, record.cbmguid]);
     } catch (e) {
       debugPrint("Error deleting drfat records : $e");

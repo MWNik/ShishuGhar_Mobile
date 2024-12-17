@@ -18,10 +18,11 @@ class CmcCCTabResponseHelper {
     print("object");
   }
 
-   Future<void> deleteDraftRecords(CmcCCResponseModel record) async {
+  Future<void> deleteDraftRecords(CmcCCResponseModel record) async {
     try {
-      await DatabaseHelper.database!.delete('tabCreche_Monitering_Checklist_CC_response',
-          where: 'is_edited = ? AND name IS NULL AND cmguid = ?',
+      await DatabaseHelper.database!.delete(
+          'tabCreche_Monitering_Checklist_CC_response',
+          where: 'is_edited = ? AND name IS NULL AND cmc_cc_guid = ?',
           whereArgs: [2, record.cmc_cc_guid]);
     } catch (e) {
       debugPrint("Error deleting drfat records : $e");
@@ -41,7 +42,6 @@ class CmcCCTabResponseHelper {
 
     return items;
   }
-
 
   Future<List<CmcCCResponseModel>> childALMChild(int? crecheIdName) async {
     var query =

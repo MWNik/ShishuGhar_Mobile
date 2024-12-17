@@ -68,7 +68,6 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
   bool tabIsScrollable = false;
   var now = DateTime.parse(Validate().currentDate());
   var applicableDate = DateTime.parse("2024-12-31");
-  
 
   @override
   void initState() {
@@ -105,7 +104,9 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
           onWillPop: () async {
@@ -214,7 +215,6 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
                 screenItem: expendedItems,
                 changeTab: changeTab,
                 tabIndex: i,
-               
                 totalTab: tabBreakItems.length)
             : AttendanceTabItemsView(
                 creche_name: widget.crexhe_name,
@@ -229,8 +229,6 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
     }
     return tabItem;
   }
-
- 
 
   void changeTab(int index) {
     if (index == 0) {
@@ -385,8 +383,8 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
         .callAttendanceResponce(widget.ChildAttenGUID);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
-      if(responseData['is_shishu_ghar_is_closed_for_the_day'] == 0){
-var items = expendedItems[tabBreakItems[index].name];
+
+      var items = expendedItems[tabBreakItems[index].name];
       if (items != null && items.isNotEmpty) {
         for (int i = 0; i < items.length; i++) {
           if (responseData.containsKey(items[i].fieldname)) {
@@ -415,9 +413,6 @@ var items = expendedItems[tabBreakItems[index].name];
           }
         }
       }
-      } 
-      
-      
     }
     // Return false if conditions are not met
     return returnStatus;

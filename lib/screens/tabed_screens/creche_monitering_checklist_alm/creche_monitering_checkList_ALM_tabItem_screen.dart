@@ -60,7 +60,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
   String _language = 'en';
 
   List<OptionsModel> _options = [];
-  List<TabFormsLogic> _logics = [];
+  DependingLogic? logic;
   List<Translation> _translation = [];
   bool _isLoading = true;
   int? isEditExisting;
@@ -86,8 +86,41 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
       CustomText.Next,
       CustomText.back,
       CustomText.ok,
-      CustomText.ChildEnrollsuccess
+      CustomText.ChildEnrollsuccess,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.Save,
+      CustomText.Submit,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.visitNoteAlrdyExists,
+      CustomText.dataSaveSuc,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
+
+    final itemz = widget.screenItem[widget.tabBreakItem.name]!;
+    itemz.forEach((element) {
+      if (Global.validString(element.label)) {
+        valueNames.add(element.label!.trim());
+      }
+    });
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -124,7 +157,9 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
         return false;
       },
       child: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Container(
+              color: Colors.white,
+              child: Center(child: CircularProgressIndicator()))
           : Scaffold(
               body: Column(
                 children: [
@@ -161,26 +196,28 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
                         ),
                         // Row(children: [
                         SizedBox(width: 10),
-                        _role == 'Creche Supervisor'
-                            ? widget.tabIndex == (widget.totalTab - 1)
-                                ? SizedBox()
-                                : Expanded(
-                                    child: CElevatedButton(
-                                      color: Color(0xff5979AA),
-                                      onPressed: () => saveOnly(1),
-                                      text: Global.returnTrLable(
-                                              _translation, 'Save', _language)
-                                          .trim(),
-                                    ),
-                                  )
-                            : SizedBox(),
+                        // _role == 'Creche Supervisor'
+                        //     ?
+                        widget.tabIndex == (widget.totalTab - 1)
+                            ? SizedBox()
+                            : Expanded(
+                                child: CElevatedButton(
+                                  color: Color(0xff5979AA),
+                                  onPressed: () => saveOnly(1),
+                                  text: Global.returnTrLable(
+                                          _translation,CustomText.Save, _language)
+                                      .trim(),
+                                ),
+                              ),
+                        // : SizedBox(),
                         // ]
                         // ),
-                        _role == 'Creche Supervisor'
-                            ? widget.tabIndex == (widget.totalTab - 1)
-                                ? SizedBox()
-                                : SizedBox(width: 10)
-                            : SizedBox(),
+                        // _role == 'Creche Supervisor'
+                        //     ?
+                        widget.tabIndex == (widget.totalTab - 1)
+                            ? SizedBox()
+                            : SizedBox(width: 10),
+                        // : SizedBox(),
                         Expanded(
                           child: CElevatedButton(
                             color: Color(0xff369A8D),
@@ -237,7 +274,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
       _options.addAll(data);
     });
     await FormLogicDataHelper().callFormLogic(parentName).then((data) {
-      _logics.addAll(data);
+      logic = DependingLogic(_translation, data, _language);
     });
     unpicableDates = await fetchDatesList();
   }
@@ -257,7 +294,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
       for (int i = 0; i < items.length; i++) {
         screenItems.add(_widgetTypeWidget(i, items[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(_logics, _myMap, items[i])) {
+        if (!logic!.callDependingLogic(_myMap, items[i])) {
           _myMap.remove(items[i].fieldname);
         }
       }
@@ -272,15 +309,16 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText: Global.returnTrLable(
+              _translation, CustomText.select_here, _language!),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           items: items,
           selectedItem: _myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               _myMap[quesItem.fieldname!] = value.name!;
@@ -301,9 +339,8 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
               : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(_myMap, quesItem),
           onChanged: (value) async {
             if (quesItem.fieldname == 'date_of_visit') {
               // if (Global.validString(_myMap['creche_id'])) {
@@ -312,8 +349,11 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
               // }
               if (unpicableDates.contains(value)) {
                 _myMap.remove(quesItem.fieldname);
+                var message = Global.returnTrLable(_translation, CustomText.visitNoteAlrdyExists,_language);
+                message = message.replaceAll(
+                  RegExp("@", caseSensitive: false), '$value');
                 Validate().singleButtonPopup(
-                    'A Visit Note already exists for the selected Date "${value}"',
+                    message,
                     Global.returnTrLable(
                         _translation, CustomText.ok, _language),
                     false,
@@ -323,8 +363,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
             } else {
               _myMap[quesItem.fieldname!] = value;
             }
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(_logics, _myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(_myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 _myMap.addEntries(
@@ -342,17 +381,14 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           initialvalue: _myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          keyboard:
-              DependingLogic().keyBoardLogic(quesItem.fieldname!, _logics),
-          readable:
-              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
+          readable: logic!.callReadableLogic(_myMap, quesItem),
           hintText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               _myMap[quesItem.fieldname!] = value;
@@ -362,24 +398,23 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(
+              _translation, CustomText.typehere, _language),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: _myMap[quesItem.fieldname!],
-          readable:
-              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          readable: logic!.callReadableLogic(_myMap, quesItem),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               _myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(_logics, _myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(_myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   _myMap.addEntries(
@@ -402,11 +437,9 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
           lng: _language,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
-          readable:
-              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
+          readable: logic!.callReadableLogic(_myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             _myMap[quesItem.fieldname!] = value;
@@ -419,13 +452,11 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
           fieldName: quesItem.fieldname,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             _myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(_logics, _myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(_myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 _myMap.addEntries(
@@ -444,15 +475,13 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           initialvalue: _myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable:
-              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          readable: logic!.callReadableLogic(_myMap, quesItem),
           hintText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               _myMap[quesItem.fieldname!] = value;
@@ -465,10 +494,9 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           maxlength: quesItem.length,
-          readable:
-              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          readable: logic!.callReadableLogic(_myMap, quesItem),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           initialvalue: _myMap[quesItem.fieldname!],
@@ -488,10 +516,9 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           maxlength: quesItem.length,
-          readable:
-              DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          readable: logic!.callReadableLogic(_myMap, quesItem),
           initialvalue: _myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -552,7 +579,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
             Validate().singleButtonPopup(
                 Global.returnTrLable(
                     _translation, CustomText.plsFilManForm, _language),
-                CustomText.ok,
+                Global.returnTrLable(_translation, CustomText.ok, _language),
                 false,
                 context);
             validStatus = false;
@@ -561,8 +588,11 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
             if (unpicableDates.contains(values)) {
               _myMap.remove(element.fieldname);
               setState(() {});
+              var message = Global.returnTrLable(_translation, CustomText.visitNoteAlrdyExists,_language);
+                message = message.replaceAll(
+                  RegExp("@", caseSensitive: false), '$values');
               Validate().singleButtonPopup(
-                  'A Visit Note already exists for the selected Date "${values}"',
+                  message,
                   Global.returnTrLable(_translation, CustomText.ok, _language),
                   false,
                   context);
@@ -571,11 +601,13 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
             }
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(_logics, _myMap, element,_translation,_language);
+        var validationMsg = logic!.validationMessge(_myMap, element);
         if (Global.validString(validationMsg)) {
-          Validate()
-              .singleButtonPopup(validationMsg!, CustomText.ok, false, context);
+          Validate().singleButtonPopup(
+              validationMsg!,
+              Global.returnTrLable(_translation, CustomText.ok, _language),
+              false,
+              context);
           validStatus = false;
           break;
         }
@@ -596,7 +628,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
             Global.returnTrLable(
                 _translation, CustomText.dataSaveSuc, _language),
             Global.returnTrLable(_translation, CustomText.ok, _language),
-            false,
+            true,
             context);
       }
     } else {
@@ -626,8 +658,13 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
           // childenrolledguid: enrolChildGuid,
           responces: responcesJs,
           is_uploaded: 0,
-          is_edited:
-              isLastIndex ? 1 : (widget.isEdit == false ? 2 : isEditExisting),
+          is_edited: isLastIndex
+              ? 1
+              : (widget.isEdit == false
+                  ? 2
+                  : isEditExisting == 0
+                      ? 1
+                      : isEditExisting),
           is_deleted: 0,
           name: name,
           created_by: username,

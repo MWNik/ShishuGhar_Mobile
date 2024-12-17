@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 import 'package:shishughar/database/helper/child_event/child_event_response_helper.dart';
 
-import '../../../custom_widget/custom_appbar.dart';
 import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
@@ -57,11 +56,10 @@ class EnrolledChildDetailsSccreen extends StatefulWidget {
 }
 
 class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<HouseHoldFielItemdModel> allItems = [];
   Map<String, dynamic> myMap = {};
   List<OptionsModel> options = [];
-  // bool isDateReadable=false;
   bool _isLoading = true;
   String userName = '';
   String? role;
@@ -84,6 +82,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
     lng = (await Validate().readString(Validate.sLanguage))!;
     labelControlls.clear();
     List<String> valueNames = [
+      CustomText.ok,
       CustomText.Save,
       CustomText.Creches,
       CustomText.CrecheCaregiver,
@@ -94,15 +93,35 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
       CustomText.eventALredyExistd,
       CustomText.ChildEventDetail,
       CustomText.back,
-      CustomText.Submit
+      CustomText.Submit,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.eventALredyExistd,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls = value);
-
-    await TranslationDataHelper()
-        .callTranslateEnrolledChildren()
         .then((value) => labelControlls.addAll(value));
+
     await updateHiddenValue();
     await callScrenControllers('Child Event');
   }
@@ -168,7 +187,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
       for (int i = 0; i < allItems.length; i++) {
         screenItems.add(widgetTypeWidget(i, allItems[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, allItems[i])) {
+        if (!logic!.callDependingLogic(myMap, allItems[i])) {
           myMap.remove(allItems[i].fieldname);
         }
       }
@@ -183,15 +202,16 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText: Global.returnTrLable(
+              labelControlls, CustomText.select_here, lng!),
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -205,20 +225,17 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           // readable: quesItem.fieldname=='date'?isDateReadable:null,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           minDate: widget.lastDate,
           maxDate: widget.maxDate,
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -240,15 +257,14 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -261,15 +277,16 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText: Global.returnTrLable(
+              labelControlls, CustomText.select_here, lng!),
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -284,7 +301,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
       //         Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng),
       //     initialValue: myMap[quesItem.fieldname!],
       //     isVisible:
-      //         DependingLogic().callDependingLogic(logics, myMap, quesItem),
+      //         logic!.callDependingLogic(myMap, quesItem),
       //     onChanged: (value) {
       //       if (value > 0)
       //         myMap[quesItem.fieldname!] = value;
@@ -302,10 +319,9 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
           lng: lng!,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -322,14 +338,13 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -339,23 +354,23 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText:
+              Global.returnTrLable(labelControlls, CustomText.typehere, lng!),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: logic!.callReadableLogic(myMap, quesItem),
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -400,9 +415,6 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
         .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
 
-    await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
-    });
     List<String> labelItems = [];
     allItems.forEach((element) {
       if (Global.validString(element.label)) {
@@ -412,7 +424,9 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
     await TranslationDataHelper()
         .callTranslateString(labelItems)
         .then((value) => labelControlls.addAll(value));
-
+    await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
+      logic = DependingLogic(labelControlls, data, lng!);
+    });
     setState(() {
       _isLoading = false;
     });
@@ -439,7 +453,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
               myMap.remove(element.fieldname);
               setState(() {});
               Validate().singleButtonPopup(
-                  '${CustomText.eventALredyExistd} "${Validate().displeDateFormate(valuees)}"',
+                  '${Global.returnTrLable(labelControlls, CustomText.eventALredyExistd, lng!)} "${Validate().displeDateFormate(valuees)}"',
                   Global.returnTrLable(labelControlls, CustomText.ok, lng!),
                   false,
                   context);
@@ -448,8 +462,7 @@ class _EnrolledChildDetailsState extends State<EnrolledChildDetailsSccreen> {
             }
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element,labelControlls,lng!);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               Global.returnTrLable(labelControlls, validationMsg, lng!),

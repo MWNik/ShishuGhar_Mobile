@@ -85,7 +85,11 @@ class _ChildImmunizationExpendedScreenSatet
       CustomText.CrecheCaregiver,
       CustomText.Next,
       CustomText.back,
-      CustomText.Submit
+      CustomText.Submit,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)

@@ -16,7 +16,7 @@ import '../database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import '../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../model/dynamic_screen_model/options_model.dart';
 import '../utils/globle_method.dart';
-import 'add_household_childred_form_expeded.dart';
+import 'tabed_screens/house_hold/add_household_childred_form_expeded.dart';
 
 class ChildrenListingScreen extends StatefulWidget {
   final String hhGuid;
@@ -27,6 +27,7 @@ class ChildrenListingScreen extends StatefulWidget {
 }
 
 class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
+  bool _isLoading = true;
   List<HouseHoldChildrenModel> hhChilddata = [];
   List<OptionsModel> relationChilddata = [];
   List<Translation> childListingControlls = [];
@@ -63,321 +64,336 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
       }
       // }
     }
-    setState(() {});
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: InkWell(
-        onTap: () async {
-          String cHHGUID = '';
+    if (_isLoading)
+      return Center(child: CircularProgressIndicator());
+    else {
+      return Scaffold(
+        floatingActionButton: InkWell(
+          onTap: () async {
+            String cHHGUID = '';
 
-          if (!Global.validString(cHHGUID)) {
-            // var checkChil = await checkChildrenLimit(hhChilddata.length);
-            // if (checkChil) {
-            cHHGUID = Validate().randomGuid();
-            print("childes $cHHGUID");
-            var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    AddHouseholdScreenChildrenFromExpended(
-                        hhGuid: widget.hhGuid,
-                        cHHGuid: cHHGUID,
-                        dobisReadable: false)));
-            if (refStatus == 'itemRefresh') {
-              await fetchHhChildrenDataList();
+            if (!Global.validString(cHHGUID)) {
+              // var checkChil = await checkChildrenLimit(hhChilddata.length);
+              // if (checkChil) {
+              cHHGUID = Validate().randomGuid();
+              print("childes $cHHGUID");
+              var refStatus = await Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          AddHouseholdScreenChildrenFromExpended(
+                              hhGuid: widget.hhGuid,
+                              cHHGuid: cHHGUID,
+                              dobisReadable: false)));
+              if (refStatus == 'itemRefresh') {
+                await fetchHhChildrenDataList();
+              }
+              // } else {
+              //   Validate().singleButtonPopup(Global.returnTrLable(childListingControlls,
+              //       'Can not add children more than ${hhChilddata.length}', lng!),
+              //       Global.returnTrLable(childListingControlls, CustomText.ok, lng!), false, context);
+
+              // }
             }
-            // } else {
-            //   Validate().singleButtonPopup(Global.returnTrLable(childListingControlls,
-            //       'Can not add children more than ${hhChilddata.length}', lng!),
-            //       Global.returnTrLable(childListingControlls, CustomText.ok, lng!), false, context);
-
-            // }
-          }
-        },
-        child: Image.asset(
-          "assets/add_btn.png",
-          scale: 2.7,
-          color: Color(0xff5979AA),
+          },
+          child: Image.asset(
+            "assets/add_btn.png",
+            scale: 2.7,
+            color: Color(0xff5979AA),
+          ),
         ),
-      ),
-      body: hhChilddata.length > 0
-          ? Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              child: ListView.builder(
-                  itemCount: hhChilddata.length,
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  scrollDirection: Axis.vertical,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () async {
-                        print('Item $index tapped');
-                        var creationDate = DateTime.parse(
-                            hhChilddata[index].created_at.toString());
-                        bool dobisReadable = false;
-                        if (creationDate.add(Duration(days: 15)).isBefore(
-                            DateTime.parse(Validate().currentDate()))) {
-                          dobisReadable = true;
-                        }
-                        var date = await Validate().readString(Validate.date);
-                        var applicableDate = Validate().stringToDate(date ?? "2024-12-31");
-                        var now = DateTime.parse(Validate().currentDate());
-                        var refStatus = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    AddHouseholdScreenChildrenFromExpended(
-                                        hhGuid: hhChilddata[index].HHGUID!,
-                                        cHHGuid: hhChilddata[index].CHHGUID!,
-                                        dobisReadable:
-                                            now.isBefore(applicableDate)
-                                                ? false
-                                                : dobisReadable)));
-                        if (refStatus == 'itemRefresh') {
-                          await fetchHhChildrenDataList();
-                        }
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5.h),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xff5A5A5A).withOpacity(
-                                      0.2), // Shadow color with opacity
-                                  offset: Offset(
-                                      0, 3), // Horizontal and vertical offset
-                                  blurRadius: 6, // Blur radius
-                                  spreadRadius: 0, // Spread radius
-                                ),
-                              ],
-                              color: Colors.white,
-                              border: Border.all(color: Color(0xffE7F0FF)),
-                              borderRadius: BorderRadius.circular(10.r)),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10.w, vertical: 8.h),
-                            child:
-                                // Row(
-                                //   mainAxisAlignment: MainAxisAlignment.start,
-                                //   crossAxisAlignment: CrossAxisAlignment.center,
-                                //   children: [
-                                //     index % 3 == 0
-                                //         ? Image.asset(
-                                //       "assets/childicon.png",
-                                //       scale: 2.8,
-                                //     )
-                                //         : index % 3 == 1
-                                //         ? Image.asset(
-                                //       "assets/cyanchild.png",
-                                //       scale: 2.8,
-                                //     )
-                                //         : Image.asset(
-                                //       "assets/yellowchild.png",
-                                //       scale: 2.8,
-                                //     ),
-                                //     SizedBox(
-                                //       width: 10.w,
-                                //     ),
-                                //     Expanded(
-                                //       child: Column(
-                                //         crossAxisAlignment: CrossAxisAlignment.start,
-                                //         children: [
-                                //           RichText(
-                                //               overflow: TextOverflow.ellipsis,
-                                //               text: TextSpan(
-                                //                   text: Global.returnTrLable(childListingControlls, 'Child Name',lng!)+ " : ",
-                                //                   style: Styles.Grey104,
-                                //                   children: [
-                                //                     TextSpan(
-                                //                         text: getItemValues(hhChilddata[index].responces!,'child_name'),
-                                //                         style: Styles.black125),
-                                //                   ])),
-                                //           RichText(
-                                //               strutStyle: StrutStyle(height: 1.h),
-                                //               overflow: TextOverflow.ellipsis,
-                                //               text: TextSpan(
-                                //                   text: Global.returnTrLable(childListingControlls, 'Relationship with child',lng!)+ " : ",
-                                //                   style: Styles.Grey104,
-                                //                   children: [
-                                //                     TextSpan(
-                                //                         text: getfindRelationValues(getItemValues(hhChilddata[index].responces!,'relationship_with_child')),
-                                //                         style: Styles.black125),
-                                //                   ])),
-                                //           Row(
-                                //             children: [
-                                //               RichText(
-                                //                   strutStyle: StrutStyle(height: 1.h),
-                                //                   overflow: TextOverflow.ellipsis,
-                                //                   text: TextSpan(
-                                //                       text: Global.returnTrLable(childListingControlls, 'Child Age (In Months)',lng!)+ " : ",
-                                //                       style: Styles.Grey104,
-                                //                       children: [
-                                //                         TextSpan(
-                                //                             text: getItemValues(hhChilddata[index].responces!,'child_age'),
-                                //                             style: Styles.black125),
-                                //                       ])),
-                                //             ],
-                                //           ),
-                                //           // RichText(
-                                //           //     overflow: TextOverflow.ellipsis,
-                                //           //     text: TextSpan(
-                                //           //         text: CustomText.LastMeasurement,
-                                //           //         style: Styles.black64,
-                                //           //         children: [
-                                //           //           TextSpan(
-                                //           //               text: " Dec 1, 2023",
-                                //           //               style: Styles.black66),
-                                //           //         ]))
-                                //         ],
-                                //       ),
-                                //     ),
-                                //     // Spacer(),
-                                //     // Column(
-                                //     //   mainAxisAlignment: MainAxisAlignment.end,
-                                //     //   children: [
-                                //     //     index % 2 == 0
-                                //     //         ? Image.asset(
-                                //     //       "assets/verify.png",
-                                //     //       scale: 2.2,
-                                //     //     )
-                                //     //         : Image.asset(
-                                //     //       "assets/greyverify.png",
-                                //     //       scale: 3.7,
-                                //     //     ),
-                                //     //   ],
-                                //     // )
-                                //   ],
-                                // ),
-                                Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                // index % 3 == 0
-                                //     ? Image.asset(
-                                //   "assets/childicon.png",
-                                //   scale: 2.8,
-                                // )
-                                //     : index % 3 == 1
-                                //     ? Image.asset(
-                                //   "assets/cyanchild.png",
-                                //   scale: 2.8,
-                                // )
-                                //     : Image.asset(
-                                //   "assets/yellowchild.png",
-                                //   scale: 2.8,
-                                // ),
-                                // SizedBox(
-                                //   width: 10.w,
-                                // ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      Global.returnTrLable(
-                                              childListingControlls,
-                                              'Child Name',
-                                              lng!) +
-                                          " : ",
-                                      style: Styles.black104,
-                                    ),
-                                    Text(
-                                      callChildWithRelationText(
-                                              Global.returnTrLable(
-                                                  childListingControlls,
-                                                  'Relationship with child',
-                                                  lng!)) +
-                                          " : ",
-                                      style: Styles.black104,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      strutStyle: StrutStyle(height: 1.2),
-                                    ),
-                                    Text(
-                                      Global.returnTrLable(
-                                              childListingControlls,
-                                              'Child Age (In Months)',
-                                              lng!) +
-                                          " : ",
-                                      style: Styles.black104,
-                                      strutStyle: StrutStyle(height: 1.2),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(width: 10),
-                                SizedBox(
-                                  height: 35.h,
-                                  width: 2,
-                                  child: VerticalDivider(
-                                    color: Color(0xffE6E6E6),
+        body: hhChilddata.length > 0
+            ? Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                child: ListView.builder(
+                    itemCount: hhChilddata.length,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          print('Item $index tapped');
+                          var creationDate = DateTime.parse(
+                              hhChilddata[index].created_at.toString());
+                          bool dobisReadable = false;
+                          if (creationDate.add(Duration(days: 15)).isBefore(
+                              DateTime.parse(Validate().currentDate()))) {
+                            dobisReadable = true;
+                          }
+                          var date = await Validate().readString(Validate.date);
+                          var applicableDate =
+                              Validate().stringToDate(date ?? "2024-12-31");
+                          var now = DateTime.parse(Validate().currentDate());
+                          var refStatus = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      AddHouseholdScreenChildrenFromExpended(
+                                          hhGuid: hhChilddata[index].HHGUID!,
+                                          cHHGuid: hhChilddata[index].CHHGUID!,
+                                          dobisReadable:
+                                              now.isBefore(applicableDate)
+                                                  ? false
+                                                  : dobisReadable)));
+                          if (refStatus == 'itemRefresh') {
+                            await fetchHhChildrenDataList();
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.h),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xff5A5A5A).withOpacity(
+                                        0.2), // Shadow color with opacity
+                                    offset: Offset(
+                                        0, 3), // Horizontal and vertical offset
+                                    blurRadius: 6, // Blur radius
+                                    spreadRadius: 0, // Spread radius
                                   ),
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
+                                ],
+                                color: Colors.white,
+                                border: Border.all(color: Color(0xffE7F0FF)),
+                                borderRadius: BorderRadius.circular(10.r)),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w, vertical: 8.h),
+                              child:
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.start,
+                                  //   crossAxisAlignment: CrossAxisAlignment.center,
+                                  //   children: [
+                                  //     index % 3 == 0
+                                  //         ? Image.asset(
+                                  //       "assets/childicon.png",
+                                  //       scale: 2.8,
+                                  //     )
+                                  //         : index % 3 == 1
+                                  //         ? Image.asset(
+                                  //       "assets/cyanchild.png",
+                                  //       scale: 2.8,
+                                  //     )
+                                  //         : Image.asset(
+                                  //       "assets/yellowchild.png",
+                                  //       scale: 2.8,
+                                  //     ),
+                                  //     SizedBox(
+                                  //       width: 10.w,
+                                  //     ),
+                                  //     Expanded(
+                                  //       child: Column(
+                                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                                  //         children: [
+                                  //           RichText(
+                                  //               overflow: TextOverflow.ellipsis,
+                                  //               text: TextSpan(
+                                  //                   text: Global.returnTrLable(childListingControlls, 'Child Name',lng!)+ " : ",
+                                  //                   style: Styles.Grey104,
+                                  //                   children: [
+                                  //                     TextSpan(
+                                  //                         text: getItemValues(hhChilddata[index].responces!,'child_name'),
+                                  //                         style: Styles.black125),
+                                  //                   ])),
+                                  //           RichText(
+                                  //               strutStyle: StrutStyle(height: 1.h),
+                                  //               overflow: TextOverflow.ellipsis,
+                                  //               text: TextSpan(
+                                  //                   text: Global.returnTrLable(childListingControlls, 'Relationship with child',lng!)+ " : ",
+                                  //                   style: Styles.Grey104,
+                                  //                   children: [
+                                  //                     TextSpan(
+                                  //                         text: getfindRelationValues(getItemValues(hhChilddata[index].responces!,'relationship_with_child')),
+                                  //                         style: Styles.black125),
+                                  //                   ])),
+                                  //           Row(
+                                  //             children: [
+                                  //               RichText(
+                                  //                   strutStyle: StrutStyle(height: 1.h),
+                                  //                   overflow: TextOverflow.ellipsis,
+                                  //                   text: TextSpan(
+                                  //                       text: Global.returnTrLable(childListingControlls, 'Child Age (In Months)',lng!)+ " : ",
+                                  //                       style: Styles.Grey104,
+                                  //                       children: [
+                                  //                         TextSpan(
+                                  //                             text: getItemValues(hhChilddata[index].responces!,'child_age'),
+                                  //                             style: Styles.black125),
+                                  //                       ])),
+                                  //             ],
+                                  //           ),
+                                  //           // RichText(
+                                  //           //     overflow: TextOverflow.ellipsis,
+                                  //           //     text: TextSpan(
+                                  //           //         text: CustomText.LastMeasurement,
+                                  //           //         style: Styles.black64,
+                                  //           //         children: [
+                                  //           //           TextSpan(
+                                  //           //               text: " Dec 1, 2023",
+                                  //           //               style: Styles.black66),
+                                  //           //         ]))
+                                  //         ],
+                                  //       ),
+                                  //     ),
+                                  //     // Spacer(),
+                                  //     // Column(
+                                  //     //   mainAxisAlignment: MainAxisAlignment.end,
+                                  //     //   children: [
+                                  //     //     index % 2 == 0
+                                  //     //         ? Image.asset(
+                                  //     //       "assets/verify.png",
+                                  //     //       scale: 2.2,
+                                  //     //     )
+                                  //     //         : Image.asset(
+                                  //     //       "assets/greyverify.png",
+                                  //     //       scale: 3.7,
+                                  //     //     ),
+                                  //     //   ],
+                                  //     // )
+                                  //   ],
+                                  // ),
+                                  Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  // index % 3 == 0
+                                  //     ? Image.asset(
+                                  //   "assets/childicon.png",
+                                  //   scale: 2.8,
+                                  // )
+                                  //     : index % 3 == 1
+                                  //     ? Image.asset(
+                                  //   "assets/cyanchild.png",
+                                  //   scale: 2.8,
+                                  // )
+                                  //     : Image.asset(
+                                  //   "assets/yellowchild.png",
+                                  //   scale: 2.8,
+                                  // ),
+                                  // SizedBox(
+                                  //   width: 10.w,
+                                  // ),
+                                  Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        getItemValues(
-                                            hhChilddata[index].responces!,
-                                            'child_name'),
-                                        style: Styles.cardBlue10,
-                                        overflow: TextOverflow.ellipsis,
+                                        Global.returnTrLable(
+                                                childListingControlls,
+                                                'Child Name',
+                                                lng!) +
+                                            " : ",
+                                        style: Styles.black104,
                                       ),
-                                      SizedBox(height: 8),
                                       Text(
-                                          getfindRelationValues(getItemValues(
-                                              hhChilddata[index].responces!,
-                                              'relationship_with_child')),
-                                          strutStyle: StrutStyle(height: 1.2),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis),
-                                      SizedBox(height: 8),
+                                        callChildWithRelationText(
+                                                Global.returnTrLable(
+                                                    childListingControlls,
+                                                    'Relationship with child',
+                                                    lng!)) +
+                                            " : ",
+                                        style: Styles.black104,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                      ),
                                       Text(
-                                          Global.validString(getItemValues(
-                                                  hhChilddata[index].responces!,
-                                                  'child_dob'))
-                                              ? Validate()
-                                                  .calculateAgeInMonths(
-                                                      Validate().stringToDate(
-                                                          getItemValues(
-                                                              hhChilddata[index]
-                                                                  .responces!,
-                                                              'child_dob')))
-                                                  .toString()
-                                              : getItemValues(
-                                                  hhChilddata[index].responces!,
-                                                  'child_age'),
-                                          strutStyle: StrutStyle(height: 1.2),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis),
+                                        Global.returnTrLable(
+                                                childListingControlls,
+                                                'Child Age (In Months)',
+                                                lng!) +
+                                            " : ",
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1.2),
+                                      ),
                                     ],
                                   ),
-                                ),
-                                SizedBox(width: 5),
-                                (hhChilddata[index].is_edited == 0 &&
-                                        hhChilddata[index].is_uploaded == 1)
-                                    ? Image.asset(
-                                        "assets/sync.png",
-                                        scale: 1.5,
-                                      )
-                                    : Image.asset(
-                                        "assets/sync_gray.png",
-                                        scale: 1.5,
-                                      )
-                              ],
+                                  SizedBox(width: 10),
+                                  SizedBox(
+                                    height: 35.h,
+                                    width: 2,
+                                    child: VerticalDivider(
+                                      color: Color(0xffE6E6E6),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          getItemValues(
+                                              hhChilddata[index].responces!,
+                                              'child_name'),
+                                          style: Styles.cardBlue10,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                            getfindRelationValues(getItemValues(
+                                                hhChilddata[index].responces!,
+                                                'relationship_with_child')),
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis),
+                                        SizedBox(height: 8),
+                                        Text(
+                                            Global.validString(getItemValues(
+                                                    hhChilddata[index]
+                                                        .responces!,
+                                                    'child_dob'))
+                                                ? Validate()
+                                                    .calculateAgeInMonths(
+                                                        Validate().stringToDate(
+                                                            getItemValues(
+                                                                hhChilddata[
+                                                                        index]
+                                                                    .responces!,
+                                                                'child_dob')))
+                                                    .toString()
+                                                : getItemValues(
+                                                    hhChilddata[index]
+                                                        .responces!,
+                                                    'child_age'),
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: 5),
+                                  (hhChilddata[index].is_edited == 0 &&
+                                          hhChilddata[index].is_uploaded == 1)
+                                      ? Image.asset(
+                                          "assets/sync.png",
+                                          scale: 1.5,
+                                        )
+                                      : Image.asset(
+                                          "assets/sync_gray.png",
+                                          scale: 1.5,
+                                        )
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-            )
-          : Center(child: Text(CustomText.NorecordAvailable)),
-    );
+                      );
+                    }),
+              )
+            : Center(
+                child: Text(Global.returnTrLable(childListingControlls,
+                    CustomText.NorecordAvailable, lng!))),
+      );
+    }
   }
 
   String getItemValues(String response, String key) {
@@ -426,10 +442,11 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
       'Relationship with child',
       'Child Age (In Months)',
       'Can not add children more than',
-      CustomText.ok
+      CustomText.ok,
+      CustomText.NorecordAvailable
     ];
 
-    await await TranslationDataHelper()
+    await TranslationDataHelper()
         .callTranslateString(valueNames)
         .then((value) => childListingControlls = value);
 

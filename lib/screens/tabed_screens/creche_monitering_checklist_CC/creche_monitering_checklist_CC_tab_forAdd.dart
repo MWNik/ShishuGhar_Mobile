@@ -55,7 +55,7 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
   String lng = "en";
   List<String> unpicableDates = [];
   bool isView = false;
-   double screenWidth = 0.0;
+  double screenWidth = 0.0;
   double tabWidth = 100.0; // Approximate width of each tab
   bool tabIsScrollable = false;
 
@@ -86,17 +86,19 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
     await callScrenControllers();
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
           onWillPop: () async {
-            widget.isViewScreen?Navigator.pop(context,CustomText.itemRefresh):Validate().showExitDialog(context,translatsLabel,lng);
+            widget.isViewScreen
+                ? Navigator.pop(context, CustomText.itemRefresh)
+                : Validate().showExitDialog(context, translatsLabel, lng);
             return false;
           },
           child: Scaffold(
@@ -107,7 +109,10 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
                 padding: EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                    widget.isViewScreen?Navigator.pop(context,CustomText.itemRefresh):Validate().showExitDialog(context,translatsLabel,lng);
+                    widget.isViewScreen
+                        ? Navigator.pop(context, CustomText.itemRefresh)
+                        : Validate()
+                            .showExitDialog(context, translatsLabel, lng);
                   },
                   child: Icon(
                     Icons.arrow_back_ios_sharp,
@@ -134,14 +139,14 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
                   ? null
                   : TabBar(
                       indicatorColor: Color(0xffF26BA3),
-              unselectedLabelColor: Colors.grey.shade300,
-              unselectedLabelStyle: Styles.white124P,
-              labelColor: Colors.white,
-              controller: _tabController,
-              isScrollable: tabIsScrollable,
-              labelPadding: EdgeInsets.zero,
-              // tabAlignment: TabAlignment.start,
-              tabAlignment: tabIsScrollable ? TabAlignment.start : null,
+                      unselectedLabelColor: Colors.grey.shade300,
+                      unselectedLabelStyle: Styles.white124P,
+                      labelColor: Colors.white,
+                      controller: _tabController,
+                      isScrollable: tabIsScrollable,
+                      labelPadding: EdgeInsets.zero,
+                      // tabAlignment: TabAlignment.start,
+                      tabAlignment: tabIsScrollable ? TabAlignment.start : null,
                       tabs: tabController(),
                       onTap: (index) {
                         if (_tabController.indexIsChanging) {
@@ -170,7 +175,6 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
   List<Widget> tabController() {
     List<Widget> tabItem = [];
     tabBreakItems.forEach((element) {
-      
       tabItem.add(Container(
         width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
         // padding: EdgeInsets.only(left: 10, right: 10),
@@ -184,7 +188,6 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
         child: Tab(
             child: Text(
           Global.returnTrLable(translatsLabel, element.label!, lng),
-         
         )),
       ));
     });
@@ -321,13 +324,15 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     tabIsScrollable = tabWidth * tabBreakItems.length > screenWidth;
 
-    // List<String> tabLabelItems = [];
-    // tabBreakItems.forEach((element) {
-    //   if(Global.validString(element.label)){
-    //     tabLabelItems.add(element.label!);
-    //   }
-    // });
-    // await TranslationDataHelper().callTranslateString(tabLabelItems).then((value) => translatsLabel.addAll(value));
+    List<String> tabLabelItems = [];
+    tabBreakItems.forEach((element) {
+      if (Global.validString(element.label)) {
+        tabLabelItems.add(element.label!);
+      }
+    });
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelItems)
+        .then((value) => translatsLabel.addAll(value));
     if (Global.validString(widget.date_of_visit)) {
       List<int> parts =
           widget.date_of_visit.toString().split('-').map(int.parse).toList();

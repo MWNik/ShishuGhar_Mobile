@@ -64,7 +64,9 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
       CustomText.usynchedAndDraft,
       CustomText.areSureToDelete,
       CustomText.Cancel,
-      CustomText.delete
+      CustomText.delete,
+      CustomText.datevisit,
+      CustomText.VisitNotes
     ];
 
     await TranslationDataHelper()
@@ -297,8 +299,7 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(50),
-                                                        color:
-                                                            Colors.red,
+                                                        color: Colors.red,
                                                       ),
                                                       child: Padding(
                                                         padding: EdgeInsets
@@ -307,8 +308,7 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
                                                                 vertical: 2.h),
                                                         child: Icon(
                                                           Icons.delete_rounded,
-                                                          color: Colors
-                                                              .white,
+                                                          color: Colors.white,
                                                           size: 16,
                                                         ),
                                                       ),

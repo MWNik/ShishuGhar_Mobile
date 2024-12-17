@@ -370,12 +370,13 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       CustomText.Opened_On,
       CustomText.ShishuGharDetails,
       CustomText.DontHaveChildrenForAttender,
-      CustomText.DontHaveChildrenForAnthropometry
+      CustomText.DontHaveChildrenForAnthropometry,
+      CustomText.ok
     ];
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => locationControlls = value);
+        .then((value) => locationControlls.addAll(value));
     await getCrecheResponce();
     setState(() {});
   }
@@ -387,7 +388,6 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => EnrolledExitChildListingTab(
               creCheId: widget.crecheId,
-              creCheName: crechName!,
               village_id:
                   Global.getItemValues(responce!.responces!, 'village_id'))));
       // }
@@ -409,8 +409,12 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
                   creche_name: crechName,
                 )));
       } else
-        Validate().singleButtonPopup(CustomText.DontHaveChildrenForAttender,
-            CustomText.ok, false, context);
+        Validate().singleButtonPopup(
+            Global.returnTrLable(locationControlls,
+                CustomText.DontHaveChildrenForAttender, lng!),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+            false,
+            context);
     } else if (i == 4) {
       var items = await EnrolledExitChilrenResponceHelper()
           .enrolledChildByCreche(widget.crecheId);
@@ -430,8 +434,9 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
         }
       } else
         Validate().singleButtonPopup(
-            CustomText.DontHaveChildrenForAnthropometry,
-            CustomText.ok,
+            Global.returnTrLable(locationControlls,
+                CustomText.DontHaveChildrenForAnthropometry, lng!),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng!),
             false,
             context);
     } else if (i == 5) {

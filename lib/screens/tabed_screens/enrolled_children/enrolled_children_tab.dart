@@ -26,19 +26,18 @@ class EnrolledChilrenTab extends StatefulWidget {
   // static String? childName;
   final bool isImageUpdate;
   final bool isEditable;
-   String? minDate;
+  String? minDate;
 
-   EnrolledChilrenTab({
-    super.key,
-    required this.CHHGUID,
-    required this.HHname,
-    required this.crecheId,
-    required this.EnrolledChilGUID,
-    required this.isNew,
-    required this.isImageUpdate,
-    required this.isEditable,
-     this.minDate
-  });
+  EnrolledChilrenTab(
+      {super.key,
+      required this.CHHGUID,
+      required this.HHname,
+      required this.crecheId,
+      required this.EnrolledChilGUID,
+      required this.isNew,
+      required this.isImageUpdate,
+      required this.isEditable,
+      this.minDate});
 
   @override
   _EnrolledChilrenTabState createState() => _EnrolledChilrenTabState();
@@ -59,7 +58,6 @@ class _EnrolledChilrenTabState extends State<EnrolledChilrenTab>
   void Function()? ontap;
   String lng = "en";
   String? role;
-
 
   Future<void> initializeData() async {
     lng = (await Validate().readString(Validate.sLanguage))!;
@@ -85,7 +83,9 @@ class _EnrolledChilrenTabState extends State<EnrolledChilrenTab>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return Scaffold(
         appBar: AppBar(
@@ -179,7 +179,7 @@ class _EnrolledChilrenTabState extends State<EnrolledChilrenTab>
             HHGUID: 'Not',
             cHHGuid: widget.CHHGUID,
             isImageUpdate: widget.isImageUpdate,
-            crecheId:widget.crecheId,
+            crecheId: widget.crecheId,
             tabBreakItem: tabBreakItems[i],
             screenItem: expendedItems,
             changeTab: changeTab,
@@ -405,7 +405,7 @@ class _EnrolledChilrenTabState extends State<EnrolledChilrenTab>
 
   Future<void> updateVerificationStatus(BuildContext mContext) async {
     var varyItem = await OptionsModelHelper()
-        .getMstCommonOptions('CC Verification status',lng);
+        .getMstCommonOptions('CC Verification status', lng);
     varyItem = varyItem
         .where((element) => (element.name == '2') || (element.name == '3'))
         .toList();
@@ -481,5 +481,4 @@ class _EnrolledChilrenTabState extends State<EnrolledChilrenTab>
           );
         });
   }
-
 }

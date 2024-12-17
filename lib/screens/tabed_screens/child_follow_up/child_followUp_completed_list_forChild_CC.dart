@@ -68,7 +68,11 @@ class _ChildFollowUpsListingScreenState
       CustomText.NorecordAvailable,
       CustomText.Search,
       CustomText.Village,
-      CustomText.Creches
+      CustomText.Creches,
+      CustomText.fllowUp,
+      CustomText.schduleDate,
+      CustomText.followup_visit_date,
+      CustomText.weight
     ];
 
     await TranslationDataHelper()

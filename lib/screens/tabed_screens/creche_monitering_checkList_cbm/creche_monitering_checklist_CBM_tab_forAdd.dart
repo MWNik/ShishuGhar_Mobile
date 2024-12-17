@@ -92,7 +92,9 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
     screenWidth = MediaQuery.of(context).size.width;
 
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
           onWillPop: () async {
@@ -175,7 +177,6 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
   List<Widget> tabController() {
     List<Widget> tabItem = [];
     tabBreakItems.forEach((element) {
-     
       tabItem.add(Container(
         width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
         // padding: EdgeInsets.only(left: 10, right: 10),
@@ -189,7 +190,6 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
         child: Tab(
             child: Text(
           Global.returnTrLable(translatsLabel, element.label!, lng),
-         
         )),
       ));
     });
@@ -326,13 +326,15 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     tabIsScrollable = tabWidth * tabBreakItems.length > screenWidth;
 
-    // List<String> tabLabelItems = [];
-    // tabBreakItems.forEach((element) {
-    //   if(Global.validString(element.label)){
-    //     tabLabelItems.add(element.label!);
-    //   }
-    // });
-    // await TranslationDataHelper().callTranslateString(tabLabelItems).then((value) => translatsLabel.addAll(value));
+    List<String> tabLabelItems = [];
+    tabBreakItems.forEach((element) {
+      if (Global.validString(element.label)) {
+        tabLabelItems.add(element.label!.trim());
+      }
+    });
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelItems)
+        .then((value) => translatsLabel.addAll(value));
     if (Global.validString(widget.date_of_visit)) {
       List<int> parts =
           widget.date_of_visit.toString().split('-').map(int.parse).toList();

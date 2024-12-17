@@ -183,8 +183,8 @@ class Global {
   static String returnTrLable(
       List<Translation> translats, String? key, String lang) {
     String retuValue = '';
-    if (key != null) {
-      retuValue = key;
+    if (validString(key)) {
+      retuValue = key!;
       if (Global.validString(lang)) {
         //  if (!(lang == 'en')) {
         var trs = translats
@@ -205,7 +205,7 @@ class Global {
         // }else{retuValue = key;}
       }
     } else
-      retuValue = '';
+      retuValue = validToString(key);
     return retuValue;
   }
 
@@ -226,6 +226,7 @@ class Global {
   }
 
   static String errorBodyToStringFromList(String? errorBody) {
+    
     if (errorBody != null) {
       try {
         var mesg = jsonDecode(errorBody);

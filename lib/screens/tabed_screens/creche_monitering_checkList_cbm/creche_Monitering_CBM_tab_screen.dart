@@ -54,7 +54,7 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
   void Function()? ontap;
   String lng = "en";
   bool isView = false;
-   double screenWidth = 0.0;
+  double screenWidth = 0.0;
   double tabWidth = 100.0; // Approximate width of each tab
   bool tabIsScrollable = false;
 
@@ -75,11 +75,12 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
       CustomText.back,
       CustomText.shouldExit,
       CustomText.exit,
-      CustomText.Cancel
+      CustomText.Cancel,
+      CustomText.VisitNote
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translatsLabel = value);
+        .then((value) => translatsLabel.addAll(value));
 
     await callScrenControllers();
   }
@@ -89,13 +90,15 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
     screenWidth = MediaQuery.of(context).size.width;
 
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
           onWillPop: () async {
             widget.isViewScreen
                 ? Navigator.pop(context, CustomText.itemRefresh)
-                : Validate().showExitDialog(context,translatsLabel,lng);
+                : Validate().showExitDialog(context, translatsLabel, lng);
             return false;
           },
           child: Scaffold(
@@ -108,7 +111,8 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
                   onTap: () {
                     widget.isViewScreen
                         ? Navigator.pop(context, CustomText.itemRefresh)
-                        : Validate().showExitDialog(context,translatsLabel,lng);
+                        : Validate()
+                            .showExitDialog(context, translatsLabel, lng);
                   },
                   child: Icon(
                     Icons.arrow_back_ios_sharp,
@@ -171,7 +175,6 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
   List<Widget> tabController() {
     List<Widget> tabItem = [];
     tabBreakItems.forEach((element) {
-      
       tabItem.add(Container(
         width: tabIsScrollable ? null : screenWidth / tabBreakItems.length,
         // padding: EdgeInsets.only(left: 10, right: 10),
@@ -185,7 +188,6 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
         child: Tab(
             child: Text(
           Global.returnTrLable(translatsLabel, element.label!, lng),
-         
         )),
       ));
     });
@@ -313,6 +315,16 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
 
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     tabIsScrollable = tabWidth * tabBreakItems.length > screenWidth;
+
+     List<String> tabLabelItems = [];
+    tabBreakItems.forEach((element) {
+      if (Global.validString(element.label)) {
+        tabLabelItems.add(element.label!.trim());
+      }
+    });
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelItems)
+        .then((value) => translatsLabel.addAll(value));
 
     if (Global.validString(widget.date_of_visit)) {
       List<int> parts =

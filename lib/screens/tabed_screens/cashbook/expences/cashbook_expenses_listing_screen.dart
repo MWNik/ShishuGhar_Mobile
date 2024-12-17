@@ -131,235 +131,253 @@ class _CashBookExpensesListingSCreenState
           : SizedBox(),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        child: Global.validString(role)?Column(
-          // mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              child: Row(
-                mainAxisAlignment: role == CustomText.crecheSupervisor.trim()
-                    ? MainAxisAlignment.spaceBetween // Space between left and right widgets
-                    : MainAxisAlignment.start,
+        child: Global.validString(role)
+            ? Column(
+                // mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  // Left Widget
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xff5A5A5A).withOpacity(0.2),
-                          offset: Offset(0, 3),
-                          blurRadius: 6,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey.shade700),
-                      borderRadius: BorderRadius.circular(5.r),
-                    ),
-                    child: RichText(
-                      text: TextSpan(
-                        text: '${Global.returnTrLable(translats, CustomText.BalanceAmount, lng).trim()}',
-                        style: Styles.black124,
-                        children: [
-                          TextSpan(
-                            text: ' :₹ ${walletToal}',
-                            style: Styles.blue125,
+                    child: Row(
+                      mainAxisAlignment: role ==
+                              CustomText.crecheSupervisor.trim()
+                          ? MainAxisAlignment
+                              .spaceBetween // Space between left and right widgets
+                          : MainAxisAlignment.start,
+                      children: [
+                        // Left Widget
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 4.w, vertical: 2.h),
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xff5A5A5A).withOpacity(0.2),
+                                offset: Offset(0, 3),
+                                blurRadius: 6,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey.shade700),
+                            borderRadius: BorderRadius.circular(5.r),
                           ),
-                        ],
-                      ),
+                          child: RichText(
+                            text: TextSpan(
+                              text:
+                                  '${Global.returnTrLable(translats, CustomText.BalanceAmount, lng).trim()}',
+                              style: Styles.black124,
+                              children: [
+                                TextSpan(
+                                  text: ' :₹ ${walletToal}',
+                                  style: Styles.blue125,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Add space between the widgets (optional)
+                        if (role == CustomText.crecheSupervisor.trim())
+                          Spacer(),
+                        // Right Widget
+                        role == CustomText.crecheSupervisor.trim()
+                            ? Container(
+                                child: AnimatedRollingSwitch(
+                                  title1: Global.returnTrLable(
+                                      translats, CustomText.all, lng),
+                                  title2: Global.returnTrLable(
+                                      translats, CustomText.unsynched, lng),
+                                  isOnlyUnsynched: isOnlyUnsynched ?? false,
+                                  onChange: (value) async {
+                                    setState(() {
+                                      isOnlyUnsynched = value;
+                                    });
+                                    await fetchCashbookData();
+                                  },
+                                ),
+                              )
+                            : SizedBox(),
+                      ],
                     ),
                   ),
-                  // Add space between the widgets (optional)
-                  if (role == CustomText.crecheSupervisor.trim()) Spacer(),
-                  // Right Widget
-                  role == CustomText.crecheSupervisor.trim()
-                      ? Container(
-                    child: AnimatedRollingSwitch(
-                      title1: Global.returnTrLable(translats, CustomText.all, lng),
-                      title2: Global.returnTrLable(translats, CustomText.unsynched, lng),
-                      isOnlyUnsynched: isOnlyUnsynched ?? false,
-                      onChange: (value) async {
-                        setState(() {
-                          isOnlyUnsynched = value;
-                        });
-                        await fetchCashbookData();
-                      },
-                    ),
-                  )
-                      : SizedBox(),
-                ],
-              ),
-            )
-            ,
-            (expensesData.length > 0)
-                ? Expanded(
-                    child: ListView.builder(
-                        itemCount: expensesData.length,
-                        shrinkWrap: true,
-                        physics: BouncingScrollPhysics(),
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (BuildContext context, int index) {
-                          return GestureDetector(
-                            onTap: () async {
-                              var cashbookGuid =
-                                  expensesData[index].cashbook_guid;
-                              var backDate = now.isBefore(applicableDate)
-                                  ? DateTime(1992)
-                                  : DateTime.parse(Validate().currentDate())
-                                      .subtract(Duration(days: 7));
-                              if (minDate != null) {
-                                if (minDate!.isBefore(backDate)) {
-                                  minDate = backDate;
-                                }
-                              } else if (minDate == null) {
-                                minDate = backDate;
-                              }
-                              // minDate=backDate;
+                  (expensesData.length > 0)
+                      ? Expanded(
+                          child: ListView.builder(
+                              itemCount: expensesData.length,
+                              shrinkWrap: true,
+                              physics: BouncingScrollPhysics(),
+                              scrollDirection: Axis.vertical,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () async {
+                                    var cashbookGuid =
+                                        expensesData[index].cashbook_guid;
+                                    var backDate = now.isBefore(applicableDate)
+                                        ? DateTime(1992)
+                                        : DateTime.parse(
+                                                Validate().currentDate())
+                                            .subtract(Duration(days: 7));
+                                    if (minDate != null) {
+                                      if (minDate!.isBefore(backDate)) {
+                                        minDate = backDate;
+                                      }
+                                    } else if (minDate == null) {
+                                      minDate = backDate;
+                                    }
+                                    // minDate=backDate;
 
-                              var created_at = DateTime.parse(
-                                  expensesData[index].created_at.toString());
-                              var date = DateTime(created_at.year,
-                                  created_at.month, created_at.day);
-                              bool isEditable = date
-                                  .add(Duration(days: 8))
-                                  .isAfter(
-                                      DateTime.parse(Validate().currentDate()));
-                              if (isEditable) {
-                                isEditable =
-                                    role == CustomText.crecheSupervisor;
-                              }
+                                    var created_at = DateTime.parse(
+                                        expensesData[index]
+                                            .created_at
+                                            .toString());
+                                    var date = DateTime(created_at.year,
+                                        created_at.month, created_at.day);
+                                    bool isEditable = date
+                                        .add(Duration(days: 8))
+                                        .isAfter(DateTime.parse(
+                                            Validate().currentDate()));
+                                    if (isEditable) {
+                                      isEditable = now.isBefore(applicableDate);
+                                    }
 
-                              var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) => (now
-                                              .isBefore(applicableDate)
-                                          ? true
-                                          : isEditable)
-                                      ? CashbookExpensesDetailsScreen(
-                                          creche_id: widget.creche_id,
-                                          cashbook_guid: cashbookGuid!,
-                                          minDate: minDate,
-                                          reqAmount: walletToal +
-                                              Global.stringToDouble(
-                                                  Global.getItemValues(
-                                                      expensesData[index]
-                                                          .responces!,
-                                                      'expense_amount')))
-                                      : CashbookExpensesDetailsViewScreen(
-                                          creche_id: widget.creche_id,
-                                          cashbook_guid: cashbookGuid!,
-                                          reqAmount: walletToal +
-                                              Global.stringToDouble(Global.getItemValues(expensesData[index].responces!, 'expense_amount')))));
-                              if (refStatus == 'itemRefresh') {
-                                await fetchCashbookData();
-                              }
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 5.h),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color:
-                                            Color(0xff5A5A5A).withOpacity(0.2),
-                                        offset: Offset(0, 3),
-                                        blurRadius: 6,
-                                        spreadRadius: 0,
-                                      ),
-                                    ],
-                                    color: Colors.white,
-                                    border:
-                                        Border.all(color: Color(0xffE7F0FF)),
-                                    borderRadius: BorderRadius.circular(10.r)),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10.w, vertical: 8.h),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} :',
-                                            style: Styles.black104,
-                                          ),
-                                          Text(
-                                            '${Global.returnTrLable(translats,CustomText.amount, lng).trim()} :',
-                                            style: Styles.black104,
-                                            strutStyle: StrutStyle(height: 1.2),
-                                          )
-                                        ],
-                                      ),
-                                      SizedBox(width: 10),
-                                      SizedBox(
-                                        height: 10.h,
-                                        width: 2,
-                                        child: VerticalDivider(
-                                          color: Color(0xffE6E6E6),
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                    var refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (BuildContext context) => (role ==
+                                                    CustomText.crecheSupervisor
+                                                ? (now.isBefore(applicableDate)
+                                                    ? true
+                                                    : false)
+                                                : false)
+                                            ? CashbookExpensesDetailsScreen(
+                                                creche_id: widget.creche_id,
+                                                cashbook_guid: cashbookGuid!,
+                                                minDate: minDate,
+                                                reqAmount: walletToal +
+                                                    Global.stringToDouble(Global.getItemValues(
+                                                        expensesData[index]
+                                                            .responces!,
+                                                        'expense_amount')))
+                                            : CashbookExpensesDetailsViewScreen(
+                                                creche_id: widget.creche_id,
+                                                cashbook_guid: cashbookGuid!,
+                                                reqAmount: walletToal + Global.stringToDouble(Global.getItemValues(expensesData[index].responces!, 'expense_amount')))));
+                                    if (refStatus == 'itemRefresh') {
+                                      await fetchCashbookData();
+                                    }
+                                  },
+                                  child: Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 5.h),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Color(0xff5A5A5A)
+                                                  .withOpacity(0.2),
+                                              offset: Offset(0, 3),
+                                              blurRadius: 6,
+                                              spreadRadius: 0,
+                                            ),
+                                          ],
+                                          color: Colors.white,
+                                          border: Border.all(
+                                              color: Color(0xffE7F0FF)),
+                                          borderRadius:
+                                              BorderRadius.circular(10.r)),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w, vertical: 8.h),
+                                        child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
-                                            Text(
-                                              Validate().displeDateFormate(
-                                                  Global.getItemValues(
-                                                      expensesData[index]
-                                                          .responces!,
-                                                      'date')),
-                                              style: Styles.cardBlue10,
-                                              strutStyle:
-                                                  StrutStyle(height: .5),
-                                              overflow: TextOverflow.ellipsis,
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} :',
+                                                  style: Styles.black104,
+                                                ),
+                                                Text(
+                                                  '${Global.returnTrLable(translats, CustomText.amount, lng).trim()} :',
+                                                  style: Styles.black104,
+                                                  strutStyle:
+                                                      StrutStyle(height: 1.2),
+                                                )
+                                              ],
                                             ),
-                                            Text(
-                                              "₹ ${Global.getItemValues(expensesData[index].responces!, 'expense_amount')}",
-                                              style: Styles.cardBlue10,
-                                              strutStyle:
-                                                  StrutStyle(height: 1.2),
-                                              overflow: TextOverflow.ellipsis,
+                                            SizedBox(width: 10),
+                                            SizedBox(
+                                              height: 10.h,
+                                              width: 2,
+                                              child: VerticalDivider(
+                                                color: Color(0xffE6E6E6),
+                                              ),
                                             ),
+                                            SizedBox(width: 10),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    Validate().displeDateFormate(
+                                                        Global.getItemValues(
+                                                            expensesData[index]
+                                                                .responces!,
+                                                            'date')),
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: .5),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  Text(
+                                                    "₹ ${Global.getItemValues(expensesData[index].responces!, 'expense_amount')}",
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(width: 5),
+                                            (expensesData[index].is_edited ==
+                                                        0 &&
+                                                    expensesData[index]
+                                                            .is_uploaded ==
+                                                        1)
+                                                ? Image.asset(
+                                                    "assets/sync.png",
+                                                    scale: 1.5,
+                                                  )
+                                                : Image.asset(
+                                                    "assets/sync_gray.png",
+                                                    scale: 1.5,
+                                                  )
                                           ],
                                         ),
                                       ),
-                                      SizedBox(width: 5),
-                                      (expensesData[index].is_edited == 0 &&
-                                              expensesData[index].is_uploaded ==
-                                                  1)
-                                          ? Image.asset(
-                                              "assets/sync.png",
-                                              scale: 1.5,
-                                            )
-                                          : Image.asset(
-                                              "assets/sync_gray.png",
-                                              scale: 1.5,
-                                            )
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
-                  )
-                : Expanded(
-                    child: Center(
-                      child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng)),
-                    ),
-                  ),
-          ],
-        ):SizedBox(),
+                                );
+                              }),
+                        )
+                      : Expanded(
+                          child: Center(
+                            child: Text(Global.returnTrLable(
+                                translats, CustomText.NorecordAvailable, lng)),
+                          ),
+                        ),
+                ],
+              )
+            : SizedBox(),
       ),
     );
   }

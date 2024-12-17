@@ -8,12 +8,14 @@ class DeviceService {
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     if (Platform.isAndroid) {
       final AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
-      return androidInfo.id;
+      String rawId = '${androidInfo.id}-${androidInfo.model}-${androidInfo.hardware}';
+      print("rawId $rawId");
+      return rawId;
     } else if (Platform.isIOS) {
       final IosDeviceInfo iosInfo = await deviceInfoPlugin.iosInfo;
-      return iosInfo.identifierForVendor;
+      return '${iosInfo.identifierForVendor}-${iosInfo.model}-${iosInfo.systemName}-${iosInfo.systemVersion}';
     } else {
       return null;
     }
-  }
+  } 
 }

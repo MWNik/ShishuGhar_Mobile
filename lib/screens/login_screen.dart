@@ -79,6 +79,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final FocusNode _focusNode = FocusNode();
   final FocusNode _focusNode2 = FocusNode();
+  List<Translation> translats = [];
 
   @override
   void initState() {
@@ -249,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                               padding: EdgeInsets.symmetric(
                                   horizontal: (_keyboardVisible) ? 15.w : 7.w),
                               child: CustomTextFieldRow(
-                                focusNode:_focusNode,
+                                focusNode: _focusNode,
                                 controller: mobileController,
                                 keyboardtype: TextInputType.text,
                                 enabled: savedUsername == null ? true : false,
@@ -269,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                   horizontal: (_keyboardVisible) ? 15.w : 7.w),
                               child: CustomTextFieldRow(
                                 maxlength: 20,
-                                focusNode:_focusNode2,
+                                focusNode: _focusNode2,
                                 controller: passwordcontroller,
                                 hintText: CustomText.Password,
                                 prefixIcon: Image.asset(
@@ -833,7 +834,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       } else {
         var userName = await Validate().readString(Validate.loginName);
         if (userName != null) {
-
           Navigator.pop(mContext);
           Validate().saveString(Validate.Password, password);
           Validate().saveString(Validate.appToken, token);
@@ -873,10 +873,24 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       await setUpLogin(loginApiModel, username, pass,
           Global.validToString(deviceId), mContext);
     } else {
+      var lang = 'en';
+      if (selectedlanguages == 'Hindi') {
+        lang = 'hi';
+      } else if (selectedlanguages == 'Odiya') {
+        lang = 'od';
+      }
+      var errorString = Global.errorBodyToString(loginResponse.body, 'message');
+      List<String> valueNames = [errorString, CustomText.ok];
+
+      await TranslationDataHelper()
+          .callTranslateString(valueNames)
+          .then((value) => translats.addAll(value));
+      print(
+          "TRANSLATED ERROR STRING ====> ${Global.returnTrLable(translats, errorString, lang)}");
       Navigator.pop(mContext);
       Validate().singleButtonPopup(
-          Global.errorBodyToString(loginResponse.body, 'message'),
-          'ok',
+          Global.returnTrLable(translats, errorString, lang),
+          Global.returnTrLable(translats, CustomText.ok, lang),
           false,
           mContext);
     }
@@ -971,7 +985,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       builder: (context) {
         return DoubleButtonDailog(
           posButton: Global.returnTrLable(
-              labelControlls!, CustomText.login, Global.validToString(lng)),
+              labelControlls!, CustomText.LogIn, Global.validToString(lng)),
           negButton: Global.returnTrLable(
               labelControlls, CustomText.Cancel, Global.validToString(lng)),
           message: Global.returnTrLable(labelControlls,

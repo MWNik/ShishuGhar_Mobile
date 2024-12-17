@@ -4,8 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 import 'package:shishughar/database/helper/height_weight_boys_girls_helper.dart';
+import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/databasemodel/child_growth_responce_model.dart';
 import 'package:flutter/material.dart';
+import 'package:shishughar/utils/validate.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../../custom_widget/custom_appbar.dart';
 import '../../custom_widget/custom_text.dart';
@@ -48,6 +50,20 @@ class _HeightforAgeBoysGirlsScreenState
   String lng = 'en';
 
   Future getDatas() async {
+    String? lngtr = await Validate().readString(Validate.sLanguage);
+    if (lngtr != null) {
+      lng = lngtr;
+    }
+    List<String> valueItems = [
+      CustomText.NorecordAvailable,
+      CustomText.GrowthChart,
+      CustomText.WeightforAge,
+      CustomText.WeightforHeight,
+      CustomText.HeightforAge
+    ];
+    await TranslationDataHelper()
+        .callTranslateString(valueItems)
+        .then((value) => translats.addAll(value));
     var boys = await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
     var girls = await HeightWeightBoysGirlsHelper().callHeightForAgeGirls();
     List res = widget.gender_id == 1 ? boys : girls;

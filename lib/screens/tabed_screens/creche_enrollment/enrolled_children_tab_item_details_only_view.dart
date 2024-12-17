@@ -58,7 +58,7 @@ class _EnrolledChilrenTabItemViewState
   bool shouldEditMesure = true;
   List<HouseHoldTabResponceHelper> retrivedList = [];
   List<OptionsModel> options = [];
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<HouseHoldFielItemdModel> multselectItemTab = [];
   Map<String, dynamic> myMap = {};
   List<Translation> translats = [];
@@ -92,7 +92,9 @@ class _EnrolledChilrenTabItemViewState
       CustomText.enrolled,
       CustomText.ChildProfile,
       CustomText.Yes,
-      CustomText.No
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
     ];
 
     // await EnrolledChildrenFieldHelper()
@@ -173,7 +175,7 @@ class _EnrolledChilrenTabItemViewState
       for (int i = 0; i < items.length; i++) {
         screenItems.add(widgetTypeWidget(i, items[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, items[i])) {
+        if (!logic!.callDependingLogic(myMap, items[i])) {
           myMap.remove(items[i].fieldname);
         }
       }
@@ -188,17 +190,19 @@ class _EnrolledChilrenTabItemViewState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng!),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: itemsOption,
           selectedItem: myMap[quesItem.fieldname],
           readable: true,
           isVisible: quesItem.fieldname == 'gender_id'
               ? true
-              : DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null) {
               myMap[quesItem.fieldname!] = value.name!;
@@ -214,14 +218,12 @@ class _EnrolledChilrenTabItemViewState
           fieldName: quesItem.fieldname,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           readable: true,
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -243,16 +245,16 @@ class _EnrolledChilrenTabItemViewState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           readable: true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible: quesItem.fieldname == 'child_name'
               ? true
-              : DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -262,23 +264,22 @@ class _EnrolledChilrenTabItemViewState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           readable: true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -308,7 +309,7 @@ class _EnrolledChilrenTabItemViewState
           items: items,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           selectedItem: myMap[quesItem.fieldname],
@@ -325,7 +326,7 @@ class _EnrolledChilrenTabItemViewState
       //   return DynamicCustomCheckboxWithLabel(
       //     label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
       //     initialValue: myMap[quesItem.fieldname!],
-      //     isVisible: DependingLogic().callDependingLogic(logics,myMap,quesItem),
+      //     isVisible: logic!.callDependingLogic(myMap,quesItem),
       //     onChanged: (value) {
       //       if(value>0)
       //         myMap[quesItem.fieldname!] = value;
@@ -341,10 +342,9 @@ class _EnrolledChilrenTabItemViewState
           lng: lng,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           // readable: true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -358,14 +358,13 @@ class _EnrolledChilrenTabItemViewState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -375,10 +374,11 @@ class _EnrolledChilrenTabItemViewState
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: true,
           titleText:
@@ -400,7 +400,7 @@ class _EnrolledChilrenTabItemViewState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: true,
           initialvalue: myMap[quesItem.fieldname!],
@@ -414,6 +414,7 @@ class _EnrolledChilrenTabItemViewState
         );
       case 'Float':
         return DynamicCustomTextFieldFloat(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
@@ -425,14 +426,12 @@ class _EnrolledChilrenTabItemViewState
               quesItem.fieldname == 'height' || quesItem.fieldname == 'weight'
                   ? shouldEditMesure
                   : true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -484,20 +483,12 @@ class _EnrolledChilrenTabItemViewState
       }
     }
 
-    List<String> fieldlabelList = [];
-    itemsList!.forEach((element) {
-      if (Global.validString(element.label)) fieldlabelList.add(element.label!);
-    });
-    await TranslationDataHelper()
-        .callTranslateString(fieldlabelList)
-        .then((value) => translats.addAll(value));
-
     await OptionsModelHelper()
         .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(translats, data, lng);
     });
 
     setState(() {

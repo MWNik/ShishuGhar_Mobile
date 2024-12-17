@@ -363,8 +363,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                     maxLines: 2,
                                   ),
                                   Text(
-                                      "${Global.returnTrLable(locationControlls, role, lng ?? 'en')}",
-                                      style: Styles.Grey104),
+                                      "${Global.returnTrLable(locationControlls, role, lng!)}",
+                                      style: Styles.roleLabe),
                                 ],
                               )
                             ]),
@@ -774,7 +774,9 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: CustomText.Version,
+                        text: lng != null
+                            ? '${Global.returnTrLable(locationControlls, CustomText.Version, lng!)}: '
+                            : '',
                         style: Styles.black124,
                         children: <TextSpan>[
                           TextSpan(
@@ -1515,6 +1517,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       CustomText.Enrolledchildren,
       CustomText.VerifyData,
       CustomText.VisitNote,
+      CustomText.Version,
       CustomText.GrowthMonitoring,
       CustomText.Attendance,
       CustomText.CrecheCommittee,
@@ -1563,7 +1566,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => locationControlls = value);
+        .then((value) => locationControlls.addAll(value));
 
     setState(() {});
   }

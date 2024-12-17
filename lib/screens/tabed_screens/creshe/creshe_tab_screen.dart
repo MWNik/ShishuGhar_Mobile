@@ -63,7 +63,9 @@ class _CresheTabScreenState extends State<CresheTabScreen>
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {

@@ -48,7 +48,7 @@ class CashbookExpensesDetailsViewScreen extends StatefulWidget {
 
 class _CashbookExpensesDetailsViewScreenState
     extends State<CashbookExpensesDetailsViewScreen> {
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<HouseHoldFielItemdModel> allItems = [];
   Map<String, dynamic> myMap = {};
   List<OptionsModel> options = [];
@@ -78,12 +78,34 @@ class _CashbookExpensesDetailsViewScreenState
     lng = (await Validate().readString(Validate.sLanguage))!;
     translats.clear();
     List<String> valueNames = [
+      CustomText.ok,
       CustomText.Save,
       CustomText.Creches,
       CustomText.CrecheCaregiver,
       CustomText.Next,
       CustomText.back,
-      CustomText.Submit
+      CustomText.Submit,
+      CustomText.CashBookExpences,
+      CustomText.dataSaveSuc,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.typehere,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -97,7 +119,8 @@ class _CashbookExpensesDetailsViewScreenState
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppbar(
-          text: Global.returnTrLable(translats, CustomText.CashBookExpences, lng!),
+          text: Global.returnTrLable(
+              translats, CustomText.CashBookExpences, lng!),
           onTap: () => Navigator.pop(context, 'itemRefresh'),
         ),
         body: _isLoading
@@ -153,7 +176,7 @@ class _CashbookExpensesDetailsViewScreenState
       for (int i = 0; i < allItems.length; i++) {
         screenItems.add(widgetTypeWidget(i, allItems[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, allItems[i])) {
+        if (!logic!.callDependingLogic(myMap, allItems[i])) {
           myMap.remove(allItems[i].fieldname);
         }
       }
@@ -168,17 +191,15 @@ class _CashbookExpensesDetailsViewScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-         
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
           readable: true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -195,15 +216,12 @@ class _CashbookExpensesDetailsViewScreenState
           readable: true,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -224,17 +242,16 @@ class _CashbookExpensesDetailsViewScreenState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
-          
+
           maxlength: quesItem.length,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
-          // readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
+          // readable: logic!.callReadableLogic( myMap, quesItem),
           readable: true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -247,17 +264,15 @@ class _CashbookExpensesDetailsViewScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-        
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
-              readable: true,
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
+          readable: true,
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -272,7 +287,7 @@ class _CashbookExpensesDetailsViewScreenState
       //         Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng),
       //     initialValue: myMap[quesItem.fieldname!],
       //     isVisible:
-      //         DependingLogic().callDependingLogic(logics, myMap, quesItem),
+      //         logic!.callDependingLogic( myMap, quesItem),
       //     onChanged: (value) {
       //       if (value > 0)
       //         myMap[quesItem.fieldname!] = value;
@@ -289,11 +304,10 @@ class _CashbookExpensesDetailsViewScreenState
           lng: lng!,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          // readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          // readable: logic!.callReadableLogic( myMap, quesItem),
           readable: true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -310,15 +324,14 @@ class _CashbookExpensesDetailsViewScreenState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          // readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          // readable: logic!.callReadableLogic( myMap, quesItem),
           readable: true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -328,24 +341,23 @@ class _CashbookExpensesDetailsViewScreenState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng!),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          // readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          // readable: logic!.callReadableLogic( myMap, quesItem),
           readable: true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -355,7 +367,6 @@ class _CashbookExpensesDetailsViewScreenState
               }
             } else {
               myMap.remove(quesItem.fieldname);
-
             }
           },
         );
@@ -365,7 +376,6 @@ class _CashbookExpensesDetailsViewScreenState
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    
     lng = (await Validate().readString(Validate.sLanguage))!;
     await CashbookExpencesMetaFieldsHelper()
         .getCashbookMetaFieldsbyScreenType(screen_type)
@@ -377,21 +387,25 @@ class _CashbookExpensesDetailsViewScreenState
         .toList();
 
     List<String> defaultCommon = [];
-    List<String> fieldLabelTranslats = [];
+    List<String> fieldlabelTranslats = [];
     for (int i = 0; i < allItems.length; i++) {
       if (Global.validString(allItems[i].options)) {
         defaultCommon.add('tab${allItems[i].options!.trim()}');
       }
-      if(Global.validString(allItems[i].label))
-      fieldLabelTranslats.add(allItems[i].label!.trim());
+      if (Global.validString(allItems[i].label)) {
+        fieldlabelTranslats.add(allItems[i].label!.trim());
+      }
     }
-    await TranslationDataHelper().callTranslateString(fieldLabelTranslats).then((value) => translats.addAll(value));
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
 
+    await TranslationDataHelper()
+        .callTranslateString(fieldlabelTranslats)
+        .then((value) => translats.addAll(value));
+
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(translats, data, lng!);
     });
 
     setState(() {
@@ -416,11 +430,10 @@ class _CashbookExpensesDetailsViewScreenState
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element,translats,lng!);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
-              Global.returnTrLable(translats, validationMsg, lng!),
+              validationMsg!,
               Global.returnTrLable(translats, CustomText.ok, lng!),
               false,
               context);
@@ -428,15 +441,19 @@ class _CashbookExpensesDetailsViewScreenState
           break;
         }
 
-        if(element.fieldname=='expense_amount' && Global.stringToDouble(myMap[element.fieldname].toString())>widget.reqAmount){
+        if (element.fieldname == 'expense_amount' &&
+            Global.stringToDouble(myMap[element.fieldname].toString()) >
+                widget.reqAmount) {
           Validate().singleButtonPopup(
-              Global.returnTrLable(translats,"Please enter amount less than or equal ₹${widget.reqAmount}", lng!),
+              Global.returnTrLable(
+                  translats,
+                  "Please enter amount less than or equal ₹${widget.reqAmount}",
+                  lng!),
               Global.returnTrLable(translats, CustomText.ok, lng!),
               false,
               context);
           validStatus = false;
         }
-
       }
       ;
     } else {

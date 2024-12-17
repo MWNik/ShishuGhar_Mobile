@@ -75,7 +75,11 @@ class _ReferallCompletedListForCCState
       CustomText.NorecordAvailable,
       CustomText.Search,
       CustomText.Village,
-      CustomText.FlaggedChilderen
+      CustomText.FlaggedChilderen,
+      CustomText.ChildId,
+      CustomText.Creche_Name,
+      CustomText.DischangeDate,
+      CustomText.visitDate
     ];
 
     await TranslationDataHelper()

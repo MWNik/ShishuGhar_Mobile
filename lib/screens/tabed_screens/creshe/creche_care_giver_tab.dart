@@ -42,7 +42,7 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
   List<Translation> labelControlls = [];
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
     callScrenControllers(CustomText.crecheCaregiver);
   }
@@ -56,7 +56,9 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {

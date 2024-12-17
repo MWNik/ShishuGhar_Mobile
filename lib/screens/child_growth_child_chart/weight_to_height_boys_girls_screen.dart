@@ -4,9 +4,11 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 import 'package:shishughar/database/helper/height_weight_boys_girls_helper.dart';
+import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/databasemodel/child_growth_responce_model.dart';
 
 import 'package:flutter/material.dart';
+import 'package:shishughar/utils/validate.dart';
 
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../../custom_widget/custom_appbar.dart';
@@ -49,9 +51,23 @@ class _WeightToHeightBoysGirlsScreenState
   String lng = 'en';
 
   Future getDatas() async {
+    String? lngtr = await Validate().readString(Validate.sLanguage);
+    if (lngtr != null) {
+      lng = lngtr;
+    }
+    List<String> valueItems = [
+      CustomText.NorecordAvailable,
+      CustomText.GrowthChart,
+      CustomText.WeightforAge,
+      CustomText.WeightforHeight,
+      CustomText.HeightforAge
+    ];
+    await TranslationDataHelper()
+        .callTranslateString(valueItems)
+        .then((value) => translats.addAll(value));
     var boys = await HeightWeightBoysGirlsHelper().callWeightToHeightBoys();
     var girls = await HeightWeightBoysGirlsHelper().callWeightToHeightGirls();
-    List res =widget.gender_id == 1 ? boys : girls;
+    List res = widget.gender_id == 1 ? boys : girls;
     // widget.gender_id == '1' ? boys : girls;
     print(widget.gender_id);
     setState(() {
@@ -112,7 +128,9 @@ class _WeightToHeightBoysGirlsScreenState
       }).toList();
 
       child!.addAll(children.map((data) {
-        var height = Global.validString(data['height'].toString())?data['height']:0.0;
+        var height = Global.validString(data['height'].toString())
+            ? data['height']
+            : 0.0;
         double x = (height as num).toDouble();
         (x > length!.last) ? maxX = x : maxX = length!.last;
         // (x < length!.first) ? minX = x : minX = length!.first;
@@ -175,8 +193,8 @@ class _WeightToHeightBoysGirlsScreenState
                     ? MultiLineChart(
                         coordinatesOne: red_cor!,
                         child: child!,
-                  childName: widget.childName,
-                  childId: widget.childId,
+                        childName: widget.childName,
+                        childId: widget.childId,
                         coordinatesTwo: green_cor!,
                         coordinatesThree: yellow_max!,
                         coordinatesFour: yellow_min!,

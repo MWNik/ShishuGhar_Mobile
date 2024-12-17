@@ -70,7 +70,10 @@ class _ChildFollowUpsListingScreenState
       CustomText.Village,
       CustomText.Creches,
       CustomText.all,
-      CustomText.unsynched
+      CustomText.unsynched,
+      CustomText.schduleDate,
+      CustomText.followup_visit_date,
+      CustomText.weight
     ];
 
     await TranslationDataHelper()

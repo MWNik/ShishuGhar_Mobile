@@ -15,7 +15,6 @@ import '../child_exit/children_enrolled_for_exit_listed.dart';
 import '../enrolled_children/children_enrolled_listed_screen.dart';
 
 class CrecheEnrolledListingTab extends StatefulWidget {
-
   String creche_id;
   String EnrolledChilGUID;
   String Childname;
@@ -48,11 +47,12 @@ class _CrecheEnrolledListingTabState extends State<CrecheEnrolledListingTab>
     setLabelTextData();
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {
@@ -109,7 +109,6 @@ class _CrecheEnrolledListingTabState extends State<CrecheEnrolledListingTab>
                   ]),
                 )
               ],
-
             ),
             centerTitle: true,
             bottom: _isLoading

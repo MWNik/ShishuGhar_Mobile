@@ -65,7 +65,7 @@ class RequisitionDetails extends StatefulWidget {
 
 class _RequisitionDetailsState extends State<RequisitionDetails> {
   TextEditingController textController = TextEditingController();
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<OptionsModel> monthsList = [];
   List<OptionsModel> yearList = [];
   List<PartnerStockModel> partnerStockItemList = [];
@@ -77,6 +77,8 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
   String userName = '';
   bool _isLoading = true;
   List<HouseHoldFielItemdModel> allItems = [];
+  HouseHoldFielItemdModel receivedQuantField = HouseHoldFielItemdModel();
+  HouseHoldFielItemdModel receivedDateField = HouseHoldFielItemdModel();
   Map<String, Map<String, dynamic>> itemMap = {};
   List<OptionsModel> options = [];
   List<Translation> translats = [];
@@ -122,13 +124,37 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
       CustomText.requiDetails,
       CustomText.Search,
       CustomText.Submit,
+      CustomText.received,
+      CustomText.supplied,
       CustomText.back,
       CustomText.plsFilManForm,
       CustomText.dataSaveSuc,
       CustomText.removedItem,
       CustomText.noREmovedItem,
       CustomText.add,
-      CustomText.required
+      CustomText.required,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
 
     await TranslationDataHelper()
@@ -232,16 +258,28 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(translats, data, lng);
     });
+    List<String> labelTranslats = [];
     for (var element in allItems) {
       _foocusNode.addEntries([MapEntry(element.fieldname!, FocusNode())]);
+      if(Global.validString(element.label)){labelTranslats.add(element.label!);}
     }
+
+    await TranslationDataHelper().callTranslateString(labelTranslats).then((value) => translats.addAll(value));
     _scrollController.addListener(() {
       if (_scrollController.position.isScrollingNotifier.value) {
         _foocusNode.forEach((_, focusNode) => focusNode.unfocus());
       }
     });
+    receivedQuantField = allItems
+        .where((element) => element.fieldname == 'quantity_received')
+        .toList()
+        .first;
+    receivedDateField = allItems
+        .where((element) => element.fieldname == 'received_date')
+        .toList()
+        .first;
 
     setState(() {
       _isLoading = false;
@@ -510,11 +548,10 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
           }
         }
 
-        var validationMsg = DependingLogic()
-            .validationMessge(logics, itemMap[name]!, element, translats, lng!);
+        var validationMsg = logic!.validationMessge(itemMap[name]!, element);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
-              Global.returnTrLable(translats, validationMsg, lng!),
+              validationMsg!,
               Global.returnTrLable(translats, CustomText.ok, lng!),
               false,
               context);
@@ -663,8 +700,7 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
         screenItems.add(widgetTypeWidget(i, itemfields[i], quant_required,
             itemName, itemFields, type, isItemReadable));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic()
-            .callDependingLogic(logics, myMap, itemfields[i])) {
+        if (!logic!.callDependingLogic(myMap, itemfields[i])) {
           // myMap.remove(itemfields[i].fieldname);
           // itemMap[itemName]!.remove(itemfields[i].fieldname);
         }
@@ -801,8 +837,11 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
                                     ),
                                     (type == 1)
                                         ? TextSpan(
-                                            text:
-                                                '(${quantity_required.toString()})',
+                                            text: Global.validString(
+                                                    quantity_required
+                                                        .toString())
+                                                ? '(${quantity_required.toString()})'
+                                                : '',
                                             style: Styles.black124)
                                         : TextSpan(text: '')
                                   ])),
@@ -934,135 +973,161 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
 
   Widget itemSupplyStatus(Map<String, dynamic> fieldData, int itemName,
       int type, bool isItemReadable) {
-    HouseHoldFielItemdModel receivedQuantField = allItems
-        .where((element) => element.fieldname == 'quantity_received')
-        .toList()
-        .first;
-    HouseHoldFielItemdModel receivedDateField = allItems
-        .where((element) => element.fieldname == 'received_date')
-        .toList()
-        .first;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: RichText(
-                      textAlign: TextAlign.left,
-                      text: TextSpan(children: [
-                        TextSpan(
-                          text: 'Supplied : ',
-                          style: Styles.black105P,
-                        ),
-                        TextSpan(
-                            text: fieldData['quantity_supplied'].toString(),
-                            style: Styles.cardBlue10),
-                        TextSpan(
+    return Container(
+      padding: EdgeInsets.all(4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+              padding: EdgeInsets.only(bottom: 6, left: 5),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: RichText(
+                        textAlign: TextAlign.left,
+                        text: TextSpan(children: [
+                          TextSpan(
                             text:
-                                ' (${Validate().displeDateFormate(fieldData['supply_date'])})',
-                            style: Styles.black123)
-                      ])),
-                ),
-                (fieldData['quantity_received'] != null &&
-                        fieldData['received_date'] != null)
-                    ? Expanded(
-                        child: RichText(
-                            text: TextSpan(children: [
-                        TextSpan(text: "Received : ", style: Styles.black105P),
-                        TextSpan(
-                            text: fieldData['quantity_received'].toString(),
-                            style: Styles.cardBlue10),
-                        TextSpan(
-                            text:
-                                ' (${Validate().displeDateFormate(fieldData['received_date'])})',
-                            style: Styles.black123)
-                      ])))
-                    : Text('')
-              ],
-            )),
-        (fieldData['quantity_received'] != null &&
-                fieldData['received_date'] != null)
-            ? Text('')
-            : type == 1
-                ? SizedBox()
-                : Container(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: CustomTextfieldSidebyside(
-                            height: 35.h,
-                            titleText: 'Received',
-                            fieldType: 'Float',
-                            initialvalue: fieldData['quantity_received'],
-                            onChanged: (value) async {
-                              if (value != null) {
-                                fieldData['quantity_received'] = value;
-                                String? validateMessage = await DependingLogic()
-                                    .validationMessge(
-                                        logics, fieldData, receivedQuantField,translats,lng);
-                                if (Global.validString(validateMessage)) {
-                                  Validate().singleButtonPopup(
-                                      Global.returnTrLable(
-                                          translats, validateMessage, lng),
-                                      Global.returnTrLable(
-                                          translats, CustomText.ok, lng),
-                                      false,
-                                      context);
-                                } else {
-                                  if (itemMap
-                                      .containsKey(itemName.toString())) {
-                                    itemMap[itemName.toString()]![
-                                        'quantity_received'] = value;
+                                '${Global.returnTrLable(translats, CustomText.supplied, lng)} : ',
+                            style: Styles.black124,
+                          ),
+                          TextSpan(
+                              text: fieldData['quantity_supplied'].toString(),
+                              style: Styles.cardBlue12),
+                          TextSpan(
+                              text: Global.validString(Validate()
+                                      .displeDateFormate(
+                                          fieldData['supply_date']))
+                                  ? ' (${Validate().displeDateFormate(fieldData['supply_date'])})'
+                                  : '',
+                              style: Styles.black123)
+                        ])),
+                  ),
+                  // (fieldData['quantity_received'] != null &&
+                  //         fieldData['received_date'] != null)
+                  (isItemReadable)
+                      ? Expanded(
+                          child: RichText(
+                              text: TextSpan(children: [
+                          TextSpan(
+                              text:
+                                  "${Global.returnTrLable(translats, CustomText.received, lng)} : ",
+                              style: Styles.black124),
+                          TextSpan(
+                              text: fieldData['quantity_received'].toString(),
+                              style: Styles.cardBlue12),
+                          TextSpan(
+                              text: Global.validString(Validate()
+                                      .displeDateFormate(
+                                          fieldData['received_date']))
+                                  ? ' (${Validate().displeDateFormate(fieldData['received_date'])})'
+                                  : '',
+                              style: Styles.black123)
+                        ])))
+                      : Text('')
+                ],
+              )),
+          // (fieldData['quantity_received'] != null &&
+          //         fieldData['received_date'] != null)
+          (isItemReadable)
+              ? Text('')
+              : type == 1
+                  ? SizedBox()
+                  : Container(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: Row(
+                        // crossAxisAlignment: CrossAxisAlignment.center,
+                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            flex: 1,
+                            child: DynamicCustomTextFieldFloat(
+                              hintText: Global.returnTrLable(
+                                  translats, CustomText.typehere, lng),
+                              height: 35.h,
+                              maxlength: 4,
+                              titleText: Global.returnTrLable(
+                                  translats, CustomText.received, lng),
+                              initialvalue: fieldData['quantity_received'],
+                              isRequred: receivedQuantField.reqd == 1
+                                  ? receivedQuantField.reqd
+                                  : logic!.dependeOnMendotory(
+                                      fieldData, receivedQuantField),
+                              isVisible: logic!.callDependingLogic(
+                                  fieldData, receivedQuantField),
+                              onChanged: (value) async {
+                                if (value != null) {
+                                  fieldData['quantity_received'] = value;
+                                  String? validateMessage = await logic!
+                                      .validationMessge(
+                                          fieldData, receivedQuantField);
+                                  if (Global.validString(validateMessage)) {
+                                    Validate().singleButtonPopup(
+                                        validateMessage!,
+                                        Global.returnTrLable(
+                                            translats, CustomText.ok, lng),
+                                        false,
+                                        context);
+                                  } else {
+                                    if (itemMap
+                                        .containsKey(itemName.toString())) {
+                                      itemMap[itemName.toString()]![
+                                          'quantity_received'] = value;
+                                    }
                                   }
                                 }
-                              }
-                            },
+                              },
+                            ),
                           ),
-                        ),
-                        CustomDatepickerDynamic(
-                          width: 180,
-                          initialvalue: fieldData[receivedDateField.fieldname],
-                          fieldName: receivedDateField.fieldname,
-                          readable: type == 1
-                              ? true
-                              : isItemReadable
-                                  ? true
-                                  : DependingLogic().callReadableLogic(
-                                      logics, fieldData, receivedDateField),
-                          isRequred: (receivedDateField.reqd == 1
-                              ? receivedDateField.reqd
-                              : DependingLogic().dependeOnMendotory(
-                                  logics, fieldData, receivedDateField)),
-                          isVisible: DependingLogic().callDependingLogic(
-                              logics, fieldData, receivedDateField),
-                          calenderValidate: DependingLogic().calenderValidation(
-                              logics, fieldData, receivedDateField),
-                          onChanged: (value) {
-                            if (value != null) {
-                              if (itemMap.containsKey(itemName.toString())) {
-                                setState(() {
-                                  itemMap[itemName.toString()]![
-                                      receivedDateField.fieldname!] = value;
-                                });
-                              }
-                            } else {
-                              if (itemMap.containsKey(itemName.toString())) {
-                                itemMap[itemName.toString()]!
-                                    .remove(receivedDateField.fieldname);
-                              }
-                            }
-                          },
-                        )
-                      ],
-                    ),
-                  )
-      ],
+                          Flexible(
+                            flex: 2,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 15),
+                              child: CustomDatepickerDynamic(
+                                // width: 180,
+                                initialvalue:
+                                    fieldData[receivedDateField.fieldname],
+                                fieldName: receivedDateField.fieldname,
+                                readable: type == 1
+                                    ? true
+                                    : isItemReadable
+                                        ? true
+                                        : logic!.callReadableLogic(
+                                            fieldData, receivedDateField),
+                                isRequred: (receivedDateField.reqd == 1
+                                    ? receivedDateField.reqd
+                                    : logic!.dependeOnMendotory(
+                                        fieldData, receivedDateField)),
+                                isVisible: logic!.callDependingLogic(
+                                    fieldData, receivedDateField),
+                                calenderValidate: logic!.calenderValidation(
+                                    fieldData, receivedDateField),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    if (itemMap
+                                        .containsKey(itemName.toString())) {
+                                      setState(() {
+                                        itemMap[itemName.toString()]![
+                                                receivedDateField.fieldname!] =
+                                            value;
+                                      });
+                                    }
+                                  } else {
+                                    if (itemMap
+                                        .containsKey(itemName.toString())) {
+                                      itemMap[itemName.toString()]!
+                                          .remove(receivedDateField.fieldname);
+                                    }
+                                  }
+                                },
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+        ],
+      ),
     );
   }
 
@@ -1118,12 +1183,10 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           items: items,
           selectedItem: itemFields[quesItem.fieldname!],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           readable: type == 1 ? true : isItemReadable,
           onChanged: (value) {
             if (value != null) {
@@ -1144,22 +1207,20 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemFields[quesItem.fieldname!],
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+                  : logic!.callReadableLogic(itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
@@ -1167,8 +1228,7 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
                 itemMap[itemName.toString()]!['quantity_required'] =
                     value.toString();
               }
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, itemFields, quesItem);
+              var logData = logic!.callAutoGeneratedValue(itemFields, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   itemFields.addEntries(
@@ -1188,18 +1248,15 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
         return DynamicCustomYesNoCheckboxWithLabel(
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: itemFields[quesItem.fieldname],
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           labelControlls: translats,
           lng: lng,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+                  : logic!.callReadableLogic(itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -1217,20 +1274,17 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
           maxline: 3,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!.callReadableLogic(itemFields, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty) {
               if (itemMap.containsKey(itemName.toString())) {
@@ -1247,19 +1301,18 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           maxlength: quesItem.length,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!.callReadableLogic(itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -1280,15 +1333,13 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           maxlength: quesItem.length,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!.callReadableLogic(itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -1311,21 +1362,18 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred:
-              DependingLogic().dependeOnMendotory(logics, itemFields, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
           initialvalue: itemFields[quesItem.fieldname!],
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           maxlength: quesItem.length,
           readable: type == 1
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!.callReadableLogic(itemFields, quesItem),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty) {
               if (itemMap.containsKey(itemName.toString())) {
@@ -1350,24 +1398,20 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
+                  : logic!.callReadableLogic(itemFields, quesItem),
           // isRequred: quesItem.reqd == 1
           //     ? quesItem.reqd
-          //     : DependingLogic()
-          //         .dependeOnMendotory(logics, itemFields, quesItem),
+          //     : logic!
+          //         .dependeOnMendotory( itemFields, quesItem),
           isRequred: (quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic()
-                  .dependeOnMendotory(logics, itemFields, quesItem)),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, itemFields, quesItem),
+              : logic!.dependeOnMendotory(itemFields, quesItem)),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
+          calenderValidate: logic!.calenderValidation(itemFields, quesItem),
           onChanged: (value) {
             // myMap[quesItem.fieldname!] = value;
-            // var logData = DependingLogic()
-            //     .callDateDiffrenceLogic(logics, myMap, quesItem);
+            // var logData = logic!
+            //     .callDateDiffrenceLogic( myMap, quesItem);
             // if (logData.isNotEmpty) {
             //   if (logData.keys.length > 0) {
             //     // var item =myMap[logData.keys.first];
@@ -1405,8 +1449,7 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic()
-                  .dependeOnMendotory(logics, itemFields, quesItem),
+              : logic!.dependeOnMendotory(itemFields, quesItem),
           // maxlength: quesItem.length,
           fieldName: quesItem.fieldname == 'quantity_received'
               ? 'weight'
@@ -1418,10 +1461,8 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
               ? true
               : isItemReadable
                   ? true
-                  : DependingLogic()
-                      .callReadableLogic(logics, itemFields, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, itemFields, quesItem),
+                  : logic!.callReadableLogic(itemFields, quesItem),
+          isVisible: logic!.callDependingLogic(itemFields, quesItem),
           onChanged: (value) async {
             print('Entered text: $value');
             if (value != null) {
@@ -1433,19 +1474,18 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
               }
               if (quesItem.fieldname == 'quantity_received') {
                 itemFields[quesItem.fieldname!] = value;
-                var validateMessage = await DependingLogic()
-                    .validationMessge(logics, itemFields, quesItem,translats,lng);
+                var validateMessage =
+                    await logic!.validationMessge(itemFields, quesItem);
                 if (Global.validString(validateMessage)) {
                   Validate().singleButtonPopup(
-                      Global.returnTrLable(translats, validateMessage, lng),
+                      validateMessage!,
                       Global.returnTrLable(translats, CustomText.ok, lng),
                       false,
                       context);
                 }
               }
 
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, itemFields, quesItem);
+              var logData = logic!.callAutoGeneratedValue(itemFields, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   // myMap.addEntries(

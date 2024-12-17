@@ -37,7 +37,7 @@ class CrecheMonitorTabItemViewForAdd extends StatefulWidget {
   final int totalTab;
   // final bool isEdit;
 
-   CrecheMonitorTabItemViewForAdd({
+  CrecheMonitorTabItemViewForAdd({
     super.key,
     required this.cmgUid,
     required this.tabBreakItem,
@@ -57,13 +57,14 @@ class CrecheMonitorTabItemViewForAdd extends StatefulWidget {
 
 class _CrecheMonitorTabItemViewForAddState
     extends State<CrecheMonitorTabItemViewForAdd> {
+  bool _isLoading = true;
   List<String> unpicableDates = [];
   String? _role;
   String username = '';
   String _language = 'en';
   List<CresheDatabaseResponceModel> allCrecheRecords = [];
   List<OptionsModel> _options = [];
-  List<TabFormsLogic> _logics = [];
+  DependingLogic? logic;
   List<Translation> _translation = [];
   Map<String, dynamic> _myMap = {};
   List<OptionsModel> items = [];
@@ -99,7 +100,13 @@ class _CrecheMonitorTabItemViewForAddState
       CustomText.back,
       CustomText.ok,
       CustomText.exit,
-      CustomText.ChildEnrollsuccess
+      CustomText.ChildEnrollsuccess,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.visitNoteAlrdyExists,
+      CustomText.dataSaveSuc
     ];
 
     final items = widget.screenItem[widget.tabBreakItem.name!]!;
@@ -109,12 +116,16 @@ class _CrecheMonitorTabItemViewForAddState
         valueNames.add(element.label!);
       }
     });
-    await TranslationDataHelper().callTranslateString(valueNames).then((value) => _translation.addAll(value));
+    await TranslationDataHelper()
+        .callTranslateString(valueNames)
+        .then((value) => _translation.addAll(value));
     allCrecheRecords = await CrecheDataHelper().getCrecheResponce();
     await updateExistingFields();
 
     await _callScreenControllers(widget.parentName);
-    setState(() {});
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _callScreenControllers(String parentName) async {
@@ -156,7 +167,7 @@ class _CrecheMonitorTabItemViewForAddState
             defaultDisableDialog(items[i].fieldname!, items[i].options!);
           } else {
             await OptionsModelHelper()
-                .getLocationData(items[i].options!.trim(), responseData,lang!)
+                .getLocationData(items[i].options!.trim(), responseData, lang!)
                 .then((data) {
               _options.addAll(data);
             });
@@ -168,14 +179,14 @@ class _CrecheMonitorTabItemViewForAddState
       logicFields.add(items[i].fieldname!);
     }
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon,lang!)
+        .getAllMstCommonNotINOptions(defaultCommon, lang!)
         .then((data) {
       _options.addAll(data);
     });
     await FormLogicDataHelper()
         .callFormLogic('Creche Monitoring Checklist')
         .then((data) {
-      _logics.addAll(data);
+      logic = DependingLogic(_translation, data, _language);
     });
 
     // var dateOfVi =
@@ -201,7 +212,7 @@ class _CrecheMonitorTabItemViewForAddState
       for (int i = 0; i < items.length; i++) {
         screenItems.add(_widgetTypeWidget(i, items[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(_logics, _myMap, items[i])) {
+        if (!logic!.callDependingLogic(_myMap, items[i])) {
           _myMap.remove(items[i].fieldname);
         }
       }
@@ -245,16 +256,17 @@ class _CrecheMonitorTabItemViewForAddState
           _myMap[quesItem.fieldname!] = items.first.name;
         }
         return DynamicCustomDropdownField(
+          hintText: Global.returnTrLable(
+              _translation, CustomText.select_here, _language!),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           items: items,
           selectedItem: _myMap[quesItem.fieldname],
           readable: true,
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) async {
             if (quesItem.fieldname == 'village_id' && value!.name != null) {
               _myMap.remove('creche_id');
@@ -275,18 +287,20 @@ class _CrecheMonitorTabItemViewForAddState
               : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(_logics, _myMap, quesItem),
-              // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
-              readable: true,
+              : logic!.dependeOnMendotory(_myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(_myMap, quesItem),
+          // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
+          readable: true,
           onChanged: (value) async {
             if (quesItem.fieldname == 'date_of_visit') {
               if (unpicableDates.contains(value)) {
                 _myMap.remove(quesItem.fieldname);
                 setState(() {});
+                var message = Global.returnTrLable(_translation, CustomText.visitNoteAlrdyExists,_language);
+                message = message.replaceAll(
+                  RegExp("@", caseSensitive: false), '$value');
                 Validate().singleButtonPopup(
-                    'A Visit Note already exists for the selected Date "${value}"',
+                    message,
                     Global.returnTrLable(
                         _translation, CustomText.ok, _language),
                     false,
@@ -296,8 +310,7 @@ class _CrecheMonitorTabItemViewForAddState
             } else {
               _myMap[quesItem.fieldname!] = value;
             }
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(_logics, _myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(_myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 _myMap.addEntries(
@@ -315,18 +328,16 @@ class _CrecheMonitorTabItemViewForAddState
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           initialvalue: _myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          keyboard:
-              DependingLogic().keyBoardLogic(quesItem.fieldname!, _logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           // readable:
-          //     DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          //     logic!.callReadableLogic( _myMap, quesItem),
           readable: true,
           hintText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               _myMap[quesItem.fieldname!] = value;
@@ -336,25 +347,24 @@ class _CrecheMonitorTabItemViewForAddState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(_translation, CustomText.typehere, _language),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: _myMap[quesItem.fieldname!],
           // readable:
-          //     DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          //     logic!.callReadableLogic( _myMap, quesItem),
           readable: true,
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               _myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(_logics, _myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(_myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   _myMap.addEntries(
@@ -374,14 +384,12 @@ class _CrecheMonitorTabItemViewForAddState
           fieldName: quesItem.fieldname,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
-              readable: true,
+              : logic!.dependeOnMendotory(_myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
+          readable: true,
           onChanged: (value) {
             _myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(_logics, _myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(_myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 _myMap.addEntries(
@@ -402,12 +410,11 @@ class _CrecheMonitorTabItemViewForAddState
           lng: _language,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           // readable:
-          //     DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          //     logic!.callReadableLogic( _myMap, quesItem),
           readable: true,
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             _myMap[quesItem.fieldname!] = value;
@@ -421,16 +428,15 @@ class _CrecheMonitorTabItemViewForAddState
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           initialvalue: _myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           // readable:
-          //     DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          //     logic!.callReadableLogic( _myMap, quesItem),
           readable: true,
           hintText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
-          isVisible:
-              DependingLogic().callDependingLogic(_logics, _myMap, quesItem),
+          isVisible: logic!.callDependingLogic(_myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               _myMap[quesItem.fieldname!] = value;
@@ -443,10 +449,10 @@ class _CrecheMonitorTabItemViewForAddState
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           maxlength: quesItem.length,
           // readable:
-          //     DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          //     logic!.callReadableLogic( _myMap, quesItem),
           readable: true,
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
@@ -467,10 +473,10 @@ class _CrecheMonitorTabItemViewForAddState
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(_logics, _myMap, quesItem),
+              : logic!.dependeOnMendotory(_myMap, quesItem),
           maxlength: quesItem.length,
           // readable:
-          //     DependingLogic().callReadableLogic(_logics, _myMap, quesItem),
+          //     logic!.callReadableLogic( _myMap, quesItem),
           readable: true,
           initialvalue: _myMap[quesItem.fieldname!],
           onChanged: (value) {
@@ -510,7 +516,7 @@ class _CrecheMonitorTabItemViewForAddState
       //   }
       //   widget.changeTab(type);
       // }
-       widget.changeTab(type);
+      widget.changeTab(type);
     } else {
       if (widget.tabIndex == 0) {
         Navigator.pop(context, 'itemRefresh');
@@ -532,7 +538,7 @@ class _CrecheMonitorTabItemViewForAddState
             Validate().singleButtonPopup(
                 Global.returnTrLable(
                     _translation, CustomText.plsFilManForm, _language),
-                CustomText.ok,
+                Global.returnTrLable(_translation, CustomText.ok, _language),
                 false,
                 context);
             validStatus = false;
@@ -541,8 +547,11 @@ class _CrecheMonitorTabItemViewForAddState
             if (unpicableDates.contains(values)) {
               _myMap.remove(element.fieldname);
               setState(() {});
+              var message = Global.returnTrLable(_translation, CustomText.visitNoteAlrdyExists,_language);
+                message = message.replaceAll(
+                  RegExp("@", caseSensitive: false), '$values');
               Validate().singleButtonPopup(
-                  'A Visit Note already exists for the selected Date "${values}"',
+                  message,
                   Global.returnTrLable(_translation, CustomText.ok, _language),
                   false,
                   context);
@@ -551,8 +560,7 @@ class _CrecheMonitorTabItemViewForAddState
             }
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(_logics, _myMap, element,_translation,_language);
+        var validationMsg = logic!.validationMessge(_myMap, element);
 
         if (Global.validString(validationMsg)) {
           Validate()
@@ -684,78 +692,91 @@ class _CrecheMonitorTabItemViewForAddState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Divider(),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: _widgetList(widget.tabBreakItem.name!),
+    if (_isLoading)
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
+    else {
+      return Scaffold(
+        body: Column(
+          children: [
+            Divider(),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _widgetList(widget.tabBreakItem.name!),
+                  ),
                 ),
               ),
             ),
-          ),
-          Divider(),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-            child: Row(
-              children: [
-                Expanded(
-                  child: CElevatedButton(
-                    color: Color(0xffF26BA3),
-                    onPressed: () {
-                      // ch(2);
-                      nextTab(0, context);
-                    },
-                    text: Global.returnTrLable(
-                            _translation, CustomText.back, _language)
-                        .trim(),
+            Divider(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CElevatedButton(
+                      color: Color(0xffF26BA3),
+                      onPressed: () {
+                        // ch(2);
+                        nextTab(0, context);
+                      },
+                      text: Global.returnTrLable(
+                              _translation, CustomText.back, _language)
+                          .trim(),
+                    ),
                   ),
-                ),
-                // Row(children: [
-                SizedBox(width: 10),
-                // _role == 'Creche Supervisor'
-                //     ? widget.tabIndex == (widget.totalTab - 1)
-                //         ? SizedBox()
-                //         : Expanded(
-                //             child: CElevatedButton(
-                //               color: Color(0xff5979AA),
-                //               onPressed: () => saveOnly(1),
-                //               text: Global.returnTrLable(
-                //                       _translation, 'Save', _language)
-                //                   .trim(),
-                //             ),
-                //           )
-                //     : SizedBox(),
-                // // ]
-                // // ),
-                // _role == 'Creche Supervisor'
-                //     ? widget.tabIndex == (widget.totalTab - 1)
-                //         ? SizedBox()
-                //         : SizedBox(width: 10)
-                //     : SizedBox(),
-                Expanded(
-                  child: CElevatedButton(
-                    color: widget.tabIndex == (widget.totalTab - 1)?Color(0xff5979AA):Color(0xff369A8D),
-                    onPressed: () {
-                      if(widget.tabIndex == (widget.totalTab - 1))
-                        Navigator.pop(context, 'itemRefresh');
-                      else nextTab(1, context);
-                      // widget.changeTab(1);
-                    },
-                    text:  Global.returnTrLable(
-                        _translation, widget.tabIndex == (widget.totalTab - 1)?CustomText.exit:CustomText.Next, _language),
+                  // Row(children: [
+                  SizedBox(width: 10),
+                  // _role == 'Creche Supervisor'
+                  //     ? widget.tabIndex == (widget.totalTab - 1)
+                  //         ? SizedBox()
+                  //         : Expanded(
+                  //             child: CElevatedButton(
+                  //               color: Color(0xff5979AA),
+                  //               onPressed: () => saveOnly(1),
+                  //               text: Global.returnTrLable(
+                  //                       _translation, 'Save', _language)
+                  //                   .trim(),
+                  //             ),
+                  //           )
+                  //     : SizedBox(),
+                  // // ]
+                  // // ),
+                  // _role == 'Creche Supervisor'
+                  //     ? widget.tabIndex == (widget.totalTab - 1)
+                  //         ? SizedBox()
+                  //         : SizedBox(width: 10)
+                  //     : SizedBox(),
+                  Expanded(
+                    child: CElevatedButton(
+                      color: widget.tabIndex == (widget.totalTab - 1)
+                          ? Color(0xff5979AA)
+                          : Color(0xff369A8D),
+                      onPressed: () {
+                        if (widget.tabIndex == (widget.totalTab - 1))
+                          Navigator.pop(context, 'itemRefresh');
+                        else
+                          nextTab(1, context);
+                        // widget.changeTab(1);
+                      },
+                      text: Global.returnTrLable(
+                          _translation,
+                          widget.tabIndex == (widget.totalTab - 1)
+                              ? CustomText.exit
+                              : CustomText.Next,
+                          _language),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    }
   }
 }

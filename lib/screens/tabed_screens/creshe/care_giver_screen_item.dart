@@ -61,14 +61,14 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
   bool _isLoading = true;
   List<HouseHoldTabResponceMosdel> retrivedList = [];
   List<OptionsModel> options = [];
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   Map<String, dynamic> myMap = {};
   List<Translation> translats = [];
   String userName = '';
   String? saveNext = CustomText.Submit;
   String? responce;
   String lng = "en";
-  List<Translation> labelControlls = [];
+  // List<Translation> translats = [];
   String? role;
   Map<String, FocusNode> _focusNode = {};
   ScrollController _scrollController = ScrollController();
@@ -98,7 +98,9 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return Scaffold(
         body: Column(
@@ -128,9 +130,9 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
                         // ch(2);
                         nextTab(0);
                       },
-                      text: Global.returnTrLable(
-                              labelControlls, CustomText.back, lng)
-                          .trim(),
+                      text:
+                          Global.returnTrLable(translats, CustomText.back, lng)
+                              .trim(),
                     ),
                   ),
                   widget.isEditable ? SizedBox(width: 10) : SizedBox(),
@@ -142,8 +144,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
                               nextTab(1);
                               // widget.changeTab(1);
                             },
-                            text: Global.returnTrLable(
-                                    labelControlls, saveNext, lng)
+                            text: Global.returnTrLable(translats, saveNext, lng)
                                 .trim(),
                           ),
                         )
@@ -166,7 +167,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
       for (int i = 0; i < items.length; i++) {
         screenItems.add(widgetTypeWidget(i, items[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, items[i])) {
+        if (!logic!.callDependingLogic(myMap, items[i])) {
           myMap.remove(items[i].fieldname);
         }
       }
@@ -190,12 +191,14 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
             .toList();
 
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
           readable: quesItem.fieldname == 'reason_for_caregiver_exit'
@@ -203,8 +206,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               : widget.isEditable == true
                   ? null
                   : !widget.isEditable,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -223,17 +225,14 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               : quesItem.fieldname == 'date_of_leaving'
                   ? null
                   : !widget.isEditable,
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 myMap.addEntries(
@@ -252,17 +251,16 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : !widget.isEditable,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -272,26 +270,25 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : !widget.isEditable,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -310,7 +307,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
       //     label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
       //     initialValue: myMap[quesItem.fieldname!],
       //     isVisible:
-      //         DependingLogic().callDependingLogic(logics, myMap, quesItem),
+      //         logic!.callDependingLogic( myMap, quesItem),
       //     onChanged: (value) {
       //       // if (value > 0)
       //         myMap[quesItem.fieldname!] = value;
@@ -323,20 +320,19 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         return DynamicCustomTextFieldNew(
           focusNode: _focusNode[quesItem.fieldname],
           maxline: 3,
-          titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
+          titleText:
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : !widget.isEditable,
-          hintText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          hintText:
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -348,16 +344,15 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         return DynamicCustomYesNoCheckboxWithLabel(
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialValue: myMap[quesItem.fieldname],
-          labelControlls: labelControlls,
+          labelControlls: translats,
           lng: lng,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           readable: role == CustomText.crecheSupervisor
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -369,14 +364,15 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : !widget.isEditable,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -398,10 +394,10 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : !widget.isEditable,
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
@@ -417,7 +413,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
       //       assetPath:myMap[quesItem.fieldname!],
       //     titleText:
       //     Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-      //     isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+      //     isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
       //     onChanged: (value) {
       //       print('Entered text: $value');
       //       myMap[quesItem.fieldname!] = value;
@@ -491,12 +487,12 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
     await setLabelTextData();
     await TranslationDataHelper()
         .callCresheTranslate()
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
     await callScrenControllers(CustomText.crecheCaregiver);
     await FormLogicDataHelper()
         .callFormLogic(CustomText.crecheCaregiver)
         .then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(translats, data, lng);
     });
     setState(() {
       _isLoading = false;
@@ -523,9 +519,8 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
             builder: (context) {
               return SingleButtonPopupDialog(
                   message: Global.returnTrLable(
-                      labelControlls, CustomText.dataSaveSuc, lng),
-                  button:
-                      Global.returnTrLable(labelControlls, CustomText.ok, lng));
+                      translats, CustomText.dataSaveSuc, lng),
+                  button: Global.returnTrLable(translats, CustomText.ok, lng));
             },
           );
           if (shouldProceed) {
@@ -556,21 +551,19 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
           var valuees = myMap[element.fieldname];
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
-                Global.returnTrLable(
-                    labelControlls, CustomText.plsFilManForm, lng!),
-                Global.returnTrLable(labelControlls, CustomText.ok, lng!),
+                Global.returnTrLable(translats, CustomText.plsFilManForm, lng!),
+                Global.returnTrLable(translats, CustomText.ok, lng!),
                 false,
                 context);
             validStatus = false;
             break;
           }
         }
-        var validationMsg = DependingLogic()
-            .validationMessge(logics, myMap, element, translats, lng!);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
-              Global.returnTrLable(labelControlls, CustomText.ok, lng!),
+              Global.returnTrLable(translats, CustomText.ok, lng!),
               false,
               context);
           validStatus = false;
@@ -665,16 +658,37 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
 
   Future<void> setLabelTextData() async {
     List<String> valueNames = [
+      CustomText.ok,
       CustomText.back,
       CustomText.Save,
       CustomText.plsFilManForm,
       CustomText.dataSaveSuc,
       CustomText.Yes,
       CustomText.No,
-      CustomText.Submit
+      CustomText.Submit,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls = value);
+        .then((value) => translats.addAll(value));
   }
 }

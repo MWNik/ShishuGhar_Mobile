@@ -9,7 +9,6 @@ import '../../../utils/globle_method.dart';
 import 'children_enrolled_listed_screen.dart';
 import 'children_enrolled_not_listed_screen.dart';
 
-
 class EnrolledChildrenListingTab extends StatefulWidget {
   final int creCheId;
   final String village_id;
@@ -20,7 +19,8 @@ class EnrolledChildrenListingTab extends StatefulWidget {
   });
 
   @override
-  _EnrolledChildrenListingTabState createState() => _EnrolledChildrenListingTabState();
+  _EnrolledChildrenListingTabState createState() =>
+      _EnrolledChildrenListingTabState();
 }
 
 class _EnrolledChildrenListingTabState extends State<EnrolledChildrenListingTab>
@@ -28,7 +28,7 @@ class _EnrolledChildrenListingTabState extends State<EnrolledChildrenListingTab>
   bool _isLoading = true;
   late TabController _tabController;
   String lng = "en";
-  List<String> tabItems=[];
+  List<String> tabItems = [];
   List<Widget> tabTitleItem = [];
   List<Translation> labelControlls = [];
 
@@ -38,11 +38,12 @@ class _EnrolledChildrenListingTabState extends State<EnrolledChildrenListingTab>
     setLabelTextData();
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {
@@ -66,11 +67,12 @@ class _EnrolledChildrenListingTabState extends State<EnrolledChildrenListingTab>
                 ),
               ),
             ),
-            title:  Column(
+            title: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  Global.returnTrLable(labelControlls,CustomText.Enrolledchildren,lng),
+                  Global.returnTrLable(
+                      labelControlls, CustomText.Enrolledchildren, lng),
                   style: Styles.white145,
                 ),
                 // Text(
@@ -78,20 +80,19 @@ class _EnrolledChildrenListingTabState extends State<EnrolledChildrenListingTab>
                 //   style: Styles.white145,
                 // ),
               ],
-
             ),
             centerTitle: true,
             bottom: _isLoading
                 ? null
                 : TabBar(
-              indicatorColor: Colors.white,
-              unselectedLabelColor: Colors.grey.shade300,
-              unselectedLabelStyle: Styles.white124P,
-              labelColor: Colors.white,
-              controller: _tabController,
-              // isScrollable: true,
-              tabs: tabTitleItem,
-            ),
+                    indicatorColor: Colors.white,
+                    unselectedLabelColor: Colors.grey.shade300,
+                    unselectedLabelStyle: Styles.white124P,
+                    labelColor: Colors.white,
+                    controller: _tabController,
+                    // isScrollable: true,
+                    tabs: tabTitleItem,
+                  ),
           ),
           body: Column(
             children: [
@@ -112,22 +113,22 @@ class _EnrolledChildrenListingTabState extends State<EnrolledChildrenListingTab>
   List<Widget> tabControllerScreen() {
     List<Widget> tabItem = [];
     for (int i = 0; i < tabItems.length; i++) {
-      if(i==1){
-        tabItem.add(NotEnrolledChildrenListedScreen(crecheId:widget.creCheId,village_id:widget.village_id));
-      }else tabItem.add(EnrolledChildrenListedScreen(crecheId:widget.creCheId));
+      if (i == 1) {
+        tabItem.add(NotEnrolledChildrenListedScreen(
+            crecheId: widget.creCheId, village_id: widget.village_id));
+      } else
+        tabItem.add(EnrolledChildrenListedScreen(crecheId: widget.creCheId));
     }
     return tabItem;
   }
 
-
-
-
-
-   tabController()  {
+  tabController() {
     tabItems.clear();
-    tabItems.add(Global.returnTrLable(labelControlls,CustomText.Enrolled,lng));
-    tabItems.add(Global.returnTrLable(labelControlls,CustomText.NotEnroll,lng));
-    tabItems.forEach((element)  {
+    tabItems
+        .add(Global.returnTrLable(labelControlls, CustomText.Enrolled, lng));
+    tabItems
+        .add(Global.returnTrLable(labelControlls, CustomText.NotEnroll, lng));
+    tabItems.forEach((element) {
       tabTitleItem.add(Tab(icon: Container(child: Text(element))));
     });
     _tabController = TabController(length: tabItems.length, vsync: this);
@@ -144,12 +145,14 @@ class _EnrolledChildrenListingTabState extends State<EnrolledChildrenListingTab>
 
   Future<void> setLabelTextData() async {
     lng = (await Validate().readString(Validate.sLanguage))!;
-    List<String> valueNames = [CustomText.Enrolledchildren,CustomText.Enrolled
-      ,CustomText.NotEnroll];
+    List<String> valueNames = [
+      CustomText.Enrolledchildren,
+      CustomText.Enrolled,
+      CustomText.NotEnroll
+    ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls=value);
+        .then((value) => labelControlls = value);
     tabController();
   }
-
 }

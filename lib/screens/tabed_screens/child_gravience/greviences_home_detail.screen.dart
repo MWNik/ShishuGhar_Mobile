@@ -44,7 +44,7 @@ class GrieviencesHomeDetailScreen extends StatefulWidget {
 }
 
 class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<HouseHoldFielItemdModel> allItems = [];
   Map<String, dynamic> myMap = {};
   List<OptionsModel> options = [];
@@ -81,15 +81,33 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
       CustomText.plsFilManForm,
       CustomText.ok,
       CustomText.ChildGrievances,
-      CustomText.Submit
+      CustomText.Submit,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.typehere,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls = value);
-
-    await TranslationDataHelper()
-        .callTranslateEnrolledChildren()
         .then((value) => labelControlls.addAll(value));
+
     await updateHiddenValue();
     await callScrenControllers('Grievance');
   }
@@ -162,7 +180,7 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
       for (int i = 0; i < allItems.length; i++) {
         screenItems.add(widgetTypeWidget(i, allItems[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, allItems[i])) {
+        if (!logic!.callDependingLogic(myMap, allItems[i])) {
           myMap.remove(allItems[i].fieldname);
         }
       }
@@ -180,22 +198,20 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
           hintText: Global.returnTrLable(
               labelControlls, CustomText.select_here, lng!),
           focusNode: _focusNode[quesItem.fieldname],
-          readable: !widget.isNew
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable:
+              !widget.isNew ? true : logic!.callReadableLogic(myMap, quesItem),
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: quesItem.fieldname == 'priority'
               ? (myMap[quesItem.fieldname] != null
                   ? myMap[quesItem.fieldname]
                   : 3.toString())
               : myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) async {
             if (value != null) {
               myMap[quesItem.fieldname!] = value.name!;
@@ -215,13 +231,11 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
           readable: quesItem.fieldname == 'grievance_date' ? true : false,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -244,17 +258,15 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
-          readable: !widget.isNew
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
+          readable:
+              !widget.isNew ? true : logic!.callReadableLogic(myMap, quesItem),
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -264,26 +276,24 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(labelControlls, CustomText.typehere, lng!),
           focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: !widget.isNew
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable:
+              !widget.isNew ? true : logic!.callReadableLogic(myMap, quesItem),
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -301,7 +311,7 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
       //   return DynamicCustomCheckboxWithLabel(
       //     label: Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng),
       //     initialValue: myMap[quesItem.fieldname!],
-      //     isVisible: DependingLogic().callDependingLogic(logics,myMap,quesItem),
+      //     isVisible: logic!.callDependingLogic(myMap,quesItem),
       //     onChanged: (value) {
       //       if(value>0)
       //         myMap[quesItem.fieldname!] = value;
@@ -318,12 +328,10 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
           lng: lng!,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: !widget.isNew
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          readable:
+              !widget.isNew ? true : logic!.callReadableLogic(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -332,15 +340,15 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(labelControlls, CustomText.typehere, lng!),
           focusNode: _focusNode[quesItem.fieldname],
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: !widget.isNew
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable:
+              !widget.isNew ? true : logic!.callReadableLogic(myMap, quesItem),
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           initialvalue: myMap[quesItem.fieldname!],
@@ -361,11 +369,10 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: !widget.isNew
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable:
+              !widget.isNew ? true : logic!.callReadableLogic(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -383,16 +390,14 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: !widget.isNew
-              ? true
-              : DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable:
+              !widget.isNew ? true : logic!.callReadableLogic(myMap, quesItem),
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -455,7 +460,7 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(labelControlls, data, lng!);
     });
     if (myMap['creche_id'] != null) {
       await updateLocationData(
@@ -499,11 +504,10 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
             break;
           }
         }
-        var validationMsg = DependingLogic()
-            .validationMessge(logics, myMap, element, labelControlls, lng!);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
-              Global.returnTrLable(labelControlls, validationMsg, lng!),
+              validationMsg!,
               Global.returnTrLable(labelControlls, CustomText.ok, lng!),
               false,
               context);

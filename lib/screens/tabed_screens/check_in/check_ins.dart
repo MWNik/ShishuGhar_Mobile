@@ -41,235 +41,240 @@ class _CheckInsScreenState extends State<CheckIns> {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? Center(child: CircularProgressIndicator())
-        : WillPopScope(
-            onWillPop: () async {
-              Navigator.pop(context, 'itemRefresh');
-              return false;
-            },
-            child: Scaffold(
-              appBar: CustomAppbar(
-                text: lng != null
-                    ? '${Global.returnTrLable(translatsLabel, CustomText.checkInAs, lng!)} $crecheName'
-                    : CustomText.checkIN,
-                onTap: () {
-                  Navigator.pop(context, 'itemRefresh');
-                },
-              ),
-              floatingActionButton: (currentDateAttendece
-                  ? SizedBox()
-                  : (role== CustomText.crecheSupervisor|| role== CustomText.clusterCoordinator||
-                  role== CustomText.alm|| role==CustomText.cbm)?
-              InkWell(
-                      onTap: () async {
-                        String hhGuid = '';
-                        if (!Global.validString(hhGuid)) {
-                          hhGuid = Validate().randomGuid();
-                          var refStatus = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  CheckInDetailsScreen(
-                                ccinguid: hhGuid,
-                                isEdit: false,
-                                lastGrowthDate: maxDate,
-                                creche_id: widget.crechId,
+    if (_isLoading)
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
+    else {
+      return WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, 'itemRefresh');
+          return false;
+        },
+        child: Scaffold(
+            appBar: CustomAppbar(
+              text: lng != null
+                  ? '${Global.returnTrLable(translatsLabel, CustomText.checkInAs, lng!)} $crecheName'
+                  : CustomText.checkIN,
+              onTap: () {
+                Navigator.pop(context, 'itemRefresh');
+              },
+            ),
+            floatingActionButton: (currentDateAttendece
+                ? SizedBox()
+                : (role == CustomText.crecheSupervisor ||
+                        role == CustomText.clusterCoordinator ||
+                        role == CustomText.alm ||
+                        role == CustomText.cbm)
+                    ? InkWell(
+                        onTap: () async {
+                          String hhGuid = '';
+                          if (!Global.validString(hhGuid)) {
+                            hhGuid = Validate().randomGuid();
+                            var refStatus = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    CheckInDetailsScreen(
+                                  ccinguid: hhGuid,
+                                  isEdit: false,
+                                  lastGrowthDate: maxDate,
+                                  creche_id: widget.crechId,
+                                ),
                               ),
-                            ),
-                          );
-                          if (refStatus == 'itemRefresh') {
-                            initData();
+                            );
+                            if (refStatus == 'itemRefresh') {
+                              initData();
+                            }
                           }
-                        }
-                      },
-                      child: Image.asset(
-                        "assets/add_btn.png",
-                        scale: 2.7,
-                        color: Color(0xff5979AA),
-                      ),
-                    ):null),
-              body:   (items.length > 0)?SingleChildScrollView(
-                child: Padding(
-                  padding:
-                      EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-                  child: Column(
-                    children: [
-                      (role== CustomText.crecheSupervisor|| role== CustomText.clusterCoordinator||
-                          role== CustomText.alm|| role==CustomText.cbm)?Align(
-                        alignment: Alignment.topRight,
-                        child: AnimatedRollingSwitch(
-                          title1: Global.returnTrLable(
-                              translatsLabel, CustomText.all, lng!),
-                          title2: Global.returnTrLable(
-                              translatsLabel, CustomText.unsynched, lng!),
-                          isOnlyUnsynched: isOnlyUnsynched ?? false,
-                          onChange: (value) async {
-                            setState(() {
-                              isOnlyUnsynched = value;
-                            });
-                            await initData();
-                          },
+                        },
+                        child: Image.asset(
+                          "assets/add_btn.png",
+                          scale: 2.7,
+                          color: Color(0xff5979AA),
                         ),
-                      ):SizedBox(),
-
-                          ListView.builder(
-                              itemCount: items.length,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.vertical,
-                              physics: BouncingScrollPhysics(),
-                              itemBuilder: (BuildContext context, int index) {
-                                return GestureDetector(
-                                  onTap: () async {
-                                    var lstDate = await callDatesAlredDateList(
-                                        Global.getItemValues(
-                                            items[index].responces,
-                                            'date_of_checkin'));
-                                    var refStatus =
-                                        await Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            CheckInDetailsScreen(
-                                                ccinguid:
-                                                    items[index].ccinguid!,
-                                                lastGrowthDate: lstDate,
-                                                minGrowthDate: minDate,
-                                                creche_id: widget.crechId,
-                                                isEdit: role ==
-                                                        CustomText
-                                                            .crecheSupervisor
-                                                            .trim()
-                                                    ? true
-                                                    : false),
-                                      ),
-                                    );
-                                    if (refStatus == 'itemRefresh') {
-                                      initData();
-                                    }
-                                  },
-                                  child: Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 5.h),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Color(0xff5A5A5A).withOpacity(
-                                                  0.2), // Shadow color with opacity
-                                              offset: Offset(0,
-                                                  3), // Horizontal and vertical offset
-                                              blurRadius: 6, // Blur radius
-                                              spreadRadius: 0, // Spread radius
+                      )
+                    : null),
+            body: Padding(
+              padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+              child: Column(
+                children: [
+                  (role == CustomText.crecheSupervisor ||
+                          role == CustomText.clusterCoordinator ||
+                          role == CustomText.alm ||
+                          role == CustomText.cbm)
+                      ? Align(
+                          alignment: Alignment.topRight,
+                          child: AnimatedRollingSwitch(
+                            title1: Global.returnTrLable(
+                                translatsLabel, CustomText.all, lng!),
+                            title2: Global.returnTrLable(
+                                translatsLabel, CustomText.unsynched, lng!),
+                            isOnlyUnsynched: isOnlyUnsynched ?? false,
+                            onChange: (value) async {
+                              setState(() {
+                                isOnlyUnsynched = value;
+                              });
+                              await initData();
+                            },
+                          ),
+                        )
+                      : SizedBox(),
+                  Expanded(
+                    child: (items.isNotEmpty)
+                        ? ListView.builder(
+                            itemCount: items.length,
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            physics: BouncingScrollPhysics(),
+                            itemBuilder: (BuildContext context, int index) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  var lstDate = await callDatesAlredDateList(
+                                      Global.getItemValues(
+                                          items[index].responces,
+                                          'date_of_checkin'));
+                                  var refStatus =
+                                      await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          CheckInDetailsScreen(
+                                              ccinguid: items[index].ccinguid!,
+                                              lastGrowthDate: lstDate,
+                                              minGrowthDate: minDate,
+                                              creche_id: widget.crechId,
+                                              isEdit: role ==
+                                                      CustomText
+                                                          .crecheSupervisor
+                                                          .trim()
+                                                  ? true
+                                                  : false),
+                                    ),
+                                  );
+                                  if (refStatus == 'itemRefresh') {
+                                    initData();
+                                  }
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 5.h),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xff5A5A5A).withOpacity(
+                                                0.2), // Shadow color with opacity
+                                            offset: Offset(0,
+                                                3), // Horizontal and vertical offset
+                                            blurRadius: 6, // Blur radius
+                                            spreadRadius: 0, // Spread radius
+                                          ),
+                                        ],
+                                        color: Colors.white,
+                                        border: Border.all(
+                                            color: Color(0xffE7F0FF)),
+                                        borderRadius:
+                                            BorderRadius.circular(10.r)),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w, vertical: 8.h),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${Global.returnTrLable(translatsLabel, CustomText.dateCheckin, lng!)} :',
+                                                style: Styles.black104,
+                                              ),
+                                              Text(
+                                                '${Global.returnTrLable(translatsLabel, CustomText.Location, lng!)} :',
+                                                style: Styles.black104,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(width: 10),
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.03,
+                                            width: 2,
+                                            child: VerticalDivider(
+                                              color: Color(0xffE6E6E6),
                                             ),
-                                          ],
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: Color(0xffE7F0FF)),
-                                          borderRadius:
-                                              BorderRadius.circular(10.r)),
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10.w, vertical: 8.h),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Column(
+                                          ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  '${Global.returnTrLable(translatsLabel, CustomText.dateCheckin, lng!)} :',
-                                                  style: Styles.black104,
-                                                ),
+                                                    Global.validString(Global
+                                                            .getItemValues(
+                                                                items[index]
+                                                                    .responces,
+                                                                'date_of_checkin'))
+                                                        ? Validate().displeDateFormate(
+                                                            Global.getItemValues(
+                                                                items[index]
+                                                                    .responces,
+                                                                'date_of_checkin'))
+                                                        : '',
+                                                    style: Styles.cardBlue10,
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
                                                 Text(
-                                                  '${Global.returnTrLable(translatsLabel, CustomText.Location, lng!)} :',
-                                                  style: Styles.black104,
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.2),
-                                                ),
+                                                    Global.getItemValues(
+                                                        items[index].responces,
+                                                        'checkin_location'),
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
                                               ],
                                             ),
-                                            SizedBox(width: 10),
-                                            SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.03,
-                                              width: 2,
-                                              child: VerticalDivider(
-                                                color: Color(0xffE6E6E6),
-                                              ),
-                                            ),
-                                            SizedBox(width: 10),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                      Global.validString(Global
-                                                              .getItemValues(
-                                                                  items[index]
-                                                                      .responces,
-                                                                  'date_of_checkin'))
-                                                          ? Validate().displeDateFormate(
-                                                              Global.getItemValues(
-                                                                  items[index]
-                                                                      .responces,
-                                                                  'date_of_checkin'))
-                                                          : '',
-                                                      style: Styles.cardBlue10,
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                  Text(
-                                                      Global.getItemValues(
-                                                          items[index]
-                                                              .responces,
-                                                          'checkin_location'),
-                                                      style: Styles.cardBlue10,
-                                                      strutStyle: StrutStyle(
-                                                          height: 1.2),
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(width: 5),
-                                            (items[index].is_edited == 0 &&
-                                                    items[index].is_uploaded ==
-                                                        1)
-                                                ? Image.asset(
-                                                    "assets/sync.png",
-                                                    scale: 1.5,
-                                                  )
-                                                : Image.asset(
-                                                    "assets/sync_gray.png",
-                                                    scale: 1.5,
-                                                  )
-                                          ],
-                                        ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          (items[index].is_edited == 0 &&
+                                                  items[index].is_uploaded == 1)
+                                              ? Image.asset(
+                                                  "assets/sync.png",
+                                                  scale: 1.5,
+                                                )
+                                              : Image.asset(
+                                                  "assets/sync_gray.png",
+                                                  scale: 1.5,
+                                                )
+                                        ],
                                       ),
                                     ),
                                   ),
-                                );
-                              })
-
-                    ],
-                  ),
-                ),
-              ): Center(
-                  child: Text((lng != null)
-                      ? Global.returnTrLable(translatsLabel,
-                      CustomText.NorecordAvailable, lng!)
-                      : '')),
-            ),
-          );
+                                ),
+                              );
+                            })
+                        : Center(
+                            child: Text((lng != null)
+                                ? Global.returnTrLable(translatsLabel,
+                                    CustomText.NorecordAvailable, lng!)
+                                : '')),
+                  )
+                ],
+              ),
+            )),
+      );
+    }
   }
 
   initData() async {
@@ -293,7 +298,7 @@ class _CheckInsScreenState extends State<CheckIns> {
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
-        .then((value) => translatsLabel = value);
+        .then((value) => translatsLabel.addAll(value));
     callCheckIns();
     crecheData = await CrecheDataHelper().getCrecheResponce();
     await callDatesList();

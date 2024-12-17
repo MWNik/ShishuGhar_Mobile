@@ -57,7 +57,9 @@ class _StockListingScreenState extends State<StockListingScreen> {
       CustomText.Search,
       CustomText.Village,
       CustomText.all,
-      CustomText.usynchedAndDraft
+      CustomText.usynchedAndDraft,
+      'Month',
+      'Year'
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)

@@ -64,11 +64,11 @@ class ChildFollowupTabItemsViewScreen extends StatefulWidget {
 class _ChildFollowupTabItemsViewScreenState
     extends State<ChildFollowupTabItemsViewScreen> {
   List<OptionsModel> options = [];
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   Map<String, dynamic> myMap = {};
   List<Translation> translats = [];
   List<DateTime> datesList = [];
-   // DateTime? childReffrenDate;
+  // DateTime? childReffrenDate;
   String userName = '';
   String lng = 'eng';
   String? role;
@@ -84,7 +84,7 @@ class _ChildFollowupTabItemsViewScreenState
   Future<void> initializeData() async {
     // List<int> dateCuuten = widget.discharge_date.split('-').map(int.parse).toList();
     // childReffrenDate=DateTime(dateCuuten[0], dateCuuten[1], dateCuuten[2]).subtract(Duration(days:1));
-   userName = (await Validate().readString(Validate.userName))!;
+    userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     userName = (await Validate().readString(Validate.userName))!;
     List<String> valueNames = [
@@ -94,7 +94,28 @@ class _ChildFollowupTabItemsViewScreenState
       CustomText.ok,
       CustomText.childrenCountVallidattion,
       CustomText.Yes,
-      CustomText.No
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.dataSaveSuc,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -106,12 +127,8 @@ class _ChildFollowupTabItemsViewScreenState
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
 
-    // attendecedRecord = await ChildAttendenceHelper()
-    //     .callChildAttendencesByGuid(widget.ChildAttenGUID);
-    // await _fetchUnpicableDates();
-    // await fetchFollowUpsDateslist();
     await updateHiddenValue();
     await callScrenControllers('Child Follow up');
     if (widget.tabIndex == (widget.totalTab - 1)) {
@@ -142,7 +159,9 @@ class _ChildFollowupTabItemsViewScreenState
         return false;
       },
       child: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Container(
+              color: Colors.white,
+              child: Center(child: CircularProgressIndicator()))
           : Scaffold(
               body: Column(children: [
                 Divider(),
@@ -229,7 +248,7 @@ class _ChildFollowupTabItemsViewScreenState
       for (int i = 0; i < items.length; i++) {
         screenItems.add(widgetTypeWidget(i, items[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, items[i])) {
+        if (!logic!.callDependingLogic(myMap, items[i])) {
           myMap.remove(items[i].fieldname);
         }
       }
@@ -244,6 +263,8 @@ class _ChildFollowupTabItemsViewScreenState
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng!),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd,
@@ -251,9 +272,8 @@ class _ChildFollowupTabItemsViewScreenState
           readable: true,
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -269,12 +289,10 @@ class _ChildFollowupTabItemsViewScreenState
           // minDate: childReffrenDate,
           isRequred: quesItem.reqd,
           readable: true,
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -298,15 +316,14 @@ class _ChildFollowupTabItemsViewScreenState
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           maxline: (quesItem.length != 0) ? quesItem.length! % 35 : 1,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           // readable: role == 'Creche Supervisor'
-          //     ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+          //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -316,24 +333,23 @@ class _ChildFollowupTabItemsViewScreenState
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd,
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           // readable: role == 'Creche Supervisor'
-          //     ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+          //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -350,7 +366,7 @@ class _ChildFollowupTabItemsViewScreenState
       //   return DynamicCustomCheckboxWithLabel(
       //     label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
       //     initialValue: myMap[quesItem.fieldname!],
-      //     isVisible: DependingLogic().callDependingLogic(logics,myMap,quesItem),
+      //     isVisible: logic!.callDependingLogic(myMap,quesItem),
       //     onChanged: (value) {
       //       if(value>0)
       //         myMap[quesItem.fieldname!] = value;
@@ -365,11 +381,10 @@ class _ChildFollowupTabItemsViewScreenState
           labelControlls: translats,
           lng: lng,
           // readable: role == 'Creche Supervisor'
-          //     ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+          //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -385,13 +400,12 @@ class _ChildFollowupTabItemsViewScreenState
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           // readable: role == 'Creche Supervisor'
-          //     ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+          //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -401,11 +415,12 @@ class _ChildFollowupTabItemsViewScreenState
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd,
           maxlength: quesItem.length,
           // readable: role == 'Creche Supervisor'
-          //     ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+          //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
           titleText:
@@ -428,7 +443,7 @@ class _ChildFollowupTabItemsViewScreenState
           isRequred: quesItem.reqd,
           maxlength: quesItem.length,
           // readable: role == 'Creche Supervisor'
-          //     ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+          //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
           initialvalue: myMap[quesItem.fieldname!],
@@ -460,21 +475,18 @@ class _ChildFollowupTabItemsViewScreenState
           isRequred: quesItem.reqd,
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          // readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          // readable: logic!.callReadableLogic( myMap, quesItem),
           readable: true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
                       [MapEntry(logData.keys.first, logData.values.first)]);
-
                 }
               }
             } else {
@@ -502,21 +514,20 @@ class _ChildFollowupTabItemsViewScreenState
             //         Global.returnTrLable(translats,CustomText.plsFilManForm,lng))));
             Validate().singleButtonPopup(
                 Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
-                CustomText.ok,
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element,translats,lng);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           // ScaffoldMessenger.of(context).showSnackBar(
           //   SnackBar(content: Text(validationMsg!)),
           // );
           Validate()
-              .singleButtonPopup(validationMsg!, CustomText.ok, false, context);
+              .singleButtonPopup(validationMsg!, Global.returnTrLable(translats, CustomText.ok, lng), false, context);
           validStatus = false;
           break;
         }
@@ -567,7 +578,9 @@ class _ChildFollowupTabItemsViewScreenState
           responcesJs,
           myMap['schedule_date'],
           userName,
-          widget.creche_id,widget.child_referral_guid,widget.followup_visit_date);
+          widget.creche_id,
+          widget.child_referral_guid,
+          widget.followup_visit_date);
     }
   }
 
@@ -576,8 +589,7 @@ class _ChildFollowupTabItemsViewScreenState
       if (_checkValidation()) {
         if (widget.tabIndex < (widget.totalTab - 1)) {
           await saveDataInData();
-        }
-        else if (widget.tabIndex == (widget.totalTab - 1)) {
+        } else if (widget.tabIndex == (widget.totalTab - 1)) {
           await saveDataInData();
           bool shouldProceed = await showDialog(
             context: context,
@@ -608,13 +620,12 @@ class _ChildFollowupTabItemsViewScreenState
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
     }
     var alredRecord =
-    await CrecheDataHelper().getCrecheResponceItem(widget.creche_id);
+        await CrecheDataHelper().getCrecheResponceItem(widget.creche_id);
     Map<String, dynamic> responseData = {};
     if (alredRecord.isNotEmpty) {
       responseData = jsonDecode(alredRecord[0].responces!);
@@ -634,43 +645,42 @@ class _ChildFollowupTabItemsViewScreenState
             (items[i].options == 'Partner')) {
           if (items[i].options == 'Creche') {
             await OptionsModelHelper()
-                .callCrechInOptionID(items[i].options!.trim(),widget.creche_id)
+                .callCrechInOptionID(items[i].options!.trim(), widget.creche_id)
                 .then((data) {
               options.addAll(data);
             });
             defaultDisableDailog(items[i].fieldname!, items[i].options!);
-          }
-          else if (items[i].options == 'Partner') {
+          } else if (items[i].options == 'Partner') {
             await OptionsModelHelper()
                 .getPartnerMstCommonOptions(
-                items[i].options!.trim(), responseData)
+                    items[i].options!.trim(), responseData)
                 .then((data) {
               options.addAll(data);
             });
             defaultDisableDailog(items[i].fieldname!, items[i].options!);
-          }
-          else {
+          } else {
             await OptionsModelHelper()
-                .getLocationData(items[i].options!.trim(), responseData,lng)
+                .getLocationData(items[i].options!.trim(), responseData, lng)
                 .then((data) {
               options.addAll(data);
             });
           }
-        }else {
-          if(items[i].ismultiselect==1) {
+        } else {
+          if (items[i].ismultiselect == 1) {
             defaultCommon.add('tab${items[i].multiselectlink!.trim()}');
-          }else defaultCommon.add('tab${items[i].options!.trim()}');
+          } else
+            defaultCommon.add('tab${items[i].options!.trim()}');
         }
       }
       logicFields.add(items[i].fieldname!);
     }
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptionsWthouASC(defaultCommon,lng)
+        .getAllMstCommonNotINOptionsWthouASC(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(translats, data, lng);
     });
   }
 
@@ -686,9 +696,9 @@ class _ChildFollowupTabItemsViewScreenState
     var alredRecord = await ChildFollowUpTabResponseHelper()
         .getChildFollowUpResponcewithGuid(widget.child_followup_guid);
     if (alredRecord.isNotEmpty) {
-      if(Global.validString(alredRecord[0].responces)) {
-        Map<String, dynamic> responseData = jsonDecode(
-            alredRecord[0].responces!);
+      if (Global.validString(alredRecord[0].responces)) {
+        Map<String, dynamic> responseData =
+            jsonDecode(alredRecord[0].responces!);
         responseData.forEach((key, value) {
           myMap[key] = value;
         });
@@ -704,9 +714,9 @@ class _ChildFollowupTabItemsViewScreenState
         if (name != null) {
           myMap['name'] = name;
         }
-      }else{
+      } else {
         var crecheDetails =
-        await CrecheDataHelper().getCrecheResponceItem(widget.creche_id);
+            await CrecheDataHelper().getCrecheResponceItem(widget.creche_id);
         if (crecheDetails.length > 0) {
           myMap['childenrolledguid'] = widget.enrolChildGuid;
           myMap['appcreated_by'] = userName;

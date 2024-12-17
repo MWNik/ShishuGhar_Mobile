@@ -189,22 +189,22 @@ class _DemograficalListingScreenState extends State<DemograficalListingScreen> {
                                         style: Styles.black104,
                                       ),
                                       Text(
-                                        '${Global.returnTrLable(translats, '${CustomText.population}(${CustomText.quarter} 1)', lng).trim()} : ',
+                                        '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 1) :',
                                         style: Styles.black104,
                                         strutStyle: StrutStyle(height: 1.2),
                                       ),
                                       Text(
-                                        '${Global.returnTrLable(translats, '${CustomText.population}(${CustomText.quarter} 2)', lng).trim()} : ',
+                                        '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 2) :',
                                         strutStyle: StrutStyle(height: 1.2),
                                         style: Styles.black104,
                                       ),
                                       Text(
-                                        '${Global.returnTrLable(translats, '${CustomText.population}(${CustomText.quarter} 3)', lng).trim()} : ',
+                                        '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 3) :',
                                         strutStyle: StrutStyle(height: 1.2),
                                         style: Styles.black104,
                                       ),
                                       Text(
-                                        '${Global.returnTrLable(translats, '${CustomText.population}(${CustomText.quarter} 4)', lng).trim()} : ',
+                                        '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 4) :',
                                         strutStyle: StrutStyle(height: 1.2),
                                         style: Styles.black104,
                                       ),

@@ -90,7 +90,7 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
       CustomText.Next,
       CustomText.back,
       CustomText.ChildEnrollment,
-      
+     
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -105,7 +105,9 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return Scaffold(
         appBar: AppBar(

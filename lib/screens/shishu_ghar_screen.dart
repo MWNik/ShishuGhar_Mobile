@@ -110,7 +110,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
       CustomText.NorecordAvailable,
       CustomText.pleaseWait,
       CustomText.ok,
-      CustomText.Selecthere,
+      CustomText.select_here,
       CustomText.ShishuGharList,
       CustomText.Filter,
       CustomText.clear
@@ -202,6 +202,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                         ),
                         SizedBox(),
                         DynamicCustomDropdownField(
+                          hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng!),
                           titleText: Global.returnTrLable(
                               translatsLabel, CustomText.state, lng!),
                           items: mstStates,
@@ -239,6 +240,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                           },
                         ),
                         DynamicCustomDropdownField(
+                          hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng!),
                           titleText: Global.returnTrLable(
                               translatsLabel, CustomText.District, lng!),
                           items: mstDistrict,
@@ -270,6 +272,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                           },
                         ),
                         DynamicCustomDropdownField(
+                          hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng!),
                           titleText: Global.returnTrLable(
                               translatsLabel, CustomText.Block, lng!),
                           items: mstBlock,

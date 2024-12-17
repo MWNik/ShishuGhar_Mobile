@@ -91,7 +91,9 @@ class _ChildFollowUpTabScreenState extends State<ChildFollowUpTabScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {
@@ -146,7 +148,6 @@ class _ChildFollowUpTabScreenState extends State<ChildFollowUpTabScreen>
                   widget.tabTitle,
                   style: Styles.white126P,
                 ),
-                
               ],
             ),
             centerTitle: true,

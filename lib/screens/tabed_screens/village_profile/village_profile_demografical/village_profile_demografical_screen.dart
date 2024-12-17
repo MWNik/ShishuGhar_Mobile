@@ -46,7 +46,7 @@ class DemograficalDetailsScreen extends StatefulWidget {
 }
 
 class _demograficalDetail extends State<DemograficalDetailsScreen> {
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<HouseHoldFielItemdModel> allItems = [];
   Map<String, dynamic> myMap = {};
   List<OptionsModel> options = [];
@@ -63,19 +63,39 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
     labelControlls.clear();
     List<String> valueNames = [
       CustomText.Save,
+      CustomText.dataSaveSuc,
       CustomText.Creches,
       CustomText.CrecheCaregiver,
       CustomText.Next,
       CustomText.back,
+      CustomText.ok,
       CustomText.Submit,
       CustomText.demographicalDetails,
       CustomText.select_here,
       CustomText.typehere,
-      CustomText.plsFilManForm
+      CustomText.plsFilManForm,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => labelControlls = value);
+        .then((value) => labelControlls.addAll(value));
 
     await TranslationDataHelper()
         .callTranslateEnrolledChildren()
@@ -145,7 +165,7 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
       for (int i = 0; i < allItems.length; i++) {
         screenItems.add(widgetTypeWidget(i, allItems[i]));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, allItems[i])) {
+        if (!logic!.callDependingLogic(myMap, allItems[i])) {
           myMap.remove(allItems[i].fieldname);
         }
       }
@@ -177,13 +197,12 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           onChanged: (value) {
             if (value != null)
@@ -198,17 +217,15 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -230,17 +247,16 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -255,22 +271,20 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -300,12 +314,12 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
       //     items: items,
       //     isRequred: quesItem.reqd == 1
       //         ? quesItem.reqd
-      //         : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+      //         : logic!.dependeOnMendotory( myMap, quesItem),
       //     titleText:
       //     Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
       //     selectedItem: myMap[quesItem.fieldname],
       //     responceFieldName: itemResopnceField,
-      //     readable:widget.isEditable?DependingLogic().callReadableLogic(logics, myMap, quesItem):true,
+      //     readable:widget.isEditable?logic!.callReadableLogic( myMap, quesItem):true,
       //     onChanged: (value) {
       //       if (value != null) myMap[quesItem.fieldname!] = value;
       //       // else
@@ -320,15 +334,14 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           initialValue: myMap[quesItem.fieldname],
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           labelControlls: labelControlls,
           lng: lng!,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -342,16 +355,15 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -364,10 +376,10 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
@@ -388,10 +400,10 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
               labelControlls, quesItem.label!.trim(), lng!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           readable: widget.isEditable
-              ? DependingLogic().callReadableLogic(logics, myMap, quesItem)
+              ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
@@ -407,7 +419,7 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
       //     assetPath:myMap[quesItem.fieldname!],
       //     titleText:
       //     Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-      //     isRequred: quesItem.reqd==1?quesItem.reqd:DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+      //     isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
       //     onChanged: (value) {
       //       print('Entered text: $value');
       //       myMap[quesItem.fieldname!] = value;
@@ -443,9 +455,6 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
         .getAllMstCommonNotINOptions(defaultCommon, lng!)
         .then((value) => options.addAll(value));
 
-    await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
-    });
     List<String> labelItems = [];
     allItems.forEach((element) {
       if (Global.validString(element.label)) {
@@ -456,6 +465,9 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
         .callTranslateString(labelItems)
         .then((value) => labelControlls.addAll(value));
 
+    await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
+      logic = DependingLogic(labelControlls, data, lng!);
+    });
     setState(() {
       _isLoading = false;
     });
@@ -479,11 +491,10 @@ class _demograficalDetail extends State<DemograficalDetailsScreen> {
             break;
           }
         }
-        var validationMsg = DependingLogic()
-            .validationMessge(logics, myMap, element, labelControlls, lng!);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
-              Global.returnTrLable(labelControlls, validationMsg, lng!),
+              validationMsg!,
               Global.returnTrLable(labelControlls, CustomText.ok, lng!),
               false,
               context);

@@ -76,7 +76,8 @@ class _CmcCCTabSCreenState extends State<CmcCCTabSCreen>
       CustomText.back,
       CustomText.shouldExit,
       CustomText.exit,
-      CustomText.Cancel
+      CustomText.Cancel,
+      CustomText.VisitNote
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -89,7 +90,9 @@ class _CmcCCTabSCreenState extends State<CmcCCTabSCreen>
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
           onWillPop: () async {
@@ -313,13 +316,15 @@ class _CmcCCTabSCreenState extends State<CmcCCTabSCreen>
     _tabController = TabController(length: tabBreakItems.length, vsync: this);
     tabIsScrollable = tabWidth * tabBreakItems.length > screenWidth;
 
-    // List<String> tabLabelItems = [];
-    // tabBreakItems.forEach((element) {
-    //   if(Global.validString(element.label)){
-    //     tabLabelItems.add(element.label!);
-    //   }
-    // });
-    // await TranslationDataHelper().callTranslateString(tabLabelItems).then((value) => translatsLabel.addAll(value));
+    List<String> tabLabelItems = [];
+    tabBreakItems.forEach((element) {
+      if (Global.validString(element.label)) {
+        tabLabelItems.add(element.label!);
+      }
+    });
+    await TranslationDataHelper()
+        .callTranslateString(tabLabelItems)
+        .then((value) => translatsLabel.addAll(value));
     if (Global.validString(widget.date_of_visit)) {
       List<int> parts =
           widget.date_of_visit.toString().split('-').map(int.parse).toList();

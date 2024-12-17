@@ -12,13 +12,12 @@ import 'children_enrolled_exit_listed_screen.dart';
 class EnrolledExitChildListingTab extends StatefulWidget {
   final int creCheId;
   final String village_id;
-  final String creCheName;
 
-  const EnrolledExitChildListingTab(
-      {super.key,
-      required this.creCheId,
-      required this.village_id,
-      required this.creCheName});
+  const EnrolledExitChildListingTab({
+    super.key,
+    required this.creCheId,
+    required this.village_id,
+  });
 
   @override
   _EnrolledChildrenListingTabState createState() =>
@@ -43,7 +42,9 @@ class _EnrolledChildrenListingTabState
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {
@@ -75,10 +76,10 @@ class _EnrolledChildrenListingTabState
                       labelControlls, CustomText.Enrolledchildren, lng),
                   style: Styles.white145,
                 ),
-                Text(
-                  widget.creCheName,
-                  style: Styles.white126P,
-                ),
+                // Text(
+                //  widget.creCheName,
+                //   style: Styles.white145,
+                // ),
               ],
             ),
             centerTitle: true,

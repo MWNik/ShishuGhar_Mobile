@@ -53,7 +53,8 @@ class ChildImmunizationExpendedDetailsScreen extends StatefulWidget {
       required this.enName,
       required this.enrolledItem,
       required this.childName,
-      required this.childHHID});
+      required this.childHHID
+      });
 
   @override
   _ChildImmunizationExpendedScreenSatet createState() =>
@@ -62,7 +63,7 @@ class ChildImmunizationExpendedDetailsScreen extends StatefulWidget {
 
 class _ChildImmunizationExpendedScreenSatet
     extends State<ChildImmunizationExpendedDetailsScreen> {
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   List<HouseHoldFielItemdModel> allItems = [];
   Map<String, dynamic> myMap = {};
   List<OptionsModel> options = [];
@@ -74,26 +75,24 @@ class _ChildImmunizationExpendedScreenSatet
   List<VaccineModel> vaccines = [];
   List<VaccineModel> vaccinesCard = [];
   int? expends;
-  int childAgeInDays = 0;
+  int childAgeInDays=0;
   Map<int, Map<String, dynamic>> vaccinesResponce = {};
 
-  List<String> hiddens = [
-    'partner_id',
+  List<String> hiddens=[ 'partner_id',
     'state_id',
     'district_id',
     'block_id',
     'gp_id',
     'village_id',
     'creche_id',
-    'child_id'
-  ];
+    'child_id'];
+
 
   Future<void> initializeData() async {
-    userName = (await Validate().readString(Validate.userName))!;
+     userName = (await Validate().readString(Validate.userName))!;
     lng = (await Validate().readString(Validate.sLanguage))!;
-    var dateTime = Global.stringToDate(
-        Global.getItemValues(widget.enrolledItem!.responces!, 'child_dob'));
-    childAgeInDays = Validate().calculateAgeInDays(dateTime!);
+    var dateTime=Global.stringToDate(Global.getItemValues(widget.enrolledItem!.responces!, 'child_dob')) ;
+    childAgeInDays=Validate().calculateAgeInDays(dateTime!);
     print("childAgeInDays $childAgeInDays");
 
     labelControlls.clear();
@@ -103,19 +102,20 @@ class _ChildImmunizationExpendedScreenSatet
       CustomText.CrecheCaregiver,
       CustomText.Next,
       CustomText.back,
-      CustomText.Submit
+      CustomText.Submit,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.dataSaveSuc
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
         .then((value) => labelControlls = value);
 
-    await TranslationDataHelper()
-        .callTranslateEnrolledChildren()
-        .then((value) => labelControlls.addAll(value));
 
-    vaccinesCard =
-        await VaccinesDataHelper().callImmunizationExpendTitle(childAgeInDays);
-    vaccines = await VaccinesDataHelper().callVaccinesByDays(childAgeInDays);
+    vaccinesCard=await VaccinesDataHelper().callImmunizationExpendTitle(childAgeInDays);
+    vaccines=await VaccinesDataHelper().callVaccinesByDays(childAgeInDays);
 
     await updateHiddenValue();
 
@@ -144,22 +144,22 @@ class _ChildImmunizationExpendedScreenSatet
           title: RichText(
             text: TextSpan(
               children: [
-                WidgetSpan(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${widget.childName}',
-                        style: Styles.white145,
-                      ),
-                      Text(
-                        '${widget.childHHID}',
-                        style: Styles.white126P,
-                      ),
-                      // Add additional TextSpans here if needed
-                    ],
-                  ),
-                )
+              WidgetSpan(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${widget.childName}',
+                      style: Styles.white145,
+                    ),
+                    Text(
+                      '${widget.childHHID}',
+                      style: Styles.white126P,
+                    ),
+                    // Add additional TextSpans here if needed
+                  ],
+                ),
+              )
               ],
             ),
           ),
@@ -202,7 +202,7 @@ class _ChildImmunizationExpendedScreenSatet
                           nextTab(1, context);
                         },
                         text: Global.returnTrLable(
-                            labelControlls, CustomText.Submit, lng!),
+                            labelControlls,  CustomText.Submit, lng!),
                       ))
                     ]),
                   )
@@ -225,6 +225,7 @@ class _ChildImmunizationExpendedScreenSatet
                 border: Border.all(color: Color(0xffE0E0E0)),
                 borderRadius: BorderRadius.circular(10.r),
               ),
+
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -236,7 +237,8 @@ class _ChildImmunizationExpendedScreenSatet
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
-                          child: Text(vaccineItem.categories!,
+                          child: Text(
+                               vaccineItem.categories!,
                               style: Styles.blue126),
                         ),
                         Padding(
@@ -252,13 +254,13 @@ class _ChildImmunizationExpendedScreenSatet
                               },
                               child: expends == i
                                   ? Image.asset(
-                                      "assets/circle_arrow.png",
-                                      scale: 2.2,
-                                    )
+                                "assets/circle_arrow.png",
+                                scale: 2.2,
+                              )
                                   : Image.asset(
-                                      "assets/circle_down_arrow.png",
-                                      scale: 2.2,
-                                    )),
+                                "assets/circle_down_arrow.png",
+                                scale: 2.2,
+                              )),
                         )
                       ],
                     ),
@@ -267,7 +269,8 @@ class _ChildImmunizationExpendedScreenSatet
                     visible: expends == i,
                     child: Container(
                       color: Colors.white,
-                      child: Padding(
+                      child:
+                      Padding(
                         padding: EdgeInsets.all(10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,9 +295,9 @@ class _ChildImmunizationExpendedScreenSatet
   }
 
   List<Widget> cVAccineWiget(int days) {
+
     List<Widget> screenItems = [];
-    var daysVaccine =
-        vaccines.where((element) => element.days == days).toList();
+    var daysVaccine=vaccines.where((element) => element.days==days).toList();
     daysVaccine.forEach((element) {
       screenItems.add(SizedBox(height: 5.h));
       screenItems.add(RichText(
@@ -304,7 +307,9 @@ class _ChildImmunizationExpendedScreenSatet
               text: '${CustomText.VaccineName} : ',
               style: Styles.blue124,
               children: [
-                TextSpan(text: element.vaccine, style: Styles.blue126),
+                TextSpan(
+                    text: element.vaccine,
+                    style: Styles.blue126),
               ])));
       screenItems.add(SizedBox(height: 5.h));
       screenItems.add(RichText(
@@ -315,25 +320,25 @@ class _ChildImmunizationExpendedScreenSatet
               style: Styles.blue124,
               children: [
                 TextSpan(
-                    text: element.site_for_vaccinations, style: Styles.blue126),
+                    text: element.site_for_vaccinations,
+                    style: Styles.blue126),
               ])));
-      if (allItems.length > 0) {
-        for (int i = 0; i < allItems.length; i++) {
-          var cWidgetDatamap = vaccinesResponce[element.name];
-          if (cWidgetDatamap == null) {
-            cWidgetDatamap = {};
-            vaccinesResponce[element.name!] = cWidgetDatamap;
-          }
-          screenItems.add(
-              widgetTypeWidget(allItems[i], cWidgetDatamap, element.name!));
-          screenItems.add(SizedBox(height: 5.h));
-          if (!DependingLogic()
-              .callDependingLogic(logics, myMap, allItems[i])) {
-            myMap.remove(allItems[i].fieldname);
+      if (allItems .length>0) {
+          for (int i = 0; i < allItems.length; i++) {
+            var cWidgetDatamap = vaccinesResponce[element.name];
+            if (cWidgetDatamap == null) {
+              cWidgetDatamap = {};
+              vaccinesResponce[element.name!] = cWidgetDatamap;
+            }
+            screenItems.add(widgetTypeWidget(allItems[i],cWidgetDatamap, element.name!));
+            screenItems.add(SizedBox(height: 5.h));
+            if (!logic!.callDependingLogic( myMap, allItems[i])) {
+              myMap.remove(allItems[i].fieldname);
+            }
           }
         }
-      }
     });
+
 
     //
 
@@ -347,12 +352,11 @@ class _ChildImmunizationExpendedScreenSatet
       vaccinesResponce[vaccineID] = cWidgetDatamap;
     }
     List<Widget> screenItems = [];
-    if (allItems.length > 0) {
+    if (allItems .length>0) {
       for (int i = 0; i < allItems.length; i++) {
-        screenItems
-            .add(widgetTypeWidget(allItems[i], cWidgetDatamap, vaccineID));
+        screenItems.add(widgetTypeWidget(allItems[i],cWidgetDatamap, vaccineID));
         screenItems.add(SizedBox(height: 5.h));
-        if (!DependingLogic().callDependingLogic(logics, myMap, allItems[i])) {
+        if (!logic!.callDependingLogic( myMap, allItems[i])) {
           myMap.remove(allItems[i].fieldname);
         }
       }
@@ -387,15 +391,14 @@ class _ChildImmunizationExpendedScreenSatet
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
         return DynamicCustomDropdownField(
-          titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          hintText: Global.returnTrLable(labelControlls, CustomText.select_here, lng!),
+          titleText:
+          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
+          isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
           items: items,
           selectedItem: itemsAnswred[quesItem.fieldname!],
-          isVisible: DependingLogic()
-              .callDependingLogic(logics, itemsAnswred, quesItem),
+          isVisible: logic!
+              .callDependingLogic( itemsAnswred, quesItem),
           onChanged: (value) {
             if (value != null)
               itemsAnswred[quesItem.fieldname!] = value.name;
@@ -408,24 +411,24 @@ class _ChildImmunizationExpendedScreenSatet
         );
       case 'Date':
         return CustomDatepickerDynamic(
-          calenderValidate: [],
-          titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
+          calenderValidate:[],
+          titleText:
+          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+
+          isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
           onChanged: (value) {
             itemsAnswred[quesItem.fieldname!] = value;
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, itemsAnswred, quesItem);
+            var logData = logic!
+                .callDateDiffrenceLogic( itemsAnswred, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 itemsAnswred.addEntries(
                     [MapEntry(logData.keys.first, logData.values.first)]);
 
                 updateItemsForChildren(itemsAnswred, vaccineID);
+
               }
             }
             setState(() {});
@@ -436,16 +439,14 @@ class _ChildImmunizationExpendedScreenSatet
           maxline: 3,
           titleText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: logic!.callReadableLogic( myMap, quesItem),
           hintText: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          logic!.callDependingLogic( myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -455,20 +456,18 @@ class _ChildImmunizationExpendedScreenSatet
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
-          titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          titleText:
+          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
+          isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
           initialvalue: itemsAnswred[quesItem.fieldname!],
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           maxlength: quesItem.length,
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
-          hintText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
-          isVisible: DependingLogic()
-              .callDependingLogic(logics, itemsAnswred, quesItem),
+          readable: logic!
+              .callReadableLogic( itemsAnswred, quesItem),
+          hintText:
+          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
+          isVisible: logic!
+              .callDependingLogic( itemsAnswred, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               itemsAnswred[quesItem.fieldname!] = value;
@@ -480,24 +479,22 @@ class _ChildImmunizationExpendedScreenSatet
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
-          titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
+          titleText:
+          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemsAnswred[quesItem.fieldname!],
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
-          isVisible: DependingLogic()
-              .callDependingLogic(logics, itemsAnswred, quesItem),
+          readable: logic!
+              .callReadableLogic( itemsAnswred, quesItem),
+          isVisible: logic!
+              .callDependingLogic( itemsAnswred, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, itemsAnswred, quesItem);
+              var logData = logic!
+                  .callAutoGeneratedValue( itemsAnswred, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   itemsAnswred.addEntries(
@@ -518,8 +515,8 @@ class _ChildImmunizationExpendedScreenSatet
       //     label:
       //     Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
       //     initialValue: itemsAnswred[quesItem.fieldname!],
-      //     isVisible: DependingLogic()
-      //         .callDependingLogic(logics, itemsAnswred, quesItem),
+      //     isVisible: logic!
+      //         .callDependingLogic( itemsAnswred, quesItem),
       //     onChanged: (value) {
       //       if (value > 0)
       //         itemsAnswred[quesItem.fieldname!] = value;
@@ -535,14 +532,13 @@ class _ChildImmunizationExpendedScreenSatet
           label: Global.returnTrLable(
               labelControlls, quesItem.label!.trim(), lng!),
           initialValue: myMap[quesItem.fieldname],
-          labelControlls: labelControlls,
+          labelControlls:labelControlls,
           lng: lng!,
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: DependingLogic().callReadableLogic(logics, myMap, quesItem),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
+          readable: logic!
+              .callReadableLogic( myMap, quesItem),
+          isVisible: logic!
+              .callDependingLogic( myMap, quesItem),
           onChanged: (value) {
             // if (value > 0)
             print('yesNo $value');
@@ -554,15 +550,13 @@ class _ChildImmunizationExpendedScreenSatet
         );
       case 'Select':
         return DynamicCustomTextFieldInt(
-          titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
+          titleText:
+          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
           maxlength: quesItem.length,
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
+          readable: logic!
+              .callReadableLogic( itemsAnswred, quesItem),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -578,14 +572,12 @@ class _ChildImmunizationExpendedScreenSatet
         );
       case 'Small Text':
         return DynamicCustomTextFieldNew(
-          titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          titleText:
+          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
+          isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
           maxlength: quesItem.length,
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
+          readable: logic!
+              .callReadableLogic( itemsAnswred, quesItem),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -599,25 +591,23 @@ class _ChildImmunizationExpendedScreenSatet
         );
       case 'Float':
         return DynamicCustomTextFieldFloat(
-          titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
+          titleText:
+          Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng!),
           fieldName: quesItem.fieldname!,
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+          isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemsAnswred[quesItem.fieldname!],
-          readable: DependingLogic()
-              .callReadableLogic(logics, itemsAnswred, quesItem),
-          isVisible: DependingLogic()
-              .callDependingLogic(logics, itemsAnswred, quesItem),
+          readable: logic!
+              .callReadableLogic( itemsAnswred, quesItem),
+          isVisible: logic!
+              .callDependingLogic( itemsAnswred, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, itemsAnswred, quesItem);
+              var logData = logic!
+                  .callAutoGeneratedValue( itemsAnswred, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   itemsAnswred.addEntries(
@@ -639,6 +629,8 @@ class _ChildImmunizationExpendedScreenSatet
   }
 
   Future<void> callScrenControllers(screen_type) async {
+   
+
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -649,9 +641,7 @@ class _ChildImmunizationExpendedScreenSatet
       allItems = value;
     });
 
-    allItems = allItems
-        .where((element) => !(hiddens.contains(element.fieldname)))
-        .toList();
+    allItems=allItems.where((element) => !(hiddens.contains(element.fieldname))).toList();
 
     List<String> defaultCommon = [];
     for (int i = 0; i < allItems.length; i++) {
@@ -661,11 +651,11 @@ class _ChildImmunizationExpendedScreenSatet
     }
 
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon, lng!)
+        .getAllMstCommonNotINOptions(defaultCommon,lng!)
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic=DependingLogic(labelControlls,data,lng!);
     });
 
     setState(() {
@@ -705,7 +695,7 @@ class _ChildImmunizationExpendedScreenSatet
   //         }
   //       }
   //       var validationMsg =
-  //           DependingLogic().validationMessge(logics, myMap, element,translats,lng!);
+  //           logic!.validationMessge( myMap, element);
   //       if (Global.validString(validationMsg)) {
   //         Validate().singleButtonPopup(
   //             Global.returnTrLable(
@@ -726,25 +716,25 @@ class _ChildImmunizationExpendedScreenSatet
   nextTab(int type, BuildContext mContext) async {
     if (type == 1) {
       // if (_checkValidation()) {
-      await saveDataInData();
-      bool shouldProceed = await showDialog(
-        context: context,
-        builder: (context) {
-          return SingleButtonPopupDialog(
-              message: Global.returnTrLable(
-                  labelControlls, CustomText.dataSaveSuc, lng!),
-              button:
-                  Global.returnTrLable(labelControlls, CustomText.ok, lng!));
-        },
-      );
-      if (shouldProceed) {
-        if (shouldProceed == true) {
-          Navigator.pop(context, 'itemRefresh');
+        await saveDataInData();
+        bool shouldProceed = await showDialog(
+          context: context,
+          builder: (context) {
+            return SingleButtonPopupDialog(
+                message: Global.returnTrLable(
+                    labelControlls, CustomText.dataSaveSuc, lng!),
+                button:
+                    Global.returnTrLable(labelControlls, CustomText.ok, lng!));
+          },
+        );
+        if (shouldProceed) {
+          if (shouldProceed == true) {
+            Navigator.pop(context, 'itemRefresh');
+          }
         }
-      }
-      // return;
+        // return;
 
-      setState(() {});
+        setState(() {});
       // }
     } else {
       Navigator.pop(context, 'itemRefresh');
@@ -785,18 +775,16 @@ class _ChildImmunizationExpendedScreenSatet
     var alrecords = await ChildImmunizationResponseHelper()
         .getChildEventResponcewithGuid(widget.child_immunization_guid!);
     if (alrecords.length > 0) {
+
       Map<String, dynamic> responcesData = jsonDecode(alrecords[0].responces!);
       var childs = responcesData['vaccine_details'];
       if (childs != null) {
-        List<Map<String, dynamic>> children =
-            List<Map<String, dynamic>>.from(childs);
+        List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(childs);
         responcesData.remove('anthropromatic_details');
 
         children.forEach((element) {
-          var itmelement = element;
-          vaccinesResponce[
-                  Global.stringToInt(element['vaccine_id'].toString())] =
-              itmelement;
+          var itmelement=element;
+          vaccinesResponce[Global.stringToInt(element['vaccine_id'].toString())] = itmelement;
         });
       }
       responcesData.forEach((key, value) {
@@ -847,23 +835,23 @@ class _ChildImmunizationExpendedScreenSatet
       context: context,
       builder: (BuildContext context) {
         return WillPopScope(
-          onWillPop: () async => false,
-          child: AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(),
-                SizedBox(height: 10),
-                const Text("Please wait..."),
-              ],
-            ),
-          ),
+            onWillPop: () async => false,
+        child:AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              SizedBox(height: 10),
+              const Text("Please wait..."),
+            ],
+          ),),
         );
       },
     );
   }
 
-  updateItemsForChildren(Map<String, dynamic> itemsAnswred, int vaccinesId) {
+  updateItemsForChildren(
+      Map<String, dynamic> itemsAnswred, int vaccinesId) {
     var cWidgetDatamap = vaccinesResponce[vaccinesId];
     if (cWidgetDatamap == null) {
       vaccinesResponce[vaccinesId] = itemsAnswred;
@@ -876,33 +864,36 @@ class _ChildImmunizationExpendedScreenSatet
   }
 
   Future<void> saveDataInData() async {
-    List<dynamic> childValues = [];
-    vaccines.forEach((element) {
-      var item = vaccinesResponce[element.name];
-      if (item != null) {
-        if (item['vaccination_date'] != null) {
-          item['vaccine_id'] = element.name;
-          childValues.add(item);
-        }
-      }
-    });
-    myMap['vaccine_details'] = childValues;
 
-    var responcesJs = jsonEncode(myMap);
-    print("responcesJs $responcesJs");
+    List<dynamic> childValues = [];
+      vaccines.forEach((element) {
+        var item = vaccinesResponce[element.name];
+        if (item != null) {
+          if(item['vaccination_date']!=null){
+            item['vaccine_id']=element.name;
+           childValues.add(item);
+          }
+        }
+      });
+      myMap['vaccine_details'] = childValues;
+
+      var responcesJs = jsonEncode(myMap);
+      print("responcesJs $responcesJs");
     var immulizerItem = ChildImmunizationResponceModel(
-        child_immunization_guid: widget.child_immunization_guid,
-        childenrolledguid: widget.chilenrolledGUID,
-        name: myMap['name'],
-        creche_id: Global.stringToInt(widget.creche_id),
-        responces: responcesJs,
-        is_uploaded: 0,
-        is_edited: 1,
-        is_deleted: 0,
-        created_at: myMap['appcreated_on'],
-        created_by: myMap['appcreated_by'],
-        update_at: myMap['app_updated_on'],
-        updated_by: myMap['app_updated_by']);
-    await ChildImmunizationResponseHelper().inserts(immulizerItem);
+                child_immunization_guid: widget.child_immunization_guid,
+                childenrolledguid: widget.chilenrolledGUID,
+                name: myMap['name'],
+                creche_id: Global.stringToInt(widget.creche_id),
+                responces: responcesJs,
+                is_uploaded: 0,
+                is_edited: 1,
+                is_deleted: 0,
+                created_at: myMap['appcreated_on'],
+                created_by: myMap['appcreated_by'],
+                update_at: myMap['app_updated_on'],
+                updated_by: myMap['app_updated_by']);
+            await ChildImmunizationResponseHelper().inserts(
+                immulizerItem);
   }
+
 }

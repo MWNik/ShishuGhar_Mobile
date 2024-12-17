@@ -16,11 +16,11 @@ import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
 
 class GraviencesTabScreen extends StatefulWidget {
-
   final String child_grievances_guid;
   final bool isNew;
 
-  GraviencesTabScreen({super.key, required this.child_grievances_guid, required this.isNew});
+  GraviencesTabScreen(
+      {super.key, required this.child_grievances_guid, required this.isNew});
 
   @override
   State<GraviencesTabScreen> createState() => _ChildReferralTabScreenState();
@@ -69,7 +69,9 @@ class _ChildReferralTabScreenState extends State<GraviencesTabScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return WillPopScope(
         onWillPop: () async {
@@ -253,7 +255,7 @@ class _ChildReferralTabScreenState extends State<GraviencesTabScreen>
             tabBreakItem: tabBreakItems[i],
             screenItem: expendedItems,
             changeTab: changeTab,
-            isNew:widget.isNew,
+            isNew: widget.isNew,
             tabIndex: i,
             totalTab: tabBreakItems.length));
       }

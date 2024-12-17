@@ -49,8 +49,7 @@ class GraviencesTabItem extends StatefulWidget {
       required this.changeTab,
       required this.tabIndex,
       required this.totalTab,
-      required this.isNew
-      });
+      required this.isNew});
 
   @override
   State<GraviencesTabItem> createState() => _ChildFollowUpTabItemSCreenState();
@@ -58,7 +57,7 @@ class GraviencesTabItem extends StatefulWidget {
 
 class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
   List<OptionsModel> options = [];
-  List<TabFormsLogic> logics = [];
+  DependingLogic? logic;
   Map<String, dynamic> myMap = {};
   List<Translation> translats = [];
   List<CresheDatabaseResponceModel> allCrecheRecords = [];
@@ -88,6 +87,29 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
       CustomText.back,
       CustomText.ok,
       CustomText.childrenCountVallidattion,
+      CustomText.Yes,
+      CustomText.No,
+      CustomText.select_here,
+      CustomText.typehere,
+      CustomText.dataSaveSuc,
+      CustomText.valuLesThanOrEqual,
+      CustomText.valueLesThan,
+      CustomText.valuGreaterThanOrEqual,
+      CustomText.valuGreaterThan,
+      CustomText.valuEqual,
+      CustomText.plsSelectIn,
+      CustomText.valuLenLessOrEqual,
+      CustomText.valuLenGreaterOrEqual,
+      CustomText.valuLenEqual,
+      CustomText.PleaseEnterValueIn,
+      CustomText.PleaseSelectAfterTimeIn,
+      CustomText.PleaseSelectAfterDateIn,
+      CustomText.PleaseSelectBeforTimeIn,
+      CustomText.PleaseSelectBeforDateIn,
+      CustomText.PleaseSelectBeforTimeInIsValidTime,
+      CustomText.plsFilManForm,
+      CustomText.wesUsageGraterQuatOpen,
+      CustomText.leavingLesThanjoining
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -99,7 +121,7 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
 
     await TranslationDataHelper()
         .callTranslateString(valueNames)
-        .then((value) => translats = value);
+        .then((value) => translats.addAll(value));
     allCrecheRecords = await CrecheDataHelper().getCrecheResponce();
     multselectItemTab =
         await ChildReferralFieldsHelper().callMultiSelectTabItem();
@@ -122,7 +144,9 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
         return false; // Change this according to your logic
       },
       child: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Container(
+              color: Colors.white,
+              child: Center(child: CircularProgressIndicator()))
           : Scaffold(
               body: Column(children: [
                 Divider(),
@@ -142,81 +166,85 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
                 Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-                  child: widget.isNew?Row(
-                      children: [
-                    Expanded(
-                      child: CElevatedButton(
-                        color: Color(0xffF26BA3),
-                        onPressed: () {
-                          // ch(2);
-                          nextTab(0, context);
-                        },
-                        text: Global.returnTrLable(
-                                translats, CustomText.back, lng)
-                            .trim(),
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                         widget.tabIndex == (widget.totalTab - 1)
-                            ? SizedBox()
-                            : Expanded(
-                                child: CElevatedButton(
-                                  color: Color(0xff5979AA),
-                                  onPressed: () {
-                                    saveOnly(1, context);
-                                    // widget.changeTab(1);
-                                  },
-                                  text: Global.returnTrLable(
-                                          translats, 'Save', lng)
-                                      .trim(),
+                  child: widget.isNew
+                      ? Row(children: [
+                          Expanded(
+                            child: CElevatedButton(
+                              color: Color(0xffF26BA3),
+                              onPressed: () {
+                                // ch(2);
+                                nextTab(0, context);
+                              },
+                              text: Global.returnTrLable(
+                                      translats, CustomText.back, lng)
+                                  .trim(),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          widget.tabIndex == (widget.totalTab - 1)
+                              ? SizedBox()
+                              : Expanded(
+                                  child: CElevatedButton(
+                                    color: Color(0xff5979AA),
+                                    onPressed: () {
+                                      saveOnly(1, context);
+                                      // widget.changeTab(1);
+                                    },
+                                    text: Global.returnTrLable(
+                                            translats, 'Save', lng)
+                                        .trim(),
+                                  ),
                                 ),
-                              ),
-                         widget.tabIndex == (widget.totalTab - 1)
-                            ? SizedBox()
-                            : SizedBox(width: 10),
-                    Expanded(
-                      child: CElevatedButton(
-                        color: Color(0xff369A8D),
-                        onPressed: () {
-                          nextTab(1, context);
-                          // widget.changeTab(1);
-                        },
-                        text: widget.tabIndex == (widget.totalTab - 1)
-                            ? (Global.returnTrLable(
-                                translats, CustomText.Submit, lng))
-                            : Global.returnTrLable(
-                                translats, CustomText.Next, lng),
-                      ),
-                    ),
-                  ]):Row(
-                      children: [
-                        Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xffF26BA3),
-                            onPressed: () {
-                              if (widget.tabIndex == 0) {
-                                Navigator.pop(context, 'itemRefresh');
-                              } else {
-                                widget.changeTab(0);
-                              }
-                            },
-                            text: Global.returnTrLable(
-                                translats, CustomText.back, lng)
-                                .trim(),
+                          widget.tabIndex == (widget.totalTab - 1)
+                              ? SizedBox()
+                              : SizedBox(width: 10),
+                          Expanded(
+                            child: CElevatedButton(
+                              color: Color(0xff369A8D),
+                              onPressed: () {
+                                nextTab(1, context);
+                                // widget.changeTab(1);
+                              },
+                              text: widget.tabIndex == (widget.totalTab - 1)
+                                  ? (Global.returnTrLable(
+                                      translats, CustomText.Submit, lng))
+                                  : Global.returnTrLable(
+                                      translats, CustomText.Next, lng),
+                            ),
                           ),
-                        ),
-                        widget.tabIndex == (widget.totalTab - 1)?SizedBox():SizedBox(width: 10),
-                        widget.tabIndex == (widget.totalTab - 1)?SizedBox():Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xff369A8D),
-                            onPressed: () {
-                              widget.changeTab(1);
-                            },
-                            text:  Global.returnTrLable(
-                                translats, CustomText.Next, lng),
+                        ])
+                      : Row(children: [
+                          Expanded(
+                            child: CElevatedButton(
+                              color: Color(0xffF26BA3),
+                              onPressed: () {
+                                if (widget.tabIndex == 0) {
+                                  Navigator.pop(context, 'itemRefresh');
+                                } else {
+                                  widget.changeTab(0);
+                                }
+                              },
+                              text: Global.returnTrLable(
+                                      translats, CustomText.back, lng)
+                                  .trim(),
+                            ),
                           ),
-                        ),
-                      ]),
+                          widget.tabIndex == (widget.totalTab - 1)
+                              ? SizedBox()
+                              : SizedBox(width: 10),
+                          widget.tabIndex == (widget.totalTab - 1)
+                              ? SizedBox()
+                              : Expanded(
+                                  child: CElevatedButton(
+                                    color: Color(0xff369A8D),
+                                    onPressed: () {
+                                      widget.changeTab(1);
+                                    },
+                                    text: Global.returnTrLable(
+                                        translats, CustomText.Next, lng),
+                                  ),
+                                ),
+                        ]),
                 )
               ]),
             ),
@@ -233,7 +261,7 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
         screenItems.add(widgetTypeWidget(i, items[i]));
         screenItems.add(SizedBox(height: 5.h));
 
-        if (!DependingLogic().callDependingLogic(logics, myMap, items[i])) {
+        if (!logic!.callDependingLogic(myMap, items[i])) {
           myMap.remove(items[i].fieldname);
         }
       }
@@ -262,30 +290,33 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
   widgetTypeWidget(int index, HouseHoldFielItemdModel quesItem) {
     switch (quesItem.fieldtype) {
       case 'Link':
-         if (quesItem.fieldname == 'creche_id') {
+        if (quesItem.fieldname == 'creche_id') {
           var village_id = myMap['village_id'];
-          if(village_id!=null) {
+          if (village_id != null) {
             items = filterCreche(village_id);
-          }else items=[];
-        }else {
-           items = options
-               .where((element) => element.flag == "tab${quesItem.options}")
-               .toList();
-         }
-         if (items.length == 1) {
-           myMap[quesItem.fieldname!] = items.first.name;
-         }
+          } else
+            items = [];
+        } else {
+          items = options
+              .where((element) => element.flag == "tab${quesItem.options}")
+              .toList();
+        }
+        if (items.length == 1) {
+          myMap[quesItem.fieldname!] = items.first.name;
+        }
         return DynamicCustomDropdownField(
+          hintText:
+              Global.returnTrLable(translats, CustomText.select_here, lng!),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: widget.isNew ?DependingLogic().callReadableLogic(logics, myMap, quesItem) : true,
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          readable:
+              widget.isNew ? logic!.callReadableLogic(myMap, quesItem) : true,
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (quesItem.fieldname == 'village_id' && value!.name != null) {
               myMap.remove('creche_id');
@@ -314,7 +345,7 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
           items: items,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           selectedItem: myMap[quesItem.fieldname],
@@ -331,17 +362,17 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
         return CustomDatepickerDynamic(
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          readable: quesItem.fieldname=='grievance_date'?true:DependingLogic().callReadableLogic(logics, myMap, quesItem),
+          readable: quesItem.fieldname == 'grievance_date'
+              ? true
+              : logic!.callReadableLogic(myMap, quesItem),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          calenderValidate:
-              DependingLogic().calenderValidation(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
 
-            var logData = DependingLogic()
-                .callDateDiffrenceLogic(logics, myMap, quesItem);
+            var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
                 // var item =myMap[logData.keys.first];
@@ -359,20 +390,20 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
-          readable: widget.isNew ?DependingLogic().callReadableLogic(logics, myMap, quesItem) : true,
+          readable:
+              widget.isNew ? logic!.callReadableLogic(myMap, quesItem) : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
           maxline: (quesItem.length != 0) ? quesItem.length! % 35 : 1,
-          keyboard: DependingLogic().keyBoardLogic(quesItem.fieldname!, logics),
+          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -382,23 +413,23 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
         );
       case 'Int':
         return DynamicCustomTextFieldInt(
+          hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: widget.isNew ?DependingLogic().callReadableLogic(logics, myMap, quesItem) : true,
+          readable:
+              widget.isNew ? logic!.callReadableLogic(myMap, quesItem) : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -419,10 +450,10 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
           lng: lng,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
-          readable: widget.isNew ?DependingLogic().callReadableLogic(logics, myMap, quesItem) : true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          readable:
+              widget.isNew ? logic!.callReadableLogic(myMap, quesItem) : true,
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
             myMap[quesItem.fieldname!] = value;
@@ -436,14 +467,14 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: widget.isNew ?DependingLogic().callReadableLogic(logics, myMap, quesItem) : true,
+          readable:
+              widget.isNew ? logic!.callReadableLogic(myMap, quesItem) : true,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
               myMap[quesItem.fieldname!] = value;
@@ -456,9 +487,10 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: widget.isNew ?DependingLogic().callReadableLogic(logics, myMap, quesItem) : true,
+          readable:
+              widget.isNew ? logic!.callReadableLogic(myMap, quesItem) : true,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialvalue: myMap[quesItem.fieldname!],
@@ -478,9 +510,10 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: widget.isNew ?DependingLogic().callReadableLogic(logics, myMap, quesItem) : true,
+          readable:
+              widget.isNew ? logic!.callReadableLogic(myMap, quesItem) : true,
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -498,18 +531,17 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
           fieldName: quesItem.fieldname!,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
-              : DependingLogic().dependeOnMendotory(logics, myMap, quesItem),
+              : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: widget.isNew ?DependingLogic().callReadableLogic(logics, myMap, quesItem) : true,
-          isVisible:
-              DependingLogic().callDependingLogic(logics, myMap, quesItem),
+          readable:
+              widget.isNew ? logic!.callReadableLogic(myMap, quesItem) : true,
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
             if (value != null) {
               myMap[quesItem.fieldname!] = value;
-              var logData = DependingLogic()
-                  .callAutoGeneratedValue(logics, myMap, quesItem);
+              var logData = logic!.callAutoGeneratedValue(myMap, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   myMap.addEntries(
@@ -539,18 +571,17 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
-                CustomText.ok,
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
             break;
           }
         }
-        var validationMsg =
-            DependingLogic().validationMessge(logics, myMap, element,translats,lng);
+        var validationMsg = logic!.validationMessge(myMap, element);
         if (Global.validString(validationMsg)) {
           Validate()
-              .singleButtonPopup(validationMsg!, CustomText.ok, false, context);
+              .singleButtonPopup(validationMsg!, Global.returnTrLable(translats, CustomText.ok, lng), false, context);
           validStatus = false;
           break;
         }
@@ -596,30 +627,30 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
       print(responcesJs);
       var item = (type == 1)
           ? ChildGrievancesResponceModel(
-        grievance_guid: widget.grievance_guid,
-        responces: responcesJs,
-        creche_id: Global.stringToInt(myMap['creche_id']),
-        is_deleted: 0,
-        is_edited: 1,
-        is_uploaded: 0,
-        name: name,
-        created_at: myMap['appcreated_on'],
-        created_by: myMap['appcreated_by'],
-        update_at: DateTime.now().toString(),
-        updated_by: userName,
-      )
+              grievance_guid: widget.grievance_guid,
+              responces: responcesJs,
+              creche_id: Global.stringToInt(myMap['creche_id']),
+              is_deleted: 0,
+              is_edited: 1,
+              is_uploaded: 0,
+              name: name,
+              created_at: myMap['appcreated_on'],
+              created_by: myMap['appcreated_by'],
+              update_at: DateTime.now().toString(),
+              updated_by: userName,
+            )
           : ChildGrievancesResponceModel(
-        grievance_guid: widget.grievance_guid,
-        responces: responcesJs,
-        is_deleted: 0,
-        is_edited: 1,
-        is_uploaded: 0,
-        name: name,
-        created_at: myMap['appcreated_on'],
-        created_by: myMap['appcreated_by'],
-        update_at: DateTime.now().toString(),
-        updated_by: userName,
-      );
+              grievance_guid: widget.grievance_guid,
+              responces: responcesJs,
+              is_deleted: 0,
+              is_edited: 1,
+              is_uploaded: 0,
+              name: name,
+              created_at: myMap['appcreated_on'],
+              created_by: myMap['appcreated_by'],
+              update_at: DateTime.now().toString(),
+              updated_by: userName,
+            );
       await ChildGrievancesTabResponceHelper().inserts(item);
     }
   }
@@ -660,7 +691,6 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
   }
 
   Future<void> callScrenControllers(screen_type) async {
-    
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
@@ -698,7 +728,7 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
             defaultDisableDailog(items[i].fieldname!, items[i].options!);
           } else {
             await OptionsModelHelper()
-                .getLocationData(items[i].options!.trim(), responseData,lng)
+                .getLocationData(items[i].options!.trim(), responseData, lng)
                 .then((data) {
               options.addAll(data);
             });
@@ -713,12 +743,12 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
       logicFields.add(items[i].fieldname!);
     }
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptionsWthouASC(defaultCommon,lng)
+        .getAllMstCommonNotINOptionsWthouASC(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
-      logics.addAll(data);
+      logic = DependingLogic(translats, data, lng);
     });
   }
 

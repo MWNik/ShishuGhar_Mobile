@@ -173,7 +173,7 @@ class CustomText {
   static String HHchildrenListing = "HH List Children";
   static String LastMeasurement = "Last Measurement";
   static String OTPVerification = "OTP Verification";
-  static String receivedcode = "Didn’t received code? ";
+  // static String receivedcode = "Didn’t received code? ";
   static String Resend = "Resend";
   static String verificationcode = "Enter the verification code";
   static String Createnewpassword = "Set New Password";
@@ -313,7 +313,7 @@ class CustomText {
   static String MyProfile = "My Profile";
   static String ChangePassword = "Change Password";
   static String Logout = "Logout";
-  static String Version = "Version: ";
+  static String Version = "Version";
   static String child_exited = "Exited";
   static String HealthUpdate = "Health Update";
   static String EvventUpdate = "Event Update";
@@ -354,7 +354,7 @@ class CustomText {
 
   static String eventALredyExistd =
       "An event already exists for the selected Date";
-  static String detail = "Detail";
+  static String detail = "Details";
   static String WeightforHeight = 'Weight for height';
   static String Moderate = 'Moderate';
   static String WeightforAge = 'Weight for age';
@@ -388,7 +388,7 @@ class CustomText {
   static String vaccinationDate = "Vaccination Date";
   static String Vaccinated = "Vaccinated";
   static String vaccine = "Vaccine";
-  static String sideForVaccination = "Site for vaccination";
+  static String sideForVaccination = "Site of vaccination";
   static String selectVacinationDate = "Select vaccination date.";
   static String selectVaccinated = "Please select vaccinated?";
   static String logoutPendingDataMsg =
@@ -420,7 +420,7 @@ class CustomText {
   static String CrecheCommitte = "Creche Committee";
   static String ccDetails = "Meeting Details";
   static String height = "Height (in cm)";
-  static String weight = "Weight (in Kg)";
+  static String weight = "Weight (in kg)";
   static String CBM = "CBM";
   static String ALM = "ALM";
   static String uploadChildMsg = "Please upload child profile first.";
@@ -511,7 +511,19 @@ class CustomText {
   static String noREmovedItem = "No removed item";
   static String mismatched = "Mismatch";
   static String received = "Received";
-  static String plsFillLessOrEqual = "Please enter amount less than or equal ";
+  static String plsFillLessOrEqual = "Please enter amount less than or equal";
+  static String supplied = "Supplied";
+  static String opening = "Opening";
+  static String wstage = "Wastage";
+  static String closing = "Closing";
+  static String usage = "Usage";
+  static String locationNotCaptured = "Location is not captured. Please try again.";
+  static String serviceNotEnabled = "Service Not Enabled";
+  static String permissionrequired = "Permission Required";
+  static String allowPermission = "Please allow location permission";
+  static String setting = "Settings";
+
+
   /* DOCTYPE LIST*/
   static String childGrowthMonitoring = "Child Growth Monitoring"; //0
   static String AnthroData = "Anthropromatic Data"; //1
@@ -547,4 +559,47 @@ class CustomText {
   static String visitPurpose = "Visit Purpose child table"; //31
   static String disability = "Disability"; //32
   /* DOCTYLE LIST END */
+
+  //validate messages
+  static String valuLesThanOrEqual =
+      "Value of must be less than Or equal to"; //32
+  static String valueLesThan = "Value of must be less than to"; //32
+  static String valuGreaterThanOrEqual =
+      "Value of must be greater than Or equal to"; //32
+  static String valuGreaterThan = "Value of must be greater than to"; //32
+  static String valuEqual = "Value of must be equal to"; //32
+  static String plsSelectIn = "Please select value in"; //32
+  static String valuLenLessOrEqual =
+      "Value of length must be less than Or equal to"; //32
+  static String valuLenGreaterOrEqual =
+      "Value of length must be greater than Or equal to"; //32
+  static String valuLenEqual = "Value of length must be equal to"; //32
+  static String wesUsageGraterQuatOpen =
+      "Sum of Usage and Wastage cannot be more than the sum of Quantity Received and Opening Stock"; //32
+  static String PleaseEnterValueIn = "Please enter value in"; //32
+  static String PleaseSelectAfterTimeIn = "Please select time after in"; //32
+  static String PleaseSelectAfterDateIn = "Please select date after in"; //32
+  static String PleaseSelectBeforTimeIn = "Please select time before in"; //32
+  static String PleaseSelectBeforDateIn = "Please select date before in"; //32
+  static String PleaseSelectBeforTimeInIsValidTime =
+      "Please select is valid time in"; //32
+  static String leavingLesThanjoining =
+      "Date of Leaving should be less than date of joining";
+  static String plsEnter = "Please enter value"; //32
+  static String plsFill = "Please fill value"; //32
+  static String plsSelect = "Please select value"; //32
+  static String valuBefore = "Value of must be before"; //32
+  static String valuAfter = "Value of must be after"; //32
+  static String futureDateNotAllowed =
+      "Future date is not allowed in follow up visit date"; //32
+  static String selecisChildavail = "Please select Is child available?"; //32
+  static String meetingAlredExist =
+      "A meeting already exist on this selected date"; //32
+
+// Growth Monitoring Validate messages
+  static String plsSelectMesureEquip = "Please select Measurement Equipment!";
+  static String plsSelectHeight = "Please enter measurement height!";
+  static String plsSelectWeight = "Please enter  measurement weight!";
+  static String plsSelectMesureDate = "Please enter  measurement taken date!";
+  static String plsSelectreason = "Please select Reason!";
 }
