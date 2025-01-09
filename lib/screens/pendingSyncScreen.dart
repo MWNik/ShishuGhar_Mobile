@@ -788,19 +788,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    } else if (userRole == 'Cluster Coordinator') {
-      /* var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
-      if (hhItems.length > 1) {
-        syncInfo[Global.returnTrLable(
-                locationControlls, CustomText.HHListing, lng!)] =
-            '[b]${hhItems.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
-      } else {
-        syncInfo[Global.returnTrLable(
-                locationControlls, CustomText.HHListing, lng!)] =
-            '[b]${hhItems.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
-      }
-      syncInfoCount[Global.returnTrLable(
-          locationControlls, CustomText.HHListing, lng!)] = hhItems.length;*/
+    }
+    else if (userRole == 'Cluster Coordinator') {
 
       var cmcCCData = await CmcCCTabResponseHelper().getCcForUpload();
       if (cmcCCData.length > 1) {
@@ -855,7 +844,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    } else if (userRole == 'Accounts and Logistics Manager') {
+    }
+    else if (userRole == 'Accounts and Logistics Manager') {
       var cmcALMData = await CmcALMTabResponseHelper().getAlmForUpload();
       if (cmcALMData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -909,7 +899,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    } else if (userRole == 'Capacity and Building Manager') {
+    }
+    else if (userRole == 'Capacity and Building Manager') {
       var cmcCBMData = await CmcCBMTabResponseHelper().getCBMForUpload();
       if (cmcCBMData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -963,7 +954,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    } else {
+    }
+    else {
       var grievanceData =
           await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
       if (grievanceData.length > 1) {
@@ -2019,14 +2011,16 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         uploadRequisition, //18
         uploadImageFile, //19
       ];
-    } else if (userRole == 'Cluster Coordinator') {
+    }
+    else if (userRole == 'Cluster Coordinator') {
       methods = [
         uploadcmcCCData,
         uploadChildGrievanceData,
         uploadCheckInData,
         uploadImageFile
       ];
-    } else if (userRole == 'Accounts and Logistics Manager') {
+    }
+    else if (userRole == 'Accounts and Logistics Manager') {
       methods = [
         uploadcmcALMData,
         uploadChildGrievanceData,
@@ -2073,56 +2067,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         var element = anthropomertydata[i];
         Map<String, dynamic> jsonBody = jsonDecode(element.responces!);
 
-        if (element.name != null) {
-          var responce = await ChildGrowthMetaUploadApi()
-              .childGrowthMetaUploadUpdate(
-                  token!, jsonEncode(jsonBody), element.name);
-          if (responce.statusCode == 200) {
-            Validate().saveString(
-                Validate.dataUploadDateTime, Validate().currentDateTime());
-            await updateResponcesChildGrowth(responce, element.responces!);
-            if ((anthropomertydata.indexOf(element)) ==
-                (anthropomertydata.length - 1)) {
-              Navigator.pop(mContext);
-              Validate().singleButtonPopup(
-                  Global.returnTrLable(locationControlls,
-                      CustomText.data_upload_success_msg, lng!),
-                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                  false,
-                  context);
-            }
-          } else if (responce.statusCode == 401) {
-            Navigator.pop(mContext);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Validate.Password);
-            ScaffoldMessenger.of(mContext).showSnackBar(
-              SnackBar(
-                  content: Text(Global.returnTrLable(
-                      locationControlls, CustomText.token_expired, lng!))),
-            );
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (mContext) => LoginScreen(),
-                ));
-            // Validate().singleButtonPopup(
-            //     Global.returnTrLable(
-            //         locationControlls, CustomText.token_expired, lng!),
-            //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-            //     false,
-            //     context);
-          } else {
-            Navigator.pop(mContext);
-            await callUploadData();
-            Validate().singleButtonPopup(
-                Global.errorBodyToStringFromList(responce.body),
-                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                false,
-                context);
 
-            return;
-          }
-        } else {
           var responce = await ChildGrowthMetaUploadApi()
               .childGrowthMetaUpload(token!, jsonEncode(jsonBody));
           if (responce.statusCode == 200) {
@@ -2139,7 +2084,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   false,
                   context);
             }
-          } else if (responce.statusCode == 401) {
+          }
+          else if (responce.statusCode == 401) {
             Navigator.pop(mContext);
             SharedPreferences prefs = await SharedPreferences.getInstance();
             await prefs.remove(Validate.Password);
@@ -2169,7 +2115,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                 context);
 
             return;
-          }
+
         }
       }
     } else {

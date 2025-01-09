@@ -142,12 +142,14 @@ class _CheckInsScreenState extends State<CheckIns> {
                                               lastGrowthDate: lstDate,
                                               minGrowthDate: minDate,
                                               creche_id: widget.crechId,
-                                              isEdit: role ==
-                                                      CustomText
-                                                          .crecheSupervisor
-                                                          .trim()
-                                                  ? true
-                                                  : false),
+                                              // isEdit: role ==
+                                              //         CustomText
+                                              //             .crecheSupervisor
+                                              //             .trim()
+                                              //     ? true
+                                              //     : false
+                                              isEdit: true
+                                                  ),
                                     ),
                                   );
                                   if (refStatus == 'itemRefresh') {

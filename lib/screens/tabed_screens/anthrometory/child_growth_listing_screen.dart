@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
-
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
-import '../../../database/helper/village_data_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/databasemodel/child_growth_responce_model.dart';
 import '../../../model/databasemodel/tabVillage_model.dart';
@@ -17,7 +14,6 @@ import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
 import 'child_growth_expended_form_screen.dart';
-import 'child_growth_form_screen.dart';
 
 class ChildGrowthListingScreen extends StatefulWidget {
   final int creche_nameId;
@@ -70,6 +66,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
       CustomText.NorecordAvailable,
       CustomText.Search,
       CustomText.Village,
+      CustomText.ok,
       CustomText.all,
       CustomText.unsynched,
       CustomText.GrowthMonitoring,
@@ -169,8 +166,8 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                               }
                             } else
                               Validate().singleButtonPopup(
-                                  CustomText.growthMonitoring,
-                                  CustomText.ok,
+                                  Global.returnTrLable(translats, CustomText.growthMonitoring, lng),
+                                  Global.returnTrLable(translats, CustomText.ok, lng),
                                   false,
                                   context);
                           },
@@ -474,7 +471,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
       while (messureDate.isBefore(currentDateMonth)) {
         messureDate = DateTime(messureDate.year, messureDate.month + 1);
         if (messureDate.month > 12) {
-          messureDate = DateTime(messureDate.year + 1, messureDate.day);
+          messureDate = DateTime(messureDate.year + 1,1);
         }
         var dateItems = dateList
             .where((element) => (element.month == messureDate.month &&
@@ -491,9 +488,9 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
               creche_id: widget.creche_nameId,
               created_by: (await Validate().readString(Validate.userName))!,
               created_at: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(
-                  messureDate.year, messureDate.month, DateTime.now().day)));
+                  messureDate.year, messureDate.month, 1)));
           print(DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(
-              messureDate.year, messureDate.month, DateTime.now().day)));
+              messureDate.year, messureDate.month, 1)));
           await ChildGrowthResponseHelper().inserts(item);
         }
       }
@@ -581,7 +578,6 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
         }
       }
     }
-
     return lastMindate;
   }
 

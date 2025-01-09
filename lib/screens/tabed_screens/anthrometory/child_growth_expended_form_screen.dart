@@ -265,21 +265,6 @@ class _ChildGrowthExpendedFormState
                     child: Row(
                       // mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        // Expanded(
-                        //   child: RichText(
-                        //     text: TextSpan(
-                        //       text: Global.returnTrLable(translatsLabel,
-                        //           CustomText.TotalChildren, lng),
-                        //       style: Styles.black124,
-                        //       children: [
-                        //         TextSpan(
-                        //           text: ' : ${enrolledChild.length}',
-                        //           style: Styles.red145,
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
                         SizedBox(
                           width: 10,
                         ),
@@ -313,15 +298,6 @@ class _ChildGrowthExpendedFormState
                             isRequred: measurement_date!.reqd,
                             minDate: widget.lastGrowthDate,
                             maxDate: widget.minGrowthDate,
-                            // minDate: callMinMeasurementGrwthDate(  for back dated entery
-                            //     myMap[measurement_date!.fieldname!] != null
-                            //         ? myMap[measurement_date!.fieldname!]
-                            //         : Validate().currentDate())!.subtract(Duration(days: 1)),
-                            // maxDate: callMaxMeasurementGrwthDate(
-                            //     myMap[measurement_date!.fieldname!] != null
-                            //         ? myMap[measurement_date!.fieldname!]
-                            //         : Validate()
-                            //             .currentDate()), //widget.minGrowthDate,
                             readable: widget.isNew,
                             onChanged: (value) {
                               myMap[measurement_date!.fieldname!] = value;
@@ -613,15 +589,6 @@ class _ChildGrowthExpendedFormState
         for (var elements in formItem) {
           focusMaps.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
         }
-        // _foocusNode.addEntries(
-        //     [MapEntry(enrolledChild[i].ChildEnrollGUID!, focusMaps)]);
-        // _scrollScontroller.addListener(() {
-        //   if (_scrollScontroller.position.isScrollingNotifier.value) {
-        //     _foocusNode.forEach((_, childMap) {
-        //       childMap.forEach((_, focusNode) => focusNode.unfocus());
-        //     });
-        //   }
-        // });
         var cWidgetDatamap = attepmtChild[filterdData[i].ChildEnrollGUID];
         if (cWidgetDatamap == null) {
           var date = Validate().stringToDate(
@@ -637,7 +604,7 @@ class _ChildGrowthExpendedFormState
           cWidgetDatamap = {};
           cWidgetDatamap['age_months'] = calucalteDate;
           cWidgetDatamap['do_you_have_height_weight'] = 1;
-          if (!widget.isNew) {
+          if (!widget.isNew && cWidgetDatamap['measurement_taken_date']==null) {
             cWidgetDatamap['measurement_taken_date'] =
                 myMap['measurement_date'];
           }
@@ -656,7 +623,7 @@ class _ChildGrowthExpendedFormState
           } else
             calucalteDate = Validate().calculateAgeInDays(date);
           cWidgetDatamap['age_months'] = calucalteDate;
-          if (!widget.isNew) {
+          if (!widget.isNew && cWidgetDatamap['measurement_taken_date'] == null) {
             cWidgetDatamap['measurement_taken_date'] =
                 myMap['measurement_date'];
           }
@@ -667,9 +634,6 @@ class _ChildGrowthExpendedFormState
           Padding(
             padding: EdgeInsets.only(bottom: 15),
             child: Container(
-              // height: expends == i
-              //     ? MediaQuery.of(context).size.height * 0.5
-              //     : 50.h,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
@@ -949,8 +913,7 @@ class _ChildGrowthExpendedFormState
       List<dynamic> childValues = [];
 
       enrolledChild.forEach((element) {
-        var item = Validate()
-            .keyesFromResponce(attepmtChild[element.ChildEnrollGUID]!);
+        var item = Validate().keyesFromResponce(attepmtChild[element.ChildEnrollGUID]!);
         if (item != null) {
           item['childenrollguid'] = element.ChildEnrollGUID;
           item['chhguid'] = element.CHHGUID;
@@ -1017,7 +980,6 @@ class _ChildGrowthExpendedFormState
       var measurementDate = myMap['measurement_date'];
       var responcesJs = jsonEncode(myMap);
       var name = myMap['name'];
-      // print("itemsDetails $responcesJs");
       await ChildGrowthResponseHelper().insertUpdate(
           widget.cgmguid,
           measurementDate,

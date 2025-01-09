@@ -53,6 +53,7 @@ class MasterDataModel {
   List<VaccineModel>? tabVaccines;
   List<MasterStockModel>? tabMasterStock;
   List<PartnerStockModel>? tabPartnerStock;
+  String? backDateDataEntry;
 
   MasterDataModel({
     this.tabState,
@@ -75,6 +76,7 @@ class MasterDataModel {
     this.tabVaccines,
     this.tabMasterStock,
     this.tabPartnerStock,
+    this.backDateDataEntry
   });
 
   factory MasterDataModel.fromJson(Map<String, dynamic> json) =>
@@ -167,6 +169,7 @@ class MasterDataModel {
             ? []
             : List<PartnerStockModel>.from(json["tabPartner Stock"]!
                 .map((x) => PartnerStockModel.fromJson(x))),
+        backDateDataEntry: json["Back_data_entry_date"]
       );
 
   Map<String, dynamic> toJson() => {
@@ -231,5 +234,6 @@ class MasterDataModel {
         "tabPartner Stock": tabPartnerStock == null
             ? []
             : List<dynamic>.from(tabPartnerStock!.map((x) => x.toJson())),
+        "Back_data_entry_date": backDateDataEntry
       };
 }

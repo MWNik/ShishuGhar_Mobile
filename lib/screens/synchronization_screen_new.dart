@@ -1125,6 +1125,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
       if (msterDataResponse.statusCode == 200) {
         MasterDataModel masterDataApiModel =
             MasterDataModel.fromJson(json.decode(msterDataResponse.body));
+        Validate().saveString(Validate.date, masterDataApiModel.backDateDataEntry ?? "2025-03-31");
         await initMasterData(masterDataApiModel);
         await downMaster(mContext, userName, password, token);
       } else if (msterDataResponse.statusCode == 401) {

@@ -363,7 +363,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                     maxLines: 2,
                                   ),
                                   Text(
-                                      "${Global.returnTrLable(locationControlls, role, lng!)}",
+                                      "${Global.returnTrLable(locationControlls, role, lng??"en")}",
                                       style: Styles.roleLabe),
                                 ],
                               )

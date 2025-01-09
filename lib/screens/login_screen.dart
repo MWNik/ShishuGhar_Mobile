@@ -65,6 +65,7 @@ class LoginScreen extends StatefulWidget {
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
+
 }
 
 class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
@@ -385,7 +386,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                                     style: Styles.black124,
                                     children: <TextSpan>[
                                       TextSpan(
-                                          text: "$appVersionName",
+                                          text: " $appVersionName",
                                           style: Styles.black126P),
                                       Constants.baseUrl ==
                                               'https://uat.shishughar.in/api/'

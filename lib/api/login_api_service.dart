@@ -4,11 +4,11 @@ import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 
 class LoginApiService {
-  var endurl = '${Constants.baseUrl}method/frappe.val.api.login';
-  var deviceChnageUrl =
-      '${Constants.baseUrl}method/frappe.val.api.update_device_id';
+
+
   Future<Response> loginUser(
       String username, String pwd, String deviceId, String appVersion) async {
+    var endurl = '${Constants.baseUrl}method/frappe.val.api.login';
     final body = {
       "usr": username.trim(),
       "pwd": pwd.trim(),
@@ -28,6 +28,8 @@ class LoginApiService {
 
   Future<Response> changeDeviceId(
       String username, String pwd, String deviceId, String appVersion) async {
+    var deviceChnageUrl =
+        '${Constants.baseUrl}method/frappe.val.api.update_device_id';
     final body = {
       "usr": username.trim(),
       "pwd": pwd.trim(),

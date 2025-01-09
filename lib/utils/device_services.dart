@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/material.dart';
 
 class DeviceService {
   static Future<String?> gteDeviceInfo() async {
+    // return 'UP1A.231005.007-23124RN87I-mt6835';
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     if (Platform.isAndroid) {
       final AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
