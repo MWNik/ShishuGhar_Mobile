@@ -8,6 +8,7 @@ import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_h
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
+import 'package:shishughar/model/databasemodel/child_growth_responce_model.dart';
 
 import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
@@ -52,14 +53,14 @@ class ChildGrowthExpendedFormScreen extends StatefulWidget {
 
   ChildGrowthExpendedFormScreen(
       {super.key,
-      required this.creche_nameId,
-      required this.creche_name,
-      required this.cgmguid,
-      this.lastGrowthDate,
-      this.minGrowthDate,
-      this.createdAt,
-      required this.isNew,
-      this.isView = false});
+        required this.creche_nameId,
+        required this.creche_name,
+        required this.cgmguid,
+        this.lastGrowthDate,
+        this.minGrowthDate,
+        this.createdAt,
+        required this.isNew,
+        this.isView = false});
 
   @override
   State<ChildGrowthExpendedFormScreen> createState() =>
@@ -76,7 +77,7 @@ class _ChildGrowthExpendedFormState
   TextEditingController Searchcontroller = TextEditingController();
   bool _isLoading = true;
   List<Translation> translatsLabel = [];
-  List<int> mesureMonths = [1, 4, 7, 10];
+  // List<int> mesureMonths = [1, 4, 7, 10];
   List<String> hiddenItem = [
     'age_months',
     'measurement_date',
@@ -99,6 +100,22 @@ class _ChildGrowthExpendedFormState
     'creche_id',
     'child_id'
   ];
+  List<String> popItems = [
+    're_measurement_equipment',
+    're_do_you_have_height_weight',
+    're_measurement_taken_date',
+    're_measurement_reason',
+    're_height',
+    're_weight',
+    're_age_months',
+    're_weight_for_age',
+    're_weight_for_height',
+    're_height_for_age',
+    're_updated_by',
+    're_updated_on',
+    're_created_by',
+    're_created_on',
+  ];
   Map<String, dynamic> myMap = {};
   Map<String, Map<String, dynamic>> attepmtChild = {};
   DependingLogic? logic;
@@ -114,13 +131,13 @@ class _ChildGrowthExpendedFormState
   List<TabWeightforageGirlsModel> tabWeightforageGirls = [];
   List<TabWeightToHeightBoysModel> tabWeightToHeightBoys = [];
   List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls = [];
+
+
   bool recrdedUpload = false;
   String lng = 'en';
   String userName = '';
   String? role;
   int? expends;
-  // Map<String, Map<String, FocusNode>> _foocusNode = {};
-  // ScrollController _scrollScontroller = ScrollController();
 
   @override
   void initState() {
@@ -128,31 +145,23 @@ class _ChildGrowthExpendedFormState
     initializeData();
   }
 
-  // @override
-  // void dispose() {
-  //   _scrollScontroller.dispose();
-  //   _foocusNode.forEach((_, childMap) {
-  //     childMap.forEach((_, focusNode) => focusNode.dispose());
-  //   });
-  //   super.dispose();
-  // }
 
   Future<void> initializeData() async {
     userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     lng = (await Validate().readString(Validate.sLanguage))!;
     tabHeightforageBoys =
-        await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
+    await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
     tHeightforageGirls =
-        await HeightWeightBoysGirlsHelper().callHeightForAgeGirls();
+    await HeightWeightBoysGirlsHelper().callHeightForAgeGirls();
     tabWeightforageBoys =
-        await HeightWeightBoysGirlsHelper().callWeightforAgeBoys();
+    await HeightWeightBoysGirlsHelper().callWeightforAgeBoys();
     tabWeightforageGirls =
-        await HeightWeightBoysGirlsHelper().callWeightforAgeGirls();
+    await HeightWeightBoysGirlsHelper().callWeightforAgeGirls();
     tabWeightToHeightBoys =
-        await HeightWeightBoysGirlsHelper().callWeightToHeightBoys();
+    await HeightWeightBoysGirlsHelper().callWeightToHeightBoys();
     tabWeightToHeightGirls =
-        await HeightWeightBoysGirlsHelper().callWeightToHeightGirls();
+    await HeightWeightBoysGirlsHelper().callWeightToHeightGirls();
     genders = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
 
     translatsLabel.clear();
@@ -168,8 +177,8 @@ class _ChildGrowthExpendedFormState
       CustomText.noEnrolledChild,
       CustomText.ok,
       CustomText.GrowthMonitoring,
-      'Search',
-      'Name',
+      CustomText.Search,
+      CustomText.Name_,
       CustomText.Severe,
       CustomText.Moderate,
       CustomText.Normal,
@@ -207,7 +216,10 @@ class _ChildGrowthExpendedFormState
       CustomText.PleaseSelectBeforTimeInIsValidTime,
       CustomText.plsFilManForm,
       CustomText.wesUsageGraterQuatOpen,
-      CustomText.leavingLesThanjoining
+      CustomText.leavingLesThanjoining,
+      CustomText.updateMeasurement,
+      CustomText.reEnter,
+      CustomText.ChildAlredExitSelectValidDAte,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -219,18 +231,18 @@ class _ChildGrowthExpendedFormState
       if (alredRecord.first.responces != null) {
         List<String> selectedChildItems = [];
         Map<String, dynamic> responseData =
-            jsonDecode(alredRecord[0].responces!);
+        jsonDecode(alredRecord[0].responces!);
         var childs = responseData['anthropromatic_details'];
         if (childs != null) {
           List<Map<String, dynamic>> children =
-              List<Map<String, dynamic>>.from(childs);
+          List<Map<String, dynamic>>.from(childs);
           children.forEach((element) {
             selectedChildItems.add(element['childenrollguid']);
           });
         }
         enrolledChild = await EnrolledExitChilrenResponceHelper()
             .enrolledChildByEnrolledGUID(
-                selectedChildItems, widget.creche_nameId);
+            selectedChildItems, widget.creche_nameId);
         filterdData = enrolledChild;
       }
     }
@@ -248,98 +260,98 @@ class _ChildGrowthExpendedFormState
       },
       child: _isLoading
           ? Container(
-              color: Colors.white,
-              child: Center(child: CircularProgressIndicator()))
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()))
           : Scaffold(
-              appBar: CustomAppbar(
-                  text: Global.returnTrLable(
-                      translatsLabel, CustomText.GrowthMonitoring, lng),
-                  subTitle: widget.creche_name,
-                  onTap: () =>
-                      Validate().showExitDialog(context, translatsLabel, lng)),
-              body: Column(
-                children: [
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Spacer(),
-                        RichText(
-                          text: TextSpan(
-                            text: Global.returnTrLable(translatsLabel,
-                                CustomText.MeasuredChildren, lng),
-                            style: Styles.black124,
-                            children: [
-                              TextSpan(
-                                text:
-                                    ' : ${countMesuredChildren()}/${enrolledChild.length}',
-                                style: Styles.red145,
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
+          appBar: CustomAppbar(
+              text: Global.returnTrLable(
+                  translatsLabel, CustomText.GrowthMonitoring, lng),
+              subTitle: widget.creche_name,
+              onTap: () =>
+                  Validate().showExitDialog(context, translatsLabel, lng)),
+          body: Column(
+            children: [
+              SizedBox(height: 10),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  // mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: 10,
                     ),
-                  ),
-                  // SizedBox(height: 10),
-                  measurement_date != null
-                      ? Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20.w, vertical: 2.h),
-                          child: CustomDatepickerDynamic(
-                            calenderValidate: [],
-                            initialvalue: myMap[measurement_date!.fieldname!],
-                            fieldName: measurement_date!.fieldname,
-                            isRequred: measurement_date!.reqd,
-                            minDate: widget.lastGrowthDate,
-                            maxDate: widget.minGrowthDate,
-                            readable: widget.isNew,
-                            onChanged: (value) {
-                              myMap[measurement_date!.fieldname!] = value;
-                              var logData = logic!.callDateDiffrenceLogic(
-                                  myMap, measurement_date!);
-                              if (logData.isNotEmpty) {
-                                if (logData.keys.length > 0) {
-                                  myMap.addEntries([
-                                    MapEntry(logData.keys.first,
-                                        logData.values.first)
-                                  ]);
-                                }
-                              }
-                              callEnrollementChildList(value);
-                            },
+                    Spacer(),
+                    RichText(
+                      text: TextSpan(
+                        text: Global.returnTrLable(translatsLabel,
+                            CustomText.MeasuredChildren, lng),
+                        style: Styles.black124,
+                        children: [
+                          TextSpan(
+                            text:
+                            ' : ${countMesuredChildren()}/${enrolledChild.length}',
+                            style: Styles.red145,
                           ),
-                        )
-                      : SizedBox(),
-                  // Padding(
-                  //     padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  //     child: Divider()),
-                  Padding(
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    child: CustomTextFieldRow(
-                      controller: Searchcontroller,
-                      onChanged: (value) {
-                        // print(value);
-                        filterDataQu(value);
-                      },
-                      hintText: (lng != null)
-                          ? Global.returnTrLable(translatsLabel, 'Search', lng!)
-                          : '',
-                      prefixIcon: Image.asset(
-                        "assets/search.png",
-                        scale: 2.4,
+                        ],
                       ),
-                    ),
+                    )
+                  ],
+                ),
+              ),
+              // SizedBox(height: 10),
+              measurement_date != null
+                  ? Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 20.w, vertical: 2.h),
+                child: CustomDatepickerDynamic(
+                  calenderValidate: [],
+                  initialvalue: myMap[measurement_date!.fieldname!],
+                  fieldName: measurement_date!.fieldname,
+                  isRequred: measurement_date!.reqd,
+                  minDate: widget.lastGrowthDate,
+                  maxDate: widget.minGrowthDate,
+                  readable: widget.isNew,
+                  onChanged: (value) {
+                    myMap[measurement_date!.fieldname!] = value;
+                    var logData = logic!.callDateDiffrenceLogic(
+                        myMap, measurement_date!);
+                    if (logData.isNotEmpty) {
+                      if (logData.keys.length > 0) {
+                        myMap.addEntries([
+                          MapEntry(logData.keys.first,
+                              logData.values.first)
+                        ]);
+                      }
+                    }
+                    callEnrollementChildList(value);
+                  },
+                ),
+              )
+                  : SizedBox(),
+              // Padding(
+              //     padding: EdgeInsets.symmetric(horizontal: 20.w),
+              //     child: Divider()),
+              Padding(
+                padding: EdgeInsets.only(left: 20, right: 20),
+                child: CustomTextFieldRow(
+                  controller: Searchcontroller,
+                  onChanged: (value) {
+                    // print(value);
+                    filterDataQu(value);
+                  },
+                  hintText: (lng != null)
+                      ? Global.returnTrLable(translatsLabel, 'Search', lng!)
+                      : '',
+                  prefixIcon: Image.asset(
+                    "assets/search.png",
+                    scale: 2.4,
                   ),
-                  Expanded(
-                      child: Padding(
+                ),
+              ),
+              Expanded(
+                  child: Padding(
                     padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+                    EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
                     child: SingleChildScrollView(
                       // controller: _scrollScontroller,
                       child: Column(
@@ -349,63 +361,58 @@ class _ChildGrowthExpendedFormState
                       ),
                     ),
                   )),
-                  // Spacer(),
-                  Divider(),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xffF26BA3),
-                            onPressed: () {
-                              // ch(2);
-                              Navigator.pop(context);
-                            },
-                            text: Global.returnTrLable(
-                                    translatsLabel, CustomText.back, lng)
-                                .trim(),
-                          ),
-                        ),
-                        // Row(children: [
-                        role == CustomText.crecheSupervisor
-                            ? SizedBox(width: 10)
-                            : SizedBox(),
-                        role == CustomText.crecheSupervisor
-                            ? Expanded(
-                                child: CElevatedButton(
-                                  color: Color(0xff369A8D),
-                                  onPressed: () {
-                                    // print('$attepmtChild');
-                                    saveMeta(1, context);
-                                  },
-                                  text: Global.returnTrLable(translatsLabel,
-                                          CustomText.Submit, lng)
-                                      .trim(),
-                                ),
-                              )
-                            : SizedBox(),
-                        // ]
-                        // ),
-                      ],
+              // Spacer(),
+              Divider(),
+              Padding(
+                padding:
+                EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CElevatedButton(
+                        color: Color(0xffF26BA3),
+                        onPressed: () {
+                          // ch(2);
+                          Navigator.pop(context);
+                        },
+                        text: Global.returnTrLable(
+                            translatsLabel, CustomText.back, lng)
+                            .trim(),
+                      ),
                     ),
-                  ),
-                ],
-              )),
+                    // Row(children: [
+                    role == CustomText.crecheSupervisor
+                        ? SizedBox(width: 10)
+                        : SizedBox(),
+                    role == CustomText.crecheSupervisor
+                        ? Expanded(
+                      child: CElevatedButton(
+                        color: Color(0xff369A8D),
+                        onPressed: () {
+                          // print('$attepmtChild');
+                          saveMeta(1, context);
+                        },
+                        text: Global.returnTrLable(translatsLabel,
+                            CustomText.Submit, lng)
+                            .trim(),
+                      ),
+                    )
+                        : SizedBox(),
+                    // ]
+                    // ),
+                  ],
+                ),
+              ),
+            ],
+          )),
     );
   }
 
   List<Widget> cWidgetInputType(
       String ChildEnrollGUID, Map<String, dynamic> cWidgetDatamap) {
-    // var cWidgetDatamap = attepmtChild[ChildEnrollGUID];
-    // if (cWidgetDatamap == null) {
-    //   cWidgetDatamap = {};
-    //   attepmtChild[ChildEnrollGUID] = cWidgetDatamap;
-    // }
     var inputItem = formItem
         .where((element) =>
-            element.fieldname == 'height' || element.fieldname == 'weight')
+    element.fieldname == 'height' || element.fieldname == 'weight')
         .toList();
 
     List<Widget> screenItems = [];
@@ -415,14 +422,13 @@ class _ChildGrowthExpendedFormState
         if (isvible) {
           screenItems.add(Expanded(
             child:
-                widgetTypeWidget(inputItem[i], cWidgetDatamap, ChildEnrollGUID),
+            widgetTypeWidget(inputItem[i], cWidgetDatamap, ChildEnrollGUID),
           ));
           screenItems.add(SizedBox(
             width: 10.w,
           ));
         }
         if (!isvible) {
-          // print('remo3 ${inputItem[i].fieldname}');
           cWidgetDatamap.remove(inputItem[i].fieldname);
         }
       }
@@ -434,9 +440,9 @@ class _ChildGrowthExpendedFormState
       Map<String, dynamic> cWidgetDatamap, String gender) {
     var inputItem = formItem
         .where((element) =>
-            element.fieldname == 'weight_for_age' ||
-            element.fieldname == 'weight_for_height' ||
-            element.fieldname == 'height_for_age')
+    element.fieldname == 'weight_for_age' ||
+        element.fieldname == 'weight_for_height' ||
+        element.fieldname == 'height_for_age')
         .toList();
     List<Widget> screenItems = [];
     if (inputItem.length > 0) {
@@ -461,15 +467,15 @@ class _ChildGrowthExpendedFormState
         } else if (colorD == 1) {
           itemC = Color(0xffF35858);
           colorName =
-              '(${Global.returnTrLable(translatsLabel, CustomText.Severe, lng)})';
+          '(${Global.returnTrLable(translatsLabel, CustomText.Severe, lng)})';
         } else if (colorD == 2) {
           itemC = Color(0xffF4B81D);
           colorName =
-              '(${Global.returnTrLable(translatsLabel, CustomText.Moderate, lng)})';
+          '(${Global.returnTrLable(translatsLabel, CustomText.Moderate, lng)})';
         } else if (colorD == 3) {
           itemC = Color(0xff8BF649);
           colorName =
-              '(${Global.returnTrLable(translatsLabel, CustomText.Normal, lng)})';
+          '(${Global.returnTrLable(translatsLabel, CustomText.Normal, lng)})';
         }
         countMesuredChildren();
         cWidgetDatamap[inputItem[i].fieldname!] = colorD;
@@ -492,7 +498,7 @@ class _ChildGrowthExpendedFormState
               ),
               Text(
                 colorName,
-                style: Styles.red85,
+                style: Styles.black12700,
               ),
               // Global.validString(grothValue)
               //     ? Text(
@@ -514,13 +520,8 @@ class _ChildGrowthExpendedFormState
 
   Widget cWidgetInLessCheck(
       String ChildEnrollGUID, Map<String, dynamic> cWidgetDatamap) {
-    // var cWidgetDatamap = attepmtChild[ChildEnrollGUID];
-    // if (cWidgetDatamap == null) {
-    //   cWidgetDatamap = {};
-    //   attepmtChild[ChildEnrollGUID] = cWidgetDatamap;
-    // }
     var inputItem = formItem
-        .where((element) => element.fieldname == 'illness_multi')
+        .where((element) => (element.fieldname == 'illness_multi' && !popItems.contains(element.fieldname)))
         .toList();
     if (inputItem.length > 0) {
       var isvible = logic!.callDependingLogic(cWidgetDatamap, inputItem[0]);
@@ -534,37 +535,9 @@ class _ChildGrowthExpendedFormState
 
   List<Widget> cWidgetInLessCheckNew(
       String ChildEnrollGUID, Map<String, dynamic> cWidgetDatamap) {
-    // var cWidgetDatamap = attepmtChild[ChildEnrollGUID];
-    // if (cWidgetDatamap == null) {
-    //   cWidgetDatamap = {};
-    //   attepmtChild[ChildEnrollGUID] = cWidgetDatamap;
-    // }
     List<Widget> screenItems = [];
-    // var inputItem = formItem
-    //     .where((element) => element.fieldname == 'illness_multi')
-    //     .toList();
-    // if (inputItem.length > 0) {
-    //   var isvible = logic!
-    //       .callDependingLogic( cWidgetDatamap, inputItem[0]);
-    //   if (isvible) {
-    //     // screenItems.add(Text(
-    //     //   Global.returnTrLable(translatsLabel, inputItem[0].label!.trim(), lng),
-    //     //   style: Styles.black124,
-    //     // ));
-    //     // screenItems.add(SizedBox(
-    //     //   height: 10.h,
-    //     // ));
-    //     screenItems.add(widgetTypeWidgetinlessForMulti(
-    //         inputItem[0], cWidgetDatamap, ChildEnrollGUID));
-    //   } else
-    //     screenItems.add(SizedBox());
-    // } else
-    //   screenItems.add(SizedBox());
-    // screenItems.add(SizedBox(
-    //   height: 10,
-    // ));
     var otherItem = formItem
-        .where((element) => (!hiddenItem.contains(element.fieldname)))
+        .where((element) => (!hiddenItem.contains(element.fieldname) && !popItems.contains(element.fieldname)))
         .toList();
     otherItem.forEach((element) {
       var isvible = logic!.callDependingLogic(cWidgetDatamap, element);
@@ -596,7 +569,7 @@ class _ChildGrowthExpendedFormState
           int calucalteDate = 0;
           if (myMap['measurement_date'] != null) {
             var mesurmentDate =
-                Validate().stringToDate(myMap['measurement_date']);
+            Validate().stringToDate(myMap['measurement_date']);
             calucalteDate =
                 Validate().calculateAgeInDaysEx(date, mesurmentDate);
           } else
@@ -606,7 +579,7 @@ class _ChildGrowthExpendedFormState
           cWidgetDatamap['do_you_have_height_weight'] = 1;
           if (!widget.isNew && cWidgetDatamap['measurement_taken_date']==null) {
             cWidgetDatamap['measurement_taken_date'] =
-                myMap['measurement_date'];
+            myMap['measurement_date'];
           }
 
           ///default value 1
@@ -623,9 +596,10 @@ class _ChildGrowthExpendedFormState
           } else
             calucalteDate = Validate().calculateAgeInDays(date);
           cWidgetDatamap['age_months'] = calucalteDate;
+          //    commented By Satish dafult date remove show old record to copy to new
           if (!widget.isNew && cWidgetDatamap['measurement_taken_date'] == null) {
             cWidgetDatamap['measurement_taken_date'] =
-                myMap['measurement_date'];
+            myMap['measurement_date'];
           }
           attepmtChild[filterdData[i].ChildEnrollGUID!] = cWidgetDatamap;
         }
@@ -667,17 +641,19 @@ class _ChildGrowthExpendedFormState
                                   cWidgetDatamap['weight_for_height']
                                       .toString()),
                               Global.stringToInt(cWidgetDatamap[
-                                              'do_you_have_height_weight']
-                                          .toString()) ==
-                                      0
+                              'do_you_have_height_weight']
+                                  .toString()) ==
+                                  0
                                   ? null
                                   : cWidgetDatamap[
-                                              'any_medical_major_illness'] !=
-                                          null
-                                      ? Global.stringToDouble(cWidgetDatamap[
-                                              'any_medical_major_illness']
-                                          .toString())
-                                      : null),
+                              'any_medical_major_illness'] !=
+                                  null
+                                  ? Global.stringToDouble(cWidgetDatamap[
+                              'any_medical_major_illness']
+                                  .toString())
+                                  : null,Global.stringToDouble(
+                              cWidgetDatamap['height_for_age']
+                                  .toString())),
                           child: Center(
                             child: Icon(
                               Icons.person,
@@ -698,7 +674,7 @@ class _ChildGrowthExpendedFormState
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
                                       text:
-                                          '${Global.returnTrLable(translatsLabel, CustomText.ChildId, lng)} : ',
+                                      '${Global.returnTrLable(translatsLabel, CustomText.ChildId, lng)} : ',
                                       style: Styles.black124r,
                                       children: [
                                         TextSpan(
@@ -712,7 +688,7 @@ class _ChildGrowthExpendedFormState
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
                                       text:
-                                          '${Global.returnTrLable(translatsLabel, 'Name', lng)} :',
+                                      '${Global.returnTrLable(translatsLabel, 'Name', lng)} :',
                                       style: Styles.black124r,
                                       children: [
                                         TextSpan(
@@ -726,7 +702,7 @@ class _ChildGrowthExpendedFormState
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
                                       text:
-                                          '${Global.returnTrLable(translatsLabel, CustomText.Gender, lng)} : ',
+                                      '${Global.returnTrLable(translatsLabel, CustomText.Gender, lng)} : ',
                                       style: Styles.black124r,
                                       children: [
                                         TextSpan(
@@ -741,13 +717,13 @@ class _ChildGrowthExpendedFormState
                                   overflow: TextOverflow.ellipsis,
                                   text: TextSpan(
                                       text:
-                                          '${Global.returnTrLable(translatsLabel, CustomText.ageInDays, lng)} : ',
+                                      '${Global.returnTrLable(translatsLabel, CustomText.ageInDays, lng)} : ',
                                       style: Styles.black124r,
                                       children: [
                                         TextSpan(
                                             text: cWidgetDatamap[
-                                                        'age_months'] !=
-                                                    null
+                                            'age_months'] !=
+                                                null
                                                 ? '${cWidgetDatamap['age_months']}'
                                                 : '',
                                             style: Styles.blue126),
@@ -755,17 +731,33 @@ class _ChildGrowthExpendedFormState
                             ],
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: expends == i
-                              ? Image.asset(
-                                  "assets/circle_arrow.png",
-                                  scale: 2.2,
-                                )
-                              : Image.asset(
-                                  "assets/circle_down_arrow.png",
-                                  scale: 2.2,
-                                ),
+                        Column(
+                         children: [
+                           (Global.stringToInt(cWidgetDatamap['do_you_have_height_weight'].toString()) == 1  && role == CustomText.clusterCoordinator)?
+                           GestureDetector(
+                             onTap: (){
+                               _reEnterDailog(context,
+                                   filterdData[i].ChildEnrollGUID!);
+                             },
+                             child: Icon(Icons.add_circle_outline,
+                             color:Color(0xff5979AA)),
+                           )
+                               :SizedBox(),
+                           SizedBox(height: 10),
+                           Padding(
+                             padding: EdgeInsets.symmetric(horizontal: 5),
+                             child: expends == i
+                                 ? Image.asset(
+                               "assets/circle_arrow.png",
+                               scale: 2.2,
+                             )
+                                 : Image.asset(
+                               "assets/circle_down_arrow.png",
+                               scale: 2.2,
+                             ),
+                           ),
+
+                         ],
                         )
                       ],
                     ),
@@ -786,15 +778,15 @@ class _ChildGrowthExpendedFormState
                         ),
                         do_you_have_height_weight != null
                             ? widgetTypeWidget(do_you_have_height_weight!,
-                                cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
+                            cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
                         measurement_taken_date != null
                             ? widgetTypeWidget(measurement_taken_date!,
-                                cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
+                            cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
                         measurement_equipment != null
                             ? widgetTypeWidget(measurement_equipment!,
-                                cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
+                            cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
                         Row(
                           children: cWidgetInputType(
@@ -805,35 +797,35 @@ class _ChildGrowthExpendedFormState
                         ),
                         cWidgetDatamap['do_you_have_height_weight'] != 0
                             ? Text(
-                                Global.returnTrLable(
-                                    translatsLabel, CustomText.zScrore, lng),
-                                style: Styles.black124,
-                              )
+                          Global.returnTrLable(
+                              translatsLabel, CustomText.zScrore, lng),
+                          style: Styles.black124,
+                        )
                             : SizedBox(),
                         cWidgetDatamap['do_you_have_height_weight'] != 0
                             ? SizedBox(
-                                height: 5.h,
-                              )
+                          height: 5.h,
+                        )
                             : SizedBox(),
                         cWidgetDatamap['do_you_have_height_weight'] != 0
                             ? Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE0E0E0)),
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: cWidgetRadiomColor(
-                                      filterdData[i].ChildEnrollGUID!,
-                                      cWidgetDatamap,
-                                      Global.getItemValues(
-                                          filterdData[i].responces,
-                                          'gender_id')),
-                                ),
-                              )
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Color(0xffE0E0E0)),
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: cWidgetRadiomColor(
+                                filterdData[i].ChildEnrollGUID!,
+                                cWidgetDatamap,
+                                Global.getItemValues(
+                                    filterdData[i].responces,
+                                    'gender_id')),
+                          ),
+                        )
                             : SizedBox(),
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),
@@ -879,7 +871,7 @@ class _ChildGrowthExpendedFormState
                   message: Global.returnTrLable(
                       translatsLabel, CustomText.dataSaveSuc, lng),
                   button:
-                      Global.returnTrLable(translatsLabel, CustomText.ok, lng));
+                  Global.returnTrLable(translatsLabel, CustomText.ok, lng));
             },
           );
           if (shouldProceed) {
@@ -920,12 +912,13 @@ class _ChildGrowthExpendedFormState
           item['child_id'] = element.name;
           item['cgmguid'] = widget.cgmguid;
           if (((Global.stringToInt(
-                          item['do_you_have_height_weight'].toString()) !=
-                      1) ||
-                  item['measurement_equipment'] == null ||
-                  item['weight'] == null ||
-                  item['height'] == null) &&
-              isMesurement(myMap[measurement_date!.fieldname])) {
+              item['do_you_have_height_weight'].toString()) !=
+              1) ||
+              item['measurement_equipment'] == null ||
+              item['weight'] == null &&
+              item['height'] == null)// &&
+              // isMesurement(myMap[measurement_date!.fieldname])
+          ) {
             item.remove('weight_for_age');
             item.remove('height_for_age');
             item.remove('weight_for_height');
@@ -986,34 +979,29 @@ class _ChildGrowthExpendedFormState
           name as int?,
           widget.creche_nameId,
           responcesJs,
-          userName,
-          myMap['created_on']);
+          myMap['created_by'],
+          myMap['created_on'],myMap['updated_on'],myMap['updated_by']);
     }
   }
 
   bool _checkValidation() {
-    // List<int> parts = myMap[measurement_date!.fieldname]
-    //     .toString()
-    //     .split('-')
-    //     .map(int.parse)
-    //     .toList();
-    // var month = parts[1];
-    // List<int> measureMonths = [1, 4, 7, 10];
     var validStatus = true;
-    if (formItem.length > 0) {
+    var mesureItem=formItem.where((element)=>!popItems.contains(element.fieldname)).toList();
+
+    if (mesureItem.length > 0) {
       if (myMap['measurement_date'] != null) {
         for (int i = 0; i < enrolledChild.length; i++) {
           var item = attepmtChild[enrolledChild[i].ChildEnrollGUID];
-          for (int i = 0; i < formItem.length; i++) {
+          for (int i = 0; i < mesureItem.length; i++) {
             if (item != null) {
-              var element = formItem[i];
+              var element = mesureItem[i];
               var validationMsg = logic!.validationMessge(item, element);
-              if (isMesurement(myMap[measurement_date!.fieldname]) == false &&
-                  (element.fieldname == 'height' ||
-                      element.fieldname == 'measurement_equipment') &&
-                  Global.validString(validationMsg)) {
-                validationMsg = '';
-              }
+              // if (isMesurement(myMap[measurement_date!.fieldname]) == false &&
+              //     (element.fieldname == 'height' ||
+              //         element.fieldname == 'measurement_equipment') &&
+              //     Global.validString(validationMsg)) {
+              //   validationMsg = '';
+              // }
               if (Global.validString(validationMsg)) {
                 validStatus = false;
                 Validate().singleButtonPopup(
@@ -1044,18 +1032,18 @@ class _ChildGrowthExpendedFormState
                           false,
                           context);
                       return validStatus;
-                    } else if (Global.stringToDouble(height.toString()) == 0) {
-                      if (isMesurement(myMap[measurement_date!.fieldname])) {
-                        validStatus = false;
-                        Validate().singleButtonPopup(
-                            Global.returnTrLable(translatsLabel,
-                                CustomText.plsSelectHeight, lng),
-                            Global.returnTrLable(
-                                translatsLabel, CustomText.ok, lng),
-                            false,
-                            context);
-                        return validStatus;
-                      }
+                    // } else if (Global.stringToDouble(height.toString()) == 0) {
+                    //   if (isMesurement(myMap[measurement_date!.fieldname])) {
+                    //     validStatus = false;
+                    //     Validate().singleButtonPopup(
+                    //         Global.returnTrLable(translatsLabel,
+                    //             CustomText.plsSelectHeight, lng),
+                    //         Global.returnTrLable(
+                    //             translatsLabel, CustomText.ok, lng),
+                    //         false,
+                    //         context);
+                    //     return validStatus;
+                    //   }
                     } else if (Global.stringToDouble(weight.toString()) == 0) {
                       validStatus = false;
                       Validate().singleButtonPopup(
@@ -1210,12 +1198,13 @@ class _ChildGrowthExpendedFormState
           hintText: Global.returnTrLable(
               translatsLabel, CustomText.select_here, lng!),
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          isRequred: quesItem.fieldname == 'measurement_equipment'
-              ? isMesurement(myMap[measurement_date!.fieldname])
-                  ? logic!.dependeOnMendotory(itemsAnswred, quesItem)
-                  : 0
-              : logic!.dependeOnMendotory(itemsAnswred, quesItem),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          // isRequred: quesItem.fieldname == 'measurement_equipment'
+          //     ? isMesurement(myMap[measurement_date!.fieldname])
+          //     ? logic!.dependeOnMendotory(itemsAnswred, quesItem)
+          //     : 0
+          //     : logic!.dependeOnMendotory(itemsAnswred, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           items: items,
           readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(itemsAnswred, quesItem)
@@ -1238,7 +1227,7 @@ class _ChildGrowthExpendedFormState
           // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           calenderValidate: [],
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           readable: role == CustomText.crecheSupervisor
@@ -1251,22 +1240,69 @@ class _ChildGrowthExpendedFormState
               : null,
           minDate: quesItem.fieldname == 'measurement_taken_date'
               ? Validate().stringToDateNull(myMap["measurement_date"]) != null
-                  ? Validate()
-                      .stringToDateNull(myMap["measurement_date"])!
-                      .subtract(Duration(days: 1))
-                  : null
+              ? Validate()
+              .stringToDateNull(myMap["measurement_date"])!
+              .subtract(Duration(days: 1))
+              : null
               : null,
           onChanged: (value) {
-            itemsAnswred[quesItem.fieldname!] = value;
-            var logData = logic!.callDateDiffrenceLogic(itemsAnswred, quesItem);
-            if (logData.isNotEmpty) {
-              if (logData.keys.length > 0) {
-                itemsAnswred.addEntries(
-                    [MapEntry(logData.keys.first, logData.values.first)]);
-
-                updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
+            // if(quesItem.fieldname == 'measurement_taken_date'){
+            //   var enrolledChildItem=filterdData .where((element) =>
+            //   element.ChildEnrollGUID == ChildEnrollGUID)
+            //       .toList();
+            //   String? childExit;
+            //   if(enrolledChildItem.isNotEmpty){
+            //     childExit=Global.getItemValues(enrolledChildItem.first.responces, 'date_of_exit');
+            //   }
+            //   if(Global.validString(childExit)) {
+            //     if(Global.stringToDate(childExit)!.isAfter(Global.stringToDate(value)!)){
+            //       itemsAnswred[quesItem.fieldname!] = value;
+            //       var logData = logic!.callDateDiffrenceLogic(
+            //           itemsAnswred, quesItem);
+            //       if (logData.isNotEmpty) {
+            //         if (logData.keys.length > 0) {
+            //           itemsAnswred.addEntries(
+            //               [MapEntry(logData.keys.first, logData.values.first)]);
+            //           updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
+            //         }
+            //       }
+            //     }
+            //     else{
+            //       itemsAnswred.remove(quesItem.fieldname);
+            //       updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
+            //       Validate().singleButtonPopup(
+            //           CustomText.ChildAlredExitSelectValidDAte,
+            //           Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+            //           false,
+            //           context);
+            //     }
+            //   } else{
+            //     itemsAnswred[quesItem.fieldname!] = value;
+            //     var logData = logic!.callDateDiffrenceLogic(
+            //         itemsAnswred, quesItem);
+            //     if (logData.isNotEmpty) {
+            //       if (logData.keys.length > 0) {
+            //         itemsAnswred.addEntries(
+            //             [MapEntry(logData.keys.first, logData.values.first)]);
+            //
+            //         updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
+            //       }
+            //     }
+            //   }
+            // }
+            // else{
+              itemsAnswred[quesItem.fieldname!] = value;
+              var logData = logic!.callDateDiffrenceLogic(
+                  itemsAnswred, quesItem);
+              if (logData.isNotEmpty) {
+                if (logData.keys.length > 0) {
+                  itemsAnswred.addEntries(
+                      [MapEntry(logData.keys.first, logData.values.first)]);
+                  updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
+                }
               }
-            }
+            // }
+
             setState(() {});
           },
         );
@@ -1274,7 +1310,7 @@ class _ChildGrowthExpendedFormState
         return DynamicCustomTextFieldNew(
           // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(itemsAnswred, quesItem)
@@ -1283,7 +1319,7 @@ class _ChildGrowthExpendedFormState
           keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           maxlength: quesItem.length,
           hintText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(itemsAnswred, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
@@ -1298,7 +1334,7 @@ class _ChildGrowthExpendedFormState
         return DynamicCustomTextFieldInt(
           // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(itemsAnswred, quesItem)
@@ -1312,7 +1348,7 @@ class _ChildGrowthExpendedFormState
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
               var logData =
-                  logic!.callAutoGeneratedValue(itemsAnswred, quesItem);
+              logic!.callAutoGeneratedValue(itemsAnswred, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   itemsAnswred.addEntries(
@@ -1328,27 +1364,27 @@ class _ChildGrowthExpendedFormState
             }
           },
         );
-      // case 'Check':
-      //   return DynamicCustomCheckboxWithLabel(
-      //     label:
-      //         Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-      //     initialValue: itemsAnswred[quesItem.fieldname!],
-      //     isVisible: logic!
-      //         .callDependingLogic( itemsAnswred, quesItem),
-      //     onChanged: (value) {
-      //       if (value > 0)
-      //         itemsAnswred[quesItem.fieldname!] = value;
-      //       else
-      //         itemsAnswred.remove(quesItem.fieldname);
-      //
-      //       updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-      //       setState(() {});
-      //     },
-      //   );
+    // case 'Check':
+    //   return DynamicCustomCheckboxWithLabel(
+    //     label:
+    //         Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+    //     initialValue: itemsAnswred[quesItem.fieldname!],
+    //     isVisible: logic!
+    //         .callDependingLogic( itemsAnswred, quesItem),
+    //     onChanged: (value) {
+    //       if (value > 0)
+    //         itemsAnswred[quesItem.fieldname!] = value;
+    //       else
+    //         itemsAnswred.remove(quesItem.fieldname);
+    //
+    //       updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
+    //       setState(() {});
+    //     },
+    //   );
       case 'Check':
         return DynamicCustomYesNoCheckboxWithLabel(
           label:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           initialValue: Global.stringToIntNull(
               itemsAnswred[quesItem.fieldname].toString()),
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
@@ -1370,7 +1406,7 @@ class _ChildGrowthExpendedFormState
           // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           maxline: 3,
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           readable: role == CustomText.crecheSupervisor
@@ -1378,7 +1414,7 @@ class _ChildGrowthExpendedFormState
               : true,
           maxlength: quesItem.length,
           hintText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(itemsAnswred, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
@@ -1392,7 +1428,7 @@ class _ChildGrowthExpendedFormState
         return DynamicCustomTextFieldInt(
           // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           maxlength: quesItem.length,
@@ -1416,7 +1452,7 @@ class _ChildGrowthExpendedFormState
         return DynamicCustomTextFieldNew(
           // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           maxlength: quesItem.length,
           readable: role == CustomText.crecheSupervisor
@@ -1437,15 +1473,16 @@ class _ChildGrowthExpendedFormState
         return DynamicCustomTextFieldFloat(
           // focusNode: _foocusNode[ChildEnrollGUID]![quesItem.fieldname],
           hintText:
-              Global.returnTrLable(translatsLabel, CustomText.typehere, lng),
+          Global.returnTrLable(translatsLabel, CustomText.typehere, lng),
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.fieldname == 'height'
-              ? (isMesurement(myMap[measurement_date!.fieldname])
-                  ? logic!.dependeOnMendotory(itemsAnswred, quesItem)
-                  : 0)
-              : logic!.dependeOnMendotory(itemsAnswred, quesItem),
+          // isRequred: quesItem.fieldname == 'height'
+          //     ? (isMesurement(myMap[measurement_date!.fieldname])
+          //     ? logic!.dependeOnMendotory(itemsAnswred, quesItem)
+          //     : 0)
+          //     : logic!.dependeOnMendotory(itemsAnswred, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemsAnswred[quesItem.fieldname!],
           readable: role == CustomText.crecheSupervisor
@@ -1458,7 +1495,7 @@ class _ChildGrowthExpendedFormState
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
               var logData =
-                  logic!.callAutoGeneratedValue(itemsAnswred, quesItem);
+              logic!.callAutoGeneratedValue(itemsAnswred, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   itemsAnswred.addEntries(
@@ -1479,15 +1516,15 @@ class _ChildGrowthExpendedFormState
     }
   }
 
-  bool isMesurement(String mesureDate) {
-    bool ismesure = false;
-    List<int> parts = mesureDate.toString().split('-').map(int.parse).toList();
-    var month = parts[1];
-    if (mesureMonths.contains(month)) {
-      ismesure = true;
-    }
-    return ismesure;
-  }
+  // bool isMesurement(String mesureDate) {
+  //   bool ismesure = false;
+  //   List<int> parts = mesureDate.toString().split('-').map(int.parse).toList();
+  //   var month = parts[1];
+  //   if (mesureMonths.contains(month)) {
+  //     ismesure = true;
+  //   }
+  //   return ismesure;
+  // }
 
   widgetTypeWidgetinlessForMulti(HouseHoldFielItemdModel quesItem,
       Map<String, dynamic> itemsAnswred, String ChildEnrollGUID) {
@@ -1547,7 +1584,7 @@ class _ChildGrowthExpendedFormState
           hintText: Global.returnTrLable(
               translatsLabel, CustomText.select_here, lng!),
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           items: items,
           selectedItem: itemsAnswred[quesItem.fieldname!],
@@ -1566,7 +1603,7 @@ class _ChildGrowthExpendedFormState
         return CustomDatepickerDynamic(
           calenderValidate: [],
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           initialvalue: itemsAnswred[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
@@ -1588,7 +1625,7 @@ class _ChildGrowthExpendedFormState
       case 'Int':
         return DynamicCustomTextFieldInt(
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           maxlength: quesItem.length,
@@ -1600,7 +1637,7 @@ class _ChildGrowthExpendedFormState
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
               var logData =
-                  logic!.callAutoGeneratedValue(itemsAnswred, quesItem);
+              logic!.callAutoGeneratedValue(itemsAnswred, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   itemsAnswred.addEntries(
@@ -1616,27 +1653,27 @@ class _ChildGrowthExpendedFormState
             }
           },
         );
-      // case 'Check':
-      //   return DynamicCustomCheckboxWithLabel(
-      //     label:
-      //         Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-      //     initialValue: itemsAnswred[quesItem.fieldname!],
-      //     isVisible: logic!
-      //         .callDependingLogic( itemsAnswred, quesItem),
-      //     onChanged: (value) {
-      //       if (value > 0)
-      //         itemsAnswred[quesItem.fieldname!] = value;
-      //       else
-      //         itemsAnswred.remove(quesItem.fieldname);
-      //
-      //       updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-      //       setState(() {});
-      //     },
-      //   );
+    // case 'Check':
+    //   return DynamicCustomCheckboxWithLabel(
+    //     label:
+    //         Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+    //     initialValue: itemsAnswred[quesItem.fieldname!],
+    //     isVisible: logic!
+    //         .callDependingLogic( itemsAnswred, quesItem),
+    //     onChanged: (value) {
+    //       if (value > 0)
+    //         itemsAnswred[quesItem.fieldname!] = value;
+    //       else
+    //         itemsAnswred.remove(quesItem.fieldname);
+    //
+    //       updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
+    //       setState(() {});
+    //     },
+    //   );
       case 'Check':
         return DynamicCustomYesNoCheckboxWithLabel(
           label:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           initialValue: itemsAnswred[quesItem.fieldname],
           labelControlls: translatsLabel,
           lng: lng,
@@ -1652,7 +1689,7 @@ class _ChildGrowthExpendedFormState
       case 'Select':
         return DynamicCustomTextFieldInt(
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           maxlength: quesItem.length,
@@ -1673,7 +1710,7 @@ class _ChildGrowthExpendedFormState
       case 'Small Text':
         return DynamicCustomTextFieldNew(
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           maxlength: quesItem.length,
           readable: logic!.callReadableLogic(itemsAnswred, quesItem),
@@ -1691,7 +1728,7 @@ class _ChildGrowthExpendedFormState
       case 'Float':
         return DynamicCustomTextFieldFloat(
           titleText:
-              Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           maxlength: quesItem.length,
@@ -1704,7 +1741,7 @@ class _ChildGrowthExpendedFormState
             if (value != null) {
               itemsAnswred[quesItem.fieldname!] = value;
               var logData =
-                  logic!.callAutoGeneratedValue(itemsAnswred, quesItem);
+              logic!.callAutoGeneratedValue(itemsAnswred, quesItem);
               if (logData.isNotEmpty) {
                 if (logData.keys.length > 0) {
                   itemsAnswred.addEntries(
@@ -1732,7 +1769,7 @@ class _ChildGrowthExpendedFormState
     if (alredRecord.length > 0) {
       if (alredRecord.first.responces != null) {
         Map<String, dynamic> responseData =
-            jsonDecode(alredRecord[0].responces!);
+        jsonDecode(alredRecord[0].responces!);
         var childs = responseData['anthropromatic_details'];
         if (childs != null) {
           List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
@@ -1743,13 +1780,18 @@ class _ChildGrowthExpendedFormState
           });
           children.forEach((element) {
             var itmelement = element;
+            if (!(Global.stringToDouble(element['re_height'].toString()) > 0) &&
+                !(Global.stringToDouble(element['re_weight'].toString()) > 0)) {
+              itmelement.remove('re_height');
+              itmelement.remove('re_weight');
+            }
             if (!(Global.stringToDouble(element['height'].toString()) > 0) &&
                 !(Global.stringToDouble(element['weight'].toString()) > 0)) {
               itmelement.remove('height');
               itmelement.remove('weight');
             }
             if (Global.stringToIntNull(
-                    itmelement['do_you_have_height_weight'].toString()) ==
+                itmelement['do_you_have_height_weight'].toString()) ==
                 2) {
               itmelement['do_you_have_height_weight'] = 0;
             }
@@ -1759,16 +1801,17 @@ class _ChildGrowthExpendedFormState
         if (alredRecord[0].name != null) {
           recrdedUpload = true;
         }
-
-        if (responseData['created_on'] != null ||
-            responseData['created_by'] != null) {
-          myMap['updated_on'] = Validate().currentDateTime();
-          myMap['updated_by'] = userName;
-        } else {
-          myMap['created_by'] = userName;
-          myMap['created_on'] = Validate().currentDateTime();
-          countMesuredChildren();
+        if(role==CustomText.crecheSupervisor) {
+          if (responseData['created_on'] != null ||
+              responseData['created_by'] != null) {
+            myMap['updated_on'] = Validate().currentDateTime();
+            myMap['updated_by'] = userName;
+          } else {
+            myMap['created_by'] = userName;
+            myMap['created_on'] = Validate().currentDateTime();
+          }
         }
+        countMesuredChildren();
       } else {
         var creCheDetails = await CrecheDataHelper()
             .getCrecheResponceItem(widget.creche_nameId);
@@ -1794,7 +1837,7 @@ class _ChildGrowthExpendedFormState
       }
     } else {
       var creCheDetails =
-          await CrecheDataHelper().getCrecheResponceItem(widget.creche_nameId);
+      await CrecheDataHelper().getCrecheResponceItem(widget.creche_nameId);
       if (creCheDetails.length > 0) {
         myMap['created_by'] = userName;
         myMap['created_on'] = Validate().currentDateTime();
@@ -1862,7 +1905,7 @@ class _ChildGrowthExpendedFormState
       var item = attepmtChild[element.ChildEnrollGUID];
       if (item != null) {
         if (((Global.validString(item['measurement_taken_date'])) &&
-                (Global.stringToDouble(item['weight'].toString()) > 0)) ||
+            (Global.stringToDouble(item['weight'].toString()) > 0)) ||
             Global.validString(item['measurement_reason'])) {
           mesuCunt = mesuCunt + 1;
         }
@@ -1978,7 +2021,7 @@ class _ChildGrowthExpendedFormState
     attepmtChild = {};
     enrolledChild = await EnrolledExitChilrenResponceHelper()
         .enrolledChildByCrecheWithDateOfExit(
-            widget.creche_nameId, selectedDate);
+        widget.creche_nameId, selectedDate);
     DateTime? dateOfMesurement = Validate().stringToDateNull(selectedDate);
     enrolledChild = enrolledChild.where((element) {
       DateTime? enrolledDate = Validate().stringToDateNull(
@@ -1989,6 +2032,40 @@ class _ChildGrowthExpendedFormState
       }
       return false;
     }).toList();
+
+    ChildGrowthMetaResponseModel? lastItem=await ChildGrowthResponseHelper().callMaxAnthroResponce(widget.creche_nameId,selectedDate);
+
+    if(Global.validString(lastItem?.responces)) {
+      Map<String, dynamic> responseData = jsonDecode(lastItem!.responces!);
+      var childs = responseData['anthropromatic_details'];
+      if (childs != null) {
+        List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(responseData['anthropromatic_details']);
+
+        children.forEach((itemMap) {
+          var filterItem = enrolledChild.where((element) {return element.ChildEnrollGUID == itemMap['childenrollguid'];});
+
+          if (filterItem.length > 0) {
+            var childEnrolleGUID=filterItem.first.ChildEnrollGUID;
+            var cWidgetDatamap = attepmtChild[childEnrolleGUID];
+            if (cWidgetDatamap == null&&Global.validString(childEnrolleGUID)) {
+              if(itemMap['do_you_have_height_weight'].toString()=='1'){
+                Map<String, dynamic> childItem= {};
+                itemMap.forEach((key, value) {
+                  if(key=='height'||key=='do_you_have_height_weight'){
+                  childItem[key] = value;
+                  }
+                });
+                attepmtChild[childEnrolleGUID!] = childItem;
+              }
+
+            }
+          }
+        });
+      }
+    }
+
+
+
     filterdData = enrolledChild;
     setState(() {});
   }
@@ -1997,13 +2074,661 @@ class _ChildGrowthExpendedFormState
     if (entry.length > 0) {
       filterdData = enrolledChild
           .where((element) =>
-              (Global.getItemValues(element.responces!, 'child_name'))
-                  .toLowerCase()
-                  .startsWith(entry.toLowerCase()))
+          (Global.getItemValues(element.responces!, 'child_name'))
+              .toLowerCase()
+              .startsWith(entry.toLowerCase()))
           .toList();
     } else {
       filterdData = enrolledChild;
     }
     setState(() {});
+  }
+
+
+  List<Widget> cWidgetRadiomColorPop(String ChildEnrollGUID,
+      Map<String, dynamic> cWidgetDatamap, String gender) {
+    var inputItem = formItem
+        .where((element) =>
+    (element.fieldname == 're_weight_for_age' ||
+        element.fieldname == 're_weight_for_height' ||
+        element.fieldname == 're_height_for_age') &&
+        popItems.contains(element.fieldname))
+        .toList();
+    List<Widget> screenItems = [];
+    if (inputItem.length > 0) {
+      for (int i = 0; i < inputItem.length; i++) {
+        var isvible = logic!.callDependingLogic(cWidgetDatamap, inputItem[i]);
+        int colorD = DependingLogic.AutoColorCreateByHeightWight(
+            tabHeightforageBoys,
+            tHeightforageGirls,
+            tabWeightforageBoys,
+            tabWeightforageGirls,
+            tabWeightToHeightBoys,
+            tabWeightToHeightGirls,
+            inputItem[i].fieldname!,
+            gender,
+            cWidgetDatamap);
+
+        Color itemC = Color(0xffAAAAAA);
+        String colorName = '';
+        if (colorD == 0) {
+          itemC = Color(0xffAAAAAA);
+          colorName = '';
+        } else if (colorD == 1) {
+          itemC = Color(0xffF35858);
+          colorName =
+          '(${Global.returnTrLable(translatsLabel, CustomText.Severe, lng)})';
+        } else if (colorD == 2) {
+          itemC = Color(0xffF4B81D);
+          colorName =
+          '(${Global.returnTrLable(translatsLabel, CustomText.Moderate, lng)})';
+        } else if (colorD == 3) {
+          itemC = Color(0xff8BF649);
+          colorName =
+          '(${Global.returnTrLable(translatsLabel, CustomText.Normal, lng)})';
+        }
+        countMesuredChildren();
+        cWidgetDatamap[inputItem[i].fieldname!] = colorD;
+        if (isvible) {
+          screenItems.add(Column(
+            children: [
+              Container(
+                height: 25,
+                width: 25,
+                decoration: BoxDecoration(
+                  color: itemC,
+                  borderRadius: BorderRadius.circular(5.r),
+                ),
+              ),
+              Text(
+                Global.returnTrLable(
+                    translatsLabel, inputItem[i].label!.trim(), lng),
+                style: Styles.black85,
+                strutStyle: StrutStyle(height: 1.2),
+              ),
+              Text(
+                colorName,
+                style: Styles.black12700,
+              ),
+            ],
+          ));
+        }
+        if (!isvible) {
+          cWidgetDatamap.remove(inputItem[i].fieldname);
+        }
+      }
+    }
+    return screenItems;
+  }
+
+  void _reEnterDailog(BuildContext context, String childEnrollGUID) {
+    Map<String, dynamic> cWidgetDatamap = {};
+    var parentItem = attepmtChild[childEnrollGUID];
+    String mesumentDate='';
+    var childItem = filterdData
+        .where((element) => element.ChildEnrollGUID == childEnrollGUID)
+        .toList();
+
+    cWidgetDatamap['re_do_you_have_height_weight'] = 1;
+    cWidgetDatamap['childenrollguid'] = childEnrollGUID;
+
+    if (parentItem != null) {
+      mesumentDate = parentItem['measurement_taken_date'];
+      parentItem.forEach((key, value) {
+        if (popItems.contains(key)) {
+          if(Global.stringToInt(parentItem['re_do_you_have_height_weight'].toString())==0
+              && parentItem['re_measurement_reason']!=null){
+              cWidgetDatamap[key] = value;
+          }else if(Global.stringToInt(parentItem['re_do_you_have_height_weight'].toString())==1){
+            cWidgetDatamap[key] = value;
+          }
+
+        }
+      });
+    }
+
+    HouseHoldFielItemdModel? re_measurement_equipment;
+    HouseHoldFielItemdModel? re_do_you_have_height_weight;
+    HouseHoldFielItemdModel? re_measurement_taken_date;
+    HouseHoldFielItemdModel? re_height;
+    HouseHoldFielItemdModel? re_weight;
+    HouseHoldFielItemdModel? re_measurement_reason;
+
+    var measurementTakenDate = formItem
+        .where((element) => element.fieldname == 're_measurement_taken_date')
+        .toList();
+
+    var haveMesure = formItem
+        .where((element) => element.fieldname == 're_do_you_have_height_weight')
+        .toList();
+
+    var height =
+    formItem.where((element) => element.fieldname == 're_height').toList();
+
+    var weight =
+    formItem.where((element) => element.fieldname == 're_weight').toList();
+
+    if (haveMesure.length > 0) {
+      re_do_you_have_height_weight = haveMesure.first;
+    }
+
+    var measurementEquipment = formItem
+        .where((element) => element.fieldname == 're_measurement_equipment')
+        .toList();
+
+    var measurement_reason = formItem
+        .where((element) => element.fieldname == 're_measurement_reason')
+        .toList();
+
+    if (measurementEquipment.length > 0) {
+      re_measurement_equipment = measurementEquipment.first;
+    }
+    if (measurementTakenDate.length > 0) {
+      re_measurement_taken_date = measurementTakenDate.first;
+    }
+    if (height.length > 0) {
+      re_height = height.first;
+    }
+    if (weight.length > 0) {
+      re_weight = weight.first;
+    }
+    if (measurement_reason.length > 0) {
+      re_measurement_reason = measurement_reason.first;
+    }
+
+    List<OptionsModel> items = options
+        .where((element) =>
+    element.flag == 'tab${re_measurement_equipment!.options}')
+        .toList();
+
+    List<OptionsModel> reasonItems = options
+        .where(
+            (element) => element.flag == 'tab${re_measurement_reason!.options}')
+        .toList();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: Container(
+                width: MediaQuery.of(context).size.width *
+                    7, // 80% of screen width
+                child: SingleChildScrollView(
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 40.h,
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Color(0xff5979AA),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(5.0),
+                              topRight: Radius.circular(5.0),
+                            ),
+                          ),
+                          child: Center(
+                              child:
+                              Text(Global.returnTrLable(translatsLabel, CustomText.updateMeasurement, lng), style: Styles.white126P)),
+                        ),
+                        StatefulBuilder(
+                            builder: (BuildContext context, StateSetter setState) {
+                              return SingleChildScrollView(
+                                child: Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                    children: [
+                                      DynamicCustomYesNoCheckboxWithLabel(
+                                        label: Global.returnTrLable(
+                                            translatsLabel,
+                                            re_do_you_have_height_weight?.label.toString(),
+                                            lng),
+                                        initialValue: Global.stringToIntNull(cWidgetDatamap[
+                                        re_do_you_have_height_weight?.fieldname]
+                                            .toString()),
+                                        isRequred: 1,
+                                        labelControlls: translatsLabel,
+                                        lng: lng,
+                                        readable: logic!.callReadableLogic(
+                                            cWidgetDatamap, re_do_you_have_height_weight!),
+                                        isVisible: logic!.callDependingLogic(
+                                            cWidgetDatamap, re_do_you_have_height_weight),
+                                        onChanged: (value) {
+                                          cWidgetDatamap[re_do_you_have_height_weight!
+                                              .fieldname!] = value;
+                                          setState(() {});
+                                        },
+                                      ),
+                                      CustomDatepickerDynamic(
+                                        calenderValidate: [],
+                                        minDate: Global.stringToDate(mesumentDate)?.subtract(Duration(days: 1)),
+                                        titleText: Global.returnTrLable(translatsLabel,
+                                            re_measurement_taken_date!.label!.trim(), lng),
+                                        isVisible: logic!.callDependingLogic(
+                                            cWidgetDatamap, re_measurement_taken_date),
+                                        initialvalue: cWidgetDatamap[
+                                        re_measurement_taken_date.fieldname!],
+                                        fieldName: re_measurement_taken_date.fieldname,
+                                        isRequred: logic!.dependeOnMendotory(
+                                            cWidgetDatamap, re_measurement_taken_date),
+                                        onChanged: (value) {
+                                          cWidgetDatamap[
+                                          re_measurement_taken_date!.fieldname!] = value;
+                                          var logData = logic!.callDateDiffrenceLogic(
+                                              cWidgetDatamap, re_measurement_taken_date!);
+                                          if (logData.isNotEmpty) {
+                                            if (logData.keys.length > 0) {
+                                              cWidgetDatamap.addEntries([
+                                                MapEntry(
+                                                    logData.keys.first, logData.values.first)
+                                              ]);
+                                  
+                                            }
+                                          }
+                                  
+                                          var date = Validate().stringToDate(
+                                              Global.getItemValues(
+                                                  childItem.first.responces, 'child_dob'));
+                                  
+                                          int calucalteDate = 0;
+                                          if (cWidgetDatamap['re_measurement_taken_date'] !=
+                                              null) {
+                                            var mesurmentDate = Validate().stringToDate(
+                                                cWidgetDatamap['re_measurement_taken_date']);
+                                            calucalteDate = Validate()
+                                                .calculateAgeInDaysEx(date, mesurmentDate);
+                                          } else
+                                            calucalteDate =
+                                                Validate().calculateAgeInDays(date);
+                                  
+                                          cWidgetDatamap['re_age_months'] = calucalteDate;
+                                  
+                                          setState(() {});
+                                        },
+                                      ),
+                                      DynamicCustomDropdownField(
+                                        hintText: Global.returnTrLable(
+                                            translatsLabel, CustomText.select_here, lng),
+                                        titleText: Global.returnTrLable(translatsLabel,
+                                            re_measurement_equipment!.label!.trim(), lng),
+                                        isRequred: logic!.dependeOnMendotory(
+                                            cWidgetDatamap, re_measurement_equipment),
+                                        items: items,
+                                        selectedItem: cWidgetDatamap[
+                                        re_measurement_equipment.fieldname!],
+                                        isVisible: logic!.callDependingLogic(
+                                            cWidgetDatamap, re_measurement_equipment),
+                                        onChanged: (value) {
+                                          if (value != null)
+                                            cWidgetDatamap[re_measurement_equipment!
+                                                .fieldname!] = value.name;
+                                          else
+                                            cWidgetDatamap
+                                                .remove(re_measurement_equipment!.fieldname);
+                                  
+                                          setState(() {});
+                                        },
+                                      ),
+                                      DynamicCustomDropdownField(
+                                        hintText: Global.returnTrLable(
+                                            translatsLabel, CustomText.select_here, lng),
+                                        titleText: Global.returnTrLable(translatsLabel,
+                                            re_measurement_reason!.label!.trim(), lng),
+                                        isRequred: logic!.dependeOnMendotory(
+                                            cWidgetDatamap, re_measurement_reason),
+                                        items: reasonItems,
+                                        selectedItem:
+                                        cWidgetDatamap[re_measurement_reason.fieldname!],
+                                        isVisible: logic!.callDependingLogic(
+                                            cWidgetDatamap, re_measurement_reason),
+                                        onChanged: (value) {
+                                          if (value != null)
+                                            cWidgetDatamap[re_measurement_reason!
+                                                .fieldname!] = value.name;
+                                          else
+                                            cWidgetDatamap
+                                                .remove(re_measurement_reason!.fieldname);
+                                  
+                                          setState(() {});
+                                        },
+                                      ),
+                                      Container(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            DynamicCustomTextFieldFloat(
+                                              width: MediaQuery.of(context).size.width * 0.3,
+                                              hintText: Global.returnTrLable(
+                                                  translatsLabel, CustomText.typehere, lng),
+                                              titleText: Global.returnTrLable(translatsLabel,
+                                                  re_height!.label!.trim(), lng),
+                                              keyboardtype: TextInputType.number,
+                                              isRequred: logic!.dependeOnMendotory(
+                                                  cWidgetDatamap, re_height),
+                                              maxlength: re_height.length,
+                                              initialvalue:
+                                              cWidgetDatamap[re_height.fieldname!],
+                                              readable: logic!.callReadableLogic(
+                                                  cWidgetDatamap, re_height),
+                                              isVisible: logic!.callDependingLogic(
+                                                  cWidgetDatamap, re_height),
+                                              fieldName: re_height.fieldname!,
+                                              onChanged: (value) {
+                                                if (value != null) {
+                                                  cWidgetDatamap[re_height!.fieldname!] =
+                                                      value;
+                                                  var logData = logic!.callAutoGeneratedValue(
+                                                      cWidgetDatamap, re_height);
+                                                  if (logData.isNotEmpty) {
+                                                    if (logData.keys.length > 0) {
+                                                      cWidgetDatamap.addEntries([
+                                                        MapEntry(logData.keys.first,
+                                                            logData.values.first)
+                                                      ]);
+                                                    }
+                                                  }
+                                                } else {
+                                                  cWidgetDatamap.remove(re_height?.fieldname);
+                                                }
+                                              },
+                                            ),
+                                            DynamicCustomTextFieldFloat(
+                                              width: MediaQuery.of(context).size.width * 0.3,
+                                              hintText: Global.returnTrLable(
+                                                  translatsLabel, CustomText.typehere, lng),
+                                              titleText: Global.returnTrLable(translatsLabel,
+                                                  re_weight!.label!.trim(), lng),
+                                              keyboardtype: TextInputType.number,
+                                              isRequred: logic!.dependeOnMendotory(
+                                                  cWidgetDatamap, re_weight),
+                                              maxlength: re_weight.length,
+                                              initialvalue:
+                                              cWidgetDatamap[re_weight.fieldname!],
+                                              readable: logic!.callReadableLogic(
+                                                  cWidgetDatamap, re_weight),
+                                              isVisible: logic!.callDependingLogic(
+                                                  cWidgetDatamap, re_weight),
+                                              fieldName: re_weight.fieldname!,
+                                              onChanged: (value) {
+                                                if (value != null) {
+                                                  cWidgetDatamap[re_weight!.fieldname!] =
+                                                      value;
+                                                  var logData = logic!.callAutoGeneratedValue(
+                                                      cWidgetDatamap, re_weight);
+                                                  if (logData.isNotEmpty) {
+                                                    if (logData.keys.length > 0) {
+                                                      cWidgetDatamap.addEntries([
+                                                        MapEntry(logData.keys.first,
+                                                            logData.values.first)
+                                                      ]);
+                                                    }
+                                                  }
+                                                } else {
+                                                  cWidgetDatamap.remove(re_weight!.fieldname);
+                                                }
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      cWidgetDatamap['re_do_you_have_height_weight'] != 0
+                                          ? Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(color: Color(0xffE0E0E0)),
+                                          borderRadius: BorderRadius.circular(10.r),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                          children: cWidgetRadiomColorPop(
+                                              childEnrollGUID,
+                                              cWidgetDatamap,
+                                              Global.getItemValues(
+                                                  childItem.first.responces,
+                                                  'gender_id')),
+                                        ),
+                                      )
+                                          : SizedBox(),
+                                      SizedBox(height: 20,),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: CElevatedButton(
+                                                text: Global.returnTrLable(
+                                                    translatsLabel, CustomText.Cancel, lng),
+                                                color: Color(0xffDB4B73),
+                                                onPressed: () => Navigator.of(context).pop()),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: CElevatedButton(
+                                                text: Global.returnTrLable(
+                                                    translatsLabel, CustomText.Submit, lng),
+                                                color: Color(0xff369A8D),
+                                                onPressed: () async {
+                                                  if(checkValidateForPop(cWidgetDatamap)){
+                                                    await saveDataForPop(cWidgetDatamap, childEnrollGUID,childItem.first);
+                                                    Navigator.of(context).pop();
+                                                  }
+                                                }),
+                                          )
+                                        ],
+                                      ),
+                                      SizedBox(height: 20,),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            })
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+                )
+              // ]),
+        );
+      },
+    );
+  }
+
+  Future<void> saveDataForPop(
+      Map<String, dynamic> cWidgetDatamap, String childEnrollGUID,EnrolledExitChildResponceModel enrollChildItem) async
+  {
+    print(cWidgetDatamap);
+    var alredRecord = await ChildGrowthResponseHelper()
+        .callAnthropometryByGuid(widget.cgmguid);
+
+    if (alredRecord.length > 0) {
+      if (alredRecord.first.responces != null) {
+        Map<String, dynamic> responseData =
+        jsonDecode(alredRecord[0].responces!);
+        var childs = responseData['anthropromatic_details'];
+        if (childs != null) {
+          List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
+              responseData['anthropromatic_details']);
+          var childItem = children
+              .where((element) => element['childenrollguid'] == childEnrollGUID)
+              .toList();
+
+          if (childItem.length > 0) {
+            children.remove(childItem.first);
+            if (cWidgetDatamap['re_do_you_have_height_weight'].toString() ==
+                '1') {
+              cWidgetDatamap.remove('re_measurement_reason');
+              childItem.first.remove('re_measurement_reason');
+
+              var gender = Global.getItemValues(enrollChildItem.responces, 'gender_id');
+              var weightForAge = DependingLogic.AutoColorCreateByHeightWight(
+                  tabHeightforageBoys,
+                  tHeightforageGirls,
+                  tabWeightforageBoys,
+                  tabWeightforageGirls,
+                  tabWeightToHeightBoys,
+                  tabWeightToHeightGirls,
+                  're_weight_for_age',
+                  gender,
+                  cWidgetDatamap);
+              var heightForAge = DependingLogic.AutoColorCreateByHeightWight(
+                  tabHeightforageBoys,
+                  tHeightforageGirls,
+                  tabWeightforageBoys,
+                  tabWeightforageGirls,
+                  tabWeightToHeightBoys,
+                  tabWeightToHeightGirls,
+                  're_height_for_age',
+                  gender,
+                  cWidgetDatamap);
+
+              var weightForHeight = DependingLogic.AutoColorCreateByHeightWight(
+                  tabHeightforageBoys,
+                  tHeightforageGirls,
+                  tabWeightforageBoys,
+                  tabWeightforageGirls,
+                  tabWeightToHeightBoys,
+                  tabWeightToHeightGirls,
+                  're_weight_for_height',
+                  gender,
+                  cWidgetDatamap);
+
+              cWidgetDatamap['re_weight_for_age'] = weightForAge;
+              cWidgetDatamap['re_height_for_age'] = heightForAge;
+              cWidgetDatamap['re_weight_for_height'] = weightForHeight;
+
+            } else {
+              cWidgetDatamap.remove('re_height');
+              cWidgetDatamap.remove('re_weight');
+              cWidgetDatamap.remove('re_measurement_taken_date');
+              cWidgetDatamap.remove('re_measurement_equipment');
+              cWidgetDatamap.remove('re_age_months');
+              cWidgetDatamap.remove('re_weight_for_age');
+              cWidgetDatamap.remove('re_weight_for_height');
+              cWidgetDatamap.remove('re_height_for_age');
+
+              childItem.first.remove('re_height');
+              childItem.first.remove('re_weight');
+              childItem.first.remove('re_measurement_taken_date');
+              childItem.first.remove('re_measurement_equipment');
+              childItem.first.remove('re_age_months');
+              childItem.first.remove('re_weight_for_age');
+              childItem.first.remove('re_weight_for_height');
+              childItem.first.remove('re_height_for_age');
+            }
+            if(cWidgetDatamap['re_created_on']!=null || cWidgetDatamap['re_created_by']!=null){
+              cWidgetDatamap['re_updated_by'] = userName;
+              cWidgetDatamap['re_updated_on'] = Validate().currentDateTime();;
+            }else{
+              cWidgetDatamap['re_created_on'] = Validate().currentDateTime();;
+              cWidgetDatamap['re_created_by'] = userName;
+            }
+            childItem.first.addAll(cWidgetDatamap);
+            children.add(childItem.first);
+            responseData['anthropromatic_details'] = children;
+            print(responseData);
+
+            var measurementDate = responseData['measurement_date'];
+            var responcesJs = jsonEncode(responseData);
+            var name = responseData['name'];
+            await ChildGrowthResponseHelper().insertUpdate(
+                widget.cgmguid,
+                measurementDate,
+                name as int?,
+                widget.creche_nameId,
+                responcesJs,
+                myMap['created_by'],
+                myMap['created_on'],myMap['updated_on'],myMap['updated_by']);
+            updateHiddenValue();
+          }
+        }
+      }
+    }
+  }
+
+  bool checkValidateForPop(Map<String, dynamic> cWidgetDatamap) {
+    bool validStatus=true;
+    var popItem=formItem.where((element)=>popItems.contains(element.fieldname)).toList();
+    for (int i = 0; i < popItem.length; i++) {
+
+      var validationMsg = logic!.validationMessge(cWidgetDatamap, popItem[i]);
+
+      // if (isMesurement(cWidgetDatamap['re_measurement_taken_date']) == false &&
+      //     (popItem[i].fieldname == 're_height' ||
+      //         popItem[i].fieldname == 're_measurement_equipment') &&
+      //     Global.validString(validationMsg)) {
+      //   validationMsg = '';
+      // }
+      if (Global.validString(validationMsg)) {
+        validStatus = false;
+        Validate().singleButtonPopup(
+            validationMsg!,
+            Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+            false,
+            context);
+        return validStatus;
+      }
+    }
+    if(validStatus) {
+      if (cWidgetDatamap['re_do_you_have_height_weight'] == null) {
+        Validate().singleButtonPopup(
+            Global.returnTrLable(
+                translatsLabel, CustomText.pleaseSelectMeasurementTaken, lng),
+            Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+            false,
+            context);
+        validStatus = false;
+      }
+      else
+      if (cWidgetDatamap['re_do_you_have_height_weight'].toString() == '1') {
+        if (!Global.validString(cWidgetDatamap['re_measurement_taken_date'])) {
+          Validate().singleButtonPopup(
+              Global.returnTrLable(
+                  translatsLabel, CustomText.plsSelectMesureDate, lng),
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
+          validStatus = false;
+        } else
+        if (!Global.validString(cWidgetDatamap['re_measurement_equipment'])) {
+          Validate().singleButtonPopup(
+              Global.returnTrLable(
+                  translatsLabel, CustomText.plsSelectMesureEquip, lng),
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
+          validStatus = false;
+        } else
+        if (Global.stringToDouble(cWidgetDatamap['re_weight'].toString()) ==
+            0) {
+          Validate().singleButtonPopup(
+              Global.returnTrLable(
+                  translatsLabel, CustomText.plsSelectWeight, lng),
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
+          validStatus = false;
+        }
+      }
+      else if (cWidgetDatamap['re_do_you_have_height_weight'].toString() ==
+          '0') {
+        if (!Global.validString(cWidgetDatamap['re_measurement_reason'])) {
+          Validate().singleButtonPopup(
+              Global.returnTrLable(
+                  translatsLabel, CustomText.plsSelectreason, lng),
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
+          validStatus = false;
+        }
+      }
+    }
+    return validStatus;
   }
 }

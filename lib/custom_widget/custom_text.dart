@@ -55,6 +55,7 @@ class CustomText {
   static String VisitInformation = "Visit Information";
   static String ForgotPassword = "Forgot your Password?";
   static String Name = "Name : ";
+  static String Name_ = "Name";
   static String Gender = "Gender";
   static String Profile = "Profile : ";
   static String ProfileS = "Profile";
@@ -231,6 +232,7 @@ class CustomText {
   static String geoWiDownDwnload = "Geography wise Download data";
   static String downloadData = "Download data";
   static String Cancel = "Cancel";
+  static String ChildAlredExitSelectValidDAte = "This child has already exited Please select a date before exit date";
   static String IAgree = "I Agree";
   static String StartDate = "Start Date";
   static String EndDate = "End Date";
@@ -601,5 +603,9 @@ class CustomText {
   static String plsSelectHeight = "Please enter measurement height!";
   static String plsSelectWeight = "Please enter  measurement weight!";
   static String plsSelectMesureDate = "Please enter  measurement taken date!";
+  static String pleaseSelectMeasurementTaken = "Please enter  measurement taken";
   static String plsSelectreason = "Please select Reason!";
+  static String reEnter = "Re Enter";
+  static String updateMeasurement = "Child measurement";
+  static String ChildIsNotAppilcableForExitToday = "Child is not applicable for exit today";
 }

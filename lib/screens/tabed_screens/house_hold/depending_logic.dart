@@ -388,14 +388,9 @@ class DependingLogic {
   String? validationMessge(
       Map<String, dynamic> answred, HouseHoldFielItemdModel parentItem) {
     String? retuenValu;
-    // var parentQlogic = logics
-    //     .where((element) =>
-    //         element.dependentControls.contains(parentItem.fieldname!) &&
-    //         (element.type_of_logic_id == '6'))
-    //     .toList();
     var logicdependControl = logics
         .where((element) =>
-            element.parentControl.contains(parentItem.fieldname!) &&
+            element.parentControl==parentItem.fieldname! &&
             (element.type_of_logic_id == '1' ||
                 element.type_of_logic_id == '3' ||
                 element.type_of_logic_id == '7' ||
@@ -410,7 +405,6 @@ class DependingLogic {
                 element.type_of_logic_id == '24'))
         .toList();
 
-    // parentQlogic.addAll(logicdependControl);
     if (logicdependControl.length > 0) {
       for (int i = 0; i < logicdependControl.length; i++) {
         var element = logicdependControl[i];
@@ -626,7 +620,9 @@ class DependingLogic {
                 break;
               }
             }
-          } else if (element.type_of_logic_id == '3') {
+          }
+          else if (element.type_of_logic_id == '3') {
+            // if(element.parentControl==parentItem.fieldname!){
             var dependVAlu = answred[element.dependentControls].toString();
             if (dependVAlu == element.algorithmExpression.toString()) {
               var parentValu = answred[element.parentControl].toString();
@@ -651,8 +647,8 @@ class DependingLogic {
                   retuenValu = updateMsg;
                 }
                 break;
-              }
-            }
+              // }
+            }}
           }
         } else if (element.type_of_logic_id == '7') {
           var dependVAlu = answred[element.dependentControls].toString();
@@ -1463,9 +1459,13 @@ class DependingLogic {
       Map<String, dynamic> cWidgetDatamap) {
     int retuenValu = 0;
 
-    if (fieldname == 'weight_for_age') {
+    if (fieldname == 'weight_for_age'|| fieldname == 're_weight_for_age') {
       var age = cWidgetDatamap['age_months'];
       var weight = cWidgetDatamap['weight'];
+      if(fieldname == 're_weight_for_age'){
+        weight = cWidgetDatamap['re_weight'];
+         age = cWidgetDatamap['re_age_months'];
+      }
 
       if (age != null && weight != null) {
         if (gender == '1') {
@@ -1506,10 +1506,16 @@ class DependingLogic {
           }
         }
       }
-    } else if (fieldname == 'height_for_age') {
+    }
+    else if (fieldname == 'height_for_age'|| fieldname == 're_height_for_age') {
       var age = cWidgetDatamap['age_months'];
       var height = cWidgetDatamap['height'];
       var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      if(fieldname == 're_height_for_age'){
+         age = cWidgetDatamap['re_age_months'];
+         height = cWidgetDatamap['re_height'];
+         measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+      }
 
       if (age != null && height != null) {
         if (age < (25 * 30) && height > 0 && measurement_equipment == '1') {
@@ -1559,10 +1565,16 @@ class DependingLogic {
           }
         }
       }
-    } else if (fieldname == 'weight_for_height') {
+    }
+    else if (fieldname == 'weight_for_height'||fieldname == 're_weight_for_height') {
       var weight = cWidgetDatamap['weight'];
       var height = cWidgetDatamap['height'];
       var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      if(fieldname == 're_weight_for_height'){
+         weight = cWidgetDatamap['re_weight'];
+         height = cWidgetDatamap['re_height'];
+         measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+      }
 
       if (weight != null && height != null) {
         if (height > 0 && measurement_equipment == '1') {
@@ -1629,9 +1641,13 @@ class DependingLogic {
       Map<String, dynamic> cWidgetDatamap) {
     String growthValue = '';
 
-    if (fieldname == 'weight_for_age') {
+    if (fieldname == 'weight_for_age'||fieldname == 're_weight_for_age') {
       var age = cWidgetDatamap['age_months'];
       var weight = cWidgetDatamap['weight'];
+      if(fieldname == 're_weight_for_age'){
+         age = cWidgetDatamap['re_age_months'];
+         weight = cWidgetDatamap['re_weight'];
+      }
 
       if (age != null && weight != null) {
         if (gender == '1') {
@@ -1674,10 +1690,15 @@ class DependingLogic {
           }
         }
       }
-    } else if (fieldname == 'height_for_age') {
+    } else if (fieldname == 'height_for_age'||fieldname == 're_height_for_age') {
       var age = cWidgetDatamap['age_months'];
       var height = cWidgetDatamap['height'];
       var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      if(fieldname == 're_height_for_age'){
+         age = cWidgetDatamap['re_age_months'];
+         height = cWidgetDatamap['re_height'];
+         measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+      }
 
       if (age != null && height != null) {
         if (age < (25 * 30) && height > 0 && measurement_equipment == '1') {
@@ -1729,10 +1750,15 @@ class DependingLogic {
           }
         }
       }
-    } else if (fieldname == 'weight_for_height') {
+    } else if (fieldname == 'weight_for_height'||fieldname == 're_weight_for_height') {
       var weight = cWidgetDatamap['weight'];
       var height = cWidgetDatamap['height'];
       var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      if(fieldname == 're_weight_for_height'){
+         weight = cWidgetDatamap['re_weight'];
+         height = cWidgetDatamap['re_height'];
+         measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+      }
 
       if (weight != null && height != null) {
         if (height > 0 && measurement_equipment == '1') {

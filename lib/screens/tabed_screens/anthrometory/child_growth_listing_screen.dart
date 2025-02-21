@@ -465,7 +465,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     var cutDate = Validate().stringToDate(Validate().currentDate());
     DateTime currentDateMonth =
         DateTime(cutDate.year, cutDate.month, cutDate.day, 0, 1);
-    DateTime messureDate = DateTime(2023, 12, currentDateMonth.day);
+    DateTime messureDate = DateTime(2023, 11, 1);
 
     if (currentDateMonth.isAfter(messureDate)) {
       while (messureDate.isBefore(currentDateMonth)) {
@@ -604,6 +604,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     if (minEnrollDate != null) {
       String cgmguid = '';
       if (!Global.validString(cgmguid)) {
+        cgmguid=Validate().randomGuid();
         await ChildGrowthResponseHelper().insertUpdate(
             cgmguid,
             null,
@@ -611,7 +612,9 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
             widget.creche_nameId,
             null,
             (await Validate().readString(Validate.userName))!,
-            Validate().currentDateTime());
+            DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime(
+                DateTime.now().year, DateTime.now().month, 1)),null,null
+            );
         childHHData = await ChildGrowthResponseHelper()
             .anthormentryByCreche(widget.creche_nameId);
       }

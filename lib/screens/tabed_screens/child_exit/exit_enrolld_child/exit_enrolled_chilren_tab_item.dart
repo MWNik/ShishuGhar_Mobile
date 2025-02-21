@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
+import 'package:shishughar/database/helper/child_attendence/child_attendance_helper_responce.dart';
 import 'package:shishughar/database/helper/creche_helper/creche_data_helper.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
+import 'package:shishughar/model/databasemodel/child_attendance_responce_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -22,6 +24,7 @@ import '../../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_
 import '../../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import '../../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.dart';
 import '../../../../custom_widget/single_poup_dailog.dart';
+import '../../../../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../../../../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../../../../database/helper/dynamic_screen_helper/house_hold_children_helper.dart';
 import '../../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
@@ -29,6 +32,7 @@ import '../../../../database/helper/enrolled_children/enrolled_children_field_he
 import '../../../../database/helper/form_logic_helper.dart';
 import '../../../../database/helper/image_file_tab_responce_helper.dart';
 import '../../../../database/helper/translation_language_helper.dart';
+import '../../../../model/databasemodel/child_growth_responce_model.dart';
 import '../../../../model/databasemodel/tab_image_file_model.dart';
 import '../../../../utils/globle_method.dart';
 
@@ -152,7 +156,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
       CustomText.PleaseSelectBeforTimeInIsValidTime,
       CustomText.plsFilManForm,
       CustomText.wesUsageGraterQuatOpen,
-      CustomText.leavingLesThanjoining
+      CustomText.leavingLesThanjoining,
+      CustomText.ChildIsNotAppilcableForExitToday
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -924,8 +929,10 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           responces[element.fieldname!] = myMap[element.fieldname];
         }
       });
+      // myMap['is_exited']=1;
       var responcesJs = jsonEncode(myMap);
       var name = myMap['name'];
+
       print(responcesJs);
       await EnrolledExitChilrenResponceHelper().insertUpdate(
           widget.EnrolledChilGUID,
@@ -1057,6 +1064,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
             .toList();
         minDateforExit =
             DateTime(parts[0], parts[1], parts[2]).subtract(Duration(days: 1));
+        // await callMaxDateFromAttendenceOrAntro();
+
       }
       if (widget.isForExit) {
         if (!Global.validString(myMap['date_of_enrollment_awc'])) {
@@ -1085,7 +1094,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           .isBefore(DateTime.parse(Validate().currentDate()))) {
         shouldEditMesure = true;
       }
-    } else {
+    }
+    else {
       var fromHHInfo = await HouseHoldChildrenHelperHelper()
           .callHouseHoldChildrenItem(widget.cHHGuid);
       Map<String, dynamic> responseData = jsonDecode(fromHHInfo[0].responces!);
@@ -1130,6 +1140,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
     myMap['hhcguid'] = widget.cHHGuid;
     myMap['is_exited'] = 1;
     myMap['childenrollguid'] = widget.EnrolledChilGUID;
+
   }
 
   double duration(String date_ofenrollment, String childdob) {
@@ -1164,4 +1175,58 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
       await ImageFileTabHelper().updateImageOnlyItem(items);
     }
   }
+
+  // Future callMaxDateFromAttendenceOrAntro()async {
+  //
+  //   String? atendeceMaxDate=await ChildAttendanceResponceHelper().maxAendenceChildItem(widget.EnrolledChilGUID);
+  //   List<ChildGrowthMetaResponseModel>? growthItems=await ChildGrowthResponseHelper().anthormentryByCrecheIdAsc(widget.crecheId);
+  //   String? growthMonitoringMaxDate;
+  //   if(growthItems.isNotEmpty){
+  //     growthItems.forEach((element) {
+  //       Map<String, dynamic> responseData = jsonDecode(element.responces!);
+  //       if(responseData['anthropromatic_details']!=null){
+  //         List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
+  //             responseData['anthropromatic_details']);
+  //
+  //         var childItem = children
+  //             .where((cItems) => cItems['childenrollguid'] == widget.EnrolledChilGUID)
+  //             .toList();
+  //         if(childItem.isNotEmpty){
+  //           var gerothDate=Global.validString(childItem.first['measurement_taken_date'])?childItem.first['measurement_taken_date']:element.measurement_date;
+  //         if(growthMonitoringMaxDate!=null){
+  //           if(Validate().stringToDate(growthMonitoringMaxDate!).isBefore(Validate().stringToDate(gerothDate))){
+  //             growthMonitoringMaxDate=gerothDate;
+  //           }
+  //         }else growthMonitoringMaxDate=gerothDate;
+  //         }
+  //       }
+  //
+  //     });
+  //     print(growthMonitoringMaxDate);
+  //   }
+  //   if(Global.validString(growthMonitoringMaxDate)&&Global.validString(atendeceMaxDate)){
+  //     if(Validate().stringToDate(growthMonitoringMaxDate!)
+  //         .isAfter(Validate().stringToDate(atendeceMaxDate!))){
+  //       minDateforExit=Validate().stringToDate(growthMonitoringMaxDate!);
+  //     }else minDateforExit=Validate().stringToDate(atendeceMaxDate);
+  //   }else if(Global.validString(growthMonitoringMaxDate)||Global.validString(atendeceMaxDate)){
+  //     if(Global.validString(growthMonitoringMaxDate)){
+  //       minDateforExit=Validate().stringToDate(growthMonitoringMaxDate!);
+  //     }else minDateforExit=Validate().stringToDate(atendeceMaxDate!);
+  //   }else minDateforExit;
+  //   var currentDate=Validate().stringToDate(Validate().currentDate());
+  //
+  //   if((currentDate.year==minDateforExit!.year)&&
+  //       (currentDate.month==minDateforExit!.month)&&(currentDate.day==minDateforExit!.day)){
+  //     Validate().singleButtonPopup(
+  //         CustomText.ChildIsNotAppilcableForExitToday,
+  //         Global.returnTrLable(translats, CustomText.ok, lng),
+  //         true,
+  //         context);
+  //   }
+  //
+  //
+  // }
+
+
 }

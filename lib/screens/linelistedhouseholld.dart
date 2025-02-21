@@ -1716,70 +1716,73 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-            title: Center(
-              child: Text(
-                Global.returnTrLable(
-                    hhlistingControlls, CustomText.PrivacyPolicy, lng!),
-                style: Styles.black3125,
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+              title: Center(
+                child: Text(
+                  Global.returnTrLable(
+                      hhlistingControlls, CustomText.PrivacyPolicy, lng!),
+                  style: Styles.black3125,
+                ),
               ),
-            ),
-            content: Text(
-              Global.returnTrLable(hhlistingControlls,
-                  CustomText.PrivacyPolicyDescription, lng!),
-              textAlign: TextAlign.justify,
-            ),
-            actions: <Widget>[
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.end, // Space buttons evenly
-                children: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      Global.returnTrLable(
-                          hhlistingControlls, CustomText.Cancel, lng!),
-                      style: Styles.red125,
-                    ),
-                  ),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 15.0), // Adjust padding as needed
-                      backgroundColor: Color(0xff369A8D), // Background color
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(30.0), // Round corners
+              content: Text(
+                Global.returnTrLable(hhlistingControlls,
+                    CustomText.PrivacyPolicyDescription, lng!),
+                textAlign: TextAlign.justify,
+              ),
+              actions: <Widget>[
+                Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.end, // Space buttons evenly
+                  children: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        Global.returnTrLable(
+                            hhlistingControlls, CustomText.Cancel, lng!),
+                        style: Styles.red125,
                       ),
                     ),
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      String hhGuid = '';
-                      if (!Global.validString(hhGuid)) {
-                        hhGuid = Validate().randomGuid();
-                        print("line $hhGuid");
-                        var refStatus = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => HHTabScreen(
-                                hhGuid: hhGuid, crecheId: widget.crecheId),
-                          ),
-                        );
-                        if (refStatus == 'itemRefresh') {
-                          await fetchHhDataList();
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 15.0), // Adjust padding as needed
+                        backgroundColor: Color(0xff369A8D), // Background color
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(30.0), // Round corners
+                        ),
+                      ),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        String hhGuid = '';
+                        if (!Global.validString(hhGuid)) {
+                          hhGuid = Validate().randomGuid();
+                          print("line $hhGuid");
+                          var refStatus = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => HHTabScreen(
+                                  hhGuid: hhGuid, crecheId: widget.crecheId),
+                            ),
+                          );
+                          if (refStatus == 'itemRefresh') {
+                            await fetchHhDataList();
+                          }
                         }
-                      }
-                    },
-                    child: Text(
-                      Global.returnTrLable(
-                          hhlistingControlls, CustomText.IAgree, lng!),
-                      style: Styles.white125,
+                      },
+                      child: Text(
+                        Global.returnTrLable(
+                            hhlistingControlls, CustomText.IAgree, lng!),
+                        style: Styles.white125,
+                      ),
                     ),
-                  ),
-                ],
-              )
-            ]);
+                  ],
+                )
+              ]),
+        );
       },
     );
   }

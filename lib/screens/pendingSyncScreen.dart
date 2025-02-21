@@ -819,6 +819,20 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               locationControlls, CustomText.ChildGrievances, lng!)] =
           grievanceData.length;
 
+      var growthMeasurement = await ChildGrowthResponseHelper().callChildGrowthResponsesForUpload();
+      if (grievanceData.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.GrowthMonitoring, lng!)] =
+        '[b]${growthMeasurement.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.GrowthMonitoring, lng!)] =
+        '[b]${growthMeasurement.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.GrowthMonitoring, lng!)] =
+          growthMeasurement.length;
+
       var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
       if (checkins.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -2016,6 +2030,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       methods = [
         uploadcmcCCData,
         uploadChildGrievanceData,
+        uploadChildGrowthData,
         uploadCheckInData,
         uploadImageFile
       ];
@@ -2054,7 +2069,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         await ChildGrowthResponseHelper().callChildGrowthResponses();
     if (anthropomertydata.length > 0) {
       loadingTextUpdatedText = Global.returnTrLable(
-          locationControlls, CustomText.enrollExitChild, lng!);
+          locationControlls, CustomText.childGrowthMonitoring, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
       loadingTextUpdatedCount = '$currentItem/${anthropomertydata.length}';

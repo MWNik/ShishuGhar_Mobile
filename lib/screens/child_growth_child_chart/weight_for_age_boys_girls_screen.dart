@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:shishughar/utils/validate.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../../custom_widget/custom_text.dart';
+import '../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
+import '../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../model/apimodel/translation_language_api_model.dart';
 import '../../utils/globle_method.dart';
 import 'line_chart.dart';
@@ -104,6 +106,8 @@ class _WeightforAgeBoysGirlsScreenState
     });
 
     childAnthro = await ChildGrowthResponseHelper().allAnthormentry();
+
+
     if (childAnthro.isNotEmpty) {
       anthroResponsesList.add(childAnthro
           .map((ele) => jsonDecode(ele.responces!)['anthropromatic_details'])
@@ -121,6 +125,27 @@ class _WeightforAgeBoysGirlsScreenState
         print(element['childenrollguid']);
         return element['childenrollguid'] == widget.childenrollguid;
       }).toList();
+
+      var childEnroll = await EnrolledExitChilrenResponceHelper()
+          .callChildrenResponce(widget.childenrollguid);
+
+      if(childEnroll.length>0){
+        var enrollChild=jsonDecode(childEnroll.first.responces!);
+        var dateEnrollment=enrollChild['date_of_enrollment'];
+        var dateBirth=enrollChild['child_dob'];
+        var weight=enrollChild['weight'];
+        if(Global.stringToDate(dateBirth)!=null&&
+            Global.stringToDate(dateEnrollment)!=null
+            &&Global.stringToDouble(weight.toString())>0) {
+          var agaInMnth = Validate().calculateAgeInDaysEx(
+              Global.stringToDate(dateBirth)!,
+              Global.stringToDate(dateEnrollment)!);
+          (agaInMnth.toDouble() > age_in_months!.last) ? maxX = agaInMnth.toDouble() : maxX = age_in_months!.last;
+          (Global.stringToDouble(weight.toString()) > height_max!.last) ? maxY = Global.stringToDouble(weight.toString()) : maxY = height_max!.last;
+          child.add(Offset(agaInMnth.toDouble(), Global.stringToDouble(weight.toString())));
+        }
+      }
+
 
       child.addAll(children.map((data) {
         double x = (Global.stringToDouble(data['age_months'].toString())).toDouble();

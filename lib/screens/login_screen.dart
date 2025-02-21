@@ -906,7 +906,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         var token = 'token ' + key + ':' + secret;
         var oUserName = loginApiModel.auth!.username!;
         var backDateDataEntry = loginApiModel.auth!.backDateDataEntry!;
-        Validate().saveString(Validate.date, backDateDataEntry);
+         Validate().saveString(Validate.date, backDateDataEntry);
         if (selectedlanguages == 'English') {
           Validate().saveString(Validate.sLanguage, 'en');
         } else if (selectedlanguages == 'Hindi') {

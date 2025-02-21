@@ -13,6 +13,7 @@ import 'package:shishughar/utils/validate.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../../custom_widget/custom_appbar.dart';
 import '../../custom_widget/custom_text.dart';
+import '../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../model/apimodel/translation_language_api_model.dart';
 import '../../utils/globle_method.dart';
 import 'line_chart.dart';
@@ -121,6 +122,21 @@ class _WeightToHeightBoysGirlsScreenState
           }
         }
       });
+
+      var childEnroll = await EnrolledExitChilrenResponceHelper()
+          .callChildrenResponce(widget.childenrollguid);
+
+      if(childEnroll.length>0){
+        var enrollChild=jsonDecode(childEnroll.first.responces!) ;
+        var weight=enrollChild['weight'];
+        var height=enrollChild['height'];
+        if(Global.stringToDouble(height.toString())>0
+            && Global.stringToDouble(weight.toString())>0) {
+          (height.toDouble() > length!.last) ? maxX = height.toDouble() : maxX = length!.last;
+          (Global.stringToDouble(weight.toString()) > height_max!.last) ? maxY = Global.stringToDouble(weight.toString()) : maxY = height_max!.last;
+          child!.add(Offset(height, weight));
+        }
+      }
 
       children = children.where((element) {
         print(element['childenrollguid']);

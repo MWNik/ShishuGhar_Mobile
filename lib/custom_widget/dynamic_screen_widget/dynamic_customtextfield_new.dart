@@ -137,7 +137,6 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
                     ? keyLogic(widget.keyboard!)
                     : widget.keyboardtype,
                 inputFormatters: <TextInputFormatter>[
-                  // EmojiInputFormatter()
                   CustomInputFormatter(RegExp(widget.keyboard != null
                       ? keyLogicFormate(widget.keyboard!)
                       : (r'^[a-zA-Z0-9\u0400-\u04FF\u0900-\u097F\u4e00-\u9fff\u0B00-\u0B7F\s]+$')))

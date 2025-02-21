@@ -11,6 +11,7 @@ import 'package:shishughar/utils/validate.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../../custom_widget/custom_appbar.dart';
 import '../../custom_widget/custom_text.dart';
+import '../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../model/apimodel/translation_language_api_model.dart';
 import '../../utils/globle_method.dart';
 import 'line_chart.dart';
@@ -126,7 +127,28 @@ class _HeightforAgeBoysGirlsScreenState
         return element['childenrollguid'] == widget.childenrollguid;
       }).toList();
 
-      child?.addAll(children.map((data) {
+      var childEnroll = await EnrolledExitChilrenResponceHelper()
+          .callChildrenResponce(widget.childenrollguid);
+
+      if(childEnroll.length>0){
+        var enrollChild=jsonDecode(childEnroll.first.responces!) ;
+        var dateEnrollment=enrollChild['date_of_enrollment'];
+        var dateBirth=enrollChild['child_dob'];
+        var height=enrollChild['height'];
+        if(Global.stringToDate(dateBirth)!=null&&
+            Global.stringToDate(dateEnrollment)!=null
+            &&Global.stringToDouble(height.toString())>0) {
+          var agaInMnth = Validate().calculateAgeInDaysEx(
+              Global.stringToDate(dateBirth)!,
+              Global.stringToDate(dateEnrollment)!);
+
+          (agaInMnth.toDouble() > age_in_months!.last) ? maxX = agaInMnth.toDouble() : maxX = age_in_months!.last;
+          (Global.stringToDouble(height.toString()) > height_max!.last) ? maxY = Global.stringToDouble(height.toString()) : maxY = height_max!.last;
+          child.add(Offset(agaInMnth.toDouble(), Global.stringToDouble(height.toString())));
+        }
+      }
+
+      child.addAll(children.map((data) {
         double x = (data['age_months'] as num).toDouble();
         (x > age_in_months!.last) ? maxX = x : maxX = age_in_months!.last;
         // (x < age_in_months!.first) ? minX = x : minX = age_in_months!.first;

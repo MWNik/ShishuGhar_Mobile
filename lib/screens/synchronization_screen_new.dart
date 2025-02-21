@@ -237,7 +237,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                       locationControlls, CustomText.ok, lngtr!),
                                   false,
                                   context);
-                          } else {
+                          }
+                          else {
                             if (pendindTaskCount == 0) {
                               List<dynamic> visitNotes = [];
                               if (role == CustomText.clusterCoordinator)
@@ -2626,7 +2627,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
     var creCheMonitoring = await CmcCCTabResponseHelper().getCcForUpload();
     var crecheCheckIn =
         await CheckInResponseHelper().callCrecheCheckInResponses();
-
+    var growthMeasurement = await ChildGrowthResponseHelper().callChildGrowthResponsesForUpload();
     var grievanceData =
         await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
 
@@ -2634,6 +2635,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
 
     int totalPendingCount = crecheCheckIn.length +
         grievanceData.length +
+        growthMeasurement.length +
         creCheMonitoring.length +
         ImageFileData.length;
 

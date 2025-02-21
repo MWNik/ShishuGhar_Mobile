@@ -26,7 +26,7 @@ class Validate {
   static String userName = 'name';
   static String loginName = 'loginName';
   static String fullName = 'fullName';
-  static String date = 'date';
+  static String date = 'backDateDataEntry';
   static String appToken = 'appToken';
   static String Password = 'Password';
   static String state = 'StateName';

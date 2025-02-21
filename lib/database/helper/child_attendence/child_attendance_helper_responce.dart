@@ -148,11 +148,6 @@ class ChildAttendanceResponceHelper {
         'SELECT atre.*, COALESCE(chilAt.max_atn_count, 0) AS children_count FROM child_attendance_responce atre LEFT JOIN ( SELECT childattenguid, MAX(atn_count) AS max_atn_count FROM ( SELECT childattenguid, COUNT(*) AS atn_count FROM child_attendence GROUP BY childattenguid ) AS atn_counts GROUP BY childattenguid ) AS chilAt ON chilAt.childattenguid = atre.childattenguid WHERE chilAt.max_atn_count IS NOT NULL and atre.creche_id=? AND substr(atre.date_of_attendance, 6, 2) = ? AND substr(atre.date_of_attendance, 1, 4) = ? ORDER BY chilAt.max_atn_count DESC LIMIT 1;',
         [creche_id, Month, Year]);
 
-    // List<ChildAttendanceResponceModel> items = [];
-
-    // result.forEach((itemMap) {
-    //   items.add(ChildAttendanceResponceModel.fromJson(itemMap));
-    // });
 
     return result;
   }
@@ -175,5 +170,20 @@ class ChildAttendanceResponceHelper {
         [creche_id, dateformate, dateformate, dateformate, selctedDate]);
 
     return result;
+  }
+
+  Future<String?> maxAendenceChildItem(
+     String childEnrollementDate ) async {
+
+    String query='select  max(strftime(?, date_of_attendance)) as max_date_of_attendance  from child_attendence where childenrolledguid=?';
+
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        query,
+        ['%Y-%m-%d', childEnrollementDate]);
+
+    if(result.isNotEmpty){
+      return result.first['max_date_of_attendance'];
+    }else return null;
+
   }
 }

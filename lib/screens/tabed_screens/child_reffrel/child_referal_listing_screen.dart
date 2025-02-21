@@ -138,6 +138,7 @@ class _ChildReferralListingScreenState
           Map<String, dynamic> growthData = {};
           growthData['childenrollguid'] = element['childenrollguid'];
           growthData['cgmguid'] = element['cgmguid'];
+          growthData['measurement_taken_date'] = element['measurement_taken_date'];
           childWith['$key#!${element['childenrollguid']}'] = growthData;
         }
       });
@@ -423,7 +424,10 @@ class _ChildReferralListingScreenState
                                         child_referral_guid: child_referral_guid,
                                         childName: childName,
                                         childId: childIdGen,
-                                        scheduleDate: keyParts[0],
+                                        scheduleDate: callDataByKey(
+                                            filteredGrowthGuidByDate.keys
+                                                .toList()[index],
+                                            'measurement_taken_date'),
                                         minDate: minDate,
                                         isEditable: true,
                                         isDischarge: false)));
@@ -532,8 +536,10 @@ class _ChildReferralListingScreenState
                                           ),
                                           Text(
                                             Validate().displeDateFormate(
-                                                filteredGrowthGuidByDate.keys
-                                                    .toList()[index]),
+                                                callDataByKey(
+                                                    filteredGrowthGuidByDate.keys
+                                                        .toList()[index],
+                                                    'measurement_taken_date')),
                                             style: Styles.cardBlue10,
                                             strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
@@ -581,7 +587,10 @@ class _ChildReferralListingScreenState
     var growthData = growthGuidByDate[key];
     var enrolledGUID = growthData['childenrollguid'];
     var cgmguid = growthData['cgmguid'];
-    if (valueKey != 'cgmguid') {
+    var measurement_taken_date = growthData['measurement_taken_date'];
+    if('measurement_taken_date'==valueKey){
+      returnValue = measurement_taken_date;
+    }else if (valueKey != 'cgmguid') {
       var reffItems = enrolledChildrenList
           .where((element) => element.ChildEnrollGUID == enrolledGUID)
           .toList();

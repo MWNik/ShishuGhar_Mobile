@@ -63,8 +63,25 @@ class ChildGrowthResponseHelper {
     return items;
   }
 
+  Future<List<ChildGrowthMetaResponseModel>> anthormentryByCrecheIdAsc(
+      int creche_id) async {
+    var query =
+        'Select * from  child_anthormentry_responce  where creche_id=? and responces NOTNULL ORDER BY strftime(?, measurement_date)  Asc';
+
+    List<Map<String, dynamic>> result =
+    await DatabaseHelper.database!.rawQuery(query, [creche_id,'%Y-%m-%d']);
+
+    List<ChildGrowthMetaResponseModel> items = [];
+    result.forEach((itemMap) {
+      items.add(ChildGrowthMetaResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<ChildGrowthMetaResponseModel>> callAnthropometryByGuid(
-      String cgmGuid) async {
+      String cgmGuid) async
+  {
     var query = 'Select * from  child_anthormentry_responce where cgmguid=?';
 
     List<Map<String, dynamic>> result =
@@ -76,6 +93,19 @@ class ChildGrowthResponseHelper {
     });
 
     return items;
+  }
+
+
+Future<ChildGrowthMetaResponseModel?> callMaxAnthroResponce(
+      int creche_id,String mesurementDate) async
+  {
+    // var query = 'select * from child_anthormentry_responce where creche_id=? and responces NOTNULL ORDER by measurement_date DESC LIMIT 1';
+    var query = 'SELECT *FROM child_anthormentry_responce WHERE creche_id = ? AND responces IS NOT NULL AND measurement_date IS NOT NULL AND strftime(?, measurement_date) < ? ORDER BY strftime(?, measurement_date) DESC limit 1;';
+
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(query, [creche_id,'%Y-%m-%d',mesurementDate,'%Y-%m-%d']);
+    if(result.length>0){
+    return ChildGrowthMetaResponseModel.fromJson(result.first);
+    }else null;
   }
 
   Future<List<ChildGrowthMetaResponseModel>>
@@ -100,8 +130,8 @@ class ChildGrowthResponseHelper {
       int? name,
       int? creche_name,
       String? responces,
-      String userId,
-      String? created_at) async {
+      String? created_by,
+      String? created_at,String? update_at,String? updated_by) async {
     var item = ChildGrowthMetaResponseModel(
         cgmguid: cgmguid,
         responces: responces,
@@ -110,8 +140,10 @@ class ChildGrowthResponseHelper {
         is_deleted: 0,
         name: name,
         creche_id: creche_name,
-        created_by: userId,
+        created_by: created_by,
         measurement_date: measurementDate,
+        update_at:update_at,
+        updated_by:updated_by,
         created_at: created_at);
     await DatabaseHelper.database!.insert(
         'child_anthormentry_responce', item.toJson(),
