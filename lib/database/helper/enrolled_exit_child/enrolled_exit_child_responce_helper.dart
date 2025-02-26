@@ -319,12 +319,13 @@ class EnrolledExitChilrenResponceHelper {
   }
 
   Future<List<Map<String, dynamic>>> getNotEnrollChildren(
-      String villageId) async {
+      String villageId,int creche_id) async {
     var query =
          // 'select chs.*,hh.responces as hhResponce from house_hold_children chs INNER join house_hold_responce as hh on hh. HHGUID=chs.HHGUID where SUBSTR( hh.responces,  INSTR( hh.responces, ?) + LENGTH(?), INSTR(SUBSTR( hh.responces, INSTR( hh.responces, ?) + LENGTH(?)), ?) - 1 ) !=? and chs.CHHGUID  not in (select ens.CHHGUID from enrollred_exit_child_responce ens INNER  join house_hold_children as hhChildren on ens.CHHGUID=hhChildren.CHHGUID  where (ens.date_of_exit isnull or length(RTRIM(LTRIM(ens.date_of_exit))) == 0)) ORDER BY LOWER( SUBSTR(chs.responces, INSTR(chs.responces, ?) + LENGTH(?) ) ) asc';   for showing without exited
-        'select chs.*,hh.responces as hhResponce from house_hold_children chs INNER join house_hold_responce as hh on hh. HHGUID=chs.HHGUID where SUBSTR( hh.responces,  INSTR( hh.responces, ?) + LENGTH(?), INSTR(SUBSTR( hh.responces, INSTR( hh.responces, ?) + LENGTH(?)), ?) - 1 ) !=? and chs.CHHGUID  not in (select ens.CHHGUID from enrollred_exit_child_responce ens INNER  join house_hold_children as hhChildren on ens.CHHGUID=hhChildren.CHHGUID  ) ORDER BY LOWER( SUBSTR(chs.responces, INSTR(chs.responces, ?) + LENGTH(?) ) ) asc';
+        'select chs.*,hh.responces as hhResponce from house_hold_children chs INNER join house_hold_responce as hh on hh. HHGUID=chs.HHGUID where hh.creche_id =? and SUBSTR( hh.responces,  INSTR( hh.responces, ?) + LENGTH(?), INSTR(SUBSTR( hh.responces, INSTR( hh.responces, ?) + LENGTH(?)), ?) - 1 ) !=? and chs.CHHGUID  not in (select ens.CHHGUID from enrollred_exit_child_responce ens INNER  join house_hold_children as hhChildren on ens.CHHGUID=hhChildren.CHHGUID  ) ORDER BY LOWER( SUBSTR(chs.responces, INSTR(chs.responces, ?) + LENGTH(?) ) ) asc';
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.rawQuery(query, [
+          creche_id,
       '"verification_status":"',
       '"verification_status":"',
       '"verification_status":"',
@@ -333,35 +334,37 @@ class EnrolledExitChilrenResponceHelper {
       '1',
       'child_name":"',
       'child_name":"'
-    ]);
-    result = result
-        .where((element) =>
-            // Global.getItemValues(
-            //         element['hhResponce'], 'verification_status') ==
-            //     "4"
-            //     &&
 
-            (Global.getItemValues(element['hhResponce'], 'village_id') ==
-                villageId.toString()))
-        .toList();
+    ]);
+    // result = result
+    //     .where((element) =>
+    //         // Global.getItemValues(
+    //         //         element['hhResponce'], 'verification_status') ==
+    //         //     "4"
+    //         //     &&
+    //
+    //         (Global.getItemValues(element['hhResponce'], 'village_id') ==
+    //             villageId.toString()))
+    //     .toList();
     return result;
   }
 
   Future<List<Map<String, dynamic>>> getNotEnrollChildrenExited(
-      String villageId) async {
+      String villageId,int creche_id) async {
     var query =
-        'select child.*,hh.responces as hhResponce from house_hold_children child left join house_hold_responce as hh on child.HHGUID=hh.HHGUID where child.CHHGUID in(select CHHGUID from enrollred_exit_child_responce where date_of_exit  NOTNULL  and child.CHHGUID not in(select CHHGUID from enrollred_exit_child_responce  where (date_of_exit isnull or length(RTRIM(LTRIM(date_of_exit))) == 0)) GROUP by CHHGUID) ORDER BY LOWER( SUBSTR(child.responces, INSTR(child.responces, ?) + LENGTH(?) ) ) asc';
+        'select child.*,hh.responces as hhResponce from house_hold_children child left join house_hold_responce as hh on child.HHGUID=hh.HHGUID where child.CHHGUID in(select CHHGUID from enrollred_exit_child_responce where date_of_exit  NOTNULL  and child.CHHGUID not in(select CHHGUID from enrollred_exit_child_responce  where  (date_of_exit isnull or length(RTRIM(LTRIM(date_of_exit))) == 0)) GROUP by CHHGUID)  and  hh.creche_id=? ORDER BY LOWER( SUBSTR(child.responces, INSTR(child.responces, ?) + LENGTH(?) ) ) asc';
     List<Map<String, dynamic>> result =
     await DatabaseHelper.database!.rawQuery(query, [
+      creche_id,
       'child_name":"',
-      'child_name":"'
+      'child_name":"',
     ]);
-    result = result
-        .where((element) =>
-
-    (Global.getItemValues(element['hhResponce'], 'village_id') ==
-        villageId.toString()))
-        .toList();
+    // result = result
+    //     .where((element) =>
+    //
+    // (Global.getItemValues(element['hhResponce'], 'village_id') ==
+    //     villageId.toString()))
+    //     .toList();
     return result;
   }
 

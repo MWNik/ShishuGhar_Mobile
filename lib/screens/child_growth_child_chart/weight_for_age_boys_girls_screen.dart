@@ -17,11 +17,13 @@ import 'line_chart.dart';
 
 class WeightforAgeBoysGirlsScreen extends StatefulWidget {
   final int gender_id;
+  final int crechId;
   final String childenrollguid, childId, childName;
 
   WeightforAgeBoysGirlsScreen(
       {super.key,
       required this.gender_id,
+      required this.crechId,
       required this.childenrollguid,
       required this.childId,
       required this.childName});
@@ -105,7 +107,7 @@ class _WeightforAgeBoysGirlsScreenState
       }).toList());
     });
 
-    childAnthro = await ChildGrowthResponseHelper().allAnthormentry();
+    childAnthro = await ChildGrowthResponseHelper().allAnthormentryOrderBy(widget.crechId);
 
 
     if (childAnthro.isNotEmpty) {
@@ -116,7 +118,11 @@ class _WeightforAgeBoysGirlsScreenState
       anthroResponsesList.forEach((ele) {
         for (var element in ele) {
           for (var ele in element) {
-            children.add(ele);
+            if(ele['do_you_have_height_weight'].toString()=='1'
+                && Global.stringToDouble(ele['weight'].toString())>0
+
+            ){
+            children.add(ele);}
           }
         }
       });
@@ -215,6 +221,7 @@ class _WeightforAgeBoysGirlsScreenState
                 height: MediaQuery.of(context).size.height,
                 child: orientation == Orientation.portrait
                     ? MultiLineChart(
+                  crechId: widget.crechId,
                         childName: widget.childName,
                         childId: widget.childId,
                         coordinatesOne: red_cor!,
@@ -235,6 +242,7 @@ class _WeightforAgeBoysGirlsScreenState
                     : SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: MultiLineChart(
+                          crechId: widget.crechId,
                           childName: widget.childName,
                           childId: widget.childId,
                           childenrollguid: widget.childenrollguid,

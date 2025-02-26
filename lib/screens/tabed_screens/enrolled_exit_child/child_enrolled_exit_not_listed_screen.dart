@@ -24,6 +24,7 @@ import 'enrolled_exit_child_tab.dart';
 class NotEnrolledExitChildrenListedScreen extends StatefulWidget {
   final int crecheId;
   final String village_id;
+
   const NotEnrolledExitChildrenListedScreen(
       {super.key, required this.crecheId, required this.village_id});
 
@@ -119,10 +120,10 @@ class _NotEnrolledChildrenListedScreenState
   Future<void> fetchChildHHDataList() async {
     if (isExited) {
       childHHData = await EnrolledExitChilrenResponceHelper()
-          .getNotEnrollChildrenExited(widget.village_id);
+          .getNotEnrollChildrenExited(widget.village_id,widget.crecheId);
     } else {
       childHHData = await EnrolledExitChilrenResponceHelper()
-          .getNotEnrollChildren(widget.village_id);
+          .getNotEnrollChildren(widget.village_id,widget.crecheId);
     }
 
     childHHData = childHHData.where((element) {
@@ -749,7 +750,7 @@ class _NotEnrolledChildrenListedScreenState
 
   bool isDateInRange(DateTime targetDate) {
     // Get the current date
-    DateTime currentDate = DateTime.now();
+    DateTime currentDate = DateTime.now();      
 
     // Calculate the difference in months
     int differenceInMonths = (currentDate.year - targetDate.year) * 12 +

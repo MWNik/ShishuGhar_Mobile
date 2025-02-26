@@ -14,6 +14,7 @@ class MultiLineChart extends StatefulWidget {
   MultiLineChart({
     super.key,
     required this.childId,
+    required this.crechId,
     required this.childName,
     required this.gender,
     required this.maxY,
@@ -41,6 +42,7 @@ class MultiLineChart extends StatefulWidget {
   String childName;
   String childId;
   final int gender;
+  final int crechId;
 
   @override
   State<MultiLineChart> createState() => _MultiLineChartState();
@@ -97,6 +99,7 @@ class _MultiLineChartState extends State<MultiLineChart> {
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
                               WeightforAgeBoysGirlsScreen(
+                                crechId: widget.crechId,
                                 childId: widget.childId,
                                 gender_id: widget.gender,
                                 childenrollguid: widget.childenrollguid,
@@ -134,6 +137,7 @@ class _MultiLineChartState extends State<MultiLineChart> {
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
                               HeightforAgeBoysGirlsScreen(
+                                crechId: widget.crechId,
                                 childId: widget.childId,
                                 gender_id: widget.gender,
                                 childenrollguid: widget.childenrollguid,
@@ -170,6 +174,7 @@ class _MultiLineChartState extends State<MultiLineChart> {
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
                               WeightToHeightBoysGirlsScreen(
+                                crechId: widget.crechId,
                                 childId: widget.childId,
                                 gender_id: widget.gender,
                                 childenrollguid: widget.childenrollguid,

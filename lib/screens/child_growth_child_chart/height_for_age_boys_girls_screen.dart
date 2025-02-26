@@ -18,12 +18,15 @@ import 'line_chart.dart';
 
 class HeightforAgeBoysGirlsScreen extends StatefulWidget {
   final int gender_id;
+  final int crechId;
+
   final String childenrollguid, childName, childId;
 
   HeightforAgeBoysGirlsScreen(
       {super.key,
       required this.gender_id,
       required this.childId,
+      required this.crechId,
       required this.childName,
       required this.childenrollguid});
 
@@ -108,7 +111,7 @@ class _HeightforAgeBoysGirlsScreenState
       }).toList());
     });
 
-    childAnthro = await ChildGrowthResponseHelper().allAnthormentry();
+    childAnthro = await ChildGrowthResponseHelper().allAnthormentryOrderBy(widget.crechId);
     if (childAnthro.isNotEmpty) {
       anthroResponsesList.add(childAnthro
           .map((ele) => jsonDecode(ele.responces!)['anthropromatic_details'])
@@ -117,7 +120,10 @@ class _HeightforAgeBoysGirlsScreenState
       anthroResponsesList.forEach((ele) {
         for (var element in ele) {
           for (var ele in element) {
-            children.add(ele);
+            if(ele['do_you_have_height_weight'].toString()=='1' &&
+                Global.stringToDouble(ele['height'].toString())>0 ) {
+              children.add(ele);
+            }
           }
         }
       });
@@ -204,13 +210,15 @@ class _HeightforAgeBoysGirlsScreenState
         ),
         body: (child.length == 0)
             ? Center(
-                child: CircularProgressIndicator(),
-              )
+          child: Text(Global.returnTrLable(
+              translats, CustomText.NorecordAvailable, lng)),
+        )
             : SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: orientation == Orientation.portrait
                     ? MultiLineChart(
+                        crechId: widget.crechId,
                         coordinatesOne: red_cor!,
                         child: child!,
                         childName: widget.childName,
@@ -231,6 +239,7 @@ class _HeightforAgeBoysGirlsScreenState
                     : SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: MultiLineChart(
+                          crechId: widget.crechId,
                           childName: widget.childName,
                           childId: widget.childId,
                           childenrollguid: widget.childenrollguid,

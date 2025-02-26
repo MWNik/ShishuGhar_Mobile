@@ -323,6 +323,22 @@ Future<ChildGrowthMetaResponseModel?> callMaxAnthroResponce(
     return items;
   }
 
+  Future<List<ChildGrowthMetaResponseModel>> allAnthormentryOrderBy(int creche_id) async {
+    var query =
+        'Select * from  child_anthormentry_responce where responces NOTNULL and creche_id =? ORDER by measurement_date ';
+
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+      query,[creche_id]
+    );
+
+    List<ChildGrowthMetaResponseModel> items = [];
+    result.forEach((itemMap) {
+      items.add(ChildGrowthMetaResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<ChildGrowthMetaResponseModel>> allAnthormentryDisableOCT() async {
     var query =
         'Select * from  child_anthormentry_responce where responces NOTNULL and measurement_date >=?';

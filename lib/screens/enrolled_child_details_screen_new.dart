@@ -575,6 +575,7 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => WeightforAgeBoysGirlsScreen(
                 childenrollguid: widget.EnrolledChilGUID,
+                crechId: widget.crechId,
                 childId:
                     '${Global.getItemValues(enrolledItem!.responces!, 'child_id')}',
                 childName:

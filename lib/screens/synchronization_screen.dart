@@ -302,7 +302,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                                   false,
                                   context);
                           }
-                        } else if (i == 1) {
+                        }
+                        else if (i == 1) {
                           String refStatus = '';
                           if (role == CustomText.crecheSupervisor) {
                             if (pendindTaskCount > 0) {
@@ -402,7 +403,8 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
                           if (refStatus == 'itemRefresh') {
                             await initializeData();
                           }
-                        } else if (i == 2) {
+                        }
+                        else if (i == 2) {
                           totalApiCount = 5;
                           callMasterData(context);
                         } else if (i == 3) {

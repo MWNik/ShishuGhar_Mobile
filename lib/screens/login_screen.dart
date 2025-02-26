@@ -533,6 +533,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     var secret = loginApiModel.auth!.apiSecret!;
     var token = 'token ' + key + ':' + secret;
 
+    var backDateDataEntry = loginApiModel.auth!.backDateDataEntry!;
+    Validate().saveString(Validate.date, backDateDataEntry);
     List<Mapping> mappingList = loginApiModel.auth!.mapping!;
 
     if (mappingList.isNotEmpty) {
@@ -957,6 +959,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         } else if (selectedlanguages == 'Odiya') {
           Validate().saveString(Validate.sLanguage, 'od');
         }
+
         await initTranslation(translates);
         await initLoginAuth(mContext, loginApiModel, enterdUserName,
             loginApiModel.auth!.username!, passwordcontroller.text.trim());

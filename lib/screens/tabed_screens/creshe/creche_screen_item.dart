@@ -219,7 +219,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
               : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          readable: isOnlyView ? true : null,
+          readable: isOnlyView ? true : logic!.callReadableLogic(myMap, quesItem),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
@@ -238,7 +238,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           calenderValidate: [],
-          readable: isOnlyView ? true : null,
+          readable: isOnlyView ? true : logic!.callReadableLogic(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
             var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
@@ -457,6 +457,8 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         return CustomTimepickerDynamic(
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
+          readable:
+          isOnlyView ? true : logic!.callReadableLogic(myMap, quesItem),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
