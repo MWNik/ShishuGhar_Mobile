@@ -13,6 +13,7 @@ import '../../../model/databasemodel/tabVillage_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
+import '../../../utils/year_month_custom_calender.dart';
 import 'child_growth_expended_form_screen.dart';
 
 class ChildGrowthListingScreen extends StatefulWidget {
@@ -31,6 +32,7 @@ class ChildGrowthListingScreen extends StatefulWidget {
 
 class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
   List<ChildGrowthMetaResponseModel> childHHData = [];
+  List<ChildGrowthMetaResponseModel> anthropometryData = [];
   List<Translation> translats = [];
   List<TabVillage> villages = [];
   String lng = 'en';
@@ -39,6 +41,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
   List<ChildGrowthMetaResponseModel> unsynchedList = [];
   List<ChildGrowthMetaResponseModel> allList = [];
   bool isOnlyUnsynched = false;
+  bool isCalenderView = false;
   String? role;
   DateTime applicableDate = Validate().stringToDate("2024-12-31");
 
@@ -85,13 +88,14 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
   Future<void> fetchEnrolleChild() async {
     childHHData = await ChildGrowthResponseHelper()
         .anthormentryByCreche(widget.creche_nameId);
+    anthropometryData = await ChildGrowthResponseHelper()
+        .anthormentryByCrecheIdAsc(widget.creche_nameId);
     if (childHHData.length > 0)
       await callDatesListAddBackDatedEntryByJadish();
     else
       lastGrowthDate = await fetchEarliestEnnrollDate();
 
-    unsynchedList =
-        childHHData.where((element) => element.is_edited == 1).toList();
+    unsynchedList = childHHData.where((element) => element.is_edited == 1).toList();
     allList = childHHData;
     childHHData = isOnlyUnsynched ? unsynchedList : allList;
     setState(() {});
@@ -104,10 +108,59 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
         text: Global.returnTrLable(translats, CustomText.GrowthMonitoring, lng),
         subTitle: widget.creche_name,
         onTap: () => Navigator.pop(context),
+        actions: [
+          IconButton(onPressed: () async {
+            isCalenderView=isCalenderView?false:true;
+            setState(() {
+
+            });
+          }, icon: Icon(isCalenderView?Icons.list_alt:Icons.calendar_month,color:Colors.white))
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-        child: Column(
+        child: isCalenderView?YearMonthCalendar(
+            initialDate: DateTime.now(),
+            mesures: anthropometryData,
+            onTap: (data) async {
+              var selectedItems=childHHData.where((element) => element.cgmguid == Global.validToString(data)).toList();
+             if(selectedItems.isNotEmpty){
+               var lstDate = await minMaxDate(selectedItems.first.created_at);
+
+               if (callMeasurementEditableDate(
+                   selectedItems.first.created_at!)) {
+                 var refStatus = await Navigator.of(context).push(
+                     MaterialPageRoute(
+                         builder: (BuildContext context) =>
+                             ChildGrowthExpendedFormScreen(
+                               creche_nameId: widget.creche_nameId,
+                               creche_name: widget.creche_name,
+                               cgmguid:
+                               selectedItems.first.cgmguid!,
+                               lastGrowthDate: lstDate,
+                               minGrowthDate: maxGrowthDate,
+                               createdAt:
+                               selectedItems.first.created_at,
+                               isNew:
+                               selectedItems.first.responces !=
+                                   null
+                                   ? true
+                                   : false,
+                             )));
+
+                 if (refStatus == 'itemRefresh') {
+                   await fetchEnrolleChild();
+                 }
+               } else
+                 Validate().singleButtonPopup(
+                     Global.returnTrLable(translats, CustomText.growthMonitoring, lng),
+                     Global.returnTrLable(translats, CustomText.ok, lng),
+                     false,
+                     context);
+             }
+
+            }
+        ):Column(
           // mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(

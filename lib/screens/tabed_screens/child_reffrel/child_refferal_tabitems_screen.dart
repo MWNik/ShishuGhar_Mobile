@@ -976,10 +976,11 @@ class _ChildFollowUpTabItemSCreenState
             visitCount = 3;
           } else if (Global.stringToDouble(
                       growhthDetails['weight_for_height'].toString()) ==
-                  1 ||
-              Global.stringToDouble(
-                      growhthDetails['weight_for_height'].toString()) ==
-                  2) {
+                  1
+              // || Global.stringToDouble(
+              //         growhthDetails['weight_for_height'].toString()) ==
+              //     2
+          ) {
             DateTime folloupDate =
                 followUpGenratedDate!.add(Duration(days: 15));
             await ChildFollowUpTabResponseHelper().autoCreateFollowRecord(

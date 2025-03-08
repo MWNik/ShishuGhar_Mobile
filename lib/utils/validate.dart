@@ -17,10 +17,14 @@ import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/utils/constants.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/secure_storage.dart';
+import 'package:shishughar/utils/year_month_custom_calender.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../custom_widget/single_poup_dailog.dart';
+import '../model/databasemodel/child_attendance_responce_model.dart';
+import '../model/databasemodel/child_growth_responce_model.dart';
+import 'custom_calender.dart';
 
 class Validate {
   static String userName = 'name';
@@ -48,6 +52,7 @@ class Validate {
   static String CrecheIdName = 'CrecheIdName';
   static String CrecheSName = 'CrecheSName';
   static String mobile_no = 'mobile_no';
+
   // static String crecheSelectedItem = 'crecheSelectedItem';
   static String sLanguage = 'sLanguage';
   static String villageIdES = 'villageIdES';
@@ -76,6 +81,7 @@ class Validate {
   static String childFollowUpUpdatedDate = 'childFollowUpUpdatedDate';
   static String childReferralUpdatedDate = 'childReferralUpdatedDate';
   static String crecheCommitteUpdateDate = 'crecheCommitteUpdateDate';
+
   // static String cmcCBMMetaUpdatedate = 'cmcCBMMetaUpdatedate';
   // static String cmcALMMetaUpdatedate = 'cmcALMMetaUpdatedate';
   // static String cmcCCMetaUpdatedate = 'cmcCCMetaUpdatedate';
@@ -664,4 +670,116 @@ class Validate {
       throw 'Could not launch $url';
     }
   }*/
+
+  Future<DateTime?> showAttendeStatusCalender({
+    required BuildContext context,
+    required DateTime initialDate,
+    required List<ChildAttendanceResponceModel> attendece,
+  }) async
+  {
+    final DateTime? picked = await showDialog<DateTime>(
+      context: context,
+      builder: (BuildContext context) {
+        DateTime? tempPickedDate = initialDate;
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: IntrinsicHeight(
+            // padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  height: 400,
+                  child: CustomCalendar(
+                      initialDate: initialDate,
+                      attendece: attendece,
+                      onTap: (data){}
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(tempPickedDate);
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10,)
+              ],
+            ),
+          ),
+        );
+
+      },
+    );
+
+    return picked;
+  }
+
+  Future<DateTime?> showAntoproStatusCalender({
+    required BuildContext context,
+    required DateTime initialDate,
+    required List<ChildGrowthMetaResponseModel> mesures,
+  }) async
+  {
+    final DateTime? picked = await showDialog<DateTime>(
+      context: context,
+      builder: (BuildContext context) {
+        DateTime? tempPickedDate = initialDate;
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: IntrinsicHeight(
+            // padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  height: 400,
+                  child: YearMonthCalendar(
+                      initialDate: initialDate,
+                      mesures: mesures,
+                      onTap: (data){}
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(tempPickedDate);
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10,)
+              ],
+            ),
+          ),
+        );
+
+      },
+    );
+
+    return picked;
+  }
 }

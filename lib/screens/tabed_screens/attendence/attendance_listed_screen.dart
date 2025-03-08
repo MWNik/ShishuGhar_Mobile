@@ -16,6 +16,7 @@ import '../../../model/databasemodel/child_for_attendence_model.dart';
 import '../../../model/databasemodel/tabVillage_model.dart';
 import '../../../model/dynamic_screen_model/enrolled_children_responce_model.dart';
 import '../../../style/styles.dart';
+import '../../../utils/custom_calender.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
 import 'attendance_form_screen_tab.dart';
@@ -48,9 +49,11 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
   DateTime? maxDate;
   DateTime? minDate;
   bool isOnlyUnsynched = false;
+  bool isCalenderView = false;
   String? role;
   DateTime applicableDate = Validate().stringToDate("2024-12-31");
   var now = DateTime.parse(Validate().currentDate());
+
 
   @override
   void initState() {
@@ -173,34 +176,71 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
         text: Global.returnTrLable(translats, CustomText.AttenList, lng),
         subTitle: widget.creche_name,
         onTap: () => Navigator.pop(context),
+        actions: [
+          IconButton(onPressed: () async {
+            isCalenderView=isCalenderView?false:true;
+            setState(() {
+
+            });
+            // var date=await Validate().showAttendeStatusCalender(
+            //   context: context,
+            //   initialDate: DateTime.now(),attendece:childAttendance
+            // );
+          }, icon: Icon(isCalenderView?Icons.list_alt:Icons.calendar_month,color:Colors.white))
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 0.h),
-        child: Column(children: [
-          // Row(
-          //   children: [
-          //     Expanded(
-          //         child: CustomTextFieldRow(
-          //       controller: searchController,
-          //       onChanged: (value) {},
-          //       hintText: 'Search',
-          //       prefixIcon: Image.asset(
-          //         "assets/search.png",
-          //         scale: 2.4,
-          //       ),
-          //     )),
-          //     SizedBox(
-          //       width: 10.w,
-          //     ),
-          //     InkWell(
-          //       onTap: () {},
-          //       child: Image.asset(
-          //         "assets/filter_icon.png",
-          //         scale: 2.4,
-          //       ),
-          //     )
-          //   ],
-          // ),
+        child: isCalenderView?CustomCalendar(
+            initialDate: DateTime.now(),
+            attendece: childAttendance,
+            onTap: (data) async {
+              print('data in $data');
+              if(data!=null) {
+                var selectedItems=childAttendance.where((element) => element.childattenguid == Global.validToString(data)).toList();
+               if(selectedItems.isNotEmpty){
+                 var currentRecordDate = Global.getItemValues(
+                     selectedItems.first.responces,
+                     'date_of_attendance');
+                 if (existingDates.contains(currentRecordDate)) {
+                   existingDates.remove(currentRecordDate);
+                 }
+
+                 var createdAtDate =
+                 DateTime.parse(selectedItems.first.created_at!);
+                 bool isEditable = DateTime(createdAtDate.year,
+                     createdAtDate.month, createdAtDate.day)
+                     .add(Duration(days: 2))
+                     .isAfter(now);
+
+                 String refStatus = '';
+
+                 var lstDate = await callDatesAlredDateList(
+                     Global.getItemValues(
+                         selectedItems.first.responces!,
+                         'date_of_attendance'));
+                 refStatus = await Navigator.of(context).push(
+                     MaterialPageRoute(
+                         builder: (BuildContext context) =>
+                             AddAttendanceScreenFormTab(
+                                 crexhe_name: widget.creche_name,
+                                 creche_nameId: selectedItems.first.creche_id,
+                                 ChildAttenGUID:
+                                 selectedItems.first.childattenguid!,
+                                 lastGrowthDate: lstDate,
+                                 minGrowthDate: minDate,
+                                 existingDates: existingDates,
+                                 isEdit: true)));
+                 if (refStatus == 'itemRefresh') {
+                   await attendeceChildRecord();
+                 }
+               }
+
+
+              }
+            }
+        ):Column(children: [
+
           (role == CustomText.crecheSupervisor)
               ? Padding(
                   padding: EdgeInsets.only(right: 5),

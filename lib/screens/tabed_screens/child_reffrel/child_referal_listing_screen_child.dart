@@ -118,8 +118,8 @@ class _ChildReferralListingScreenState
         if (Global.stringToDouble(
                     element['weight_for_height'].toString()) ==
                 1 ||
-            Global.stringToDouble(element['weight_for_height'].toString()) ==
-                2 ||
+            // Global.stringToDouble(element['weight_for_height'].toString()) ==
+            //     2 ||
             Global.stringToInt(
                     element['any_medical_major_illness'].toString()) ==
                 1 ||
