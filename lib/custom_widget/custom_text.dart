@@ -507,6 +507,21 @@ class CustomText {
   static String shouldExit = "Are you sure want to the exit this screen";
   static String childDobIsNotValidForEnrolled =
       "Child dob is not valid for enrolled.";
+  static String crecheOpeningDateMsg =
+      "Creche opening date not available please contact your admin.";
+  static String crecheOpeningDateNotMatchMsg =
+      "Enrollment date can not be before then creche opening date.";
+  static String crecheOpeningDateAfterDate =
+      "Enrollment can not  be after then after creche closing date";
+  static String crecheClosingDateMsg =
+      "Creche closed enrollment can not be done.";
+
+  static String crecheNotopenBefore =
+      "Enrolment cannot be done before the creche opening date.";
+
+  static String crecheUpdateInHH =
+      "Creche can not be changed as there are active children in the current creche.";
+
   static String freshChild = "Fresh child";
   static String exitedChild = "Exited child";
   static String removedItem = "Removed Item List";

@@ -65,7 +65,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
   int? enName;
   String? role;
   String? date;
-
+  String? crecheOpeningDate;
+  String? crecheClosingDate;
   int _currentIndex = 0;
   List image = [
     'assets/childperson.png',
@@ -478,6 +479,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
       // EnrolledExitChilrenTab.childName = '';
       var refstatus = await Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => EnrolledExitChilrenTab(
+              openingDate:Global.validToString(crecheOpeningDate),
+              closingDate:Global.validToString(crecheClosingDate),
               isEditable: role == CustomText.crecheSupervisor ? isEdit : false,
               CHHGUID: widget.CHHGUID,
               HHGUID: Global.getItemValues(enrolledItem!.responces!, 'hhguid'),
@@ -672,6 +675,12 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
         await OptionsModelHelper().getMstCommonOptions('Gender', lng);
 
     var lngtr = await Validate().readString(Validate.sLanguage);
+    var creches = await CrecheDataHelper().getCrecheResponceItem(widget.crechId);
+    if(creches.length>0){
+      crecheOpeningDate=Global.getItemValues(creches.first.responces, 'creche_opening_date');
+      crecheClosingDate=Global.getItemValues(creches.first.responces, 'creche_closing_date');
+    }
+
     date = await Validate().readString(Validate.date);
     if (lngtr != null) {
       lng = lngtr;

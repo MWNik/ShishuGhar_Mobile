@@ -17,6 +17,7 @@ import '../../../database/helper/district_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/house_hold_children_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
+import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/gram_panchayat_data_helper.dart';
 import '../../../database/helper/house_field_item_helper.dart';
@@ -53,7 +54,8 @@ class AddHouseholdScreenFromTab extends StatefulWidget {
       required this.changeTab,
       required this.tabIndex,
       required this.crecheId,
-      required this.totalTab});
+      required this.totalTab,
+     });
 
   @override
   State<AddHouseholdScreenFromTab> createState() =>
@@ -510,7 +512,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   nextTab(int type) async {
     if (role == 'Creche Supervisor') {
       if (type == 1) {
-        if (checkValidation()) {
+        var checVali=await checkValidation();
+        if (checVali) {
           if (widget.tabIndex < (widget.totalTab - 1)) {
             // myMap['verification_status'] = children__3_years != null
             //     ? (childCount == children__3_years ? '2' : '1')
@@ -571,7 +574,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   nextTabSave(int type) async {
     if (role == 'Creche Supervisor') {
       if (type == 1) {
-        if (checkValidation()) {
+        var checVali=await checkValidation();
+        if (checVali) {
           if (widget.tabIndex < (widget.totalTab - 1)) {
             // myMap['verification_status'] = myMap['verification_status'] == "1";
             if (widget.tabIndex == (widget.totalTab) - 1) {
@@ -620,7 +624,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
     }
   }
 
-  bool checkValidation() {
+  Future<bool> checkValidation() async {
     var validStatus = true;
     var items = widget.screenItem[widget.tabBreakItem.name];
     if (items != null) {
@@ -660,14 +664,35 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         //   validStatus = false;
         //   break;
         // }
+      };
+      var crechees=items.where((element) => element.fieldname=='creche_id').toList();
+      if(myMap['creche_id']!=null&&crechees.length>0) {
+        if(widget.crecheId!=Global.stringToInt(myMap['creche_id'].toString())){
+          validStatus = await checkValidCrech();
+        }
+
       }
-      ;
     } else {
       print("selected items is null");
+
     }
 
     return validStatus;
   }
+
+  Future<bool> checkValidCrech() async {
+   bool validStatus = true;
+   var childCount =await EnrolledExitChilrenResponceHelper().enrolledChildCountByHHGUID(widget.hhGuid,widget.crecheId);
+
+    if(childCount.length>0){
+      validStatus=false;
+      Validate()
+          .singleButtonPopup( Global.returnTrLable(translats,
+          CustomText.crecheUpdateInHH, lng), Global.returnTrLable(translats, CustomText.ok, lng), false, context);
+    }
+    return validStatus;
+  }
+
 
   Future<void> saveDataInData() async {
     var widgets = widget.screenItem[widget.tabBreakItem.name];
@@ -833,7 +858,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       CustomText.PleaseSelectBeforTimeInIsValidTime,
       CustomText.plsFilManForm,
       CustomText.wesUsageGraterQuatOpen,
-      CustomText.leavingLesThanjoining
+      CustomText.leavingLesThanjoining,
+      CustomText.crecheUpdateInHH
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -988,4 +1014,22 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
     });
     return crecheOptionsList;
   }
+
+  // bool crechedOpeningDate(String enrollmenDate) {
+  //   DateTime? openningDate = Global.stringToDate(widget.openingDate);
+  //   DateTime? dateOfEnrole = Global.stringToDate(enrollmenDate);
+  //   if (openningDate != null&&dateOfEnrole != null) {
+  //     return dateOfEnrole.isAfter(openningDate) ||
+  //         openningDate.isAtSameMomentAs(dateOfEnrole);
+  //   } else
+  //     return false;
+  // }
+  // bool crechedClosingDate(String enrollmenDate) {
+  //   DateTime? closingDate = Global.stringToDate(widget.closingDate);
+  //   DateTime? dateOfEnrole = Global.stringToDate(enrollmenDate);
+  //   if (closingDate != null&&dateOfEnrole != null) {
+  //     return closingDate.isAfter(dateOfEnrole);
+  //   } else
+  //     return true;
+  // }
 }

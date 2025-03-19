@@ -244,6 +244,9 @@ class _ChildGrowthExpendedFormState
             .enrolledChildByEnrolledGUID(
             selectedChildItems, widget.creche_nameId);
         filterdData = enrolledChild;
+
+
+
       }
     }
 
@@ -429,7 +432,7 @@ class _ChildGrowthExpendedFormState
           ));
         }
         if (!isvible) {
-          cWidgetDatamap.remove(inputItem[i].fieldname);
+          inputItem[i].fieldname=='height'?'':cWidgetDatamap.remove(inputItem[i].fieldname);
         }
       }
     }
@@ -445,7 +448,7 @@ class _ChildGrowthExpendedFormState
         element.fieldname == 'height_for_age')
         .toList();
     List<Widget> screenItems = [];
-    if (inputItem.length > 0) {
+    if (inputItem.length > 0 && cWidgetDatamap['do_you_have_height_weight'].toString()== '1') {
       for (int i = 0; i < inputItem.length; i++) {
         var isvible = logic!.callDependingLogic(cWidgetDatamap, inputItem[i]);
         int colorD = DependingLogic.AutoColorCreateByHeightWight(
@@ -911,14 +914,16 @@ class _ChildGrowthExpendedFormState
           item['chhguid'] = element.CHHGUID;
           item['child_id'] = element.name;
           item['cgmguid'] = widget.cgmguid;
-          if (((Global.stringToInt(
-              item['do_you_have_height_weight'].toString()) !=
-              1) ||
-              item['measurement_equipment'] == null ||
-              item['weight'] == null &&
-              item['height'] == null)&&
-              isMesurement(myMap[measurement_date!.fieldname])
-          ) {
+          // if (((Global.stringToInt(
+          //     item['do_you_have_height_weight'].toString()) !=
+          //     1) ||
+          //     item['measurement_equipment'] == null ||
+          //     item['weight'] == null &&
+          //     item['height'] == null)&&
+          //     isMesurement(myMap[measurement_date!.fieldname])
+          // )
+          if ( item['do_you_have_height_weight'].toString()!= '1')
+          {
             item.remove('weight_for_age');
             item.remove('height_for_age');
             item.remove('weight_for_height');
@@ -1812,6 +1817,39 @@ class _ChildGrowthExpendedFormState
           } else {
             myMap['created_by'] = userName;
             myMap['created_on'] = Validate().currentDateTime();
+          }
+
+          ChildGrowthMetaResponseModel? lastItem=await ChildGrowthResponseHelper().callMaxAnthroResponce(widget.creche_nameId,alredRecord.first.measurement_date!);
+
+          if(Global.validString(lastItem?.responces)) {
+            Map<String, dynamic> lastRecordResponce = jsonDecode(lastItem!.responces!);
+            var lastRecordChild = lastRecordResponce['anthropromatic_details'];
+            if (lastRecordChild != null && childs != null ) {
+              List<Map<String, dynamic>> lastRecordschildren = List<Map<String, dynamic>>.from(lastRecordResponce['anthropromatic_details']);
+              lastRecordschildren.forEach((itemMap) {
+                var filterItem = enrolledChild.where((element) {return element.ChildEnrollGUID == itemMap['childenrollguid'];});
+                if (filterItem.length > 0) {
+                  var childEnrolleGUID=filterItem.first.ChildEnrollGUID;
+                  var currentChildRecord = childs.where((element) {return element['childenrollguid'] == childEnrolleGUID;});
+                  if(currentChildRecord.length>0) {
+                    Map<String, dynamic> childItem = attepmtChild[childEnrolleGUID!]??{};
+                    if (Global.validString(childEnrolleGUID) && childItem.isNotEmpty) {
+                      if (itemMap['do_you_have_height_weight'].toString() ==
+                          '1' && Global.stringToDouble(
+                          currentChildRecord.first['height'].toString()) < 1) {
+
+                        itemMap.forEach((key, value) {
+                          if (key == 'height') {
+                            childItem[key] = value;
+                          }
+                        });
+                        attepmtChild[childEnrolleGUID] = childItem;
+                      }
+                    }
+                  }
+                }
+              });
+            }
           }
         }
         countMesuredChildren();

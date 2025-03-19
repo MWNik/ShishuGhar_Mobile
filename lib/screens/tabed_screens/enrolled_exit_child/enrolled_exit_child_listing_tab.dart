@@ -4,6 +4,7 @@ import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/utils/validate.dart';
 
+import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import 'child_enrolled_exit_not_listed_screen.dart';
@@ -13,10 +14,12 @@ class EnrolledExitChildListingTab extends StatefulWidget {
   final int creCheId;
   final String village_id;
 
+
   const EnrolledExitChildListingTab({
     super.key,
     required this.creCheId,
     required this.village_id,
+
   });
 
   @override
@@ -31,6 +34,8 @@ class _EnrolledChildrenListingTabState
   String lng = "en";
   List<Translation> labelControlls = [];
   String? role;
+  String? crecheOpeningDate;
+  String? crecheClosingDate;
   int tabCount = 2;
 
   @override
@@ -167,10 +172,12 @@ class _EnrolledChildrenListingTabState
     for (int i = 0; i < tabCount; i++) {
       if (i == 1) {
         tabItem.add(NotEnrolledExitChildrenListedScreen(
-            crecheId: widget.creCheId, village_id: widget.village_id));
+            crecheId: widget.creCheId, village_id: widget.village_id,
+        ));
       } else
         tabItem
-            .add(EnrolledExitChildrenListedScreen(crecheId: widget.creCheId));
+            .add(EnrolledExitChildrenListedScreen(crecheId: widget.creCheId,
+        ));
     }
     return tabItem;
   }
@@ -199,6 +206,7 @@ class _EnrolledChildrenListingTabState
     await TranslationDataHelper()
         .callTranslateString(valueNames)
         .then((value) => labelControlls = value);
+
     tabController();
   }
 }

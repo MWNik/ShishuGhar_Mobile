@@ -1005,7 +1005,8 @@ class _ChildFollowUpTabItemSCreenState
                 widget.creche_id,
                 userName);
             visitCount = 2;
-          } else if (Global.stringToDouble(
+          }
+          else if (Global.stringToDouble(
                   growhthDetails['weight_for_age'].toString()) ==
               1) {
             //SUW  weight_for_age  red

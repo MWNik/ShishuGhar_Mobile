@@ -32,6 +32,8 @@ class EnrolledExitChilrenTab extends StatefulWidget {
   final bool isEditable;
   String? minDate;
   String? childId;
+  final String openingDate;
+  final String closingDate;
 
   EnrolledExitChilrenTab(
       {super.key,
@@ -43,6 +45,8 @@ class EnrolledExitChilrenTab extends StatefulWidget {
       required this.isNew,
       required this.isImageUpdate,
       required this.isEditable,
+      required this.openingDate,
+      required this.closingDate,
       this.minDate,
       this.childId});
 
@@ -221,6 +225,8 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
           screenType: 'Child Enrollment and Exit',
           totalTab: tabBreakItems.length,
           isUploaded: isUploaded,
+          openingDate: widget.openingDate,
+          closingDate: widget.closingDate,
         ));
       }
     }

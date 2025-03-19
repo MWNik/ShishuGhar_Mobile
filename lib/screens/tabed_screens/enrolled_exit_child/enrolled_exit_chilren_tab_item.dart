@@ -35,6 +35,7 @@ import '../../../model/apimodel/tabWeight_for_age_Girls _model.dart';
 import '../../../model/apimodel/tabWeight_to_Height_Boys_model.dart';
 import '../../../model/apimodel/tabWeight_to_Height_Girls_model.dart';
 import '../../../model/databasemodel/tab_image_file_model.dart';
+import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
@@ -57,6 +58,8 @@ class EnrolledExitChildTabItem extends StatefulWidget {
   String? minDate;
   final bool isForExit;
   final String screenType;
+  final String openingDate;
+  final String closingDate;
   int? isUploaded;
 
   EnrolledExitChildTabItem(
@@ -76,7 +79,10 @@ class EnrolledExitChildTabItem extends StatefulWidget {
       required this.screenType,
       this.minDate,
       this.isUploaded,
-      required this.isForExit});
+      required this.isForExit,
+      required this.openingDate,
+      required this.closingDate
+      });
 
   @override
   _EnrolledChilrenTabItemState createState() => _EnrolledChilrenTabItemState();
@@ -110,6 +116,12 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
   List<String> redableItemsFloat = [
     'height',
     'weight',
+  ];
+
+  List<String> colorIndicatorForMeasure = [
+    'weight_for_age',
+    'weight_for_height',
+    'height_for_age',
   ];
   // int? isUploaded = 0;
   Map<String, FocusNode> _focusNode = {};
@@ -175,7 +187,11 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
       CustomText.PleaseSelectBeforTimeInIsValidTime,
       CustomText.plsFilManForm,
       CustomText.wesUsageGraterQuatOpen,
-      CustomText.leavingLesThanjoining
+      CustomText.leavingLesThanjoining,
+      CustomText.crecheOpeningDateMsg,
+      CustomText.crecheOpeningDateNotMatchMsg,
+      CustomText.crecheOpeningDateAfterDate,
+      CustomText.crecheClosingDateMsg,
     ];
     List<HouseHoldFielItemdModel> items =
         widget.screenItem[widget.tabBreakItem.name!]!;
@@ -482,6 +498,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     List<Widget> screenItems = [];
     var items = widget.screenItem[itemId];
     if (items != null) {
+      // items=items.where((element) => !colorIndicatorForMeasure.contains(element.fieldname)).toList();
       for (int i = 0; i < items.length; i++) {
         screenItems.add(widgetTypeWidget(i, items[i]));
         screenItems.add(SizedBox(height: 5.h));
@@ -792,11 +809,12 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           },
         );
       case 'Float':
-        return DynamicCustomTextFieldFloat(
+        if(!colorIndicatorForMeasure.contains(quesItem.fieldname))
+          return DynamicCustomTextFieldFloat(
           hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           focusNode: _focusNode[quesItem.fieldname],
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd,
           maxlength: quesItem.length,
@@ -804,13 +822,13 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           initialvalue: myMap[quesItem.fieldname!],
           readable: widget.isEditable == true
               ? (quesItem.fieldname == 'height' ||
-                      quesItem.fieldname == 'weight'
-                  ? (widget.isForExit
-                      ? (redableItemsFloat.contains(quesItem.fieldname)
-                          ? true
-                          : false)
-                      : shouldEditMesure)
-                  : logic!.callReadableLogic(myMap, quesItem))
+              quesItem.fieldname == 'weight'
+              ? (widget.isForExit
+              ? (redableItemsFloat.contains(quesItem.fieldname)
+              ? true
+              : false)
+              : shouldEditMesure)
+              : logic!.callReadableLogic(myMap, quesItem))
               : true,
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
@@ -829,6 +847,23 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
             }
           },
         );
+        else if(quesItem.fieldname=='weight_for_age' && myMap['measurement_taken'].toString()=='1'){
+          return Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Color(0xffE0E0E0)),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Row(
+              mainAxisAlignment:
+              MainAxisAlignment.spaceBetween,
+              children: cWidgetRadiomColorPop(),
+            ),
+          );
+        }
+        else return SizedBox();
+
       case 'Attach':
         return CustomImageDynamic(
           child_guid: widget.EnrolledChilGUID,
@@ -1101,8 +1136,21 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           validStatus = false;
           break;
         }
+      };
+      if(!crechedOpeningDate(myMap['date_of_enrollment'])){
+        validStatus = false;
+        Validate()
+            .singleButtonPopup( Global.validString(widget.openingDate)?
+        Global.returnTrLable(translats,
+            CustomText.crecheOpeningDateNotMatchMsg, lng):Global.returnTrLable(translats,
+            CustomText.crecheOpeningDateMsg, lng), Global.returnTrLable(translats, CustomText.ok, lng), false, context);
       }
-      ;
+      if(!crechedClosingDate(myMap['date_of_enrollment'])){
+        Validate()
+            .singleButtonPopup(Global.returnTrLable(translats,
+            CustomText.crecheClosingDateMsg, lng), Global.returnTrLable(translats, CustomText.ok, lng), false, context);
+        validStatus = false;
+      }
     } else {
       print("selected items is null");
     }
@@ -1174,7 +1222,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         if (date_of_enrollment
             .add(Duration(days: 30))
             .isBefore(DateTime.parse(Validate().currentDate()))) {
-          shouldEditMesure = true;
+          // shouldEditMesure = true;
         }
       }
     } else {
@@ -1256,5 +1304,91 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     } else {
       await ImageFileTabHelper().updateImageOnlyItem(items);
     }
+  }
+
+  bool crechedOpeningDate(String enrollmenDate) {
+    DateTime? openningDate = Global.stringToDate(widget.openingDate);
+    DateTime? dateOfEnrole = Global.stringToDate(enrollmenDate);
+    if (openningDate != null&&dateOfEnrole != null) {
+      return dateOfEnrole.isAfter(openningDate) ||
+          openningDate.isAtSameMomentAs(dateOfEnrole);
+    } else
+      return false;
+  }
+  bool crechedClosingDate(String enrollmenDate) {
+    DateTime? closingDate = Global.stringToDate(widget.closingDate);
+    DateTime? dateOfEnrole = Global.stringToDate(enrollmenDate);
+    if (closingDate != null&&dateOfEnrole != null) {
+      return closingDate.isAfter(dateOfEnrole);
+    } else
+      return true;
+  }
+
+  List<Widget> cWidgetRadiomColorPop() {
+    List<Widget> screenItems = [];
+    var enrolleDate = Validate().stringToDateNull(myMap['date_of_enrollment']);
+    var childDob = Validate().stringToDateNull(myMap['child_dob']);
+    var items = widget.screenItem[widget.tabBreakItem.name!];
+    if (items != null&&enrolleDate!=null&&childDob!=null&&myMap['gender_id']!=null) {
+      var calucalteDate =
+      Validate().calculateAgeInDaysEx(childDob, enrolleDate);
+      myMap['age_months'] = calucalteDate;
+      items=items.where((element) => colorIndicatorForMeasure.contains(element.fieldname)).toList();
+      for (int i = 0; i < items.length; i++) {
+        int colorD = DependingLogic.AutoColorCreateByHeightWight(
+            tabHeightforageBoys,
+            tHeightforageGirls,
+            tabWeightforageBoys,
+            tabWeightforageGirls,
+            tabWeightToHeightBoys,
+            tabWeightToHeightGirls,
+            items[i].fieldname!,
+            myMap['gender_id'],
+            myMap);
+
+        Color itemC = Color(0xffAAAAAA);
+        String colorName = '';
+        if (colorD == 0) {
+          itemC = Color(0xffAAAAAA);
+          colorName = '';
+        } else if (colorD == 1) {
+          itemC = Color(0xffF35858);
+          colorName =
+          '(${Global.returnTrLable(translats, CustomText.Severe, lng)})';
+        } else if (colorD == 2) {
+          itemC = Color(0xffF4B81D);
+          colorName =
+          '(${Global.returnTrLable(translats, CustomText.Moderate, lng)})';
+        } else if (colorD == 3) {
+          itemC = Color(0xff8BF649);
+          colorName =
+          '(${Global.returnTrLable(translats, CustomText.Normal, lng)})';
+        }
+        myMap[items[i].fieldname!] = colorD;
+          screenItems.add(Column(
+            children: [
+              Container(
+                height: 25,
+                width: 25,
+                decoration: BoxDecoration(
+                  color: itemC,
+                  borderRadius: BorderRadius.circular(5.r),
+                ),
+              ),
+              Text(
+                Global.returnTrLable(
+                    translats, items[i].label!.trim(), lng),
+                style: Styles.black85,
+                strutStyle: StrutStyle(height: 1.2),
+              ),
+              Text(
+                colorName,
+                style: Styles.black12700,
+              ),
+            ],
+          ));
+      }
+    }
+    return screenItems;
   }
 }

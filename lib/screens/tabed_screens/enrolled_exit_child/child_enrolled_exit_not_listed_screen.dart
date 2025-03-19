@@ -14,6 +14,7 @@ import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/custom_textfield.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
+import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../database/helper/village_data_helper.dart';
@@ -26,7 +27,10 @@ class NotEnrolledExitChildrenListedScreen extends StatefulWidget {
   final String village_id;
 
   const NotEnrolledExitChildrenListedScreen(
-      {super.key, required this.crecheId, required this.village_id});
+      {super.key,
+      required this.crecheId,
+      required this.village_id,
+      });
 
   @override
   _NotEnrolledChildrenListedScreenState createState() =>
@@ -45,6 +49,8 @@ class _NotEnrolledChildrenListedScreenState
   String? selectedVillage;
   List<OptionsModel> villageList = [];
   String? selectedItem;
+  String? crecheOpeningDate;
+  String? crecheClosingDate;
 
   bool isDropdownActivated = false;
   int? ageLimit;
@@ -70,6 +76,11 @@ class _NotEnrolledChildrenListedScreenState
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
       lng = lngtr;
+    }
+    var creches = await CrecheDataHelper().getCrecheResponceItem(widget.crecheId);
+    if(creches.length>0){
+      crecheOpeningDate=Global.getItemValues(creches.first.responces, 'creche_opening_date');
+      crecheClosingDate=Global.getItemValues(creches.first.responces, 'creche_closing_date');
     }
     role = (await Validate().readString(Validate.role))!;
     genderList = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
@@ -100,11 +111,18 @@ class _NotEnrolledChildrenListedScreenState
       CustomText.clear,
       CustomText.Gender,
       CustomText.childDobIsNotValidForEnrolled,
-      CustomText.ok
+      CustomText.ok,
+      CustomText.crecheOpeningDateMsg,
+      CustomText.crecheOpeningDateNotMatchMsg,
+      CustomText.crecheOpeningDateAfterDate,
+      CustomText.crecheClosingDateMsg,
+      CustomText.crecheNotopenBefore,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
+
+
     villageValue();
     fetchChildHHDataList();
     setState(() {});
@@ -120,10 +138,10 @@ class _NotEnrolledChildrenListedScreenState
   Future<void> fetchChildHHDataList() async {
     if (isExited) {
       childHHData = await EnrolledExitChilrenResponceHelper()
-          .getNotEnrollChildrenExited(widget.village_id,widget.crecheId);
+          .getNotEnrollChildrenExited(widget.village_id, widget.crecheId);
     } else {
       childHHData = await EnrolledExitChilrenResponceHelper()
-          .getNotEnrollChildren(widget.village_id,widget.crecheId);
+          .getNotEnrollChildren(widget.village_id, widget.crecheId);
     }
 
     childHHData = childHHData.where((element) {
@@ -141,31 +159,6 @@ class _NotEnrolledChildrenListedScreenState
 
     setState(() {});
   }
-
-  // filteredGetData(BuildContext context) async {
-  //   if (selectedItem != null && ageLimit != null) {
-  //     filterData = childHHData.where((element) {
-  //       var ViItem = Global.getItemValues(element['responces'], 'gender_id');
-  //       var ageItem =
-  //       int.parse(Global.getItemValues(element['responces'], 'child_age'));
-  //       return ViItem == selectedItem && ageItem <= ageLimit! + 1;
-  //     }).toList();
-  //   } else if (selectedItem != null && ageLimit == null) {
-  //     filterData = childHHData.where((element) {
-  //       var ViItem = Global.getItemValues(element['responces'], 'gender_id');
-  //       return ViItem == selectedItem;
-  //     }).toList();
-  //   } else if (ageLimit != null && selectedItem == null) {
-  //     filterData = childHHData.where((element) {
-  //       var ageItem =
-  //       int.parse(Global.getItemValues(element['responces'], 'child_age'));
-  //       return ageItem <= ageLimit! + 1;
-  //     }).toList();
-  //   } else {
-  //     filterData = childHHData;
-  //   }
-  //   setState(() {});
-  // }
 
   filteredGetData(BuildContext context) async {
     var filteredList = isOnlyUnsynched ? unsynchedList : allList;
@@ -462,55 +455,83 @@ class _NotEnrolledChildrenListedScreenState
                       return GestureDetector(
                         onTap: () async {
                           if (role == CustomText.crecheSupervisor) {
-                            String refStatus = '';
-                            String enrolledChildGuid = '';
-                            if (isDateInRange(Validate().stringToDate(
-                                Global.getItemValues(
-                                    selectedItem['responces'], 'child_dob')))) {
-                              String? minDate = await callDateOfExit(
-                                  Global.getItemValues(
-                                      selectedItem['responces'], 'hhcguid'));
-                              if (!Global.validString(enrolledChildGuid)) {
-                                enrolledChildGuid = Validate().randomGuid();
-                                EnrolledExitChilrenTab.childName =
+                            if (crechedOpeningDate()) {
+                              if (crechedCloseDate()) {
+                                String refStatus = '';
+                                String enrolledChildGuid = '';
+                                if (isDateInRange(Validate().stringToDate(
                                     Global.getItemValues(
                                         selectedItem['responces'],
-                                        'child_name');
-                                refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        EnrolledExitChilrenTab(
-                                            isEditable: role ==
-                                                    CustomText.crecheSupervisor
-                                                        .trim()
-                                                ? true
-                                                : false,
-                                            CHHGUID: Global.getItemValues(
-                                                selectedItem['responces'],
-                                                'hhcguid'),
-                                            HHGUID: Global.getItemValues(
-                                                selectedItem['hhResponce'],
-                                                'hhguid'),
-                                            HHname: Global.stringToInt(
-                                                selectedItem['name'].toString()),
-                                            EnrolledChilGUID: enrolledChildGuid,
-                                            crecheId: widget.crecheId,
-                                            minDate: minDate,
-                                            isNew: 0,
-                                            isImageUpdate: false)));
+                                        'child_dob')))) {
+                                  String? minDate = await callDateOfExit(
+                                      Global.getItemValues(
+                                          selectedItem['responces'],
+                                          'hhcguid'));
+                                  if (!Global.validString(enrolledChildGuid)) {
+                                    enrolledChildGuid = Validate().randomGuid();
+                                    EnrolledExitChilrenTab.childName =
+                                        Global.getItemValues(
+                                            selectedItem['responces'],
+                                            'child_name');
+                                    refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            EnrolledExitChilrenTab(
+                                                openingDate: Global.validToString(crecheOpeningDate),
+                                                closingDate: Global.validToString(crecheClosingDate),
+                                                isEditable: role ==
+                                                        CustomText.crecheSupervisor
+                                                            .trim()
+                                                    ? true
+                                                    : false,
+                                                CHHGUID: Global.getItemValues(
+                                                    selectedItem['responces'],
+                                                    'hhcguid'),
+                                                HHGUID: Global.getItemValues(
+                                                    selectedItem['hhResponce'],
+                                                    'hhguid'),
+                                                HHname: Global.stringToInt(
+                                                    selectedItem['name'].toString()),
+                                                EnrolledChilGUID: enrolledChildGuid,
+                                                crecheId: widget.crecheId,
+                                                minDate: minDate,
+                                                isNew: 0,
+                                                isImageUpdate: false)));
+                                  }
+                                  if (refStatus == 'itemRefresh') {
+                                    await fetchChildHHDataList();
+                                  }
+                                } else
+                                  Validate().singleButtonPopup(
+                                      Global.returnTrLable(
+                                          translats,
+                                          CustomText
+                                              .childDobIsNotValidForEnrolled,
+                                          lng),
+                                      Global.returnTrLable(
+                                          translats, CustomText.ok, lng),
+                                      false,
+                                      context);
                               }
-                              if (refStatus == 'itemRefresh') {
-                                await fetchChildHHDataList();
+                              else {
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(translats,
+                                        CustomText.crecheClosingDateMsg, lng),
+                                    Global.returnTrLable(
+                                        translats, CustomText.ok, lng),
+                                    false,
+                                    context);
                               }
-                            } else
+                            }
+                            else {
                               Validate().singleButtonPopup(
-                                  Global.returnTrLable(
-                                      translats,
-                                      CustomText.childDobIsNotValidForEnrolled,
-                                      lng),
+                                  Global.validString(crecheOpeningDate)?Global.returnTrLable(translats,
+                                      CustomText.crecheNotopenBefore, lng):Global.returnTrLable(translats,
+                                      CustomText.crecheOpeningDateMsg, lng),
                                   Global.returnTrLable(
                                       translats, CustomText.ok, lng),
                                   false,
                                   context);
+                            }
                           }
                         },
                         child: Padding(
@@ -750,7 +771,7 @@ class _NotEnrolledChildrenListedScreenState
 
   bool isDateInRange(DateTime targetDate) {
     // Get the current date
-    DateTime currentDate = DateTime.now();      
+    DateTime currentDate = DateTime.now();
 
     // Calculate the difference in months
     int differenceInMonths = (currentDate.year - targetDate.year) * 12 +
@@ -759,5 +780,22 @@ class _NotEnrolledChildrenListedScreenState
 
     // Check if the difference is between 6 and 36 months
     return differenceInMonths >= 6 && differenceInMonths <= 36;
+  }
+
+  bool crechedCloseDate() {
+    DateTime? closingDate = Global.stringToDate(crecheClosingDate);
+    if (closingDate != null) {
+      return closingDate.isAfter(DateTime.now()) ||
+          closingDate.isAtSameMomentAs(DateTime.now());
+    } else
+      return true;
+  }
+
+  bool crechedOpeningDate() {
+    DateTime? openningDate = Global.stringToDate(crecheOpeningDate);
+    if (openningDate != null) {
+      return DateTime.now().isAfter(openningDate) ||
+          openningDate.isAtSameMomentAs(DateTime.now());
+    } else return false;
   }
 }

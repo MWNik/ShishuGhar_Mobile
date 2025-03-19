@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
-
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/validate.dart';
 import '../../../custom_widget/custom_text.dart';
@@ -23,7 +22,6 @@ import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/house_field_item_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
-import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';

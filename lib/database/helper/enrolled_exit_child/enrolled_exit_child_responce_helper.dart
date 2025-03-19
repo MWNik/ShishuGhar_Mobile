@@ -787,6 +787,28 @@ class EnrolledExitChilrenResponceHelper {
     }
   }
 
+  Future<List<EnrolledExitChildResponceModel>> enrolledChildCountByHHGUID(String HHGUID, int creche_id) async {
+    String query = '''
+    SELECT * 
+    FROM enrollred_exit_child_responce  
+    WHERE CHHGUID IN (
+        SELECT CHHGUID FROM house_hold_children WHERE HHGUID = ?
+    ) 
+    AND (date_of_exit IS NULL OR length(RTRIM(LTRIM(date_of_exit))) == 0)
+    AND creche_id = ?
+  ''';
+
+    List<Map<String, dynamic>> result = await await DatabaseHelper.database!
+        .rawQuery(query, [HHGUID,creche_id]);
+
+    List<EnrolledExitChildResponceModel> items = [];
+    result.forEach((itemMap) {
+      items.add(EnrolledExitChildResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<EnrolledExitChildResponceModel>>
       enrolledChildByCrecheWithDateOfExit(
           int crecheIdName, String attendeceDate) async {

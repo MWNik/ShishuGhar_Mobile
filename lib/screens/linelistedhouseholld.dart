@@ -27,6 +27,7 @@ import '../custom_widget/custom_textfield.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.dart';
 import '../custom_widget/single_poup_dailog.dart';
 import '../database/helper/block_data_helper.dart';
+import '../database/helper/creche_helper/creche_data_helper.dart';
 import '../database/helper/district_data_helper.dart';
 import '../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../database/helper/gram_panchayat_data_helper.dart';
@@ -91,7 +92,8 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
   List<int> blockIdList = [];
   List<int> panchayatIdList = [];
   List<int> villageIdList = [];
-
+  String? crecheOpeningDate;
+  String? crecheClosingDate;
   String GeneralFilter = 'General Filter';
 
   String? _selectedItem;
@@ -238,6 +240,11 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
     calEndDate = Global.initCurrentDate();
     var panchayatId = await Validate().readInt(Validate.panchayatId);
     role = await Validate().readString(Validate.role);
+    var creches = await CrecheDataHelper().getCrecheResponceItem(widget.crecheId);
+    if(creches.length>0){
+      crecheOpeningDate=Global.getItemValues(creches.first.responces, 'creche_opening_date');
+      crecheClosingDate=Global.getItemValues(creches.first.responces, 'creche_closing_date');
+    }
     filterData.clear();
     hhdata.clear();
     var allData = await HouseHoldTabResponceHelper()
@@ -299,7 +306,28 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
         floatingActionButton: (role == 'Creche Supervisor')
             ? InkWell(
                 onTap: () async {
-                  _showConsentDialog(context);
+                  // if (crechedOpeningDate()) {
+                  //   if(crechedCloseDate()) {
+                      _showConsentDialog(context);
+                  //   }else{
+                  //     Validate().singleButtonPopup(
+                  //         Global.returnTrLable(hhlistingControlls,
+                  //             CustomText.crecheClosingDateMsg, lng!),
+                  //         Global.returnTrLable(
+                  //             hhlistingControlls, CustomText.ok, lng!),
+                  //         false,
+                  //         context);
+                  //   }
+                  // }else{
+                  //   Validate().singleButtonPopup(
+                  //       Global.validString(crecheOpeningDate)?Global.returnTrLable(hhlistingControlls,
+                  //           CustomText.crecheOpeningDateAfterDateForHH, lng!):Global.returnTrLable(hhlistingControlls,
+                  //           CustomText.crecheOpeningDateMsg, lng!),
+                  //       Global.returnTrLable(
+                  //           hhlistingControlls, CustomText.ok, lng!),
+                  //       false,
+                  //       context);
+                  // }
                 },
                 child: Image.asset(
                   "assets/add_btn.png",
@@ -1500,7 +1528,9 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
       CustomText.clear,
       CustomText.Cancel,
       CustomText.areSureToDelete,
-      CustomText.delete
+      CustomText.delete,
+      CustomText.crecheOpeningDateMsg,
+      CustomText.crecheClosingDateMsg,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -1785,5 +1815,21 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
         );
       },
     );
+  }
+  bool crechedCloseDate() {
+    DateTime? closingDate = Global.stringToDate(crecheClosingDate);
+    if (closingDate != null) {
+      return closingDate.isAfter(DateTime.now()) ||
+          closingDate.isAtSameMomentAs(DateTime.now());
+    } else
+      return true;
+  }
+
+  bool crechedOpeningDate() {
+    DateTime? openningDate = Global.stringToDate(crecheOpeningDate);
+    if (openningDate != null) {
+      return DateTime.now().isAfter(openningDate) ||
+          openningDate.isAtSameMomentAs(DateTime.now());
+    } else return false;
   }
 }

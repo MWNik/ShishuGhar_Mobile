@@ -70,12 +70,29 @@ class _CustomCalendarState extends State<YearMonthCalendar> {
         var attendenceDate = Global.stringToDate(item.measurement_date);
         if (attendenceDate != null) {
           return (attendenceDate.year == date.year &&
-              attendenceDate.month == date.month);
+              attendenceDate.month == date.month && item.is_uploaded==1);
         }else return false;
       }).toList();
 
       bool isAttendece=attendeDateEs.isNotEmpty?true:false;
       selectGuid=attendeDateEs.isNotEmpty?attendeDateEs.first.cgmguid:null;
+
+      bool isAttendeceDraft=false;
+      if(!Global.validString(selectGuid)){
+        var attendeDateDraft= widget.mesures.where((item) {
+          var attendenceDate = Global.stringToDate(item.measurement_date);
+          if (attendenceDate != null) {
+            return (attendenceDate.year == date.year &&
+                attendenceDate.month == date.month && item.is_uploaded==0);
+          }else return false;
+        }).toList();
+
+         isAttendeceDraft=attendeDateDraft.isNotEmpty?true:false;
+        selectGuid=attendeDateDraft.isNotEmpty?attendeDateDraft.first.cgmguid:null;
+      }
+
+
+
 
       return GestureDetector(
         onTap: () => widget.onTap(selectGuid),
@@ -84,7 +101,7 @@ class _CustomCalendarState extends State<YearMonthCalendar> {
           margin: const EdgeInsets.all(4.0),
           decoration: BoxDecoration(
             color:isAttendece
-                ? Colors.green
+                ? Colors.green:isAttendeceDraft?Colors.red
                 : (isFuture ? Colors.grey[300] : Colors.white),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey, width: 0.5),
@@ -94,7 +111,7 @@ class _CustomCalendarState extends State<YearMonthCalendar> {
             months[index],
             style: TextStyle(
               color: isAttendece
-            ? Colors.white
+            ? Colors.white :isAttendeceDraft?Colors.white
                 : (isFuture ? Colors.grey : Colors.black),
             ),
           ),

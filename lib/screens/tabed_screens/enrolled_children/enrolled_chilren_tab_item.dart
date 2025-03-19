@@ -963,8 +963,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
           validStatus = false;
           break;
         }
-      }
-      ;
+      };
     } else {
       print("selected items is null");
     }
@@ -1078,4 +1077,13 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
       await ImageFileTabHelper().updateImageOnlyItem(items);
     }
   }
+
+  // bool crechedOpeningDate() {
+  //   DateTime? closingDate = Global.stringToDate(widget.openingDate);
+  //   if (closingDate != null) {
+  //     return closingDate.isBefore(DateTime.now()) ||
+  //         closingDate.isAtSameMomentAs(DateTime.now());
+  //   } else
+  //     return true;
+  // }
 }
