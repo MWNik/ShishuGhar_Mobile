@@ -30,10 +30,18 @@ import '../../../../database/helper/dynamic_screen_helper/house_hold_children_he
 import '../../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../../database/helper/enrolled_children/enrolled_children_field_helper.dart';
 import '../../../../database/helper/form_logic_helper.dart';
+import '../../../../database/helper/height_weight_boys_girls_helper.dart';
 import '../../../../database/helper/image_file_tab_responce_helper.dart';
 import '../../../../database/helper/translation_language_helper.dart';
+import '../../../../model/apimodel/tabHeight_for_age_Boys_model.dart';
+import '../../../../model/apimodel/tabHeight_for_age_Girls_model.dart';
+import '../../../../model/apimodel/tabWeight_for_age_Boys _model.dart';
+import '../../../../model/apimodel/tabWeight_for_age_Girls _model.dart';
+import '../../../../model/apimodel/tabWeight_to_Height_Boys_model.dart';
+import '../../../../model/apimodel/tabWeight_to_Height_Girls_model.dart';
 import '../../../../model/databasemodel/child_growth_responce_model.dart';
 import '../../../../model/databasemodel/tab_image_file_model.dart';
+import '../../../../style/styles.dart';
 import '../../../../utils/globle_method.dart';
 
 class ExitEnrolledChildTabItem extends StatefulWidget {
@@ -54,6 +62,7 @@ class ExitEnrolledChildTabItem extends StatefulWidget {
   final String screenType;
   final bool isForExitList;
   final bool isForCrecheEnrollment;
+
 
   ExitEnrolledChildTabItem(
       {super.key,
@@ -96,6 +105,13 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
   bool isRecordNew = true;
   DateTime? minDateforExit;
   String childDOB = '';
+  List<TabHeightforageBoysModel> tabHeightforageBoys = [];
+  List<TabHeightforageGirlsModel> tHeightforageGirls = [];
+  List<TabWeightforageBoysModel> tabWeightforageBoys = [];
+  List<TabWeightforageGirlsModel> tabWeightforageGirls = [];
+  List<TabWeightToHeightBoysModel> tabWeightToHeightBoys = [];
+  List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls = [];
+
   // List<String> redableItemsData = [
   //
   // ];
@@ -108,7 +124,14 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
     'height',
     'weight',
     'measurement_taken',
-    'measurement_equipment'
+    'measurement_equipment',
+    'measurement_date'
+  ];
+
+  List<String> colorIndicatorForMeasure = [
+    'weight_for_age',
+    'weight_for_height',
+    'height_for_age',
   ];
   // List<String> redableItemsFloat = [
   //
@@ -170,6 +193,19 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
     await TranslationDataHelper()
         .callTranslateString(valueNames)
         .then((value) => translats.addAll(value));
+
+    tabHeightforageBoys =
+    await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
+    tHeightforageGirls =
+    await HeightWeightBoysGirlsHelper().callHeightForAgeGirls();
+    tabWeightforageBoys =
+    await HeightWeightBoysGirlsHelper().callWeightforAgeBoys();
+    tabWeightforageGirls =
+    await HeightWeightBoysGirlsHelper().callWeightforAgeGirls();
+    tabWeightToHeightBoys =
+    await HeightWeightBoysGirlsHelper().callWeightToHeightBoys();
+    tabWeightToHeightGirls =
+    await HeightWeightBoysGirlsHelper().callWeightToHeightGirls();
 
     if (widget.isNew == 1) {
       isRecordNew = false;
@@ -494,14 +530,15 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
         );
       case 'Date':
         var minDate;
-        if (quesItem.fieldname == 'date_of_enrollment') {
+        if (quesItem.fieldname == 'date_of_enrollment'|| quesItem.fieldname == 'date_of_exit') {
           if (Global.validString(widget.minDate)) {
             minDate =
                 DateTime.parse(widget.minDate!).subtract(Duration(days: 1));
           }
-        } else if (quesItem.fieldname == 'date_of_exit') {
-          minDate = minDateforExit;
         }
+        // else if (quesItem.fieldname == 'date_of_exit') {
+        //   minDate = minDateforExit;
+        // }
         return CustomDatepickerDynamic(
           initialvalue: quesItem.fieldname == 'date_of_enrollment_awc'
               ? (Global.validString(myMap['date_of_enrollment_awc'])
@@ -516,12 +553,10 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
                       : logic!.callReadableLogic(myMap, quesItem))
                   : logic!.callReadableLogic(myMap, quesItem))
               : true,
-          // minDate: quesItem.fieldname == 'date_of_enrollment'
-          //     ? Global.validString(widget.minDate)
-          //         ? DateTime.parse(widget.minDate!).subtract(Duration(days: 1))
-          //         : null
-          //     : null,
-          minDate: minDate,
+          minDate: quesItem.fieldname == 'date_of_exit'
+              ? minDate
+              : Global.stringToDate(myMap['date_of_enrollment']),
+          // minDate: minDate,
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -749,6 +784,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           },
         );
       case 'Float':
+        if (!colorIndicatorForMeasure.contains(quesItem.fieldname))
         return DynamicCustomTextFieldFloat(
           hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           titleText:
@@ -785,6 +821,22 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
             }
           },
         );
+        else if (quesItem.fieldname == 'weight_for_age' &&
+            myMap['measurement_taken'].toString() == '1') {
+          return Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Color(0xffE0E0E0)),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: cWidgetRadiomColorPop(),
+            ),
+          );
+        } else
+          return SizedBox();
       case 'Attach':
         return CustomImageDynamic(
           child_guid: widget.EnrolledChilGUID,
@@ -851,7 +903,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
   defaultDisableDailog(String fieldName, String flag) async {
     var tabName = 'tab$flag';
     var item = options.where((element) => element.flag == tabName).toList();
-    if (item.length > 0) {
+    if (item.length >0) {
       myMap[fieldName] = item.first.name!;
     }
   }
@@ -1016,8 +1068,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
             break;
           }
         }
-      }
-      ;
+      };
     } else {
       print("selected items is null");
     }
@@ -1228,5 +1279,101 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
   //
   // }
 
+  List<Widget> cWidgetRadiomColorPop() {
+    List<Widget> screenItems = [];
 
+    var items = widget.screenItem[widget.tabBreakItem.name!];
+    if (items != null) {
+      if (myMap['measurement_date'] != null &&
+          myMap['child_dob'] != null &&
+          myMap['gender_id'] != null) {
+        var measurementDate =
+        Validate().stringToDateNull(myMap['measurement_date']);
+        var childDob = Validate().stringToDateNull(myMap['child_dob']);
+
+        if (measurementDate != null && childDob != null) {
+          var calucalteDate =
+          Validate().calculateAgeInDaysEx(childDob, measurementDate);
+          myMap['age_months'] = calucalteDate;
+        }
+      }
+
+      items = items
+          .where(
+              (element) => colorIndicatorForMeasure.contains(element.fieldname))
+          .toList();
+      for (int i = 0; i < items.length; i++) {
+        int colorD = DependingLogic.AutoColorCreateByHeightWightNew(
+            tabHeightforageBoys,
+            tHeightforageGirls,
+            tabWeightforageBoys,
+            tabWeightforageGirls,
+            tabWeightToHeightBoys,
+            tabWeightToHeightGirls,
+            items[i].fieldname!,
+            myMap['gender_id'],myMap['measurement_date'],
+            myMap);
+        String grothValue =
+        DependingLogic.AutoColorCreateByHeightWightStringNew(
+            tabHeightforageBoys,
+            tHeightforageGirls,
+            tabWeightforageBoys,
+            tabWeightforageGirls,
+            tabWeightToHeightBoys,
+            tabWeightToHeightGirls,
+            items[i].fieldname!,
+            myMap['gender_id'],myMap['measurement_date'],
+            myMap);
+
+        Color itemC = Color(0xffAAAAAA);
+        String colorName = '';
+        if (colorD == 0) {
+          itemC = Color(0xffAAAAAA);
+          colorName = '';
+        } else if (colorD == 1) {
+          itemC = Color(0xffF35858);
+          colorName =
+          '(${Global.returnTrLable(translats, CustomText.Severe, lng)})';
+        } else if (colorD == 2) {
+          itemC = Color(0xffF4B81D);
+          colorName =
+          '(${Global.returnTrLable(translats, CustomText.Moderate, lng)})';
+        } else if (colorD == 3) {
+          itemC = Color(0xff8BF649);
+          colorName =
+          '(${Global.returnTrLable(translats, CustomText.Normal, lng)})';
+        }
+        myMap[items[i].fieldname!] = colorD;
+        screenItems.add(Column(
+          children: [
+            Container(
+              height: 25,
+              width: 25,
+              decoration: BoxDecoration(
+                color: itemC,
+                borderRadius: BorderRadius.circular(5.r),
+              ),
+            ),
+            Text(
+              Global.returnTrLable(translats, items[i].label!.trim(), lng),
+              style: Styles.black85,
+              strutStyle: StrutStyle(height: 1.2),
+            ),
+            Text(
+              colorName,
+              style: Styles.black12700,
+            ),
+            Global.validString(grothValue)
+                ? Text(
+              '($grothValue)',
+              style: Styles.red85,
+            )
+                : SizedBox(),
+          ],
+        ));
+      }
+      // }
+    }
+    return screenItems;
+  }
 }

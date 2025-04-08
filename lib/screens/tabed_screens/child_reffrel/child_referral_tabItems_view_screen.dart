@@ -41,10 +41,13 @@ class ChildReferralTabItemsViewScreen extends StatefulWidget {
   final Function(int) changeTab;
   final int tabIndex;
   final int totalTab;
-  // final DateTime? minDate;
   final String scheduleDate;
+  final DateTime? minDate;
+   bool isEditableForDischage;
+   bool isEditable;
 
-  const ChildReferralTabItemsViewScreen(
+
+   ChildReferralTabItemsViewScreen(
       {super.key,
       required this.child_referral_guid,
       required this.GrowthMonitoringGUID,
@@ -58,7 +61,9 @@ class ChildReferralTabItemsViewScreen extends StatefulWidget {
       required this.changeTab,
       required this.tabIndex,
       required this.totalTab,
-      // required this.minDate,
+      required this.isEditableForDischage,
+      required this.minDate,
+      required this.isEditable,
       required this.scheduleDate});
 
   @override
@@ -80,8 +85,6 @@ class _ChildFollowUpTabItemSCreenState
   bool _isLoading = true;
   String? saveNext = CustomText.Next;
   List<HouseHoldFielItemdModel> multselectItemTab = [];
-  bool reffrralDateRedable = false;
-  bool isWeightOnDischargeeditable = true;
 
   @override
   void initState() {
@@ -138,7 +141,6 @@ class _ChildFollowUpTabItemSCreenState
     multselectItemTab =
         await ChildReferralFieldsHelper().callMultiSelectTabItem();
     await updateHiddenValue();
-    await callReffralDateReadable();
     await callScrenControllers('Child Referral');
     if (widget.tabIndex == (widget.totalTab - 1)) {
       saveNext = CustomText.saveEnrolled;
@@ -178,67 +180,16 @@ class _ChildFollowUpTabItemSCreenState
                 Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-                  child: Row(children: [
-                    Expanded(
-                      child: CElevatedButton(
-                        color: Color(0xffF26BA3),
-                        onPressed: () {
-                          // ch(2);
-                          nextTab(0, context);
-                        },
-                        text: Global.returnTrLable(
-                                translats, CustomText.back, lng)
-                            .trim(),
-                      ),
-                    ),
-                    role == CustomText.crecheSupervisor
-                        ? isWeightOnDischargeeditable
-                            ? SizedBox(width: 10)
-                            : SizedBox()
-                        : SizedBox(),
-
-                    // role == 'Creche Supervisor'
-                    //     ? widget.tabIndex == (widget.totalTab - 1)
-                    //         ? SizedBox()
-                    //         : Expanded(
-                    //             child: CElevatedButton(
-                    //               color: Color(0xff5979AA),
-                    //               onPressed: () {
-                    //                 saveOnly(1, context);
-                    //                 // widget.changeTab(1);
-                    //               },
-                    //               text: Global.returnTrLable(
-                    //                       translats, 'Save', lng)
-                    //                   .trim(),
-                    //             ),
-                    //           )
-                    //     : SizedBox(),
-                    // // ]
-                    // // ),
-                    // role == 'Creche Supervisor'
-                    //     ? widget.tabIndex == (widget.totalTab - 1)
-                    //         ? SizedBox()
-                    //         : SizedBox(width: 10)
-                    //     : SizedBox(),
-                    role == CustomText.crecheSupervisor
-                        ? isWeightOnDischargeeditable
-                            ? Expanded(
-                                child: CElevatedButton(
-                                  color: Color(0xff369A8D),
-                                  onPressed: () {
-                                    nextTab(1, context);
-                                    // widget.changeTab(1);
-                                  },
-                                  text: widget.tabIndex == (widget.totalTab - 1)
-                                      ? (Global.returnTrLable(
-                                          translats, CustomText.Submit, lng))
-                                      : Global.returnTrLable(
-                                          translats, CustomText.Next, lng),
-                                ),
-                              )
-                            : SizedBox()
-                        : SizedBox()
-                  ]),
+                  child: CElevatedButton(
+                    color: Color(0xffF26BA3),
+                    onPressed: () {
+                      // ch(2);
+                      nextTab(0, context);
+                    },
+                    text: Global.returnTrLable(
+                        translats, CustomText.back, lng)
+                        .trim(),
+                  ),
                 )
               ]),
             ),
@@ -274,14 +225,16 @@ class _ChildFollowUpTabItemSCreenState
         }
         return DynamicCustomDropdownField(
           hintText:
-              Global.returnTrLable(translats, CustomText.select_here, lng),
+          Global.returnTrLable(translats, CustomText.select_here, lng),
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
-          // readable: role == 'Creche Supervisor' ? false : true,
-          readable: true,
+          readable: (quesItem.fieldname == 'child_status') ?
+          widget.isEditableForDischage ?logic!
+              .callReadableLogic(myMap, quesItem):true:widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
           items: items,
           selectedItem: myMap[quesItem.fieldname],
           isVisible: logic!.callDependingLogic(myMap, quesItem),
@@ -311,11 +264,12 @@ class _ChildFollowUpTabItemSCreenState
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           selectedItem: myMap[quesItem.fieldname],
-          responceFieldName: itemResopnceField,
           isVisible: logic!.callDependingLogic(myMap, quesItem),
-          readable: true,
+          readable: widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
+          responceFieldName: itemResopnceField,
           onChanged: (value) {
             if (value != null)
               myMap[quesItem.fieldname!] = value;
@@ -326,44 +280,19 @@ class _ChildFollowUpTabItemSCreenState
           },
         );
       case 'Date':
-        DateTime? minimumDate;
-        // if (quesItem.fieldname == 'visit_date') {
-        //   minimumDate = widget.minDate;
-        // } else if (quesItem.fieldname == 'admission_date') {
-        //   if (myMap['visit_date'] != null) {
-        //     List<int> parts = myMap['visit_date']
-        //         .toString()
-        //         .split('-')
-        //         .map(int.parse)
-        //         .toList();
-        //     minimumDate = DateTime(parts[0], parts[1], parts[2]);
-        //   }
-        // }
-        // else
-        if (quesItem.fieldname == 'discharge_date') {
-          if (myMap['admission_date'] != null) {
-            List<int> parts = myMap['admission_date']
-                .toString()
-                .split('-')
-                .map(int.parse)
-                .toList();
-            minimumDate = DateTime(parts[0], parts[1], parts[2]);
-          }
-        }
         return CustomDatepickerDynamic(
           initialvalue: myMap[quesItem.fieldname!],
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           fieldName: quesItem.fieldname,
-          minDate: minimumDate,
+          minDate: callRequredMinimumDate(quesItem.fieldname!),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
-          // readable: quesItem.fieldname == 'date_of_referral'
-          //     ? true
-          //     : (quesItem.fieldname == 'discharge_date'
-          //         ? reffrralDateRedable
-          //         : false),
-          readable: true,
+          // readable: (quesItem.fieldname == 'date_of_referral' ||
+          readable: (quesItem.fieldname == 'discharge_date') ?
+          widget.isEditableForDischage ?logic!
+              .callReadableLogic(myMap, quesItem):true:widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
           calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
@@ -371,8 +300,6 @@ class _ChildFollowUpTabItemSCreenState
             var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
             if (logData.isNotEmpty) {
               if (logData.keys.length > 0) {
-                // var item =myMap[logData.keys.first];
-                // if(item==null||logData.values.first!=item) {
                 myMap.addEntries(
                     [MapEntry(logData.keys.first, logData.values.first)]);
 
@@ -382,12 +309,12 @@ class _ChildFollowUpTabItemSCreenState
             setState(() {});
           },
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
         );
       case 'Data':
         return DynamicCustomTextFieldNew(
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
@@ -395,12 +322,10 @@ class _ChildFollowUpTabItemSCreenState
           maxlength: quesItem.length,
           maxline: (quesItem.length != 0) ? quesItem.length! % 35 : 1,
           keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
-          // readable: role == 'Creche Supervisor'
-          //     ? logic!.callReadableLogic( myMap, quesItem)
-          //     : true,
-          readable: true,
+          readable: widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
           hintText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
@@ -418,12 +343,10 @@ class _ChildFollowUpTabItemSCreenState
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          // readable: role == 'Creche Supervisor'
-          //     ? logic!.callReadableLogic( myMap, quesItem)
-          //     : true,
-          readable: true,
+          readable: widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
@@ -442,18 +365,6 @@ class _ChildFollowUpTabItemSCreenState
             }
           },
         );
-      // case 'Check':
-      //   return DynamicCustomCheckboxWithLabel(
-      //     label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-      //     initialValue: myMap[quesItem.fieldname!],
-      //     isVisible: logic!.callDependingLogic(myMap,quesItem),
-      //     onChanged: (value) {
-      //       if(value>0)
-      //         myMap[quesItem.fieldname!] = value;
-      //       else myMap.remove(quesItem.fieldname);
-      //       setState(() {});
-      //     },
-      //   );
       case 'Check':
         return DynamicCustomYesNoCheckboxWithLabel(
           label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -463,10 +374,8 @@ class _ChildFollowUpTabItemSCreenState
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
-          // readable: role == 'Creche Supervisor'
-          //     ? logic!.callReadableLogic( myMap, quesItem)
-          //     : true,
-          readable: true,
+          readable: widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('yesNo $value');
@@ -478,18 +387,16 @@ class _ChildFollowUpTabItemSCreenState
         return DynamicCustomTextFieldNew(
           maxline: 3,
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          // readable: role == 'Creche Supervisor'
-          //     ? logic!.callReadableLogic( myMap, quesItem)
-          //     : true,
-          readable: true,
+          readable: widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
           hintText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
@@ -505,12 +412,10 @@ class _ChildFollowUpTabItemSCreenState
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          // readable: role == 'Creche Supervisor'
-          //     ? logic!.callReadableLogic( myMap, quesItem)
-          //     : true,
-          readable: true,
+          readable: widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -525,15 +430,13 @@ class _ChildFollowUpTabItemSCreenState
       case 'Small Text':
         return DynamicCustomTextFieldNew(
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          // readable: role == 'Creche Supervisor'
-          //     ? logic!.callReadableLogic( myMap, quesItem)
-          //     : true,
-          readable: true,
+          readable: widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
@@ -543,23 +446,11 @@ class _ChildFollowUpTabItemSCreenState
               myMap.remove(quesItem.fieldname);
           },
         );
-      // case 'Long Text':
-      //   return CustomImageDynamic(
-      //     assetPath:myMap[quesItem.fieldname!],
-      //     titleText:
-      //     Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-      //     isRequred: quesItem.reqd==1?quesItem.reqd:logic!.dependeOnMendotory( myMap, quesItem),
-      //     onChanged: (value) {
-      //       print('Entered text: $value');
-      //       myMap[quesItem.fieldname!] = value;
-      //       setState(() {});
-      //     },
-      //   );
       case 'Float':
         return DynamicCustomTextFieldFloat(
           hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
+          Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -567,10 +458,10 @@ class _ChildFollowUpTabItemSCreenState
           maxlength: quesItem.length,
           fieldName: quesItem.fieldname!,
           initialvalue: myMap[quesItem.fieldname!],
-          // readable: logic!.callReadableLogic( myMap, quesItem),
-          readable: quesItem.fieldname == 'weight_on_discharge'
-              ? (isWeightOnDischargeeditable == true ? false : true)
-              : true,
+          readable: (quesItem.fieldname == 'weight_on_discharge') ?
+          widget.isEditableForDischage ?logic!
+              .callReadableLogic(myMap, quesItem):true:widget.isEditable?logic!
+              .callReadableLogic(myMap, quesItem):true,
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             print('Entered text: $value');
@@ -822,15 +713,6 @@ class _ChildFollowUpTabItemSCreenState
         myMap['appcreated_by'] = userName;
         myMap['appcreated_on'] = Validate().currentDateTime();
       }
-      var created_at = DateTime.parse(myMap['appcreated_on'].toString());
-      var date = DateTime(created_at.year, created_at.month, created_at.day);
-      if (date
-          .add(Duration(days: 31))
-          .isAfter(DateTime.parse(Validate().currentDate()))) {
-        isWeightOnDischargeeditable = true;
-      } else {
-        isWeightOnDischargeeditable = false;
-      }
       var name = alredRecord[0].name;
       if (name != null) {
         myMap['name'] = name;
@@ -903,12 +785,49 @@ class _ChildFollowUpTabItemSCreenState
     }
   }
 
-  Future callReffralDateReadable() async {
-    var items = await ChildFollowUpTabResponseHelper()
-        .getFollowUpesponsebyReffreral(
-            widget.child_referral_guid, widget.enrolChildGuid);
-    if (items.length > 0) {
-      reffrralDateRedable = true;
+  DateTime callRequredMinimumDate(String fieldname) {
+    DateTime minimumDate = widget.minDate ?? DateTime(1992);
+    if (fieldname == 'visit_date') {
+      if (Global.validString(myMap['date_of_referral'])) {
+        List<int> parts = myMap['date_of_referral']
+            .toString()
+            .split('-')
+            .map(int.parse)
+            .toList();
+        minimumDate =
+            DateTime(parts[0], parts[1], parts[2]).subtract(Duration(days: 1));
+      }
+    } else if (fieldname == 'admission_date') {
+      if (myMap['visit_date'] != null) {
+        List<int> parts =
+        myMap['visit_date'].toString().split('-').map(int.parse).toList();
+        minimumDate =
+            DateTime(parts[0], parts[1], parts[2]).subtract(Duration(days: 1));
+      }
+    } else if (fieldname == 'discharge_date') {
+      if (myMap['admission_date'] != null) {
+        List<int> parts = myMap['admission_date']
+            .toString()
+            .split('-')
+            .map(int.parse)
+            .toList();
+        minimumDate =
+            DateTime(parts[0], parts[1], parts[2]).subtract(Duration(days: 1));
+      }
+    } else if (fieldname == 'date_of_referral') {
+      // var cDate = Global.validString(myMap['date_of_referral'])?DateTime.parse(myMap['date_of_referral']):DateTime.parse(Validate().currentDate());
+      var cDate = DateTime.parse(Validate().currentDate());
+      var minDate = cDate.subtract(Duration(days: 7));
+      List<int> parts =
+      widget.scheduleDate.toString().split('-').map(int.parse).toList();
+      var setDate = DateTime(parts[0], parts[1], parts[2]);
+      if (setDate.isBefore(minDate)) {
+        minimumDate = minDate;
+      } else {
+        minimumDate = setDate.subtract(Duration(days: 1));
+      }
     }
+    return minimumDate;
   }
+
 }

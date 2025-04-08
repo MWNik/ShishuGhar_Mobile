@@ -37,8 +37,6 @@ class _CrecheMonitorListingScreenState
   String lng = 'en';
   List<Translation> translats = [];
   bool isOnlyUnsynched = false;
-  DateTime applicableDate = Validate().stringToDate(Validate.date);
-  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -47,8 +45,6 @@ class _CrecheMonitorListingScreenState
   }
 
   Future<void> initializeData() async {
-    var date = await Validate().readString(Validate.date);
-    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     lng = (await Validate().readString(Validate.sLanguage))!;
     List<String> valueNames = [
       CustomText.VisitNotes,
@@ -97,7 +93,8 @@ class _CrecheMonitorListingScreenState
           crecheId: widget.crecheId ?? "0",
           dateOfVisit: dateOfVisit,
           isEdit: isEdit,
-          isViewScreen: isViewScreen,
+          isViewScreen: isViewScreen==true?false:true,
+          // isViewScreen: isViewScreen,
         ),
       ),
     );
@@ -115,7 +112,7 @@ class _CrecheMonitorListingScreenState
           String cmgUid = '';
           if (!(Global.validString(cmgUid))) {
             cmgUid = Validate().randomGuid();
-            _navigateToFormPage(cmgUid, null, false, false);
+            _navigateToFormPage(cmgUid, null, false, true);
           }
         },
         child: Image.asset(
@@ -161,25 +158,15 @@ class _CrecheMonitorListingScreenState
                     itemBuilder: (BuildContext context, int index) {
                       final responce = filterData[index].responces;
                       var selectedItem = filterData[index];
-
                       return GestureDetector(
                         onTap: () async {
-                          var created_at = DateTime.parse(
-                              selectedItem.created_at.toString());
-                          var date = DateTime(created_at.year, created_at.month,
-                              created_at.day);
-                          bool isViewScreen = date
-                              .add(Duration(days: 7))
-                              .isBefore(
-                                  DateTime.parse(Validate().currentDate()));
                           final cmgUid = selectedItem.cmguid;
+                          bool isEdited=await Validate().checkEditable(selectedItem.created_at, 7);
                           await _navigateToFormPage(
                               cmgUid,
                               Global.getItemValues(responce!, 'date_of_visit'),
                               true,
-                              now.isBefore(applicableDate)
-                                  ? false
-                                  : isViewScreen);
+                              isEdited);
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 5.h),

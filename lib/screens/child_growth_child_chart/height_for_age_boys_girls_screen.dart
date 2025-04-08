@@ -68,8 +68,8 @@ class _HeightforAgeBoysGirlsScreenState
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
-    var boys = await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
-    var girls = await HeightWeightBoysGirlsHelper().callHeightForAgeGirls();
+    var boys = await HeightWeightBoysGirlsHelper().callHeightForAgeBoys35();
+    var girls = await HeightWeightBoysGirlsHelper().callHeightForAgeGirls35();
     List res = widget.gender_id == 1 ? boys : girls;
     // widget.gender_id == '1' ? boys : girls;
     print(widget.gender_id);
@@ -80,33 +80,33 @@ class _HeightforAgeBoysGirlsScreenState
       }).toList());
 
       height_max?.addAll(res.map((data) {
-        double result = (data.green as num).toDouble();
+        double result = (data.sd2 as num).toDouble();
         return result;
       }).toList());
 
       height_min?.addAll(res.map((data) {
-        double result = (data.red as num).toDouble();
+        double result = (data.sd3neg as num).toDouble();
         return result;
       }).toList());
 
       green_cor?.addAll(res.map((data) {
         double x = (data.age_in_days as num).toDouble();
-        double y = (data.green as num).toDouble();
+        double y = (data.sd2 as num).toDouble();
         return Offset(x, y);
       }).toList());
       red_cor?.addAll(res.map((data) {
         double x = (data.age_in_days as num).toDouble();
-        double y = (data.red as num).toDouble();
+        double y = (data.sd3neg as num).toDouble();
         return Offset(x, y);
       }).toList());
       yellow_max?.addAll(res.map((data) {
         double x = (data.age_in_days as num).toDouble();
-        double y = (data.yellow_max as num).toDouble();
+        double y = (data.sd2neg as num).toDouble();
         return Offset(x, y);
       }).toList());
       yellow_min?.addAll(res.map((data) {
         double x = (data.age_in_days as num).toDouble();
-        double y = (data.yellow_min as num).toDouble();
+        double y = (data.sd3neg as num).toDouble();
         return Offset(x, y);
       }).toList());
     });
@@ -229,6 +229,7 @@ class _HeightforAgeBoysGirlsScreenState
                         gender: widget.gender_id,
                         maxX: maxX!,
                         maxY: maxY!,
+                  minX: 35,
                         bottomName: "Age",
                         leftName: "Height",
                         heading: CustomText.HeightforAge,
@@ -253,7 +254,7 @@ class _HeightforAgeBoysGirlsScreenState
                           leftName: "Height",
                           maxY: maxY!,
                           child: child!,
-                          maxX: maxX!,
+                          maxX: maxX!,minX: 35,
                           // minX: minX!,
                           // minY: minY!,
                         ),

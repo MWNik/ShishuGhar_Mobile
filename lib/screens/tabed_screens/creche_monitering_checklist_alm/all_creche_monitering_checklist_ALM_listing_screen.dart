@@ -39,8 +39,6 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
   bool isOnlyUnsynched = false;
   List<CmcALMResponseModel> unsynchedList = [];
   List<CmcALMResponseModel> allList = [];
-  DateTime applicableDate = Validate().stringToDate(Validate.date);
-  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -49,8 +47,6 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
   }
 
   Future<void> initializeData() async {
-    var date = await Validate().readString(Validate.date);
-    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     translats.clear();
     lng = (await Validate().readString(Validate.sLanguage))!;
     List<String> valueItems = [
@@ -255,14 +251,7 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                       itemBuilder: (BuildContext context, int index) {
                         return GestureDetector(
                           onTap: () async {
-                            var created_at = DateTime.parse(
-                                filterData[index].created_at.toString());
-                            var date = DateTime(created_at.year,
-                                created_at.month, created_at.day);
-                            bool isViewScreen = date
-                                .add(Duration(days: 7))
-                                .isBefore(
-                                    DateTime.parse(Validate().currentDate()));
+                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, 7);
                             var cbmguid = filterData[index].almguid;
                             if (Global.validString(cbmguid)) {
                               var refStatus = await Navigator.of(context).push(
@@ -276,10 +265,7 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                                                       filterData[index]
                                                           .responces,
                                                       'date_of_visit'),
-                                              isViewScreen:
-                                                  now.isBefore(applicableDate)
-                                                      ? false
-                                                      : isViewScreen)));
+                                              isViewScreen:isEdited==true?false:true)));
 
                               if (refStatus == 'itemRefresh') {
                                 await fetchCmcCBMRecords();

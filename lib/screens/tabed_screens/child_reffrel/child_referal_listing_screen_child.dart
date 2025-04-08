@@ -213,6 +213,8 @@ class _ChildReferralListingScreenState
                                 .toList()[index]
                                 .toString()
                                 .split('#!');
+
+
                             var backDate = now.isBefore(applicableDate)
                                 ? DateTime(1992)
                                 : DateTime.parse(Validate().currentDate())
@@ -270,6 +272,7 @@ class _ChildReferralListingScreenState
                                                 'measurement_taken_date'),
                                             minDate: minDate!,
                                             isDischarge: false,
+                                            isEditableForDischage: true,
                                             isEditable: true,
                                           )));
 

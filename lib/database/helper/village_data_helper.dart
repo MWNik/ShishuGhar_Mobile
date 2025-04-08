@@ -20,6 +20,20 @@ class VillageDataHelper {
     return tabVillageList;
   }
 
+
+  Future<List<TabVillage>> villageById(int villageId) async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from tabVillage where name=?',[villageId]);
+
+    List<TabVillage> tabVillageList = [];
+
+    for (var element in result) {
+      TabVillage state = TabVillage.fromJson(element);
+      tabVillageList.add(state);
+    }
+    return tabVillageList;
+  }
+
   Future<List<TabVillage>> getVillageListByVillageId(List<int>villageId) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery('Select * from tabVillage where name in (${villageId.join(', ')}) order By value ASC');
 

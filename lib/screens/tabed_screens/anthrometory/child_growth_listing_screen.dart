@@ -15,6 +15,7 @@ import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
 import '../../../utils/year_month_custom_calender.dart';
 import 'child_growth_expended_form_screen.dart';
+import 'child_growth_expended_form_screen_view.dart';
 
 class ChildGrowthListingScreen extends StatefulWidget {
   final int creche_nameId;
@@ -126,7 +127,6 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
               var selectedItems=childHHData.where((element) => element.cgmguid == Global.validToString(data)).toList();
              if(selectedItems.isNotEmpty){
                var lstDate = await minMaxDate(selectedItems.first.created_at);
-
                if (callMeasurementEditableDate(
                    selectedItems.first.created_at!)) {
                  var refStatus = await Navigator.of(context).push(
@@ -151,7 +151,26 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                  if (refStatus == 'itemRefresh') {
                    await fetchEnrolleChild();
                  }
-               } else
+               } else if(selectedItems.first.responces!=null){
+                 Navigator.of(context).push(
+                     MaterialPageRoute(
+                         builder: (BuildContext context) =>
+                             ChildGrowthExpendedFormScreenView(
+                               creche_nameId: widget.creche_nameId,
+                               creche_name: widget.creche_name,
+                               cgmguid:
+                               selectedItems.first.cgmguid!,
+                               lastGrowthDate: lstDate,
+                               minGrowthDate: maxGrowthDate,
+                               createdAt:
+                               selectedItems.first.created_at,
+                               isNew:
+                               selectedItems.first.responces !=
+                                   null
+                                   ? true
+                                   : false,
+                             )));
+               }else
                  Validate().singleButtonPopup(
                      Global.returnTrLable(translats, CustomText.growthMonitoring, lng),
                      Global.returnTrLable(translats, CustomText.ok, lng),
@@ -160,7 +179,9 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
              }
 
             }
-        ):Column(
+        )
+
+            :Column(
           // mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
@@ -217,6 +238,26 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                               if (refStatus == 'itemRefresh') {
                                 await fetchEnrolleChild();
                               }
+                            }
+                            else if(childHHData[index].responces!=null){
+                              Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          ChildGrowthExpendedFormScreenView(
+                                            creche_nameId: widget.creche_nameId,
+                                            creche_name: widget.creche_name,
+                                            cgmguid:
+                                            childHHData[index].cgmguid!,
+                                            lastGrowthDate: lstDate,
+                                            minGrowthDate: maxGrowthDate,
+                                            createdAt:
+                                            childHHData[index].created_at,
+                                            isNew:
+                                            childHHData[index].responces !=
+                                                null
+                                                ? true
+                                                : false,
+                                          )));
                             } else
                               Validate().singleButtonPopup(
                                   Global.returnTrLable(translats, CustomText.growthMonitoring, lng),
@@ -549,8 +590,12 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
       }
     }
 
+    // childHHData = await ChildGrowthResponseHelper()
+    //     .anthormentryByCreche(widget.creche_nameId);
+
+    //Showing last 12 month
     childHHData = await ChildGrowthResponseHelper()
-        .anthormentryByCreche(widget.creche_nameId);
+        .anthormentryByCrecheLimit12(widget.creche_nameId);
   }
 
   // Future<DateTime?> callDatesAlredDateList(String date) async {

@@ -120,27 +120,14 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
                       return GestureDetector(
                         onTap: () async {
                           print('Item $index tapped');
-                          var creationDate = DateTime.parse(
-                              hhChilddata[index].created_at.toString());
-                          bool dobisReadable = false;
-                          if (creationDate.add(Duration(days: 15)).isBefore(
-                              DateTime.parse(Validate().currentDate()))) {
-                            dobisReadable = true;
-                          }
-                          var date = await Validate().readString(Validate.date);
-                          var applicableDate =
-                              Validate().stringToDate(date ?? "2024-12-31");
-                          var now = DateTime.parse(Validate().currentDate());
+                          var isEditable=await Validate().checkEditable(hhChilddata[index].created_at,15);
                           var refStatus = await Navigator.of(context).push(
                               MaterialPageRoute(
                                   builder: (BuildContext context) =>
                                       AddHouseholdScreenChildrenFromExpended(
                                           hhGuid: hhChilddata[index].HHGUID!,
                                           cHHGuid: hhChilddata[index].CHHGUID!,
-                                          dobisReadable:
-                                              now.isBefore(applicableDate)
-                                                  ? false
-                                                  : dobisReadable)));
+                                          dobisReadable:isEditable)));
                           if (refStatus == 'itemRefresh') {
                             await fetchHhChildrenDataList();
                           }
@@ -461,4 +448,5 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
     }
     return retuValue;
   }
+
 }

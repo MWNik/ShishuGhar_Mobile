@@ -331,22 +331,24 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
                           /*  var detailMap = await fetchChildtDetailbyGuid(
                               childExitData[index]['ChildEnrollGUID']!);*/
                           //  var childId = detailMap.keys.first;
-                          var date_of_enrollment = Global.getItemValues(
-                              selectedItem['responces'], 'date_of_enrollment');
-
-                          var created_at = DateTime.parse(
-                              selectedItem['created_at'].toString());
-                          var date = DateTime(created_at.year, created_at.month,
-                              created_at.day);
+                          // var date_of_enrollment = Global.getItemValues(
+                          //     selectedItem['responces'], 'date_of_enrollment');
+                          String? minDate=await callMinDate(Global.getItemValues(
+                              selectedItem['responces'], 'date_of_enrollment'));
+                          bool isEdit = await  Validate().checkEditable(selectedItem['created_at'],15);
+                          // var created_at = DateTime.parse(
+                          //     selectedItem['created_at'].toString());
+                          // var date = DateTime(created_at.year, created_at.month,
+                          //     created_at.day);
                           var childName = Global.getItemValues(
                               selectedItem['responces'], 'child_name');
-                          bool isEditable = date
-                              .add(Duration(days: 16))
-                              .isAfter(
-                                  DateTime.parse(Validate().currentDate()));
-                          var applicableDate =
-                              Validate().stringToDate(Validate.date);
-                          var now = DateTime.parse(Validate().currentDate());
+                          // bool isEditable = date
+                          //     .add(Duration(days: 16))
+                          //     .isAfter(
+                          //         DateTime.parse(Validate().currentDate()));
+                          // var applicableDate =
+                          //     Validate().stringToDate(Validate.date);
+                          // var now = DateTime.parse(Validate().currentDate());
 
                           // var childName = detailMap.values.first;
                           var refStatus = await Navigator.of(context).push(
@@ -371,11 +373,9 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
                                           isEditable: role ==
                                                   CustomText.crecheSupervisor
                                                       .trim()
-                                              ? now.isBefore(applicableDate)
-                                                  ? true
-                                                  : isEditable
+                                              ? isEdit
                                               : false,
-                                          minDate: date_of_enrollment)));
+                                          minDate: minDate)));
                           if (refStatus == 'itemRefresh') {
                             await fetchChildevents();
                           }
@@ -690,4 +690,8 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
 
   //   return lastGrowthDateNew;
   // }
+
+  Future<String?> callMinDate(String dateOfEnrollment) async {
+    return await Validate().callMinDate(dateOfEnrollment, 15);
+  }
 }

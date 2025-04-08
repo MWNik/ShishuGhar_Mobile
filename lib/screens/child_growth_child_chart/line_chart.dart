@@ -19,6 +19,7 @@ class MultiLineChart extends StatefulWidget {
     required this.gender,
     required this.maxY,
     required this.maxX,
+    required this.minX,
     required this.bottomName,
     required this.leftName,
     // required this.minY,
@@ -38,7 +39,7 @@ class MultiLineChart extends StatefulWidget {
       child;
   final String childenrollguid, bottomName, leftName, heading;
   // final double minY, maxY, minX, maxX;
-  final double maxY, maxX;
+  final double maxY, maxX,minX;
   String childName;
   String childId;
   final int gender;
@@ -274,9 +275,10 @@ class _MultiLineChartState extends State<MultiLineChart> {
         height: chartHeight,
         child: LineChart(
           LineChartData(
-            minX: 0,
+            // minX: 0,
+            minX: Global.roundToNearest(widget.minX),
             maxX: widget.maxX,
-            minY: 0,
+            minY:0,
             maxY: Global.roundToNearest(widget.maxY),
             borderData: FlBorderData(
               show: true,

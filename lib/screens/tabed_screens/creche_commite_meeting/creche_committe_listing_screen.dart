@@ -49,8 +49,6 @@ class _CrecheCommitteListingScreenState
   }
 
   Future<void> initializeData() async {
-    var date = await Validate().readString(Validate.date);
-    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     role = (await Validate().readString(Validate.role))!;
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
@@ -118,6 +116,7 @@ class _CrecheCommitteListingScreenState
                 String ccGuid = '';
                 if (!Global.validString(ccGuid)) {
                   ccGuid = Validate().randomGuid();
+                  String? minDate=await Validate().requredOnlyMinimum(null, 7);
                   var refStatus = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
@@ -125,9 +124,7 @@ class _CrecheCommitteListingScreenState
                                   creche_id: widget.creche_id,
                                   ccGuid: ccGuid,
                                   isImageUpdate: false,
-                                  minDate: now.isBefore(applicableDate)
-                                      ? null
-                                      : minDate,
+                                  minDate: minDate!=null?Validate().stringToDate(minDate):null,
                                   existingList: existingDate)));
                   if (refStatus == 'itemRefresh') {
                     await fetchCommittieMeetingrecords();
@@ -179,15 +176,12 @@ class _CrecheCommitteListingScreenState
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                          var created_at = DateTime.parse(
-                              filterData[index].created_at.toString());
-                          var date = DateTime(created_at.year, created_at.month,
-                              created_at.day);
-                          bool isUneditable =
-                              role == CustomText.crecheSupervisor.trim()
-                                  ? date.add(Duration(days: 7)).isBefore(
-                                      DateTime.parse(Validate().currentDate()))
-                                  : true;
+                          bool isEdited=await Validate().checkEditable(filterData[index].created_at, 7);
+                          String? minDate=await Validate().requredOnlyMinimum(null, 7);
+                          bool isUnEditable=true;
+                          if(isEdited&&role == CustomText.crecheSupervisor){
+                            isUnEditable=false;
+                          }
                           if (existingDate.contains(Global.getItemValues(
                               filterData[index].responces, 'meeting_date'))) {
                             var currentRecordDate = Global.getItemValues(
@@ -195,16 +189,13 @@ class _CrecheCommitteListingScreenState
                             existingDate.remove(currentRecordDate);
                           }
 
-                          if (now.isBefore(applicableDate)) {
-                            isUneditable = false;
-                          }
 
                           var ccGuid = filterData[index].ccguid;
                           if (Global.validString(ccGuid)) {
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        isUneditable
+                                    isUnEditable
                                             ? CrecheCommitteDetailsViewScreen(
                                                 creche_id: widget.creche_id,
                                                 ccGuid: ccGuid,
@@ -212,10 +203,7 @@ class _CrecheCommitteListingScreenState
                                             : CrecheCommitteDetailsScreen(
                                                 creche_id: widget.creche_id,
                                                 ccGuid: ccGuid,
-                                                minDate:
-                                                    now.isBefore(applicableDate)
-                                                        ? null
-                                                        : minDate,
+                                                minDate:minDate!=null?Validate().stringToDate(minDate):null,
                                                 existingList: existingDate,
                                                 isImageUpdate:
                                                     Global.validString(

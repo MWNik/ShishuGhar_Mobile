@@ -125,7 +125,8 @@ class DoctypeUpdate {
             Validate.doctypeUpdateTimeStamp, DateTime.now().toString());
         await callApiLogicData(userName, password, token, context);
         return true;
-      } else if (response.statusCode == 401) {
+      }
+      else if (response.statusCode == 401) {
         Navigator.pop(context);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.remove(Validate.Password);
@@ -140,7 +141,8 @@ class DoctypeUpdate {
               builder: (mContext) => LoginScreen(),
             ));
         return false;
-      } else {
+      }
+      else {
         Navigator.pop(context);
         Validate().singleButtonPopup(
             Global.errorBodyToString(response.body, 'message'),
@@ -1414,7 +1416,7 @@ class DoctypeUpdate {
                 const CircularProgressIndicator(),
                 SizedBox(height: 10.h),
                 Text(
-                    '${Global.returnTrLable(locationControlls, CustomText.pleaseWait, lng)} ${(loadingText)}/100%'),
+                    '${Global.returnTrLable(locationControlls, CustomText.pleaseWait, lng)} (${(loadingText)}/100)%'),
               ],
             ));
           }),

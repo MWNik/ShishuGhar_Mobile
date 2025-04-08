@@ -452,26 +452,26 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
     iniData();
   }
 
-  bool checkEditable() {
-    bool returnStatus = true;
-    if (enrolledItem != null && Global.validString(enrolledItem!.created_at)) {
-      var creation = DateTime.parse(enrolledItem!.created_at.toString());
-      var datePart = DateTime(creation.year, creation.month, creation.day);
-      var now = DateTime.now();
-      var nowDatePart = DateTime(now.year, now.month, now.day);
-      returnStatus = datePart.add(Duration(days: 16)).isAfter(nowDatePart);
-    }
-
-    var applicableDate = Validate().stringToDate(date ?? "2024-12-31");
-    var now = DateTime.parse(Validate().currentDate());
-
-    return now.isBefore(applicableDate) ? true : returnStatus;
-  }
+  // bool checkEditable() {
+  //   bool returnStatus = true;
+  //   if (enrolledItem != null && Global.validString(enrolledItem!.created_at)) {
+  //     var creation = DateTime.parse(enrolledItem!.created_at.toString());
+  //     var datePart = DateTime(creation.year, creation.month, creation.day);
+  //     var now = DateTime.now();
+  //     var nowDatePart = DateTime(now.year, now.month, now.day);
+  //     returnStatus = datePart.add(Duration(days: 15)).isAfter(nowDatePart);
+  //   }
+  //
+  //   var applicableDate = Validate().stringToDate(date ?? "2024-12-31");
+  //   var now = DateTime.parse(Validate().currentDate());
+  //
+  //   return now.isBefore(applicableDate) ? true : returnStatus;
+  // }
 
   Future<void> onclick(int i, String imsgeItem) async {
     print("Role =======> $role");
     if (i == 0) {
-      bool isEdit = checkEditable();
+      bool isEdit =await  Validate().checkEditable(enrolledItem!.created_at,15);
 
       String? minDate = await callDateOfExit(enrolledItem!.CHHGUID!);
       EnrolledExitChilrenTab.childName =
@@ -497,7 +497,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
       if (refstatus == CustomText.itemRefresh) {
         await iniData();
       }
-    } else if (i == 1) {
+    }
+    else if (i == 1) {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => CrecheEnrollChildEnrollSingleScreen(
               creche_id:
@@ -507,7 +508,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
                   '${Global.getItemValues(enrolledItem!.responces!, 'child_id')}',
               childName:
                   '${Global.getItemValues(enrolledItem!.responces!, 'child_name')}')));
-    } else if (i == 2) {
+    }
+    else if (i == 2) {
       Navigator.of(context).push(MaterialPageRoute(
         builder: (BuildContext context) => ChildGrowthListingScreenInChild(
             childEnrollment: widget.EnrolledChilGUID,
@@ -520,7 +522,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
             childName:
                 '${Global.getItemValues(enrolledItem!.responces!, 'child_name')}'),
       ));
-    } else if (i == 3) {
+    }
+    else if (i == 3) {
       if (role == CustomText.crecheSupervisor.trim()) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => ReffralTabScreen(
@@ -542,7 +545,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
                       labelControlls, CustomText.childReferral, lng),
                 )));
       }
-    } else if (i == 4) {
+    }
+    else if (i == 4) {
       if (role == CustomText.crecheSupervisor.trim()) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => FollowUpTabScreenForChild(
@@ -574,7 +578,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
                       '${Global.getItemValues(enrolledItem!.responces!, 'child_name')}',
                 )));
       }
-    } else if (i == 5) {
+    }
+    else if (i == 5) {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => WeightforAgeBoysGirlsScreen(
                 childenrollguid: widget.EnrolledChilGUID,
@@ -588,7 +593,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
                 ),
                 // date_of_birth:Global.stringToDate(Global.getItemValues(enrolledItem!.responces!, 'child_dob'))!
               )));
-    } else if (i == 6) {
+    }
+    else if (i == 6) {
       var childImmuData = await ChildImmunizationResponseHelper()
           .childEventByChild(
               Global.getItemValues(enrolledItem!.responces, 'creche_id'),
@@ -813,6 +819,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
   }
 
   Future<String?> callDateOfExit(String CHHGUID) async {
-    return await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
+    // return await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
+    String? maxDateOfExit=await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
+    return await Validate().callMinDate(maxDateOfExit, 15);
   }
 }

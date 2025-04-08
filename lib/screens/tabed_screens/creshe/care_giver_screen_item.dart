@@ -32,6 +32,7 @@ import '../../../utils/globle_method.dart';
 class CareGiverScreenItem extends StatefulWidget {
   final String CGGuid;
   final String crechedCode;
+  String? minDate;
   final int parentName;
   final String tabBreakItem;
   final Map<String, List<HouseHoldFielItemdModel>> screenItem;
@@ -40,7 +41,7 @@ class CareGiverScreenItem extends StatefulWidget {
   final int totalTab;
   final bool isEditable;
 
-  const CareGiverScreenItem({
+  CareGiverScreenItem({
     super.key,
     required this.CGGuid,
     required this.crechedCode,
@@ -51,6 +52,7 @@ class CareGiverScreenItem extends StatefulWidget {
     required this.totalTab,
     required this.parentName,
     required this.isEditable,
+    this.minDate,
   });
 
   @override
@@ -68,6 +70,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
   String? saveNext = CustomText.Submit;
   String? responce;
   String lng = "en";
+
   // List<Translation> translats = [];
   String? role;
   Map<String, FocusNode> _focusNode = {};
@@ -135,8 +138,8 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
                               .trim(),
                     ),
                   ),
-                  widget.isEditable ? SizedBox(width: 10) : SizedBox(),
-                  widget.isEditable
+                  (role == CustomText.crecheSupervisor) ? SizedBox(width: 10) : SizedBox(),
+                  (role == CustomText.crecheSupervisor)
                       ? Expanded(
                           child: CElevatedButton(
                             color: Color(0xff369A8D),
@@ -201,11 +204,18 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               : logic!.dependeOnMendotory(myMap, quesItem),
           items: items,
           selectedItem: myMap[quesItem.fieldname],
-          readable: quesItem.fieldname == 'reason_for_caregiver_exit'
-              ? null
-              : widget.isEditable == true
-                  ? null
-                  : !widget.isEditable,
+          readable: role == CustomText.crecheSupervisor
+              ? quesItem.fieldname == 'reason_for_caregiver_exit'
+              ? logic!.callReadableLogic(myMap, quesItem)
+              : widget.isEditable
+              ? logic!.callReadableLogic(myMap, quesItem)
+              : !widget.isEditable
+              : true,
+          // readable: quesItem.fieldname == 'reason_for_caregiver_exit'
+          //     ? null
+          //     : widget.isEditable == true
+          //         ? null
+          //         : !widget.isEditable,
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value != null)
@@ -220,16 +230,27 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
           focusNode: _focusNode[quesItem.fieldname],
           initialvalue: myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          readable: widget.isEditable == true
-              ? null
-              : quesItem.fieldname == 'date_of_leaving'
-                  ? null
-                  : !widget.isEditable,
+          readable: role == CustomText.crecheSupervisor
+              ? quesItem.fieldname == 'date_of_leaving'
+              ? logic!.callReadableLogic(myMap, quesItem)
+              : widget.isEditable
+              ? logic!.callReadableLogic(myMap, quesItem)
+              : !widget.isEditable
+              : true,
+          // readable: widget.isEditable == true
+          //     ? null
+          //     : quesItem.fieldname == 'date_of_leaving'
+          //         ? null
+          //         : !widget.isEditable,
           calenderValidate: logic!.calenderValidation(myMap, quesItem),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
+          minDate: (quesItem.fieldname == 'date_of_joinning' &&
+                  Global.validString(widget.minDate))
+              ? Validate().stringToDate(widget.minDate!)
+              : null,
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
             var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
@@ -255,9 +276,14 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
           initialvalue: myMap[quesItem.fieldname!],
           keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           maxlength: quesItem.length,
-          readable: widget.isEditable
+          readable: role == CustomText.crecheSupervisor
+              ? widget.isEditable
               ? logic!.callReadableLogic(myMap, quesItem)
-              : !widget.isEditable,
+              : !widget.isEditable
+              : true,
+          // readable: widget.isEditable
+          //     ? logic!.callReadableLogic(myMap, quesItem)
+          //     : !widget.isEditable,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
@@ -278,9 +304,14 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: widget.isEditable
+          readable: role == CustomText.crecheSupervisor
+              ? widget.isEditable
               ? logic!.callReadableLogic(myMap, quesItem)
-              : !widget.isEditable,
+              : !widget.isEditable
+              : true,
+          // readable: widget.isEditable
+          //     ? logic!.callReadableLogic(myMap, quesItem)
+          //     : !widget.isEditable,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
@@ -327,9 +358,14 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               : logic!.dependeOnMendotory(myMap, quesItem),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: widget.isEditable
+          readable: role == CustomText.crecheSupervisor
+              ? widget.isEditable
               ? logic!.callReadableLogic(myMap, quesItem)
-              : !widget.isEditable,
+              : !widget.isEditable
+              : true,
+          // readable: widget.isEditable
+          //     ? logic!.callReadableLogic(myMap, quesItem)
+          //     : !widget.isEditable,
           hintText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
@@ -346,12 +382,19 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
           initialValue: myMap[quesItem.fieldname],
           labelControlls: translats,
           lng: lng,
+
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
+
           readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(myMap, quesItem)
+              ? quesItem.fieldname == 'is_active'
+                  ? logic!.callReadableLogic(myMap, quesItem)
+                  : widget.isEditable
+                      ? logic!.callReadableLogic(myMap, quesItem)
+                      : !widget.isEditable
               : true,
+
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             // if (value > 0)
@@ -371,9 +414,14 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: widget.isEditable
+          readable: role == CustomText.crecheSupervisor
+              ? widget.isEditable
               ? logic!.callReadableLogic(myMap, quesItem)
-              : !widget.isEditable,
+              : !widget.isEditable
+              : true,
+          // readable: widget.isEditable
+          //     ? logic!.callReadableLogic(myMap, quesItem)
+          //     : !widget.isEditable,
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           initialvalue: myMap[quesItem.fieldname!],
@@ -396,9 +444,14 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: widget.isEditable
+          readable: role == CustomText.crecheSupervisor
+              ? widget.isEditable
               ? logic!.callReadableLogic(myMap, quesItem)
-              : !widget.isEditable,
+              : !widget.isEditable
+              : true,
+          // readable: widget.isEditable
+          //     ? logic!.callReadableLogic(myMap, quesItem)
+          //     : !widget.isEditable,
           initialvalue: myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');

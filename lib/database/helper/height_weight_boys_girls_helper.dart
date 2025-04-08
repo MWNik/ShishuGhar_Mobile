@@ -24,9 +24,36 @@ class HeightWeightBoysGirlsHelper {
     return tabHeightforageBoys;
   }
 
+  Future<List<TabHeightforageBoysModel>> callHeightForAgeBoys35() async {
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery('select * from tabHeightforAgeBoys where age_in_days>34');
+
+    List<TabHeightforageBoysModel> tabHeightforageBoys = [];
+
+    for (var element in result) {
+      TabHeightforageBoysModel item =
+          TabHeightforageBoysModel.fromJson(element);
+      tabHeightforageBoys.add(item);
+    }
+    return tabHeightforageBoys;
+  }
+
   Future<List<TabHeightforageGirlsModel>> callHeightForAgeGirls() async {
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.query('tabHeightforAgeGirls');
+
+    List<TabHeightforageGirlsModel> tabHeightforAgeGirls = [];
+
+    for (var element in result) {
+      TabHeightforageGirlsModel item =
+          TabHeightforageGirlsModel.fromJson(element);
+      tabHeightforAgeGirls.add(item);
+    }
+    return tabHeightforAgeGirls;
+  }
+  Future<List<TabHeightforageGirlsModel>> callHeightForAgeGirls35() async {
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery('select * from tabHeightforAgeGirls where age_in_days>34');
 
     List<TabHeightforageGirlsModel> tabHeightforAgeGirls = [];
 
@@ -41,6 +68,19 @@ class HeightWeightBoysGirlsHelper {
   Future<List<TabWeightforageBoysModel>> callWeightforAgeBoys() async {
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.query('tabWeightforAgeBoys');
+
+    List<TabWeightforageBoysModel> tabWeightforAgeBoys = [];
+
+    for (var element in result) {
+      TabWeightforageBoysModel item =
+          TabWeightforageBoysModel.fromJson(element);
+      tabWeightforAgeBoys.add(item);
+    }
+    return tabWeightforAgeBoys;
+  }
+  Future<List<TabWeightforageBoysModel>> callWeightforAgeBoys35() async {
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery('select * from tabWeightforAgeBoys where age_in_days>34');
 
     List<TabWeightforageBoysModel> tabWeightforAgeBoys = [];
 
@@ -83,6 +123,20 @@ class HeightWeightBoysGirlsHelper {
     return tabWeightforAgeGirls;
   }
 
+  Future<List<TabWeightforageGirlsModel>> callWeightforAgeGirls35() async {
+    List<Map<String, dynamic>> result =
+    await DatabaseHelper.database!.rawQuery('select * from tabWeightforAgeGirls where age_in_days>34');
+
+    List<TabWeightforageGirlsModel> tabWeightforAgeGirls = [];
+
+    for (var element in result) {
+      TabWeightforageGirlsModel item =
+      TabWeightforageGirlsModel.fromJson(element);
+      tabWeightforAgeGirls.add(item);
+    }
+    return tabWeightforAgeGirls;
+  }
+
   Future<List<TabWeightforageGirlsModel>> callWeightforAgeGirlsIn(
       List<int> items) async {
     String itemDays = List.filled(items.length, '?').join(',');
@@ -113,10 +167,50 @@ class HeightWeightBoysGirlsHelper {
     }
     return tabWeightToHeightBoys;
   }
+  Future<List<TabWeightToHeightBoysModel>> callWeightToHeightBoys24Or0() async {
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery('select * from tabWeightToHeightBoys where (age_type = 0 AND length < 65) OR (age_type = 24 AND length >= 65)');
+
+    List<TabWeightToHeightBoysModel> tabWeightToHeightBoys = [];
+
+    for (var element in result) {
+      TabWeightToHeightBoysModel item =
+          TabWeightToHeightBoysModel.fromJson(element);
+      tabWeightToHeightBoys.add(item);
+    }
+    return tabWeightToHeightBoys;
+  }
+
+  Future<List<TabWeightToHeightBoysModel>> callWeightToHeightBoys24() async {
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.query('tabWeightToHeightBoys');
+
+    List<TabWeightToHeightBoysModel> tabWeightToHeightBoys = [];
+
+    for (var element in result) {
+      TabWeightToHeightBoysModel item =
+          TabWeightToHeightBoysModel.fromJson(element);
+      tabWeightToHeightBoys.add(item);
+    }
+    return tabWeightToHeightBoys;
+  }
 
   Future<List<TabWeightToHeightGirlsModel>> callWeightToHeightGirls() async {
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.query('tabWeightToHeightGirls');
+
+    List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls = [];
+
+    for (var element in result) {
+      TabWeightToHeightGirlsModel item =
+          TabWeightToHeightGirlsModel.fromJson(element);
+      tabWeightToHeightGirls.add(item);
+    }
+    return tabWeightToHeightGirls;
+  }
+  Future<List<TabWeightToHeightGirlsModel>> callWeightToHeightGirls24Or0() async {
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery('select * from tabWeightToHeightGirls WHERE (age_type = 0 AND length < 65) OR (age_type = 24 AND length >= 65)');
 
     List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls = [];
 

@@ -139,6 +139,7 @@ import '../utils/globle_method.dart';
 import '../utils/validate.dart';
 import 'change_password_screen.dart';
 import 'dashboardscreen_new.dart';
+import 'enrolled_child_terms_condition.dart';
 import 'login_screen.dart';
 
 class HomeReplicaScreen extends StatefulWidget {
@@ -1280,6 +1281,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     callInitBlock();
   }
 
+  void checkZscoreValue(double weight,double m,double l,double s){
+    double value=Global.retrunValidNum(m).toDouble();
+    double zScore = Global.calculateZScore(weight,m,l,s);
+    int days = Global.getbackDaysByMonth('2025-04-01',25);
+    print('zScore $zScore  $days');
+
+  }
+
+
   Future<void> callInsertHouseHoldFields(HouseHoldFieldModel items) async {
     await DatabaseHelper.database!.delete('tabhouseholdfield');
     if (items.tabHousehold_Form != null) {
@@ -1706,6 +1716,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<void> onclick(int i, String imsgeItem, String lng) async {
+    // checkZscoreValue(9.70,9.1618,0.0821,0.1089);
     String? refStatus;
     if (i == 0) {
       // if (role == CustomText.crecheSupervisor.trim() ||

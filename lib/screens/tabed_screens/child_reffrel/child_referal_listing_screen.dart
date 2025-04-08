@@ -430,6 +430,7 @@ class _ChildReferralListingScreenState
                                             'measurement_taken_date'),
                                         minDate: minDate,
                                         isEditable: true,
+                                        isEditableForDischage: true,
                                         isDischarge: false)));
 
                             if (refStatus == 'itemRefresh') {

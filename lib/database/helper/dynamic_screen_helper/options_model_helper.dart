@@ -37,7 +37,8 @@ class OptionsModelHelper {
   }
 
   Future<List<OptionsModel>> getLocationData(
-      String tableName, Map<String, dynamic> responseData, String lng) async {
+      String tableName, Map<String, dynamic> responseData, String lng)
+  async {
     var tabName = 'tab$tableName'.replaceAll(" ", "");
     int? selectedLocation;
     String? selectedLocationID;
@@ -114,7 +115,9 @@ class OptionsModelHelper {
     }
     return optionsModel;
   }
-  Future<List<OptionsModel>> getYearOptions() async {
+
+  Future<List<OptionsModel>> getYearOptions()
+  async {
     String flag = 'tabYear';
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery('select * from mstCommon where flag=? order by seq_id  ASC',[flag]);
 
@@ -126,8 +129,24 @@ class OptionsModelHelper {
     return options;
   }
 
+  Future<List<OptionsModel>> partnerByPartnerId(int iPartnerId)
+  async {
+    String flag = 'tabPartner';
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from mstCommon where flag=? and name=? order by seq_id  ASC',
+        [flag,iPartnerId]);
+
+    List<OptionsModel> options = [];
+    for(var element in result){
+      var item = new OptionsModel(name: element['name'].toString(),values: element['value'].toString(),flag: flag);
+      options.add(item);
+    }
+    return options;
+  }
+
   Future<List<OptionsModel>> getMstCommonOptions(
-      String tableName, String lang) async {
+      String tableName, String lang)
+  async {
     // var tabName='tab$tableName'.replaceAll(" ", "");
     var tabName = 'tab$tableName';
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
@@ -156,7 +175,8 @@ class OptionsModelHelper {
   }
 
   Future<List<OptionsModel>> callDayOfWeekMstCommonOptions(
-      String tableName, String lang) async {
+      String tableName, String lang)
+  async {
     // var tabName='tab$tableName'.replaceAll(" ", "");
     var tabName = 'tab$tableName';
     List<Map<String, dynamic>> result = await DatabaseHelper.database!
@@ -183,7 +203,8 @@ class OptionsModelHelper {
     return optionsModel;
   }
 
-  Future<List<OptionsModel>> getAllMstCommonOptions(String lang) async {
+  Future<List<OptionsModel>> getAllMstCommonOptions(String lang)
+  async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'SELECT * FROM mstCommon WHERE flag NOT IN (?) order by CASE WHEN value LIKE ? THEN 1 ELSE 0 END,  seq_id  ASC',
         ['tabPartner', '%other%']);
@@ -210,7 +231,8 @@ class OptionsModelHelper {
   }
 
   Future<List<OptionsModel>> getAllMstCommonNotINOptions(
-      List<String> defaultCommon, String lang) async {
+      List<String> defaultCommon, String lang)
+  async {
     String questionMarks = List.filled(defaultCommon.length, '?').join(',');
     List<dynamic> parameters = [...defaultCommon, '%other%'];
     print(defaultCommon);
@@ -240,7 +262,8 @@ class OptionsModelHelper {
   }
 
   Future<List<OptionsModel>> getAllMstCommonNotINPartenerStock(String flag,
-      int crechId, String rguid, int year, int month, String lang) async {
+      int crechId, String rguid, int year, int month, String lang)
+  async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'select * from mstCommon WHERE flag=? and  name not in(select item_id from tabCreche_requisition_response where creche_id=? and item_id NOTNULL and rguid!=? and year=? and month=?) order by CASE WHEN value LIKE ? THEN 1 ELSE 0 END,  seq_id  ASC',
         [flag, crechId, rguid, year, month, '%other%']);
@@ -267,7 +290,8 @@ class OptionsModelHelper {
   }
 
   Future<List<OptionsModel>> getAllMstCommonNotINPartenerStockWithoyExisting(
-      String flag, int crechId, int year, int month, String lang) async {
+      String flag, int crechId, int year, int month, String lang)
+  async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'select * from mstCommon WHERE flag=? and  name not in(select item_id from tabCreche_requisition_response where creche_id=? and item_id NOTNULL  and year=? and month=?) order by CASE WHEN value LIKE ? THEN 1 ELSE 0 END,  seq_id  ASC',
         [flag, crechId, year, month, '%other%']);
@@ -294,7 +318,8 @@ class OptionsModelHelper {
   }
 
   Future<List<OptionsModel>> getAllMstCommonNotINOptionsWthouASC(
-      List<String> defaultCommon, String lang) async {
+      List<String> defaultCommon, String lang)
+  async {
     String questionMarks = List.filled(defaultCommon.length, '?').join(',');
     List<dynamic> parameters = [...defaultCommon];
     print(defaultCommon);
@@ -392,7 +417,8 @@ class OptionsModelHelper {
   }
 
   Future<List<OptionsModel>> callCrechInOption(
-      String tableName, int creche_id) async {
+      String tableName, int creche_id)
+  async {
     var tabName = 'tab$tableName';
     List<OptionsModel> optionsModel = [];
     var crecheLocationWise =

@@ -43,8 +43,6 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
   bool isOnlyUnsynched = false;
   List<CmcCCResponseModel> unsynchedList = [];
   List<CmcCCResponseModel> allList = [];
-  DateTime applicableDate = Validate().stringToDate(Validate.date);
-  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -53,8 +51,6 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
   }
 
   Future<void> initializeData() async {
-    var date = await Validate().readString(Validate.date);
-    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -265,14 +261,7 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
                         return GestureDetector(
                           onTap: () async {
                             var ccGuid = filterData[index].cmc_cc_guid;
-                            var created_at = DateTime.parse(
-                                filterData[index].created_at.toString());
-                            var date = DateTime(created_at.year,
-                                created_at.month, created_at.day);
-                            bool isViewScreen = date
-                                .add(Duration(days: 7))
-                                .isBefore(
-                                    DateTime.parse(Validate().currentDate()));
+                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, 7);
 
                             if (Global.validString(ccGuid)) {
                               var refStatus = await Navigator.of(context).push(
@@ -286,10 +275,7 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
                                                       filterData[index]
                                                           .responces!,
                                                       'date_of_visit'),
-                                              isViewScreen:
-                                                  now.isBefore(applicableDate)
-                                                      ? false
-                                                      : isViewScreen)));
+                                              isViewScreen:isEdited==true?false:true)));
 
                               if (refStatus == 'itemRefresh') {
                                 await fetchCmcCCRecords();

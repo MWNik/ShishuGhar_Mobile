@@ -20,6 +20,7 @@ import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responc
 import '../../../database/helper/village_data_helper.dart';
 import '../../../model/databasemodel/tabVillage_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
+import '../../enrolled_child_terms_condition.dart';
 import 'enrolled_exit_child_tab.dart';
 
 class NotEnrolledExitChildrenListedScreen extends StatefulWidget {
@@ -473,9 +474,9 @@ class _NotEnrolledChildrenListedScreenState
                                         Global.getItemValues(
                                             selectedItem['responces'],
                                             'child_name');
-                                    refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                                     refStatus = await Navigator.of(context).push(MaterialPageRoute(
                                         builder: (BuildContext context) =>
-                                            EnrolledExitChilrenTab(
+                                            EnrolledChildTermsCondition(
                                                 openingDate: Global.validToString(crecheOpeningDate),
                                                 closingDate: Global.validToString(crecheClosingDate),
                                                 isEditable: role ==
@@ -766,7 +767,8 @@ class _NotEnrolledChildrenListedScreenState
   }
 
   Future<String?> callDateOfExit(String CHHGUID) async {
-    return await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
+    String? maxDateOfExit=await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
+    return await Validate().callMinDate(maxDateOfExit, 15);
   }
 
   bool isDateInRange(DateTime targetDate) {

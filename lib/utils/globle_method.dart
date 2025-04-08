@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:shishughar/utils/validate.dart';
 
 import '../model/apimodel/translation_language_api_model.dart';
 import '../model/databasemodel/tabBlock_model.dart';
@@ -74,6 +76,10 @@ class Global {
     }
   }
 
+  static String convertToTwoDigit(int number) {
+    return number.toString().padLeft(2, '0');
+  }
+
   static bool validToBool(bool? isSelected) {
     if (isSelected != null) {
       return isSelected;
@@ -136,6 +142,23 @@ class Global {
     }
   }
 
+  static int getbackDaysByMonth(String? date,int month) {
+    int days=0;
+    try {
+      if(Global.validString(date)) {
+        DateTime? dateValue = Validate().stringToDateNull(date!);
+        if (dateValue != null) {
+          DateTime newDate = DateTime(
+              dateValue.year, dateValue.month - 25, dateValue.day);
+          days = Validate().calculateAgeInDaysEx(newDate, dateValue);
+        }
+      }
+     return days;
+    } on Exception {
+      return days;
+    }
+  }
+
   static double roundToNearestHalf(double number) {
     return (number * 2).ceil() / 2;
   }
@@ -143,6 +166,36 @@ class Global {
     print(double.parse(number.toStringAsFixed(1)));
     return double.parse(number.toStringAsFixed(1));
   }
+
+
+  static double roundAfterTwoDecimalTr(num number) {
+    double truncatedValue = (number * 100).truncateToDouble()/ 100;
+    return truncatedValue;
+  }
+
+  static double stringToDoubleTr(String? number) {
+    double truncatedValue=0.00;
+    if(validNum(number)>0){
+      double value = double.parse(number!);
+       truncatedValue = (value * 100).truncateToDouble()/ 100;
+    }
+    return truncatedValue;
+  }
+
+  static double roundAfterThreeDecimalTr(num number) {
+    double truncatedValue = (number * 1000).truncateToDouble()/ 1000;
+    return truncatedValue;
+  }
+
+  static double stringToDoubleThreeTr(String? number) {
+    double truncatedValue=0.00;
+    if(validNum(number)>0){
+      double value = double.parse(number!);
+      truncatedValue = (value * 1000).truncateToDouble()/ 1000;
+    }
+    return truncatedValue;
+  }
+
 
   static String intToString(int? value) {
     try {
@@ -178,6 +231,29 @@ class Global {
     } on Exception {
       return 0;
     }
+  }
+
+  static double calculateZScore(double value, double M, double L, double S) {
+    // if (L == 0) {
+    //   throw ArgumentError("L should not be zero to avoid division errors.");
+    // }
+    // return ((pow(value / M, L)) - 1) / (S * L);
+    // Step 1: Compute (value / M)
+    double ratio = value / M;
+
+    // Step 2: Compute (ratio^L)
+    double ratioToL = pow(ratio, L).toDouble(); // Convert result to double
+
+    // Step 3: Compute (ratio^L - 1)
+    double numerator = ratioToL - 1;
+
+    // Step 4: Compute (S * L)
+    double denominator = S * L;
+
+    // Step 5: Compute Z-score
+    double zScore = numerator / denominator;
+
+    return stringToDouble(zScore.toStringAsFixed(2));
   }
 
   static String returnTrLable(

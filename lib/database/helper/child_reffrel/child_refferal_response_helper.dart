@@ -165,7 +165,11 @@ class ChildReferralTabResponseHelper {
       String? schedule_date,
       String responces,
       String userId,
-      String cgmguid) async {
+      String? updatedBy,
+      String cgmguid,
+      String? created_at,
+      String? update_at
+      ) async {
     var item = ChildReferralTabResponceModel(
         child_referral_guid: child_referral_guid,
         childenrolledguid: enrolChildGuid,
@@ -180,7 +184,9 @@ class ChildReferralTabResponseHelper {
         schedule_date: schedule_date,
         name: name,
         created_by: userId,
-        created_at: Validate().currentDateTime());
+        update_at: update_at,
+        updated_by:updatedBy,
+        created_at: created_at);
     await DatabaseHelper.database!.insert(
         'child_referral_responce', item.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);

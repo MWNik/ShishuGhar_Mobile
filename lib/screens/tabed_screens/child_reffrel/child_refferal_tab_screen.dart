@@ -31,6 +31,7 @@ class ChildReferralTabScreen extends StatefulWidget {
   final DateTime? minDate;
   final String scheduleDate;
   final bool isEditable;
+  final bool isEditableForDischage;
 
   ChildReferralTabScreen(
       {super.key,
@@ -47,7 +48,8 @@ class ChildReferralTabScreen extends StatefulWidget {
       required this.isDischarge,
       required this.minDate,
       required this.scheduleDate,
-      required this.isEditable});
+      required this.isEditable,
+      required this.isEditableForDischage});
 
   @override
   State<ChildReferralTabScreen> createState() => _ChildReferralTabScreenState();
@@ -315,7 +317,7 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
     List<Widget> tabItem = [];
     for (int i = 0; i < tabBreakItems.length; i++) {
       if (tabBreakItems[i].parent == 'Child Referral') {
-        tabItem.add(widget.isEditable
+        tabItem.add((widget.isEditableForDischage)
             ? ChildReferralTabItemsScreen(
                 enrollDate: widget.enrollDate,
                 GrowthMonitoringGUID: widget.GrowthMonitoringGUID,
@@ -330,6 +332,8 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
                 isDischarge: widget.isDischarge,
                 tabIndex: i,
                 totalTab: tabBreakItems.length,
+                isEditable: widget.isEditable,
+                isEditableForDischage: widget.isEditableForDischage,
                 scheduleDate: widget.scheduleDate,
                 minDate: widget.minDate ?? null)
             : ChildReferralTabItemsViewScreen(
@@ -345,6 +349,9 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
                 screenItem: expendedItems,
                 changeTab: changeTab,
                 tabIndex: i,
+                isEditable: widget.isEditable,
+                isEditableForDischage: widget.isEditableForDischage,
+                minDate: widget.minDate ?? null,
                 totalTab: tabBreakItems.length));
       }
     }

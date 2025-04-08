@@ -47,6 +47,22 @@ class ChildGrowthResponseHelper {
     return items;
   }
 
+  Future<List<ChildGrowthMetaResponseModel>> anthormentryByCrecheLimit12(
+      int creche_id) async {
+    var query =
+        'Select * from  child_anthormentry_responce  where creche_id=?  ORDER by created_at  DESC limit 12';
+
+    List<Map<String, dynamic>> result =
+    await DatabaseHelper.database!.rawQuery(query, [creche_id]);
+
+    List<ChildGrowthMetaResponseModel> items = [];
+    result.forEach((itemMap) {
+      items.add(ChildGrowthMetaResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<ChildGrowthMetaResponseModel>> anthormentryByCrecheINChild(
       int creche_id) async {
     var query =

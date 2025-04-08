@@ -60,6 +60,9 @@ class _HouseholdScreenState
   String? hhNameTitle = CustomText.hhHeadName;
   String? role;
   bool isEdited = true;
+  List<String> dobField = [
+    'child_dob','is_dob_available','child_age'
+  ];
 
   @override
   void initState() {

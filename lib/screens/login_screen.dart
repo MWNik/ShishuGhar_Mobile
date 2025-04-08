@@ -450,7 +450,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     );
   }
 
-  initMasterData(MasterDataModel master) async {
+  Future initMasterData(MasterDataModel master) async {
     if (master != null) {
       List<TabState> stateList = master.tabState!;
 

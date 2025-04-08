@@ -44,7 +44,7 @@ class _WeightToHeightBoysGirlsScreenState
   List<Offset>? yellow_min = [];
   List<Offset>? child = [];
   List<double>? length = [], height_max = [], height_min = [];
-  double? maxX, maxY;
+  double? maxX, maxY,minX;
   // minY, minX;
   List children = [];
   List<ChildGrowthMetaResponseModel> childAnthro = [];
@@ -68,8 +68,8 @@ class _WeightToHeightBoysGirlsScreenState
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
-    var boys = await HeightWeightBoysGirlsHelper().callWeightToHeightBoys();
-    var girls = await HeightWeightBoysGirlsHelper().callWeightToHeightGirls();
+    var boys = await HeightWeightBoysGirlsHelper().callWeightToHeightBoys24Or0();
+    var girls = await HeightWeightBoysGirlsHelper().callWeightToHeightGirls24Or0();
     List res = widget.gender_id == 1 ? boys : girls;
     // widget.gender_id == '1' ? boys : girls;
     print(widget.gender_id);
@@ -79,34 +79,36 @@ class _WeightToHeightBoysGirlsScreenState
         return result;
       }).toList());
 
+      minX=res.length>0?(res.first.length as num).toDouble():0;
+
       height_max?.addAll(res.map((data) {
-        double result = (data.green as num).toDouble();
+        double result = (data.sd2 as num).toDouble();
         return result;
       }).toList());
 
       height_min?.addAll(res.map((data) {
-        double result = (data.red as num).toDouble();
+        double result = (data.sd3neg as num).toDouble();
         return result;
       }).toList());
 
       green_cor?.addAll(res.map((data) {
         double x = (data.length as num).toDouble();
-        double y = (data.green as num).toDouble();
+        double y = (data.sd2 as num).toDouble();
         return Offset(x, y);
       }).toList());
       red_cor?.addAll(res.map((data) {
         double x = (data.length as num).toDouble();
-        double y = (data.red as num).toDouble();
+        double y = (data.sd3neg as num).toDouble();
         return Offset(x, y);
       }).toList());
       yellow_max?.addAll(res.map((data) {
         double x = (data.length as num).toDouble();
-        double y = (data.yellow_max as num).toDouble();
+        double y = (data.sd2neg as num).toDouble();
         return Offset(x, y);
       }).toList());
       yellow_min?.addAll(res.map((data) {
         double x = (data.length as num).toDouble();
-        double y = (data.yellow_min as num).toDouble();
+        double y = (data.sd3neg as num).toDouble();
         return Offset(x, y);
       }).toList());
     });
@@ -157,9 +159,6 @@ class _WeightToHeightBoysGirlsScreenState
         // (x < length!.first) ? minX = x : minX = length!.first;
 
         double y = (data['weight'] as num).toDouble();
-
-        (y > height_max!.last) ? maxY = y : maxY = height_max!.last;
-        // (y < height_min!.first) ? minY = y : minY = height_min!.first;
 
         return Offset(x, y);
       }).toList());
@@ -227,7 +226,7 @@ class _WeightToHeightBoysGirlsScreenState
                         heading: CustomText.WeightforHeight,
                         bottomName: "Height",
                         leftName: "Weight",
-                        // minY: minY!,
+                  minX: minX!,
                         // minX: minX!,
                         childenrollguid: widget.childenrollguid,
                       )
@@ -250,7 +249,7 @@ class _WeightToHeightBoysGirlsScreenState
                           child: child!,
                           maxX: maxX!,
                           // minX: minX!,
-                          // minY: minY!,
+                          minX: minX!,
                         ),
                       )),
       ),

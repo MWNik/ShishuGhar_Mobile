@@ -1064,12 +1064,14 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                             onTap: () async {
                               // Handle item tap here
                               print('Item $index tapped');
+                              String? minDate=await Validate().requredOnlyMinimum(filterData[index].created_at, 7);
+                              String? maxDate=filterData[index].created_at;
                               var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (BuildContext context) =>
                                       HHTabScreen(
                                           hhGuid: filterData[index].HHGUID!,
-                                          crecheId: widget.crecheId),
+                                          crecheId: widget.crecheId,minDate:minDate,maxDate:maxDate),
                                 ),
                               );
                               if (refStatus == 'itemRefresh') {
@@ -1791,11 +1793,12 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                         String hhGuid = '';
                         if (!Global.validString(hhGuid)) {
                           hhGuid = Validate().randomGuid();
+                          String? minDate=await Validate().requredOnlyMinimum(null, 7);
                           print("line $hhGuid");
                           var refStatus = await Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (BuildContext context) => HHTabScreen(
-                                  hhGuid: hhGuid, crecheId: widget.crecheId),
+                                  hhGuid: hhGuid, crecheId: widget.crecheId,minDate: minDate),
                             ),
                           );
                           if (refStatus == 'itemRefresh') {

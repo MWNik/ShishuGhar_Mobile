@@ -297,7 +297,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                   false,
                                   context);
                           }
-                        } else if (i == 1) {
+                        }
+                        else if (i == 1) {
                           String refStatus = '';
                           if (role == CustomText.crecheSupervisor) {
                             if (pendindTaskCount > 0) {
@@ -397,7 +398,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                           if (refStatus == 'itemRefresh') {
                             await initializeData();
                           }
-                        } else if (i == 2) {
+                        }
+                        else if (i == 2) {
                           totalApiCount = 27;
                           callMasterData(context);
                         }
@@ -688,7 +690,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                 const CircularProgressIndicator(),
                 SizedBox(height: 10.h),
                 Text(
-                    '${Global.returnTrLable(locationControlls, CustomText.pleaseWait, lngtr!)} ${(loadingText)}/100%'),
+                    '${Global.returnTrLable(locationControlls, CustomText.pleaseWait, lngtr!)} (${(loadingText)}/100)%'),
               ],
             ));
           }),

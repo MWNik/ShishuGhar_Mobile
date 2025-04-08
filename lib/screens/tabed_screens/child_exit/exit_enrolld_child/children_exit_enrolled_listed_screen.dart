@@ -307,6 +307,8 @@ class _EnrolledChildrenListedScreenState
                           var selectedItem = filterData[index];
                           var childName = Global.getItemValues(
                               selectedItem['responces'], 'child_name');
+                          String? minDate=await callMinDate(Global.getItemValues(
+                              selectedItem['responces'], 'date_of_enrollment'));
 
                           var refStatus = await Navigator.of(context).push(
                               MaterialPageRoute(
@@ -329,7 +331,7 @@ class _EnrolledChildrenListedScreenState
                                                     .trim()
                                             ? true
                                             : false,
-                                        minDate: null,
+                                        minDate: minDate,
                                         childName: childName,
                                         crecheId: Global.stringToInt(
                                             Global.getItemValues(
@@ -612,5 +614,9 @@ class _EnrolledChildrenListedScreenState
     maxAgeLimit = null;
     minAgeLimit = null;
     setState(() {});
+  }
+
+  Future<String?> callMinDate(String dateOfEnrollment) async {
+    return await Validate().callMinDate(dateOfEnrollment, 15);
   }
 }

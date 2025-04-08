@@ -511,15 +511,11 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                               'weight_for_age'),
                                                           style: Styles.red85,
                                                         ),
-                                                        // Text(
-                                                        //   callColorNameAvg(
-                                                        //       childResponce(
-                                                        //           childHHData[
-                                                        //                   index]
-                                                        //               .responces!),
-                                                        //       'weight_for_age'),
-                                                        //   style: Styles.red85,
-                                                        // ),
+                                                        Text(
+                                                          callColorNameAvg(childResponce(childHHData[index].responces!), 'weight_for_age',
+                                                              callGetChildDataFromAnthro(childHHData[index].responces!, 'measurement_taken_date')),
+                                                          style: Styles.red85,
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
@@ -557,15 +553,15 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                             'weight_for_height'),
                                                         style: Styles.red85,
                                                       ),
-                                                      // Text(
-                                                      //   callColorNameAvg(
-                                                      //       childResponce(
-                                                      //           childHHData[
-                                                      //                   index]
-                                                      //               .responces!),
-                                                      //       'weight_for_height'),
-                                                      //   style: Styles.red85,
-                                                      // ),
+                                                      Text(
+                                                        callColorNameAvg(
+                                                            childResponce(
+                                                                childHHData[
+                                                                        index]
+                                                                    .responces!),
+                                                            'weight_for_height',callGetChildDataFromAnthro(childHHData[index].responces!, 'measurement_taken_date')),
+                                                        style: Styles.red85,
+                                                      ),
                                                     ],
                                                   )),
                                                   Expanded(
@@ -602,15 +598,15 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                             'height_for_age'),
                                                         style: Styles.red85,
                                                       ),
-                                                      // Text(
-                                                      //   callColorNameAvg(
-                                                      //       childResponce(
-                                                      //           childHHData[
-                                                      //                   index]
-                                                      //               .responces!),
-                                                      //       'height_for_age'),
-                                                      //   style: Styles.red85,
-                                                      // ),
+                                                      Text(
+                                                        callColorNameAvg(
+                                                            childResponce(
+                                                                childHHData[
+                                                                        index]
+                                                                    .responces!),
+                                                            'height_for_age',callGetChildDataFromAnthro(childHHData[index].responces!, 'measurement_taken_date')),
+                                                        style: Styles.red85,
+                                                      ),
                                                     ],
                                                   ))
                                                 ],
@@ -772,8 +768,8 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
     return colorName;
   }
 
-  String callColorNameAvg(Map<String, dynamic> responce, String key) {
-    String grothValue = DependingLogic.AutoColorCreateByHeightWightString(
+  String callColorNameAvg(Map<String, dynamic> responce, String key, String? measurementDate) {
+    String grothValue = DependingLogic.AutoColorCreateByHeightWightStringNew(
         tabHeightforageBoys,
         tHeightforageGirls,
         tabWeightforageBoys,
@@ -781,7 +777,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
         tabWeightToHeightBoys,
         tabWeightToHeightGirls,
         key,
-        widget.gender,
+        widget.gender,measurementDate,
         responce);
     if (Global.validString(grothValue)) {
       grothValue = '(${grothValue})';

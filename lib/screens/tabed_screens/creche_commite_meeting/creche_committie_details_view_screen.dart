@@ -218,8 +218,8 @@ class _CrecheCommettieDetailsScreenState
               : logic!.dependeOnMendotory(myMap, quesItem),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           // minDate: quesItem.fieldname == 'meeting_date' ? widget.minDate : null,
-          readable:
-              quesItem.fieldname == 'meeting_date' ? isDateReadable : null,
+          readable:true,
+              // quesItem.fieldname == 'meeting_date' ? isDateReadable : true,
           calenderValidate: logic!.calenderValidation(myMap, quesItem),
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;

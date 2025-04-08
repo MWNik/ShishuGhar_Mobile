@@ -34,8 +34,6 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
   List<Translation> translats = [];
   String lng = 'en';
   bool isOnlyUnsyched = false;
-  DateTime applicableDate = Validate().stringToDate(Validate.date);
-  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -44,8 +42,6 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
   }
 
   Future<void> initializeData() async {
-    var date = await Validate().readString(Validate.date);
-    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -157,14 +153,7 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
                         onTap: () async {
                           var ccGuid = filterCCdata[index].cmc_cc_guid;
                           if (Global.validString(ccGuid)) {
-                            var created_at = DateTime.parse(
-                                filterCCdata[index].created_at.toString());
-                            var date = DateTime(created_at.year,
-                                created_at.month, created_at.day);
-                            bool isViewScreen = date
-                                .add(Duration(days: 7))
-                                .isBefore(
-                                    DateTime.parse(Validate().currentDate()));
+                            bool isEdited=await Validate().checkEditable(filterCCdata[index].created_at, 7);
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
@@ -174,10 +163,7 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
                                             creche_id: Global.stringToInt(
                                                 widget.creche_id),
                                             isEdit: false,
-                                            isViewScreen:
-                                                now.isBefore(applicableDate)
-                                                    ? false
-                                                    : isViewScreen,
+                                            isViewScreen:isEdited==true?false:true,
                                             date_of_visit: Global.getItemValues(
                                                 filterCCdata[index].responces!,
                                                 'date_of_visit'))));

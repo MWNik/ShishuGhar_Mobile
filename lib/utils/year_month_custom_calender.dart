@@ -65,6 +65,7 @@ class _CustomCalendarState extends State<YearMonthCalendar> {
       DateTime today = DateTime.now();
       String? selectGuid = null;
       DateTime date=DateTime(_currentDate.year,index+1);
+      DateTime last12Date = DateTime(today.year, today.month - 12);  //for disable after 12 month
       bool isFuture = date.isAfter(today);
       var attendeDateEs= widget.mesures.where((item) {
         var attendenceDate = Global.stringToDate(item.measurement_date);
@@ -91,7 +92,7 @@ class _CustomCalendarState extends State<YearMonthCalendar> {
         selectGuid=attendeDateDraft.isNotEmpty?attendeDateDraft.first.cgmguid:null;
       }
 
-
+      bool isOutsideAllowedRange = date.isAfter(today) || date.isBefore(last12Date);//for disable after 12 month
 
 
       return GestureDetector(
@@ -102,7 +103,7 @@ class _CustomCalendarState extends State<YearMonthCalendar> {
           decoration: BoxDecoration(
             color:isAttendece
                 ? Colors.green:isAttendeceDraft?Colors.red
-                : (isFuture ? Colors.grey[300] : Colors.white),
+                : ((isFuture || isOutsideAllowedRange) ? Colors.grey[300] : Colors.white),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey, width: 0.5),
           ),
@@ -112,7 +113,7 @@ class _CustomCalendarState extends State<YearMonthCalendar> {
             style: TextStyle(
               color: isAttendece
             ? Colors.white :isAttendeceDraft?Colors.white
-                : (isFuture ? Colors.grey : Colors.black),
+                : ((isFuture||isOutsideAllowedRange) ? Colors.grey : Colors.black),
             ),
           ),
         ),

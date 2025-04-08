@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -45,11 +44,8 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
   List<Translation> translats = [];
   String lng = 'en';
   List<String> existingDates = [];
-  DateTime? lastDate;
   bool isOnlyUnsyched = false;
   String? role;
-  DateTime applicableDate = Validate().stringToDate("2024-12-31");
-  var now = DateTime.parse(Validate().currentDate());
   // DateTime? maxDate;
 
   void initState() {
@@ -58,26 +54,7 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
   }
 
   Future<void> initializeData() async {
-    var date = await Validate().readString(Validate.date);
-    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     role = (await Validate().readString(Validate.role))!;
-    List<int> dateParts =
-        widget.dateofEnrollment.split('-').map(int.parse).toList();
-    lastDate = DateTime(dateParts[0], dateParts[1], dateParts[2])
-        .subtract(Duration(days: 1));
-
-    var currDate = Validate().currentDate();
-    List<int> crrntDateParts = currDate.split('-').map(int.parse).toList();
-    var backDate =
-        DateTime(crrntDateParts[0], crrntDateParts[1], crrntDateParts[2])
-            .subtract(Duration(days: 30));
-    if (lastDate != null) {
-      if (lastDate!.isBefore(backDate!)) {
-        lastDate = backDate;
-      }
-    } else if (lastDate == null) {
-      lastDate = backDate;
-    }
 
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
@@ -133,6 +110,7 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                 String child_health_guid = '';
                 if (!(Global.validString(child_health_guid))) {
                   child_health_guid = Validate().randomGuid();
+                  String? minDate=await Validate().callMinDate(widget.dateofEnrollment, 30);
                   var refStatus = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
@@ -141,9 +119,7 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                                   enName: widget.enName!,
                                   creche_id: widget.creche_id,
                                   chilenrolledGUID: widget.chilenrolledGUID,
-                                  lastDate: now.isBefore(applicableDate)
-                                      ? null
-                                      : lastDate,
+                                  lastDate: Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
                                   childName: widget.childName,
                                   childId: widget.childId,
                                   existingDates: existingDates)));
@@ -197,20 +173,14 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                          // var lstDate=await callDatesAlredDateList(Global.getItemValues(filterhealthData[index].responces!, 'date'));
-                          var created_at = DateTime.parse(
-                              filterhealthData[index].created_at.toString());
-                          var recordDate = DateTime(created_at.year,
-                              created_at.month, created_at.day);
-                          bool isUnEditable =
-                              role == CustomText.crecheSupervisor.trim()
-                                  ? recordDate.add(Duration(days: 15)).isBefore(
-                                      DateTime.parse(Validate().currentDate()))
-                                  : true;
 
-                          if (now.isBefore(applicableDate)) {
-                            isUnEditable = false;
+                          bool isEdited=await Validate().checkEditable(filterhealthData[index].created_at, 15);
+                          String? minDate=await Validate().callMinDate(widget.dateofEnrollment, 30);
+                          bool isUnEditable=true;
+                          if(isEdited && role == CustomText.crecheSupervisor){
+                            isUnEditable=false;
                           }
+
 
                           if (existingDates.contains(Global.getItemValues(
                               filterhealthData[index].responces, 'date'))) {
@@ -242,10 +212,7 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                                               creche_id: widget.creche_id,
                                               chilenrolledGUID:
                                                   widget.chilenrolledGUID,
-                                              lastDate:
-                                                  now.isBefore(applicableDate)
-                                                      ? null
-                                                      : lastDate,
+                                              lastDate:Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
                                               childId: widget.childId,
                                               childName: widget.childName,
                                               existingDates: existingDates)));
@@ -388,79 +355,79 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
     );
   }
 
-  Future<void> fetchChildDetail() async {
-    //added
-    List<String> datesListString = [];
-    if (childHeathResponce.isNotEmpty) {
-      childHeathResponce.forEach((element) {
-        var date = Global.getItemValues(element.responces!, 'date');
-        if (Global.validString(date)) {
-          datesListString.add(date);
-        }
-      });
-      var dateList = datesListString.map((dateString) {
-        List<int> dateParts = dateString.split('-').map(int.parse).toList();
-        return DateTime(dateParts[0], dateParts[1], dateParts[2]);
-      }).toList();
-      if (dateList.length > 0) {
-        lastDate = dateList.reduce(
-            (value, element) => value.isAfter(element) ? value : element);
-        // currentDate =
-        //     lastDate == Validate().stringToDate(Validate().currentDate());
-      }
-    }
-  }
+  // Future<void> fetchChildDetail() async {
+  //   //added
+  //   List<String> datesListString = [];
+  //   if (childHeathResponce.isNotEmpty) {
+  //     childHeathResponce.forEach((element) {
+  //       var date = Global.getItemValues(element.responces!, 'date');
+  //       if (Global.validString(date)) {
+  //         datesListString.add(date);
+  //       }
+  //     });
+  //     var dateList = datesListString.map((dateString) {
+  //       List<int> dateParts = dateString.split('-').map(int.parse).toList();
+  //       return DateTime(dateParts[0], dateParts[1], dateParts[2]);
+  //     }).toList();
+  //     if (dateList.length > 0) {
+  //       lastDate = dateList.reduce(
+  //           (value, element) => value.isAfter(element) ? value : element);
+  //       // currentDate =
+  //       //     lastDate == Validate().stringToDate(Validate().currentDate());
+  //     }
+  //   }
+  // }
 
-  Future<DateTime?> callDatesAlredDateList(String date) async {
-    DateTime? lastGrowthDateNew;
-    List<String> dateStringData = [];
-    childHeathResponce.forEach((element) {
-      var date = Global.getItemValues(element.responces!, 'date');
-      if (Global.validString(date)) {
-        dateStringData.add(date);
-      }
-    });
-    var dateList = dateStringData.map((dateString) {
-      List<int> dateParts = dateString.split('-').map(int.parse).toList();
-      return DateTime(dateParts[0], dateParts[1], dateParts[2]);
-    }).toList();
-
-    List<int> dateCuuten = date.split('-').map(int.parse).toList();
-
-    var selecttedItemDate =
-        DateTime(dateCuuten[0], dateCuuten[1], dateCuuten[2]);
-
-    if (dateList.length > 0) {
-      var maxDateList = dateList
-          .where((element) => (selecttedItemDate.isAfter(element)))
-          .toList();
-      DateTime? greatestDate = maxDateList.isNotEmpty
-          ? maxDateList.reduce(
-              (value, element) => value.isAfter(element) ? value : element)
-          : null;
-      print('max $greatestDate');
-      lastGrowthDateNew = greatestDate;
-    }
-
-    if (dateList.length > 0) {
-      var minDateList = dateList
-          .where((element) => (selecttedItemDate.isBefore(element)))
-          .toList();
-      DateTime? lowesttDate = minDateList.isNotEmpty
-          ? minDateList.reduce(
-              (value, element) => value.isBefore(element) ? value : element)
-          : null;
-      // maxDate=lowesttDate;
-      print('min $lowesttDate');
-    }
-    // else maxDate=null;
-    if (lastGrowthDateNew == null) {
-      List<int> dateParts =
-          widget.dateofEnrollment.split('-').map(int.parse).toList();
-      lastGrowthDateNew = DateTime(dateParts[0], dateParts[1], dateParts[2])
-          .subtract(Duration(days: 1));
-    }
-
-    return lastGrowthDateNew;
-  }
+  // Future<DateTime?> callDatesAlredDateList(String date) async {
+  //   DateTime? lastGrowthDateNew;
+  //   List<String> dateStringData = [];
+  //   childHeathResponce.forEach((element) {
+  //     var date = Global.getItemValues(element.responces!, 'date');
+  //     if (Global.validString(date)) {
+  //       dateStringData.add(date);
+  //     }
+  //   });
+  //   var dateList = dateStringData.map((dateString) {
+  //     List<int> dateParts = dateString.split('-').map(int.parse).toList();
+  //     return DateTime(dateParts[0], dateParts[1], dateParts[2]);
+  //   }).toList();
+  //
+  //   List<int> dateCuuten = date.split('-').map(int.parse).toList();
+  //
+  //   var selecttedItemDate =
+  //       DateTime(dateCuuten[0], dateCuuten[1], dateCuuten[2]);
+  //
+  //   if (dateList.length > 0) {
+  //     var maxDateList = dateList
+  //         .where((element) => (selecttedItemDate.isAfter(element)))
+  //         .toList();
+  //     DateTime? greatestDate = maxDateList.isNotEmpty
+  //         ? maxDateList.reduce(
+  //             (value, element) => value.isAfter(element) ? value : element)
+  //         : null;
+  //     print('max $greatestDate');
+  //     lastGrowthDateNew = greatestDate;
+  //   }
+  //
+  //   if (dateList.length > 0) {
+  //     var minDateList = dateList
+  //         .where((element) => (selecttedItemDate.isBefore(element)))
+  //         .toList();
+  //     DateTime? lowesttDate = minDateList.isNotEmpty
+  //         ? minDateList.reduce(
+  //             (value, element) => value.isBefore(element) ? value : element)
+  //         : null;
+  //     // maxDate=lowesttDate;
+  //     print('min $lowesttDate');
+  //   }
+  //   // else maxDate=null;
+  //   if (lastGrowthDateNew == null) {
+  //     List<int> dateParts =
+  //         widget.dateofEnrollment.split('-').map(int.parse).toList();
+  //     lastGrowthDateNew = DateTime(dateParts[0], dateParts[1], dateParts[2])
+  //         .subtract(Duration(days: 1));
+  //   }
+  //
+  //   return lastGrowthDateNew;
+  // }
 }

@@ -42,8 +42,6 @@ class _CrecheMonitorListingScreenState
   List<CrecheMonitorResponseModel> unsynchedList = [];
   List<CrecheMonitorResponseModel> allList = [];
   bool isDraftAvailable = false;
-  DateTime applicableDate = Validate().stringToDate(Validate.date);
-  DateTime now = DateTime.parse(Validate().currentDate());
 
   @override
   void initState() {
@@ -52,8 +50,6 @@ class _CrecheMonitorListingScreenState
   }
 
   Future<void> initializeData() async {
-    var date = await Validate().readString(Validate.date);
-    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     lng = (await Validate().readString(Validate.sLanguage))!;
     List<String> valueItems = [
       CustomText.VisitNotes,
@@ -271,14 +267,7 @@ class _CrecheMonitorListingScreenState
                         return GestureDetector(
                           onTap: () async {
                             final cmgUid = filterData[index].cmguid;
-                            var created_at = DateTime.parse(
-                                filterData[index].created_at.toString());
-                            var date = DateTime(created_at.year,
-                                created_at.month, created_at.day);
-                            bool isViewScreen = date
-                                .add(Duration(days: 7))
-                                .isBefore(
-                                    DateTime.parse(Validate().currentDate()));
+                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, 7);
 
                             final allowRefresh =
                                 await Navigator.of(context).push(
@@ -290,9 +279,7 @@ class _CrecheMonitorListingScreenState
                                       filterData[index].responces,
                                       'date_of_visit'),
                                   isEdit: true,
-                                  isViewScreen: now.isBefore(applicableDate)
-                                      ? false
-                                      : isViewScreen,
+                                  isViewScreen: isEdited==true?false:true,
                                 ),
                               ),
                             );

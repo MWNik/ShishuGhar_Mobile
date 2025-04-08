@@ -10,6 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:shishughar/firebase_options.dart';
 import 'package:shishughar/screens/splashScreen.dart';
+import 'package:shishughar/utils/globle_method.dart';
 import 'database/database_helper.dart';
 
 void main() async {
@@ -29,7 +30,9 @@ void main() async {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
-
+  // var value1=Global.roundAfterThreeDecimalTr(2.9999999);
+  // var value2=Global.stringToDoubleThreeTr('2.9999999');
+  // print('value $value1 $value2 ');
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
     DeviceOrientation.portraitUp,

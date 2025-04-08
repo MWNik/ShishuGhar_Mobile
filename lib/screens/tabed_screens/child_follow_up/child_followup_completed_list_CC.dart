@@ -373,13 +373,8 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
                                   var child_followup_guid =
                                       selectedItem['child_followup_guid'];
 
-                                  var currentDate =
-                                      DateTime.parse(Validate().currentDate());
-                                  bool isEditable = currentDate.isBefore(
-                                      DateTime.parse(filteredFollowUp[index]
-                                                  ['created_at']
-                                              .toString())
-                                          .add(Duration(days: 7)));
+                                  bool isEdited=await Validate().checkEditable(filteredFollowUp[index]
+                                  ['created_at'], 7);
                                   var dateString =
                                       filteredFollowUp[index]['schedule_date']!;
                                   var parts = dateString
@@ -457,7 +452,7 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
                                                           CustomText
                                                               .crecheSupervisor
                                                               .trim()
-                                                      ? isEditable
+                                                      ? isEdited
                                                       : false,
                                                 )));
 

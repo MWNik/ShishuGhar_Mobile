@@ -165,9 +165,7 @@ class _ChildFollowUpsListingScreenState
 
                           var currentDate =
                               DateTime.parse(Validate().currentDate());
-                          bool isEditable = currentDate.isBefore(DateTime.parse(
-                                  followUpsList[index].created_at.toString())
-                              .add(Duration(days: 7)));
+                          bool isEdited=await Validate().checkEditable(followUpsList[index].created_at, 7);
                           var dateString = followUpsList[index].schedule_date!;
                           var parts = dateString
                               .toString()

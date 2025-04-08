@@ -23,8 +23,13 @@ import 'depending_logic.dart';
 class HHTabScreen extends StatefulWidget {
   final String hhGuid;
   final int crecheId;
+   String? minDate;
+   String? maxDate;
 
-  HHTabScreen({super.key, required this.hhGuid, required this.crecheId});
+  HHTabScreen({super.key, required this.hhGuid, required this.crecheId,
+    this.minDate,
+    this.maxDate
+  });
 
   @override
   _HHTabScreenState createState() => _HHTabScreenState();
@@ -323,6 +328,8 @@ class _HHTabScreenState extends State<HHTabScreen>
       } else {
         tabItem.add(AddHouseholdScreenFromTab(
             hhGuid: widget.hhGuid,
+            minDate: widget.minDate,
+            maxDate: widget.maxDate,
             crecheId: widget.crecheId,
             tabBreakItem: tabBreakItems[i],
             screenItem: itemScreenItems,

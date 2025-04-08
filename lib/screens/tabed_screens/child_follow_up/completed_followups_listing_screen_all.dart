@@ -306,10 +306,7 @@ class _ChildFollowUpsListingScreenState
 
                           var currentDate =
                               DateTime.parse(Validate().currentDate());
-                          bool isEditable = currentDate.isBefore(DateTime.parse(
-                                  filteredFollowUp[index]['created_at']
-                                      .toString())
-                              .add(Duration(days: 7)));
+                          bool isEdited=await Validate().checkEditable(filteredFollowUp[index]['created_at'], 7);
                           var dateString =
                               filteredFollowUp[index]['schedule_date']!;
                           var parts = dateString
@@ -369,10 +366,7 @@ class _ChildFollowUpsListingScreenState
                                           minDate: backDate.isBefore(backDateSD)
                                               ? backDateSD
                                               : backDate,
-                                          isEditable: currentDate
-                                                  .isBefore(applicableDate)
-                                              ? true
-                                              : isEditable,
+                                          isEditable: isEdited,
                                         )));
 
                             if (refStatus == 'itemRefresh') {

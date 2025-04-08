@@ -28,9 +28,11 @@ import '../model/apimodel/translation_language_api_model.dart';
 import '../style/styles.dart';
 import '../utils/globle_method.dart';
 import '../utils/validate.dart';
+import 'dashboard_report_by_api.dart';
 
 class ShishuGharDetailsReplica extends StatefulWidget {
   final int crecheId;
+
   ShishuGharDetailsReplica({super.key, required this.crecheId});
 
   @override
@@ -52,6 +54,7 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
   String? supName;
   String? crechName;
   String? role;
+
   @override
   void initState() {
     super.initState();
@@ -345,6 +348,7 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       'assets/creche_profile/notes.png',
       'assets/creche_profile/casebook.png',
       'assets/creche_profile/stock.png',
+      'assets/creche_profile/task.png',
     ];
 
     text = [
@@ -356,6 +360,7 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       CustomText.VisitNote,
       CustomText.Cashbook,
       CustomText.Stock,
+      CustomText.DashBoardReport,
     ];
 
     List<String> valueNames = [
@@ -371,7 +376,8 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       CustomText.ShishuGharDetails,
       CustomText.DontHaveChildrenForAttender,
       CustomText.DontHaveChildrenForAnthropometry,
-      CustomText.ok
+      CustomText.ok,
+      CustomText.nointernetconnectionavailable
     ];
 
     await TranslationDataHelper()
@@ -475,6 +481,21 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
           builder: (BuildContext context) => StockTabListingScreen(
                 creche_id: widget.crecheId.toString(),
               )));
+    } else if (i == 8) {
+      var network = await Validate().checkNetworkConnection();
+      if (network) {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => DashboardReportByApiScreen(
+                  crecheId: widget.crecheId,
+                )));
+      } else {
+        Validate().singleButtonPopup(
+            Global.returnTrLable(
+                locationControlls, CustomText.nointernetconnectionavailable, lng!),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+            false,
+            context);
+      }
     }
   }
 }

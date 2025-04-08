@@ -764,18 +764,8 @@ class _ChildImmunizationExpendedScreenSatet
                         print(type);
                         if (Global.validString(
                             createAtVaccines[vaccines[index].name!])) {
-                          var editDate = DateTime.parse(
-                                  createAtVaccines[vaccines[index].name!])
-                              .add(Duration(days: 16));
-                          var currentDate =
-                              DateTime.parse(Validate().currentDateTime());
-                          var date = await Validate().readString(Validate.date);
-                          var applicableDate =
-                              Validate().stringToDate(date ?? "2024-12-31");
-                          print(date);
-                          if (currentDate.isBefore(applicableDate)
-                              ? true
-                              : editDate.isAfter(currentDate)) {
+                          var editDate=await Validate().checkEditable(createAtVaccines[vaccines[index].name!], 15);
+                          if(editDate) {
                             await createVaccine(
                                 vaccines[index].name!,
                                 vaccines[index].vaccine!,

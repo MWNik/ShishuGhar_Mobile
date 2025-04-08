@@ -238,26 +238,28 @@ class _CashBookExpensesListingSCreenState
                                       isEditable = now.isBefore(applicableDate);
                                     }
 
+                                    bool isEdited=await Validate().checkEditable(expensesData[index].created_at, 7);
+                                    bool isUnEditable=true;
+                                    if(isEdited && role == CustomText.crecheSupervisor){
+                                      isUnEditable=false;
+                                    }
+
                                     var refStatus = await Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (BuildContext context) => (role ==
-                                                    CustomText.crecheSupervisor
-                                                ? (now.isBefore(applicableDate)
-                                                    ? true
-                                                    : false)
-                                                : false)
-                                            ? CashbookExpensesDetailsScreen(
-                                                creche_id: widget.creche_id,
-                                                cashbook_guid: cashbookGuid!,
-                                                minDate: minDate,
-                                                reqAmount: walletToal +
-                                                    Global.stringToDouble(Global.getItemValues(
-                                                        expensesData[index]
-                                                            .responces!,
-                                                        'expense_amount')))
-                                            : CashbookExpensesDetailsViewScreen(
-                                                creche_id: widget.creche_id,
-                                                cashbook_guid: cashbookGuid!,
-                                                reqAmount: walletToal + Global.stringToDouble(Global.getItemValues(expensesData[index].responces!, 'expense_amount')))));
+                                        builder: (BuildContext context) => (
+                                            isUnEditable)
+                                            ? CashbookExpensesDetailsViewScreen(
+                                            creche_id: widget.creche_id,
+                                            cashbook_guid: cashbookGuid!,
+                                            reqAmount: walletToal + Global.stringToDouble(Global.getItemValues(expensesData[index].responces!, 'expense_amount')))
+                                            : CashbookExpensesDetailsScreen(
+                                            creche_id: widget.creche_id,
+                                            cashbook_guid: cashbookGuid!,
+                                            minDate: minDate,
+                                            reqAmount: walletToal +
+                                                Global.stringToDouble(Global.getItemValues(
+                                                    expensesData[index]
+                                                        .responces!,
+                                                    'expense_amount')))));
                                     if (refStatus == 'itemRefresh') {
                                       await fetchCashbookData();
                                     }

@@ -555,7 +555,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                 const CircularProgressIndicator(),
                 SizedBox(height: 10.h),
                 Text(
-                    '${Global.returnTrLable(locationControlls, CustomText.pleaseWait, lng!)} ${(loadingText)}/100%'),
+                    '${Global.returnTrLable(locationControlls, CustomText.pleaseWait, lng!)} (${(loadingText)}/100)%'),
               ],
             ));
           }),

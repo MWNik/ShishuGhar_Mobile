@@ -39,6 +39,8 @@ import 'depending_logic.dart';
 
 class AddHouseholdScreenFromTab extends StatefulWidget {
   final String hhGuid;
+   String? minDate;
+   String? maxDate;
   final HouseHoldFielItemdModel tabBreakItem;
   final Map<String, List<HouseHoldFielItemdModel>> screenItem;
   final Function(int) changeTab;
@@ -46,7 +48,7 @@ class AddHouseholdScreenFromTab extends StatefulWidget {
   final int totalTab;
   final int crecheId;
 
-  const AddHouseholdScreenFromTab(
+   AddHouseholdScreenFromTab(
       {super.key,
       required this.hhGuid,
       required this.tabBreakItem,
@@ -55,6 +57,8 @@ class AddHouseholdScreenFromTab extends StatefulWidget {
       required this.tabIndex,
       required this.crecheId,
       required this.totalTab,
+       this.minDate,
+       this.maxDate,
      });
 
   @override
@@ -235,6 +239,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
                   ? logic!.callReadableLogic(myMap, quesItem)
                   : true
               : true,
+          minDate: (quesItem.fieldname == 'date_of_visit' && Global.validString(widget.minDate))?DateTime.parse(widget.minDate!).subtract(Duration(days: 1)):null,
+          maxDate: (quesItem.fieldname == 'date_of_visit' && Global.validString(widget.maxDate))?DateTime.parse(widget.maxDate!):null,
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
             var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);

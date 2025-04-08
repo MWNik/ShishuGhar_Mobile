@@ -1004,7 +1004,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.HHListing, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+      loadingTextUpdatedCount = '($currentItem/${hhItems.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -1046,7 +1046,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+              loadingTextUpdatedCount = '($currentItem/${hhItems.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -1102,7 +1102,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+              loadingTextUpdatedCount = '($currentItem/${hhItems.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -1272,7 +1272,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.CrecheProfileView, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${crecheProfiles.length}';
+      loadingTextUpdatedCount = '($currentItem/${crecheProfiles.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -1319,7 +1319,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${crecheProfiles.length}';
+              loadingTextUpdatedCount = '($currentItem/${crecheProfiles.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -1376,7 +1376,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${crecheProfiles.length}';
+              loadingTextUpdatedCount = '($currentItem/${crecheProfiles.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -1513,7 +1513,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.childAttendence, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
+      loadingTextUpdatedCount = '($currentItem/${chilAttendence.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -1560,7 +1560,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
           } else {
             currentItem = currentItem + 1;
-            loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
+            loadingTextUpdatedCount = '($currentItem/${chilAttendence.length})';
             loadingText = Global.returnTrLable(
                 locationControlls, CustomText.uploading, lng!);
             loadingText =
@@ -1620,7 +1620,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         //             context);
         //     } else {
         //       currentItem = currentItem + 1;
-        //       loadingTextUpdatedCount = '$currentItem/${chilAttendence.length}';
+        //       loadingTextUpdatedCount = '($currentItem/${chilAttendence.length})';
         //       loadingText = Global.returnTrLable(
         //           locationControlls, CustomText.uploading, lng!);
         //       loadingText =
@@ -1695,7 +1695,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.checkIns, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${crecheCheckIn.length}';
+      loadingTextUpdatedCount = '($currentItem/${crecheCheckIn.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -1736,7 +1736,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${crecheCheckIn.length}';
+              loadingTextUpdatedCount = '($currentItem/${crecheCheckIn.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -2072,7 +2072,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.childGrowthMonitoring, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${anthropomertydata.length}';
+      loadingTextUpdatedCount = '($currentItem/${anthropomertydata.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -2164,7 +2164,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.ChildEvents, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${childeventdata.length}';
+      loadingTextUpdatedCount = '($currentItem/${childeventdata.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -2197,7 +2197,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${childeventdata.length}';
+              loadingTextUpdatedCount = '($currentItem/${childeventdata.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -2258,7 +2258,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${childeventdata.length}';
+              loadingTextUpdatedCount = '($currentItem/${childeventdata.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -2331,7 +2331,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.ChildHealth, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${childhealthdata.length}';
+      loadingTextUpdatedCount = '($currentItem/${childhealthdata.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -2500,7 +2500,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.ChildImmunization, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${childimmunizationdata.length}';
+      loadingTextUpdatedCount = '($currentItem/${childimmunizationdata.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -2796,7 +2796,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.ChildGrievances, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${grievancedata.length}';
+      loadingTextUpdatedCount = '($currentItem/${grievancedata.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -2831,7 +2831,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${grievancedata.length}';
+              loadingTextUpdatedCount = '($currentItem/${grievancedata.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -2892,7 +2892,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${grievancedata.length}';
+              loadingTextUpdatedCount = '($currentItem/${grievancedata.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -2965,7 +2965,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.VisitNotes, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${crecheData.length}';
+      loadingTextUpdatedCount = '($currentItem/${crecheData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -3002,7 +3002,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${crecheData.length}';
+              loadingTextUpdatedCount = '($currentItem/${crecheData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3059,7 +3059,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${crecheData.length}';
+              loadingTextUpdatedCount = '($currentItem/${crecheData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3126,7 +3126,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.childReferral, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+      loadingTextUpdatedCount = '($currentItem/${referralData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -3154,7 +3154,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+              loadingTextUpdatedCount = '($currentItem/${referralData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3209,7 +3209,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+              loadingTextUpdatedCount = '($currentItem/${referralData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3278,7 +3278,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.fllowUp, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+      loadingTextUpdatedCount = '($currentItem/${followUpData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -3306,7 +3306,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+              loadingTextUpdatedCount = '($currentItem/${followUpData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3361,7 +3361,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+              loadingTextUpdatedCount = '($currentItem/${followUpData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3430,7 +3430,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.CrecheCommitte, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${ccmData.length}';
+      loadingTextUpdatedCount = '($currentItem/${ccmData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -3464,7 +3464,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${ccmData.length}';
+              loadingTextUpdatedCount = '($currentItem/${ccmData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3527,7 +3527,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${ccmData.length}';
+              loadingTextUpdatedCount = '($currentItem/${ccmData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3611,7 +3611,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.CashBookExpences, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${casgBookdata.length}';
+      loadingTextUpdatedCount = '($currentItem/${casgBookdata.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -3642,7 +3642,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${casgBookdata.length}';
+              loadingTextUpdatedCount = '($currentItem/${casgBookdata.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3696,7 +3696,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${casgBookdata.length}';
+              loadingTextUpdatedCount = '($currentItem/${casgBookdata.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3763,7 +3763,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.CashBookReceipt, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${cashbookReceiptData.length}';
+      loadingTextUpdatedCount = '($currentItem/${cashbookReceiptData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -3917,7 +3917,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.VisitNotes, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${cmcALMData.length}';
+      loadingTextUpdatedCount = '($currentItem/${cmcALMData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -3941,7 +3941,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${cmcALMData.length}';
+              loadingTextUpdatedCount = '($currentItem/${cmcALMData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -3990,7 +3990,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${cmcALMData.length}';
+              loadingTextUpdatedCount = '($currentItem/${cmcALMData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4052,7 +4052,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.VisitNotes, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${cmcCBMData.length}';
+      loadingTextUpdatedCount = '($currentItem/${cmcCBMData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -4076,7 +4076,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${cmcCBMData.length}';
+              loadingTextUpdatedCount = '($currentItem/${cmcCBMData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4125,7 +4125,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${cmcCBMData.length}';
+              loadingTextUpdatedCount = '($currentItem/${cmcCBMData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4187,7 +4187,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.VisitNotes, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${cmcCCData.length}';
+      loadingTextUpdatedCount = '($currentItem/${cmcCCData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -4214,7 +4214,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${cmcCCData.length}';
+              loadingTextUpdatedCount = '($currentItem/${cmcCCData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4263,7 +4263,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${cmcCCData.length}';
+              loadingTextUpdatedCount = '($currentItem/${cmcCCData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4389,7 +4389,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       loadingTextUpdatedText =
           Global.returnTrLable(locationControlls, CustomText.HHListing, lng!);
       int currentItem = 1;
-      loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+      loadingTextUpdatedCount = '($currentItem/${hhItems.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -4430,7 +4430,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               uploadChildProfileSequence2(mContext, methodeIndex);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+              loadingTextUpdatedCount = '($currentItem/${hhItems.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4473,7 +4473,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               uploadChildProfileSequence2(mContext, methodeIndex);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${hhItems.length}';
+              loadingTextUpdatedCount = '($currentItem/${hhItems.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4521,7 +4521,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       loadingTextUpdatedText = Global.returnTrLable(
           locationControlls, CustomText.ChildProfile, lng!);
       int currentItem = 1;
-      loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+      loadingTextUpdatedCount = '($currentItem/${chilProfiles.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -4548,7 +4548,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               uploadChildProfileSequence3(mContext, methodeIndex);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingTextUpdatedCount = '($currentItem/${chilProfiles.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4594,7 +4594,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               uploadChildProfileSequence3(mContext, methodeIndex);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingTextUpdatedCount = '($currentItem/${chilProfiles.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4646,7 +4646,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.enrollExitChild, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+      loadingTextUpdatedCount = '($currentItem/${chilProfiles.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -4670,7 +4670,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               uploadChildGrowthDataSeq1(mContext, methodeIndex);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingTextUpdatedCount = '($currentItem/${chilProfiles.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4716,7 +4716,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               uploadChildGrowthDataSeq1(mContext, methodeIndex);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingTextUpdatedCount = '($currentItem/${chilProfiles.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -4904,7 +4904,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.GrowthMonitoring, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${anthropomertydata.length}';
+      loadingTextUpdatedCount = '($currentItem/${anthropomertydata.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -5017,7 +5017,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.childReferral, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+      loadingTextUpdatedCount = '($currentItem/${referralData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -5040,7 +5040,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               uploadChildFollowUpDataSeq3(mContext, methodeIndex);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+              loadingTextUpdatedCount = '($currentItem/${referralData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -5090,7 +5090,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
               uploadChildFollowUpDataSeq3(mContext, methodeIndex);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${referralData.length}';
+              loadingTextUpdatedCount = '($currentItem/${referralData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -5144,7 +5144,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.fllowUp, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+      loadingTextUpdatedCount = '($currentItem/${followUpData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -5176,7 +5176,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     mContext);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+              loadingTextUpdatedCount = '($currentItem/${followUpData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -5235,7 +5235,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     mContext);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${followUpData.length}';
+              loadingTextUpdatedCount = '($currentItem/${followUpData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -5453,7 +5453,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.imageFiles, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${ImageFileData.length}';
+      loadingTextUpdatedCount = '($currentItem/${ImageFileData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -5476,7 +5476,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                 context);
           } else {
             currentItem = currentItem + 1;
-            loadingTextUpdatedCount = '$currentItem/${ImageFileData.length}';
+            loadingTextUpdatedCount = '($currentItem/${ImageFileData.length})';
             loadingText = Global.returnTrLable(
                 locationControlls, CustomText.uploading, lng!);
             loadingText =
@@ -5547,7 +5547,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           locationControlls, CustomText.enrollExitChild, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+      loadingTextUpdatedCount = '($currentItem/${chilProfiles.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -5575,7 +5575,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   mContext);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingTextUpdatedCount = '($currentItem/${chilProfiles.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -5626,7 +5626,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                   mContext);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${chilProfiles.length}';
+              loadingTextUpdatedCount = '($currentItem/${chilProfiles.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -5692,7 +5692,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.Stock, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${stockData.length}';
+      loadingTextUpdatedCount = '($currentItem/${stockData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =
@@ -5726,7 +5726,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${stockData.length}';
+              loadingTextUpdatedCount = '($currentItem/${stockData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -5782,7 +5782,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                     context);
             } else {
               currentItem = currentItem + 1;
-              loadingTextUpdatedCount = '$currentItem/${stockData.length}';
+              loadingTextUpdatedCount = '($currentItem/${stockData.length})';
               loadingText = Global.returnTrLable(
                   locationControlls, CustomText.uploading, lng!);
               loadingText =
@@ -5847,7 +5847,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
           Global.returnTrLable(locationControlls, CustomText.requisition, lng!);
       int currentItem = 1;
       var token = await Validate().readString(Validate.appToken);
-      loadingTextUpdatedCount = '$currentItem/${requisitionData.length}';
+      loadingTextUpdatedCount = '($currentItem/${requisitionData.length})';
       loadingText =
           Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
       loadingText =

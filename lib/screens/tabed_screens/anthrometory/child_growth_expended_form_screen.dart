@@ -135,6 +135,7 @@ class _ChildGrowthExpendedFormState
 
   bool recrdedUpload = false;
   String lng = 'en';
+  DateTime? caMinDate;
   String userName = '';
   String? role;
   int? expends;
@@ -147,6 +148,12 @@ class _ChildGrowthExpendedFormState
 
 
   Future<void> initializeData() async {
+    if(widget.lastGrowthDate!=null){
+      String? minDate=await Validate().callMinDate(widget.lastGrowthDate.toString(), 10);
+      if(Global.validString(minDate)){
+        caMinDate=Validate().stringToDate(minDate!);
+      }else caMinDate=widget.lastGrowthDate;
+    }else caMinDate=widget.lastGrowthDate;
     userName = (await Validate().readString(Validate.userName))!;
     role = await Validate().readString(Validate.role);
     lng = (await Validate().readString(Validate.sLanguage))!;
@@ -311,7 +318,7 @@ class _ChildGrowthExpendedFormState
                   initialvalue: myMap[measurement_date!.fieldname!],
                   fieldName: measurement_date!.fieldname,
                   isRequred: measurement_date!.reqd,
-                  minDate: widget.lastGrowthDate,
+                  minDate: caMinDate,
                   maxDate: widget.minGrowthDate,
                   readable: widget.isNew,
                   onChanged: (value) {
@@ -451,7 +458,7 @@ class _ChildGrowthExpendedFormState
     if (inputItem.length > 0 && cWidgetDatamap['do_you_have_height_weight'].toString()== '1') {
       for (int i = 0; i < inputItem.length; i++) {
         var isvible = logic!.callDependingLogic(cWidgetDatamap, inputItem[i]);
-        int colorD = DependingLogic.AutoColorCreateByHeightWight(
+        int colorD = DependingLogic.AutoColorCreateByHeightWightNew(
             tabHeightforageBoys,
             tHeightforageGirls,
             tabWeightforageBoys,
@@ -459,7 +466,18 @@ class _ChildGrowthExpendedFormState
             tabWeightToHeightBoys,
             tabWeightToHeightGirls,
             inputItem[i].fieldname!,
-            gender,
+            gender,cWidgetDatamap['measurement_taken_date'],
+            cWidgetDatamap);
+
+        String grothValue = DependingLogic.AutoColorCreateByHeightWightStringNew(
+            tabHeightforageBoys,
+            tHeightforageGirls,
+            tabWeightforageBoys,
+            tabWeightforageGirls,
+            tabWeightToHeightBoys,
+            tabWeightToHeightGirls,
+            inputItem[i].fieldname!,
+            gender,cWidgetDatamap['measurement_taken_date'],
             cWidgetDatamap);
 
         Color itemC = Color(0xffAAAAAA);
@@ -503,12 +521,12 @@ class _ChildGrowthExpendedFormState
                 colorName,
                 style: Styles.black12700,
               ),
-              // Global.validString(grothValue)
-              //     ? Text(
-              //         '($grothValue)',
-              //         style: Styles.red85,
-              //       )
-              //     : SizedBox(),
+              Global.validString(grothValue)
+                  ? Text(
+                      '($grothValue)',
+                      style: Styles.red85,
+                    )
+                  : SizedBox(),
             ],
           ));
         }
@@ -935,7 +953,7 @@ class _ChildGrowthExpendedFormState
             // print(item['height']);
           } else {
             var gender = Global.getItemValues(element.responces, 'gender_id');
-            var weightForAge = DependingLogic.AutoColorCreateByHeightWight(
+            var weightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
                 tabHeightforageBoys,
                 tHeightforageGirls,
                 tabWeightforageBoys,
@@ -943,9 +961,9 @@ class _ChildGrowthExpendedFormState
                 tabWeightToHeightBoys,
                 tabWeightToHeightGirls,
                 'weight_for_age',
-                gender,
+                gender,item['measurement_taken_date'],
                 item);
-            var heightForAge = DependingLogic.AutoColorCreateByHeightWight(
+            var heightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
                 tabHeightforageBoys,
                 tHeightforageGirls,
                 tabWeightforageBoys,
@@ -953,10 +971,10 @@ class _ChildGrowthExpendedFormState
                 tabWeightToHeightBoys,
                 tabWeightToHeightGirls,
                 'height_for_age',
-                gender,
+                gender,item['measurement_taken_date'],
                 item);
 
-            var weightForHeight = DependingLogic.AutoColorCreateByHeightWight(
+            var weightForHeight = DependingLogic.AutoColorCreateByHeightWightNew(
                 tabHeightforageBoys,
                 tHeightforageGirls,
                 tabWeightforageBoys,
@@ -964,7 +982,7 @@ class _ChildGrowthExpendedFormState
                 tabWeightToHeightBoys,
                 tabWeightToHeightGirls,
                 'weight_for_height',
-                gender,
+                gender,item['measurement_taken_date'],
                 item);
 
             item['weight_for_age'] = weightForAge;
@@ -1798,6 +1816,9 @@ class _ChildGrowthExpendedFormState
               itmelement.remove('height');
               itmelement.remove('weight');
             }
+            if (!(Global.stringToDouble(element['height'].toString()) > 0)) {
+              itmelement.remove('height');
+            }
             if (Global.stringToIntNull(
                 itmelement['do_you_have_height_weight'].toString()) ==
                 2) {
@@ -1840,7 +1861,9 @@ class _ChildGrowthExpendedFormState
 
                         itemMap.forEach((key, value) {
                           if (key == 'height') {
-                            childItem[key] = value;
+                            if ((Global.stringToDouble(value.toString()) > 0)) {
+                              childItem[key] = value;
+                            }
                           }
                         });
                         attepmtChild[childEnrolleGUID] = childItem;
@@ -2093,7 +2116,11 @@ class _ChildGrowthExpendedFormState
                 Map<String, dynamic> childItem= {};
                 itemMap.forEach((key, value) {
                   if(key=='height'||key=='do_you_have_height_weight'){
-                  childItem[key] = value;
+                    if(key=='height' && Global.stringToDouble(value.toString())>0) {
+                      childItem[key] = value;
+                    }else   if(key!='height'){
+                      childItem[key] = value;
+                    }
                   }
                 });
                 attepmtChild[childEnrolleGUID!] = childItem;
@@ -2139,7 +2166,7 @@ class _ChildGrowthExpendedFormState
     if (inputItem.length > 0) {
       for (int i = 0; i < inputItem.length; i++) {
         var isvible = logic!.callDependingLogic(cWidgetDatamap, inputItem[i]);
-        int colorD = DependingLogic.AutoColorCreateByHeightWight(
+        int colorD = DependingLogic.AutoColorCreateByHeightWightNew(
             tabHeightforageBoys,
             tHeightforageGirls,
             tabWeightforageBoys,
@@ -2147,7 +2174,7 @@ class _ChildGrowthExpendedFormState
             tabWeightToHeightBoys,
             tabWeightToHeightGirls,
             inputItem[i].fieldname!,
-            gender,
+            gender,cWidgetDatamap['measurement_taken_date'],
             cWidgetDatamap);
 
         Color itemC = Color(0xffAAAAAA);
@@ -2608,7 +2635,7 @@ class _ChildGrowthExpendedFormState
               childItem.first.remove('re_measurement_reason');
 
               var gender = Global.getItemValues(enrollChildItem.responces, 'gender_id');
-              var weightForAge = DependingLogic.AutoColorCreateByHeightWight(
+              var weightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
                   tabHeightforageBoys,
                   tHeightforageGirls,
                   tabWeightforageBoys,
@@ -2616,9 +2643,9 @@ class _ChildGrowthExpendedFormState
                   tabWeightToHeightBoys,
                   tabWeightToHeightGirls,
                   're_weight_for_age',
-                  gender,
+                  gender,cWidgetDatamap['measurement_taken_date'],
                   cWidgetDatamap);
-              var heightForAge = DependingLogic.AutoColorCreateByHeightWight(
+              var heightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
                   tabHeightforageBoys,
                   tHeightforageGirls,
                   tabWeightforageBoys,
@@ -2626,10 +2653,10 @@ class _ChildGrowthExpendedFormState
                   tabWeightToHeightBoys,
                   tabWeightToHeightGirls,
                   're_height_for_age',
-                  gender,
+                  gender,cWidgetDatamap['measurement_taken_date'],
                   cWidgetDatamap);
 
-              var weightForHeight = DependingLogic.AutoColorCreateByHeightWight(
+              var weightForHeight = DependingLogic.AutoColorCreateByHeightWightNew(
                   tabHeightforageBoys,
                   tHeightforageGirls,
                   tabWeightforageBoys,
@@ -2637,7 +2664,7 @@ class _ChildGrowthExpendedFormState
                   tabWeightToHeightBoys,
                   tabWeightToHeightGirls,
                   're_weight_for_height',
-                  gender,
+                  gender,cWidgetDatamap['measurement_taken_date'],
                   cWidgetDatamap);
 
               cWidgetDatamap['re_weight_for_age'] = weightForAge;

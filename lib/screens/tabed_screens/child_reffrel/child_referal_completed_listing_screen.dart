@@ -44,7 +44,7 @@ class _ChildReferralListingScreenState
   List<CresheDatabaseResponceModel> crecheData = [];
   List<Translation> translats = [];
   String lng = 'en';
-  DateTime? minDate;
+  // DateTime? minDate;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController Searchcontroller = TextEditingController();
   List<OptionsModel> creches = [];
@@ -332,35 +332,38 @@ class _ChildReferralListingScreenState
                                   'creche_id'));
                           var child_referral_guid =
                               filteredReferral[index]['child_referral_guid'];
-                          var backDate = now.isBefore(applicableDate)
-                              ? DateTime(1992)
-                              : DateTime.parse(Validate().currentDate())
-                                  .subtract(Duration(days: 7));
-                          if (backDate.isAfter(DateTime.parse(
-                              filteredReferral[index]['date_of_referral']))) {
-                            minDate = backDate;
-                          } else {
-                            minDate = DateTime.parse(
-                                filteredReferral[index]['date_of_referral']);
-                          }
-                          if (minDate != null) {
-                            List<int> parts = Validate()
-                                .currentDate()
-                                .split('-')
-                                .map(int.parse)
-                                .toList();
-                            if (DateTime(minDate!.year, minDate!.month)
-                                .isBefore(DateTime(parts[0], parts[1]))) {
-                              minDate = DateTime(parts[0], parts[1], 1);
-                            }
-                          }
+                          String? minDate=await Validate().callMinDate(filteredReferral[index]['date_of_referral'], 7);
+                          // var backDate = now.isBefore(applicableDate)
+                          //     ? DateTime(1992)
+                          //     : DateTime.parse(Validate().currentDate())
+                          //         .subtract(Duration(days: 7));
+                          // if (backDate.isAfter(DateTime.parse(
+                          //     filteredReferral[index]['date_of_referral']))) {
+                          //   minDate = backDate;
+                          // } else {
+                          //   minDate = DateTime.parse(
+                          //       filteredReferral[index]['date_of_referral']);
+                          // }
+                          // if (minDate != null) {
+                          //   List<int> parts = Validate()
+                          //       .currentDate()
+                          //       .split('-')
+                          //       .map(int.parse)
+                          //       .toList();
+                          //   if (DateTime(minDate!.year, minDate!.month)
+                          //       .isBefore(DateTime(parts[0], parts[1]))) {
+                          //     minDate = DateTime(parts[0], parts[1], 1);
+                          //   }
+                          // }
 
-                          var created_at = DateTime.parse(
-                              filteredReferral[index]['created_at'].toString());
-                          var date = DateTime(created_at.year, created_at.month,
-                              created_at.day);
-                          bool isEditable = date.add(Duration(days: 8)).isAfter(
-                              DateTime.parse(Validate().currentDate()));
+                          bool isEdited=await Validate().checkEditable(filteredReferral[index]['created_at'], 7);
+                          bool isEditableForDischage=isEdited;
+                          if(Global.validString(Global.getItemValues(filteredReferral[index]['responces'], 'discharge_date'))
+                          && Global.getItemValues(filteredReferral[index]['responces'], 'child_status')=='2'){
+                            isEditableForDischage=await Validate().checkEditable(filteredReferral[index]['created_at'], 30);
+                          }else if(Global.getItemValues(filteredReferral[index]['responces'], 'child_status')=='1'){
+                            isEditableForDischage=true;
+                          }else isEditableForDischage=isEdited;
 
                           var refStatus = await Navigator.of(context).push(MaterialPageRoute(
                               builder: (BuildContext context) => ChildReferralTabScreen(
@@ -381,10 +384,9 @@ class _ChildReferralListingScreenState
                                   child_id: childId,
                                   child_referral_guid: child_referral_guid,
                                   childName: childName,
-                                  minDate: minDate!,
-                                  isEditable: now.isBefore(applicableDate)
-                                      ? true
-                                      : isEditable,
+                                  minDate: minDate!=null?Validate().stringToDate(minDate):null,
+                                  isEditable: isEdited,
+                                  isEditableForDischage: isEditableForDischage,
                                   scheduleDate: filteredReferral[index]['date_of_referral'],
                                   childId: childIdGen,
                                   isDischarge: Global.validString(Global.getItemValues(filteredReferral[index]['responces'], 'discharge_date')))));

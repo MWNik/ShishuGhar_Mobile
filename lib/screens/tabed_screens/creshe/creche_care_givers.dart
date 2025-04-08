@@ -92,6 +92,7 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
                   String hhGuid = '';
                   if (!Global.validString(hhGuid)) {
                     hhGuid = Validate().randomGuid();
+                    String? minDate=await Validate().requredOnlyMinimum(null, 15);
                     print("line $hhGuid");
                     var refStatus = await Navigator.of(context).push(
                         MaterialPageRoute(
@@ -100,7 +101,9 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
                                     isEditable: true,
                                     CGGuid: hhGuid,
                                     crechedCode: widget.crechedCode,
-                                    parentName: widget.parentName)));
+                                    parentName: widget.parentName,
+                                    minDate: minDate
+                                )));
                     if (refStatus == 'itemRefresh') {
                       await fetchCrecheDataList();
                     }
@@ -156,33 +159,34 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
                             //   hhGuid = Validate().randomGuid();
                             //   print("line $hhGuid");
                             // }
-                            var created_at = DateTime.parse(
-                                caregiverData[index].created_at.toString());
-                            var date = DateTime(created_at.year,
-                                created_at.month, created_at.day);
-                            bool isEditab = date.add(Duration(days: 8)).isAfter(
-                                DateTime.parse(Validate().currentDate()));
-                            var backDate =
-                                await Validate().readString(Validate.date);
+                            // var created_at = DateTime.parse(
+                            //     caregiverData[index].created_at.toString());
+                            // var date = DateTime(created_at.year,
+                            //     created_at.month, created_at.day);
+                            // bool isEditab = date.add(Duration(days: 8)).isAfter(
+                            //     DateTime.parse(Validate().currentDate()));
+                            // var backDate =
+                            //     await Validate().readString(Validate.date);
+                            //
+                            // var applicableDate = Validate()
+                            //     .stringToDate(backDate ?? "2024-12-31");
+                            // var now = DateTime.parse(Validate().currentDate());
 
-                            var applicableDate = Validate()
-                                .stringToDate(backDate ?? "2024-12-31");
-                            var now = DateTime.parse(Validate().currentDate());
-
+                            bool isEdited=await Validate().checkEditable(caregiverData[index].created_at, 7);
+                            String? minDate=await Validate().requredOnlyMinimum(null, 15);
+                            bool isUnEditable=false;
+                            if(isEdited && role == CustomText.crecheSupervisor){
+                              isUnEditable=isEdited;
+                            }
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
                                         CreheCareGiverTab(
-                                            isEditable: role ==
-                                                    CustomText.crecheSupervisor
-                                                        .trim()
-                                                ? now.isBefore(applicableDate)
-                                                    ? true
-                                                    : isEditab
-                                                : false,
+                                            isEditable: isUnEditable,
                                             CGGuid:
                                                 caregiverData[index].CGGUID!,
                                             crechedCode: widget.crechedCode,
+                                            minDate: minDate,
                                             parentName:
                                                 caregiverData[index].parent!)));
                             if (refStatus == 'itemRefresh') {

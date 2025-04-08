@@ -57,6 +57,8 @@ class CustomText {
   static String Name = "Name : ";
   static String Name_ = "Name";
   static String Gender = "Gender";
+  static String Month = "Month";
+  static String Year = "Year";
   static String Profile = "Profile : ";
   static String ProfileS = "Profile";
   static String Resources = "Resources";
@@ -73,6 +75,7 @@ class CustomText {
   static String Dashboard = "Dashboard";
   static String Reports = "Reports";
   static String Report = "Report";
+  static String DashBoardReport = "Dashboard Report";
   static String More = "More";
   static String District = "District";
   static String Block = "Block";
@@ -249,6 +252,7 @@ class CustomText {
   static String do_you_want_to_upload = "Do you want to upload?";
   static String data_upload_success_msg = "Data Uploaded Successfully";
   static String nothing_for_upload_msg = "Nothing for upload";
+  static String pleaseSelectMonth = "Please select a month";
   static String pleaseUploadDataFirst = "Please upload pending data first.";
   static String darftDataForComplete =
       "You have uncompleted data in your device, please complete and upload first and then try to download data.";
@@ -266,6 +270,7 @@ class CustomText {
   static String ChilderenExistingshishuGhar = "Childeren Existing shishu Ghar";
   static String data_not_uploaded_msg = "Data not uploaded.";
   static String columnBreak = 'Column Break';
+  static String BENEFICIARYCONSENTFORM = 'BENEFICIARY CONSENT FORM';
   static String tabBreak = 'Tab Break';
   static String plsFilManForm = "Please fill all mandatory fields!";
   static String dataSaveSuc = "Data saved successfully";
@@ -623,4 +628,16 @@ class CustomText {
   static String reEnter = "Re Enter";
   static String updateMeasurement = "Child measurement";
   static String ChildIsNotAppilcableForExitToday = "Child is not applicable for exit today";
+  static String January ="January";
+  static String February = "February";
+  static String March =  "March";
+  static String April =  "April";
+  static String May =  "May";
+  static String June =   "June";
+  static String July = "July";
+  static String August =  "August";
+  static String September =  "September";
+  static String October =  "October";
+  static String November =  "November";
+  static String December = "December";
 }

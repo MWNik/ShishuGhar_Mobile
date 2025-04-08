@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:shishughar/database/helper/child_attendence/attendance_responce_helper.dart';
 import 'package:shishughar/database/helper/child_attendence/child_attendance_helper_responce.dart';
 import 'package:shishughar/model/apimodel/auth_login_model.dart';
 import 'package:shishughar/model/apimodel/login_model.dart';
@@ -28,7 +27,7 @@ class DatabaseHelper {
       print("Opening existing database");
     }
     database = await openDatabase(path,
-        version: 3,
+        version: 5,
         onUpgrade: (db, oldVersion, newVersion) =>
             upgradeVersion(db, oldVersion, newVersion));
 
@@ -75,6 +74,56 @@ class DatabaseHelper {
             is_active INTEGER,
             seq_id INTEGER
           );''');
+        } catch (e) {
+          print("$e");
+        }
+      }
+      if (oldVersion == 3 && newVersion > 3) {
+        try {
+          Map<String, String> newColumns = {
+            "l": "NUMERIC",
+            "m": "NUMERIC",
+            "s": "NUMERIC",
+            "sd4neg": "NUMERIC",
+            "sd3neg": "NUMERIC",
+            "sd2neg": "NUMERIC",
+            "sd1neg": "NUMERIC",
+            "sd0": "NUMERIC",
+            "sd1": "NUMERIC",
+            "sd2": "NUMERIC",
+            "sd3": "NUMERIC",
+            "sd4": "NUMERIC",
+          };
+        // table tabWeightforAgeGirls
+          await addColumnsToTable(db,'tabWeightforAgeGirls',newColumns);
+
+          // table tabWeightforAgeBoys
+          await addColumnsToTable(db,'tabWeightforAgeBoys',newColumns);
+
+          // table tabHeightforAgeBoys
+          await addColumnsToTable(db,'tabHeightforAgeBoys',newColumns);
+
+          // table tabHeightforAgeGirls
+          await addColumnsToTable(db,'tabHeightforAgeGirls',newColumns);
+
+          // table tabWeightToHeightBoys
+          await addColumnsToTable(db,'tabWeightToHeightBoys',newColumns);
+
+          // table tabWeightToHeightGirls
+          await addColumnsToTable(db,'tabWeightToHeightGirls',newColumns);
+
+        } catch (e) {
+          print("$e");
+        }
+      }
+      if (oldVersion == 4 && newVersion > 4) {
+        try {
+          // table tabWeightToHeightBoys
+          await addNewColoumn(db,'tabWeightToHeightBoys','age_type','INTEGER');
+
+          // table tabWeightToHeightGirls
+          await addNewColoumn(db,'tabWeightToHeightGirls','age_type','INTEGER');
+
         } catch (e) {
           print("$e");
         }
@@ -296,5 +345,42 @@ class DatabaseHelper {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future addNewColoumn(Database db, String tableName, String columnName,
+      String columnType) async {
+    try {
+      await db.execute('ALTER TABLE $tableName ADD COLUMN $columnName $columnType');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> addColumnsToTable(Database db,String tableName, Map<String, String> columns) async {
+    // String query = "ALTER TABLE $tableName";
+    //
+    // // Convert the map into SQL statements
+    // List<String> columnStatements = columns.entries
+    //     .map((entry) => "ADD COLUMN ${entry.key} ${entry.value}")
+    //     .toList();
+    //
+    // // Join columns with commas and append to query
+    // query += " " + columnStatements.join(", ") + ";";
+    // print(query);
+    // try {
+    //   await db.execute(query);
+    // } catch (e) {
+    //   print(e);
+    // }
+    for (var entry in columns.entries) {
+      String query = "ALTER TABLE $tableName ADD COLUMN ${entry.key} ${entry.value};";
+      try {
+        await db.execute(query);
+        print("Added column: ${entry.key} ${entry.value}");
+      } catch (e) {
+        print("Error adding column ${entry.key}: $e");
+      }
+    }
+     // Print the query (for debugging)
   }
 }

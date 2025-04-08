@@ -171,6 +171,8 @@ class Validate {
     return field.getInt(key);
   }
 
+
+
   void saveBoolean(String key, bool value) async {
     SharedPreferences field = await SharedPreferences.getInstance();
     field.setBool(key, value);
@@ -781,5 +783,57 @@ class Validate {
     );
 
     return picked;
+  }
+
+  Future<bool> checkEditable(String? createdDate,int days) async {
+    bool returnStatus = true;
+    if (Global.validString(createdDate)) {
+      var creation = DateTime.parse(createdDate.toString());
+      var datePart = DateTime(creation.year, creation.month, creation.day);
+      var now = DateTime.now();
+      var nowDatePart = DateTime(now.year, now.month, now.day);
+      returnStatus = datePart.add(Duration(days: days)).isAfter(nowDatePart);
+    }
+    var date = await Validate().readString(Validate.date);
+    var applicableDate = Validate().stringToDate(date ?? "2025-03-31");
+    var now = DateTime.parse(Validate().currentDate());
+    print('checkEditable  ${now.isBefore(applicableDate) ? true : returnStatus}');
+    return now.isBefore(applicableDate) ? true : returnStatus;
+  }
+
+  Future<String?> callMinDate(String? validateDate,int days) async {
+    String? minDate;
+    var now = DateTime.now();
+    var nowDatePart = now.subtract(Duration(days: days));
+    if(Global.validString(validateDate)){
+      DateTime maxDateofExit=await Validate().stringToDate(validateDate!);
+      DateTime minimumDate=maxDateofExit.isBefore(nowDatePart) ? nowDatePart : maxDateofExit;
+      minDate='${minimumDate.year}-${Global.convertToTwoDigit(minimumDate.month)}-${Global.convertToTwoDigit(minimumDate.day)}';
+    }else{
+      minDate='${nowDatePart.year}-${Global.convertToTwoDigit(nowDatePart.month)}-${Global.convertToTwoDigit(nowDatePart.day)}';
+    }
+
+    var date = await Validate().readString(Validate.date);
+    var applicableDate = Validate().stringToDate(date ?? "2025-03-31");
+    return now.isBefore(applicableDate) ? null : minDate;
+    // return maxDateOfExit;
+  }
+
+  Future<String?> requredOnlyMinimum(String? createdDate,int days) async {
+    String? minDate;
+    var now = DateTime.now();
+    var nowDatePart = now.subtract(Duration(days: days));
+    if(Global.validString(createdDate)){
+      DateTime created=await Validate().stringToDate(createdDate!);
+      var minimumDate = created.subtract(Duration(days: days));
+      minDate='${minimumDate.year}-${Global.convertToTwoDigit(minimumDate.month)}-${Global.convertToTwoDigit(minimumDate.day)}';
+    }else{
+      minDate='${nowDatePart.year}-${Global.convertToTwoDigit(nowDatePart.month)}-${Global.convertToTwoDigit(nowDatePart.day)}';
+    }
+
+    var date = await Validate().readString(Validate.date);
+    var applicableDate = Validate().stringToDate(date ?? "2025-03-31");
+    return now.isBefore(applicableDate) ? null : minDate;
+    // return maxDateOfExit;
   }
 }

@@ -45,13 +45,9 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
   List<Translation> translats = [];
   String lng = 'en';
   List<String> existingDates = [];
-  DateTime? lastDate;
   bool isOnlyUnsyched = false;
   String? role;
-  DateTime applicableDate = Validate().stringToDate("2024-12-31");
-  var now = DateTime.parse(Validate().currentDate());
 
-  // DateTime? maxDate;
 
   void initState() {
     super.initState();
@@ -59,27 +55,7 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
   }
 
   Future<void> initializeData() async {
-    var date = await Validate().readString(Validate.date);
-    applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     role = (await Validate().readString(Validate.role))!;
-    List<int> dateParts =
-        widget.dateOfEnrollment.split('-').map(int.parse).toList();
-    lastDate = DateTime(dateParts[0], dateParts[1], dateParts[2])
-        .subtract(Duration(days: 1));
-
-    var currDate = Validate().currentDate();
-    List<int> crrntDateParts = currDate.split('-').map(int.parse).toList();
-    var backDate =
-        DateTime(crrntDateParts[0], crrntDateParts[1], crrntDateParts[2])
-            .subtract(Duration(days: 30));
-    if (lastDate != null) {
-      if (lastDate!.isBefore(backDate!)) {
-        lastDate = backDate;
-      }
-    } else if (lastDate == null) {
-      lastDate = backDate;
-    }
-
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -137,6 +113,7 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
                 String chilevenGuid = '';
                 if (!(Global.validString(chilevenGuid))) {
                   chilevenGuid = Validate().randomGuid();
+                  String? minDate=await Validate().callMinDate(widget.dateOfEnrollment, 30);
                   var refStatus = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
@@ -145,9 +122,7 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
                                 enName: widget.enName!,
                                 chilenrolledGUID: widget.chilenrolledGUID!,
                                 creche_id: widget.creche_id,
-                                lastDate: now.isBefore(applicableDate)
-                                    ? null
-                                    : lastDate,
+                                lastDate: Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
                                 childId: widget.childId,
                                 childName: widget.childName,
                                 existingDates: existingDates,
@@ -201,18 +176,11 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                          var created_at = DateTime.parse(
-                              filterEventData[index].created_at.toString());
-                          var recordDate = DateTime(created_at.year,
-                              created_at.month, created_at.day);
-                          bool isUnEditable =
-                              role == CustomText.crecheSupervisor.trim()
-                                  ? recordDate.add(Duration(days: 15)).isBefore(
-                                      DateTime.parse(Validate().currentDate()))
-                                  : true;
-
-                          if (now.isBefore(applicableDate)) {
-                            isUnEditable = false;
+                          bool isEdited=await Validate().checkEditable(filterEventData[index].created_at, 15);
+                          String? minDate=await Validate().callMinDate(widget.dateOfEnrollment, 30);
+                          bool isUnEditable=true;
+                          if(isEdited&&role == CustomText.crecheSupervisor){
+                            isUnEditable=false;
                           }
                           if (existingDates.contains(Global.getItemValues(
                               filterEventData[index].responces, 'date'))) {
@@ -250,10 +218,7 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
                                                   filterEventData[index]
                                                       .childenrolledguid,
                                               creche_id: widget.creche_id,
-                                              lastDate:
-                                                  now.isBefore(applicableDate)
-                                                      ? null
-                                                      : lastDate,
+                                              lastDate:Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
                                               // maxDate:maxDate,
                                               childId: widget.childId,
                                               childName: widget.childName,

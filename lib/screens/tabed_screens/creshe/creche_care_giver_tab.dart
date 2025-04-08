@@ -13,16 +13,18 @@ import 'care_giver_screen_item.dart';
 
 class CreheCareGiverTab extends StatefulWidget {
   final String CGGuid;
+   String? minDate;
   final int parentName;
   final String crechedCode;
   final bool isEditable;
 
-  const CreheCareGiverTab({
+   CreheCareGiverTab({
     super.key,
     required this.CGGuid,
     required this.parentName,
     required this.crechedCode,
     required this.isEditable,
+     this.minDate,
   });
 
   @override
@@ -157,6 +159,7 @@ class _CrecheCareGiverTabState extends State<CreheCareGiverTab>
         screenItem: itemScreenItems,
         changeTab: changeTab,
         isEditable: widget.isEditable,
+        minDate: widget.minDate,
         tabIndex: 0,
         totalTab: 1));
     return tabItem;
