@@ -707,8 +707,14 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: logic!.callReadableLogic(myMap, quesItem),
-          initialvalue: myMap[quesItem.fieldname!],
+          readable: (quesItem.fieldname == 'checkin_location')
+              ? true
+              : widget.isEdit
+              ? true
+              : logic!.callReadableLogic(myMap, quesItem),
+          initialvalue:
+          // quesItem.fieldname == 'checkin_location'?address ?? '':
+          myMap[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
             if (value.isNotEmpty)
@@ -1408,6 +1414,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         langs = currentLocation.longitude.toString();
         address = await Validate().getAddressFromLatLng(
             currentLocation.latitude!, currentLocation.longitude!);
+        myMap['checkin_location'] = address??'';
         if (address != null) {
           setState(() {});
         }

@@ -88,7 +88,13 @@ class _ChildGrowthExpendedFormState
     'weight',
     'measurement_equipment',
     'do_you_have_height_weight',
-    'measurement_taken_date'
+    'measurement_taken_date',
+    'height_for_age_zscore',
+    'weight_for_height_zscore',
+    'weight_for_age_zscore',
+    're_height_for_age_zscore',
+    're_weight_for_height_zscore',
+    're_weight_for_age_zscore',
   ];
   List<String> staticHiddenItem = [
     'partner_id',

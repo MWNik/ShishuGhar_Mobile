@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:shishughar/utils/validate.dart';
 
+import '../model/apimodel/creche_database_responce_model.dart';
 import '../model/apimodel/translation_language_api_model.dart';
 import '../model/databasemodel/tabBlock_model.dart';
 import '../model/databasemodel/tabDistrict_model.dart';
@@ -353,8 +354,27 @@ class Global {
     return currentDate;
   }
 
+  static List<OptionsModel> callFiltersCreches(
+      List<CresheDatabaseResponceModel> creches, String lng, OptionsModel? parentItem)
+  {
+    List<OptionsModel> teCreches = [];
+    if (parentItem != null && creches.length > 0) {
+      creches =
+          creches.where((element) => getItemValues(element.responces, 'village_id') == parentItem.name).toList();
+      creches.forEach((element) {
+        var item = OptionsModel();
+        item.name = "${element.name}";
+        item.flag = "tabCreche";
+        item.values = getItemValues(element.responces, 'creche_name');
+        teCreches.add(item);
+      });
+    }
+    return teCreches;
+  }
+
   static List<OptionsModel> callFiltersVillages(
-      List<TabVillage> villages, String lng, OptionsModel? parentItem) {
+      List<TabVillage> villages, String lng, OptionsModel? parentItem)
+  {
     List<OptionsModel> teVillage = [];
     if (parentItem != null && villages.length > 0) {
       villages =
@@ -377,8 +397,11 @@ class Global {
     return teVillage;
   }
 
+
+
   static List<OptionsModel> callGramPanchyats(
-      List<TabGramPanchayat> gp, String lng, OptionsModel? parentItem) {
+      List<TabGramPanchayat> gp, String lng, OptionsModel? parentItem)
+  {
     List<OptionsModel> teGramP = [];
     if (parentItem != null && gp.length > 0) {
       gp = gp.where((element) => element.blockId == parentItem.name).toList();
@@ -401,7 +424,8 @@ class Global {
   }
 
   static List<OptionsModel> callBlocks(
-      List<TabBlock> bloks, String lng, OptionsModel? parentItem) {
+      List<TabBlock> bloks, String lng, OptionsModel? parentItem)
+  {
     List<OptionsModel> teBlock = [];
     if (parentItem != null && bloks.length > 0) {
       bloks = bloks
@@ -426,7 +450,8 @@ class Global {
   }
 
   static List<OptionsModel> callDistrict(
-      List<TabDistrict> districts, String lng, OptionsModel? parentItem) {
+      List<TabDistrict> districts, String lng, OptionsModel? parentItem)
+  {
     List<OptionsModel> teDistrict = [];
     if (parentItem != null && districts.length > 0) {
       districts = districts
@@ -450,7 +475,8 @@ class Global {
     return teDistrict;
   }
 
-  static List<OptionsModel> callSatates(List<TabState> states, String lng) {
+  static List<OptionsModel> callSatates(List<TabState> states, String lng)
+  {
     List<OptionsModel> teStates = [];
     if (states.length > 0) {
       states.forEach((element) {

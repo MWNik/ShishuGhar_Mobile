@@ -18,6 +18,7 @@ import '../model/apimodel/translation_language_api_model.dart';
 import '../style/styles.dart';
 import '../utils/globle_method.dart';
 import '../utils/validate.dart';
+import 'dashboard_report_for_all_creche_by_api.dart';
 import 'linelistedhouseholld.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -129,6 +130,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } else if (_currentIndex == 1) {
       refreshStatus = await Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => EnrolledChildrenForCC()));
+    } else if (_currentIndex == 2) {
+      refreshStatus =  await Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => DashboardReportSupeByApiScreen()));
     } else if (_currentIndex == 4) {
       if (HomeReplicaScreen.scaffoldKey != null) {
         HomeReplicaScreen.scaffoldKey!.currentState?.openDrawer();

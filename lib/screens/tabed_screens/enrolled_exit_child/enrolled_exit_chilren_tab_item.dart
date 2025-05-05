@@ -122,6 +122,11 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     'weight_for_height',
     'height_for_age',
   ];
+  List<String> zscoreIndicatorForMeasure = [
+    'height_for_age_zscore',
+    'weight_for_height_zscore',
+    'weight_for_age_zscore',
+  ];
 
   // int? isUploaded = 0;
   Map<String, FocusNode> _focusNode = {};
@@ -603,6 +608,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
         );
       case 'Data':
+        if (!zscoreIndicatorForMeasure.contains(quesItem.fieldname))
         return DynamicCustomTextFieldNew(
           focusNode: _focusNode[quesItem.fieldname],
           titleText:
@@ -630,6 +636,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
               myMap.remove(quesItem.fieldname);
           },
         );
+        else return SizedBox();
       case 'Int':
         return DynamicCustomTextFieldInt(
           hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
@@ -809,7 +816,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           },
         );
       case 'Float':
-        if (!colorIndicatorForMeasure.contains(quesItem.fieldname))
+        if (!colorIndicatorForMeasure.contains(quesItem.fieldname)&&!zscoreIndicatorForMeasure.contains(quesItem.fieldname))
           return DynamicCustomTextFieldFloat(
             hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
             focusNode: _focusNode[quesItem.fieldname],
@@ -1013,54 +1020,56 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         if (myMap[element.fieldname] != null) {
           responces[element.fieldname!] = myMap[element.fieldname];
         }
+
       });
+
       if (Global.stringToInt(myMap['measurement_taken'].toString()) > 0) {
-        Map<String, dynamic> childResponce = {
-          'weight': myMap['weight'],
-          'height': myMap['height'],
-          // 'age_months': Validate()
-          //     .calculateAgeInDays(Validate().stringToDate(myMap['child_dob'])),
-          'age_months': Validate().calculateAgeInDaysEx(
-              Validate().stringToDate(myMap['child_dob']),
-              Validate().stringToDate(myMap['measurement_date'])),
-          'measurement_equipment': myMap['measurement_equipment'],
-        };
-        var weightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
-            tabHeightforageBoys,
-            tHeightforageGirls,
-            tabWeightforageBoys,
-            tabWeightforageGirls,
-            tabWeightToHeightBoys,
-            tabWeightToHeightGirls,
-            'weight_for_age',
-            myMap['gender_id'],childResponce['measurement_date'],
-            childResponce);
-        var heightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
-            tabHeightforageBoys,
-            tHeightforageGirls,
-            tabWeightforageBoys,
-            tabWeightforageGirls,
-            tabWeightToHeightBoys,
-            tabWeightToHeightGirls,
-            'height_for_age',
-            myMap['gender_id'],childResponce['measurement_date'],
-            childResponce);
+        var colorIndicatorItems = widgets.where((item) =>
+            colorIndicatorForMeasure.contains(item.fieldname)).toList();
+        if (colorIndicatorItems.length > 0) {
 
-        var weightForHeight = DependingLogic.AutoColorCreateByHeightWightNew(
-            tabHeightforageBoys,
-            tHeightforageGirls,
-            tabWeightforageBoys,
-            tabWeightforageGirls,
-            tabWeightToHeightBoys,
-            tabWeightToHeightGirls,
-            'weight_for_height',
-            myMap['gender_id'],childResponce['measurement_date'],
-            childResponce);
+          Map<String, dynamic> childResponce = {
+            'weight': myMap['weight'],
+            'height': myMap['height'],
+            // 'age_months': Validate()
+            //     .calculateAgeInDays(Validate().stringToDate(myMap['child_dob'])),
+            'age_months': Validate().calculateAgeInDaysEx(
+                Validate().stringToDate(myMap['child_dob']),
+                Validate().stringToDate(myMap['measurement_date'])),
+            'measurement_equipment': myMap['measurement_equipment'],
+          };
+          colorIndicatorItems.forEach((item) {
+            myMap[item.fieldname!] = DependingLogic.AutoColorCreateByHeightWightNew(
+                    tabHeightforageBoys,
+                    tHeightforageGirls,
+                    tabWeightforageBoys,
+                    tabWeightforageGirls,
+                    tabWeightToHeightBoys,
+                    tabWeightToHeightGirls,
+                    item.fieldname!,
+                    myMap['gender_id'],
+                myMap['measurement_date'],
+                    childResponce);
 
-        myMap['weight_for_age'] = weightForAge;
-        myMap['height_for_age'] = heightForAge;
-        myMap['weight_for_height'] = weightForHeight;
+            var zscroreValue= DependingLogic.AutoColorCreateByHeightWightStringNew(
+                    tabHeightforageBoys,
+                    tHeightforageGirls,
+                    tabWeightforageBoys,
+                    tabWeightforageGirls,
+                    tabWeightToHeightBoys,
+                    tabWeightToHeightGirls,
+                    item.fieldname!,
+                    myMap['gender_id'],
+                myMap['measurement_date'],
+                    childResponce);
+            myMap['${item.fieldname}_zscore'] =zscroreValue;
+
+          });
+
+        }
       }
+
+
 
       var responcesJs = jsonEncode(myMap);
       var name = myMap['name'];

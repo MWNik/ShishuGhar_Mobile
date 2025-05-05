@@ -348,7 +348,7 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       'assets/creche_profile/notes.png',
       'assets/creche_profile/casebook.png',
       'assets/creche_profile/stock.png',
-      'assets/creche_profile/task.png',
+      // 'assets/creche_profile/task.png',
     ];
 
     text = [
@@ -360,7 +360,7 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       CustomText.VisitNote,
       CustomText.Cashbook,
       CustomText.Stock,
-      CustomText.DashBoardReport,
+      // CustomText.DashBoardReport,
     ];
 
     List<String> valueNames = [

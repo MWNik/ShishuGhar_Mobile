@@ -143,6 +143,7 @@ class CustomText {
   static String PresentBreastFeeding = "In Present She/he Breast Feeding";
   static String PhysicallyNotFit = "Is Child Physically Not Fit";
   static String MedicalIssue = "Is Child Has Any Medical Issue  (last 6 Month)";
+  static String childInfoNotAvailable = "Child information is not available";
   static String Clarify = "If Any (Clarify)";
   static String howManySiblingsArChildhave = "how Many Siblings Are Child have";
   static String Daily = "Daily : ";
@@ -422,6 +423,7 @@ class CustomText {
   static String PresChild = "Present Children";
   static String measurment = 'Measurement';
   static String selectAllForUpload = 'Select all for upload';
+  static String selectAll = 'Select all';
   static String uploadAll = 'Upload All';
   static String ccListing = "Creche Committee Listing";
   static String CrecheCommitte = "Creche Committee";
@@ -544,6 +546,7 @@ class CustomText {
   static String permissionrequired = "Permission Required";
   static String allowPermission = "Please allow location permission";
   static String setting = "Settings";
+  static String crecheNotAvailable = "Creche is not available please contact to admin.";
 
 
   /* DOCTYPE LIST*/

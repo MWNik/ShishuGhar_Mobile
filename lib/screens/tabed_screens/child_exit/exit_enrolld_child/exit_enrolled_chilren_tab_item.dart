@@ -133,9 +133,12 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
     'weight_for_height',
     'height_for_age',
   ];
-  // List<String> redableItemsFloat = [
-  //
-  // ];
+
+  List<String> zscoreIndicatorForMeasure = [
+    'height_for_age_zscore',
+    'weight_for_height_zscore',
+    'weight_for_age_zscore',
+  ];
 
   @override
   void initState() {
@@ -582,6 +585,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
         );
       case 'Data':
+        if (!zscoreIndicatorForMeasure.contains(quesItem.fieldname))
         return DynamicCustomTextFieldNew(
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -608,6 +612,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
               myMap.remove(quesItem.fieldname);
           },
         );
+        else return SizedBox();
       case 'Int':
         return DynamicCustomTextFieldInt(
           keyboardtype: TextInputType.number,
@@ -784,7 +789,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           },
         );
       case 'Float':
-        if (!colorIndicatorForMeasure.contains(quesItem.fieldname))
+        if (!colorIndicatorForMeasure.contains(quesItem.fieldname)&&!zscoreIndicatorForMeasure.contains(quesItem.fieldname))
         return DynamicCustomTextFieldFloat(
           hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           titleText:

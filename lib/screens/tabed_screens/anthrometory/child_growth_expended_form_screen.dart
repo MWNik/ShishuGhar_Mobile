@@ -84,6 +84,12 @@ class _ChildGrowthExpendedFormState
     'weight_for_age',
     'weight_for_height',
     'height_for_age',
+    'height_for_age_zscore',
+    'weight_for_height_zscore',
+    'weight_for_age_zscore',
+    're_height_for_age_zscore',
+    're_weight_for_height_zscore',
+    're_weight_for_age_zscore',
     'height',
     'weight',
     'measurement_equipment',
@@ -111,6 +117,9 @@ class _ChildGrowthExpendedFormState
     're_weight_for_age',
     're_weight_for_height',
     're_height_for_age',
+    're_weight_for_age_zcore',
+    're_weight_for_height_zcore',
+    're_height_for_age_zcore',
     're_updated_by',
     're_updated_on',
     're_created_by',
@@ -945,6 +954,9 @@ class _ChildGrowthExpendedFormState
             item.remove('weight_for_age');
             item.remove('height_for_age');
             item.remove('weight_for_height');
+            item.remove('weight_for_age_zscore');
+            item.remove('weight_for_height_zscore');
+            item.remove('height_for_age_zscore');
             item.remove('measurement_equipment');
             item.remove('measurement_taken_date');
             item.remove('height');
@@ -988,6 +1000,42 @@ class _ChildGrowthExpendedFormState
             item['weight_for_age'] = weightForAge;
             item['height_for_age'] = heightForAge;
             item['weight_for_height'] = weightForHeight;
+
+            var weight_for_age_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
+                tabHeightforageBoys,
+                tHeightforageGirls,
+                tabWeightforageBoys,
+                tabWeightforageGirls,
+                tabWeightToHeightBoys,
+                tabWeightToHeightGirls,
+                'weight_for_age',
+                gender,item['measurement_taken_date'],
+                item);
+            var height_for_age_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
+                tabHeightforageBoys,
+                tHeightforageGirls,
+                tabWeightforageBoys,
+                tabWeightforageGirls,
+                tabWeightToHeightBoys,
+                tabWeightToHeightGirls,
+                'height_for_age',
+                gender,item['measurement_taken_date'],
+                item);
+            var weight_for_height_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
+                tabHeightforageBoys,
+                tHeightforageGirls,
+                tabWeightforageBoys,
+                tabWeightforageGirls,
+                tabWeightToHeightBoys,
+                tabWeightToHeightGirls,
+                'weight_for_height',
+                gender,item['measurement_taken_date'],
+                item);
+
+            item['weight_for_age_zscore'] = weight_for_age_zscore;
+            item['weight_for_height_zscore'] = weight_for_height_zscore;
+            item['height_for_age_zscore'] = height_for_age_zscore;
+
           }
           childValues.add(item);
         }
@@ -1542,13 +1590,14 @@ class _ChildGrowthExpendedFormState
     }
   }
 
-  bool isMesurement(String mesureDate) {
+  bool isMesurement(String? mesureDate) {
     bool ismesure = false;
+    if(Global.validString(mesureDate)){
     List<int> parts = mesureDate.toString().split('-').map(int.parse).toList();
     var month = parts[1];
     if (mesureMonths.contains(month)) {
       ismesure = true;
-    }
+    }}
     return ismesure;
   }
 
@@ -2174,7 +2223,18 @@ class _ChildGrowthExpendedFormState
             tabWeightToHeightBoys,
             tabWeightToHeightGirls,
             inputItem[i].fieldname!,
-            gender,cWidgetDatamap['measurement_taken_date'],
+            gender,cWidgetDatamap['re_measurement_taken_date'],
+            cWidgetDatamap);
+
+        String grothValue = DependingLogic.AutoColorCreateByHeightWightStringNew(
+            tabHeightforageBoys,
+            tHeightforageGirls,
+            tabWeightforageBoys,
+            tabWeightforageGirls,
+            tabWeightToHeightBoys,
+            tabWeightToHeightGirls,
+            inputItem[i].fieldname!,
+            gender,cWidgetDatamap['re_measurement_taken_date'],
             cWidgetDatamap);
 
         Color itemC = Color(0xffAAAAAA);
@@ -2218,6 +2278,12 @@ class _ChildGrowthExpendedFormState
                 colorName,
                 style: Styles.black12700,
               ),
+              Global.validString(grothValue)
+                  ? Text(
+                '($grothValue)',
+                style: Styles.red85,
+              )
+                  : SizedBox(),
             ],
           ));
         }
@@ -2232,7 +2298,7 @@ class _ChildGrowthExpendedFormState
   void _reEnterDailog(BuildContext context, String childEnrollGUID) {
     Map<String, dynamic> cWidgetDatamap = {};
     var parentItem = attepmtChild[childEnrollGUID];
-    String mesumentDate='';
+    String? mesumentDate='';
     var childItem = filterdData
         .where((element) => element.ChildEnrollGUID == childEnrollGUID)
         .toList();
@@ -2635,6 +2701,7 @@ class _ChildGrowthExpendedFormState
               childItem.first.remove('re_measurement_reason');
 
               var gender = Global.getItemValues(enrollChildItem.responces, 'gender_id');
+
               var weightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
                   tabHeightforageBoys,
                   tHeightforageGirls,
@@ -2643,7 +2710,7 @@ class _ChildGrowthExpendedFormState
                   tabWeightToHeightBoys,
                   tabWeightToHeightGirls,
                   're_weight_for_age',
-                  gender,cWidgetDatamap['measurement_taken_date'],
+                  gender,cWidgetDatamap['re_measurement_taken_date'],
                   cWidgetDatamap);
               var heightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
                   tabHeightforageBoys,
@@ -2653,9 +2720,8 @@ class _ChildGrowthExpendedFormState
                   tabWeightToHeightBoys,
                   tabWeightToHeightGirls,
                   're_height_for_age',
-                  gender,cWidgetDatamap['measurement_taken_date'],
+                  gender,cWidgetDatamap['re_measurement_taken_date'],
                   cWidgetDatamap);
-
               var weightForHeight = DependingLogic.AutoColorCreateByHeightWightNew(
                   tabHeightforageBoys,
                   tHeightforageGirls,
@@ -2664,12 +2730,47 @@ class _ChildGrowthExpendedFormState
                   tabWeightToHeightBoys,
                   tabWeightToHeightGirls,
                   're_weight_for_height',
-                  gender,cWidgetDatamap['measurement_taken_date'],
+                  gender,cWidgetDatamap['re_measurement_taken_date'],
                   cWidgetDatamap);
 
               cWidgetDatamap['re_weight_for_age'] = weightForAge;
               cWidgetDatamap['re_height_for_age'] = heightForAge;
               cWidgetDatamap['re_weight_for_height'] = weightForHeight;
+
+              var re_weight_for_age_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
+                  tabHeightforageBoys,
+                  tHeightforageGirls,
+                  tabWeightforageBoys,
+                  tabWeightforageGirls,
+                  tabWeightToHeightBoys,
+                  tabWeightToHeightGirls,
+                  're_weight_for_age',
+                  gender,cWidgetDatamap['re_measurement_taken_date'],
+                  cWidgetDatamap);
+              var re_height_for_age_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
+                  tabHeightforageBoys,
+                  tHeightforageGirls,
+                  tabWeightforageBoys,
+                  tabWeightforageGirls,
+                  tabWeightToHeightBoys,
+                  tabWeightToHeightGirls,
+                  're_height_for_age',
+                  gender,cWidgetDatamap['re_measurement_taken_date'],
+                  cWidgetDatamap);
+              var re_weight_for_height_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
+                  tabHeightforageBoys,
+                  tHeightforageGirls,
+                  tabWeightforageBoys,
+                  tabWeightforageGirls,
+                  tabWeightToHeightBoys,
+                  tabWeightToHeightGirls,
+                  're_weight_for_height',
+                  gender,cWidgetDatamap['re_measurement_taken_date'],
+                  cWidgetDatamap);
+
+              cWidgetDatamap['re_weight_for_age_zscore'] = re_weight_for_age_zscore;
+              cWidgetDatamap['re_height_for_age_zscore'] = re_height_for_age_zscore;
+              cWidgetDatamap['re_weight_for_height_zscore'] = re_weight_for_height_zscore;
 
             } else {
               cWidgetDatamap.remove('re_height');
@@ -2681,6 +2782,10 @@ class _ChildGrowthExpendedFormState
               cWidgetDatamap.remove('re_weight_for_height');
               cWidgetDatamap.remove('re_height_for_age');
 
+              cWidgetDatamap.remove('re_weight_for_age_zscore');
+              cWidgetDatamap.remove('re_weight_for_height_zscore');
+              cWidgetDatamap.remove('re_height_for_age_zscore');
+
               childItem.first.remove('re_height');
               childItem.first.remove('re_weight');
               childItem.first.remove('re_measurement_taken_date');
@@ -2689,6 +2794,10 @@ class _ChildGrowthExpendedFormState
               childItem.first.remove('re_weight_for_age');
               childItem.first.remove('re_weight_for_height');
               childItem.first.remove('re_height_for_age');
+
+              childItem.first.remove('re_weight_for_age_zscore');
+              childItem.first.remove('re_weight_for_height_zscore');
+              childItem.first.remove('re_height_for_age_zscore');
             }
             if(cWidgetDatamap['re_created_on']!=null || cWidgetDatamap['re_created_by']!=null){
               cWidgetDatamap['re_updated_by'] = userName;

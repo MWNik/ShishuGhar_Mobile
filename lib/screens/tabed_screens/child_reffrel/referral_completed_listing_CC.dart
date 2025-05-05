@@ -406,7 +406,7 @@ class _ReferallCompletedListForCCState
                                         child_id: childId,
                                         child_referral_guid: child_referral_guid,
                                         childName: childName,
-                                        minDate: minDate!,
+                                        minDate: minDate,
                                         isEditable: role == CustomText.crecheSupervisor.trim() ? isEdited : false,
                                         isEditableForDischage: role == CustomText.crecheSupervisor.trim() ? isEditableForDischage : false,
                                         scheduleDate: filteredReferral[index]['date_of_referral'],

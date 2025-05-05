@@ -91,6 +91,7 @@ class _CustomDropdownFieldState extends State<DynamicCustomDropdownField> {
               child: Padding(
                 padding: EdgeInsets.only(left: 10.w, right: 10.w),
                 child: DropdownButtonFormField<OptionsModel>(
+                  isExpanded: true,
                   focusNode: widget.focusNode,
                   value: isDropdownEnabled
                       ? (widget.selectedItem != null
@@ -143,7 +144,9 @@ class _CustomDropdownFieldState extends State<DynamicCustomDropdownField> {
                     value: item,
                     child: Text(
                       item.values!,
-                      style: Styles.black124,
+                      strutStyle:
+                      StrutStyle(height: 1.2),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ))
                       .toList(),

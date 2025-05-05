@@ -2267,10 +2267,11 @@ class DependingLogic {
 
         }
         if (gender == '1') {
+          var roundedHeight=Global.roundToNearest(Global.validNum(height.toString()));
           var filtredItem = tabWeightToHeightBoys
               .where((element) =>
           (element.length ==
-              Global.roundToNearest(Global.validNum(height.toString())) && element.age_type==preHeight ))
+              roundedHeight && element.age_type==preHeight ))
               .toList();
           if (filtredItem.length > 0) {
             if (Global.stringToDoubleThreeTr(weight.toString()) < Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!)) {

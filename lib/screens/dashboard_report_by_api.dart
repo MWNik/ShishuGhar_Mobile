@@ -8,7 +8,6 @@ import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
-import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';

@@ -215,7 +215,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
                                 await minMaxDate(childHHData[index].created_at);
 
                             if (callMeasurementEditableDate(
-                                childHHData[index].created_at!)) {
+                                childHHData[index].created_at)) {
                               var refStatus = await Navigator.of(context).push(
                                   MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -764,7 +764,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
       DateTime? selectedDate = DateTime.parse(date.toString());
       DateTime currentDate = DateTime.parse(Validate().currentDate());
       DateTime editableDate =
-          DateTime(selectedDate!.year, selectedDate.month + 1, 11);
+          DateTime(selectedDate.year, selectedDate.month + 1, 11);
       if (currentDate.isBefore(editableDate)) {
         isEditable = true;
       } else {

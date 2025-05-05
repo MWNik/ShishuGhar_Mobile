@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/src/response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shishughar/api/creche_Monitering_checkList_alm_api.dart';
 import 'package:shishughar/api/creche_monetering_checkList_cbm_api.dart';
@@ -28,7 +29,6 @@ import 'package:shishughar/model/databasemodel/tabVillage_model.dart';
 import 'package:shishughar/model/databasemodel/tabstate_model.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/validate.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import '../api/cashBook_expenses_api.dart';
 import '../api/cashbook_receipt_api.dart';
@@ -50,6 +50,7 @@ import '../api/user_manual_pdf_api.dart';
 import '../api/village_profile_meta_api.dart';
 import '../custom_widget/custom_string_dropdown.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
+import '../custom_widget/muliselect_button_dailog.dart';
 import '../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../database/helper/cashbook/expences/cashbook_response_expences_helper.dart';
 import '../database/helper/cashbook/receipt/cashbook_receipt_response_helper.dart';
@@ -86,13 +87,15 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
   OptionsModel? selectedDistrict;
   OptionsModel? selectedBlock;
   OptionsModel? selectedGramPanchayat;
-  List<String> selectedVillage = [];
+  // List<String> selectedVillage = [];
+  List<OptionsModel> selectedMVillage = [];
 
   List<OptionsModel> mstStates = [];
   List<OptionsModel> mstDistrict = [];
   List<OptionsModel> mstBlock = [];
   List<OptionsModel> mstGP = [];
-  List<String> villageList = [];
+  List<OptionsModel> mstVillages = [];
+  // List<String> villageList = [];
 
   List<TabState> states = [];
   List<TabDistrict> district = [];
@@ -198,27 +201,29 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
             OptionsModel(name: gp.name.toString(), values: value, flag: 'taGp');
       } else
         throw Exception("Gram Panchayat not available");
-      villageList = callFiltersVillages(village, lng!, selectedGramPanchayat);
-      selectedVillage.clear();
+      // villageList = callFiltersVillages(village, lng!, selectedGramPanchayat);
+      mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
+      selectedMVillage.clear();
       var selcVSaved = await Validate().readString(Validate.villageIdES);
-      village.forEach((element) {
+      mstVillages.forEach((element) {
         if (selcVSaved != null) {
           if (selcVSaved.contains(element.name.toString())) {
-            var value = "${element.value}";
-            if (lng == 'hi' &&
-                Global.validString(element.village_hi.toString())) {
-              value = element.village_hi.toString();
-            } else if (lng == 'od' &&
-                Global.validString(element.village_od.toString())) {
-              value = element.village_od.toString();
-            }
-            selectedVillage.add(value);
+            // var value = "${element.value}";
+            // if (lng == 'hi' &&
+            //     Global.validString(element.village_hi.toString())) {
+            //   value = element.village_hi.toString();
+            // } else if (lng == 'od' &&
+            //     Global.validString(element.village_od.toString())) {
+            //   value = element.village_od.toString();
+            // }
+            var item=OptionsModel(name:element.name.toString(),values: element.values,flag: element.flag);
+            selectedMVillage.add(item);
           }
         }
       });
     }
 
-    if (mstStates.length == 1 && villageList.length == 0) {
+    if (mstStates.length == 1 && mstVillages.length == 0) {
       selectedState = mstStates.first;
       mstDistrict = Global.callDistrict(district, lng!, selectedState);
       if (mstDistrict.length == 1) {
@@ -229,8 +234,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
           mstGP = Global.callGramPanchyats(gramPanchayat, lng!, selectedBlock);
           if (mstGP.length == 1) {
             selectedGramPanchayat = mstGP.first;
-            villageList =
-                callFiltersVillages(village, lng!, selectedGramPanchayat);
+            mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
           }
         }
       }
@@ -287,7 +291,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                               selectedDistrict = null;
                               selectedBlock = null;
                               selectedGramPanchayat = null;
-                              selectedVillage = [];
+                              selectedMVillage = [];
                               mstDistrict = Global.callDistrict(
                                   district, lng!, selectedState);
                               if (mstDistrict.length == 1) {
@@ -300,8 +304,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                                       gramPanchayat, lng!, selectedBlock);
                                   if (mstGP.length == 1) {
                                     selectedGramPanchayat = mstGP.first;
-                                    villageList = callFiltersVillages(
-                                        village, lng!, selectedGramPanchayat);
+                                    mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
                                   }
                                 }
                               }
@@ -325,7 +328,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                               selectedDistrict = value;
                               selectedBlock = null;
                               selectedGramPanchayat = null;
-                              selectedVillage = [];
+                              selectedMVillage = [];
                               mstBlock = Global.callBlocks(
                                   block, lng!, selectedDistrict);
                               if (mstBlock.length == 1) {
@@ -334,8 +337,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                                     gramPanchayat, lng!, selectedBlock);
                                 if (mstGP.length == 1) {
                                   selectedGramPanchayat = mstGP.first;
-                                  villageList = callFiltersVillages(
-                                      village, lng!, selectedGramPanchayat);
+                                  mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
                                 }
                               }
                               setState(() {
@@ -357,13 +359,12 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                             onChanged: (value) async {
                               selectedBlock = value;
                               selectedGramPanchayat = null;
-                              selectedVillage = [];
+                              selectedMVillage = [];
                               mstGP = Global.callGramPanchyats(
                                   gramPanchayat, lng!, selectedBlock);
                               if (mstGP.length == 1) {
                                 selectedGramPanchayat = mstGP.first;
-                                villageList = callFiltersVillages(
-                                    village, lng!, selectedGramPanchayat);
+                                mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
                               }
                               setState(() {
                                 // Update gramPanchayatList based on selectedBlock
@@ -383,9 +384,8 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                                 : null,
                             onChanged: (value) async {
                               selectedGramPanchayat = value;
-                              selectedVillage = [];
-                              villageList = callFiltersVillages(
-                                  village, lng!, selectedGramPanchayat);
+                              selectedMVillage = [];
+                              mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
                               setState(() {
                                 // Update villageList based on selectedGramPanchayat
                                 // villageList = // data from database based on selectedGramPanchayat;
@@ -411,48 +411,99 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                               SizedBox(
                                 height: 3.h,
                               ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffACACAC)),
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: MultiSelectDialogField(
-                                  initialValue: selectedVillage,
-                                  dialogHeight: 150.h,
+                              GestureDetector(
+                                onTap: (){
+                                  showMultiSelectDailog(mstVillages);
+                                },
+                                child: Container(
                                   decoration: BoxDecoration(
-                                    shape: BoxShape.rectangle,
+                                    border: Border.all(color: Color(0xffACACAC)),
+                                    borderRadius: BorderRadius.circular(10.r),
                                   ),
-                                  title: Text(Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.Village,
-                                      lng!)),
-                                  buttonIcon: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: Colors.grey.shade700,
+                                  child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextButton(
+                                            onPressed: (){
+                                              showMultiSelectDailog(mstVillages);
+                                            },
+                                            child: Text(
+                                              Global.returnTrLable(locationControlls,CustomText.SelectVillage,lng!),overflow: TextOverflow.ellipsis,),
+                                          ),
+                                          IconButton(onPressed: (){
+                                            showMultiSelectDailog(mstVillages);
+                                          }, icon: Icon(Icons.arrow_drop_down,color: Colors.black,))
+                                        ],
+                                      ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 5,right: 5),
+                                    child: Wrap(
+                                      crossAxisAlignment: WrapCrossAlignment.start,
+                                      spacing: 8.0, // space between items
+                                      runSpacing: 8.0, // space between lines
+                                      children: selectedMVillage.map((item) {
+                                        return FilterChip(
+                                          label: Text(item.values!),
+                                          selected: selectedMVillage.contains(item),
+                                          onSelected: (isSelected) {
+                                            setState(() {
+                                              isSelected
+                                                  ? selectedMVillage.add(item)
+                                                  : selectedMVillage.remove(item);
+                                            });
+                                          },
+                                        );
+                                      }).toList(),),
+                                  )
+                                    ],
                                   ),
-                                  buttonText: Text(Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.SelectVillage,
-                                      lng!)),
-                                  items: villageList
-                                      .map((e) =>
-                                          MultiSelectItem(e, e.toString()))
-                                      .toList(),
-                                  listType: MultiSelectListType.LIST,
-                                  confirmText: Text(Global.returnTrLable(
-                                      locationControlls, CustomText.ok, lng!)),
-                                  cancelText: Text(Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.Cancel,
-                                      lng!)),
-                                  onConfirm: (value) {
-                                    setState(() {
-                                      print(value);
-                                      selectedVillage = value;
-                                    });
-                                  },
                                 ),
                               ),
+                              // Container(
+                              //   decoration: BoxDecoration(
+                              //     border: Border.all(color: Color(0xffACACAC)),
+                              //     borderRadius: BorderRadius.circular(10.r),
+                              //   ),
+                              //     child: MultiSelectDialogField(
+                              //     initialValue: selectedVillage,
+                              //     dialogHeight: 150.h,
+                              //     decoration: BoxDecoration(
+                              //       shape: BoxShape.rectangle,
+                              //     ),
+                              //     title: Text(Global.returnTrLable(
+                              //         locationControlls,
+                              //         CustomText.Village,
+                              //         lng!)),
+                              //     buttonIcon: Icon(
+                              //       Icons.arrow_drop_down,
+                              //       color: Colors.grey.shade700,
+                              //     ),
+                              //     buttonText: Text(Global.returnTrLable(
+                              //         locationControlls,
+                              //         CustomText.SelectVillage,
+                              //         lng!)),
+                              //     items: villageList
+                              //         .map((e) =>
+                              //             MultiSelectItem(e, e.toString()))
+                              //         .toList(),
+                              //     listType: MultiSelectListType.LIST,
+                              //     confirmText: Text(Global.returnTrLable(
+                              //         locationControlls, CustomText.ok, lng!)),
+                              //     cancelText: Text(Global.returnTrLable(
+                              //         locationControlls,
+                              //         CustomText.Cancel,
+                              //         lng!)),
+                              //     onConfirm: (value) {
+                              //       setState(() {
+                              //         print(value);
+                              //         selectedVillage = value;
+                              //       });
+                              //     },
+                              //   ),
+                              // ),
                               SizedBox(height: 30.h),
                               CElevatedButton(
                                 onPressed: () async {
@@ -490,7 +541,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                                             CustomText.ok, lng!),
                                         false,
                                         context);
-                                  } else if (selectedVillage.length == 0) {
+                                  } else if (selectedMVillage.length == 0) {
                                     Validate().singleButtonPopup(
                                         Global.returnTrLable(locationControlls,
                                             CustomText.plSelect_village, lng!),
@@ -509,15 +560,12 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
                                         Validate.gramPanchayat,
                                         selectedGramPanchayat!.name!);
                                     String villagesss = '';
-                                    village.forEach((element) {
-                                      if (selectedVillage
-                                          .contains(element.value)) {
-                                        if (Global.validString(villagesss)) {
-                                          villagesss =
-                                              '$villagesss,${element.name}';
-                                        } else
-                                          villagesss = '${element.name}';
-                                      }
+                                    selectedMVillage.forEach((element) {
+                                      if (Global.validString(villagesss)) {
+                                        villagesss =
+                                        '$villagesss,${element.name}';
+                                      } else
+                                        villagesss = '${element.name}';
                                     });
                                     Validate().saveString(
                                         Validate.villageIdES, villagesss);
@@ -585,7 +633,8 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
       CustomText.nointernetconnectionavailable,
       CustomText.data_downloaded_successfully,
       CustomText.somethingWentError,
-      CustomText.ok
+      CustomText.ok,
+      CustomText.selectAll
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -1942,25 +1991,40 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
     }
   }
 
-  List<String> callFiltersVillages(
-      List<TabVillage> villages, String lng, OptionsModel? parentItem) {
-    List<String> teVillage = [];
-    if (parentItem != null && villages.length > 0) {
-      villages =
-          villages.where((element) => element.gpId == parentItem.name).toList();
-      villages.forEach((element) {
-        var value = "${element.value}";
-        if (lng == 'hi' && Global.validString(element.village_hi.toString())) {
-          value = element.village_hi.toString();
-        } else if (lng == 'od' &&
-            Global.validString(element.village_od.toString())) {
-          value = element.village_od.toString();
-        }
-        teVillage.add(value);
-      });
+
+
+  showMultiSelectDailog(List<OptionsModel> items) async {
+    if(selectedGramPanchayat==null){
+      Validate().singleButtonPopup(
+          Global.returnTrLable(locationControlls,
+              CustomText.plSelect_geamPanchayat, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          false,
+          context);
+    }else {
+      var selectedItems = await showDialog<List<OptionsModel>>(
+        context: context,
+        builder: (context) =>
+            MultiSelectButtonDialog(
+              items: items,
+              selectAll: Global.returnTrLable(locationControlls,
+                  CustomText.selectAll, lng!),
+              title: Global.returnTrLable(locationControlls,
+                  CustomText.SelectVillage, lng!),
+              selectedItem: selectedMVillage,
+              posButton: Global.returnTrLable(locationControlls,
+                  CustomText.ok, lng!),
+              negButton: Global.returnTrLable(locationControlls,
+                  CustomText.Cancel, lng!),
+            ),
+      );
+      if (selectedItems != null) {
+        setState(() {
+          selectedMVillage = selectedItems;
+          print('select $selectedItems');
+        });
+      }
     }
-    return teVillage;
   }
 }
 
-// var dislist =  DatabaseHelper.database!.rawQuery('SELECT * FROM TABLE tabGender Whare state_id=$stateId;');
