@@ -107,13 +107,13 @@ class _UpdateCheckScreenState extends State<UpdateCheckScreen> {
           content: Text(
               'A new version of the app is available. Please update to the latest version.'),
           actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _navigateToSplashScreen();
-              },
-              child: Text('Cancel'),
-            ),
+            // TextButton(
+            //   onPressed: () {
+            //     Navigator.of(context).pop();
+            //     _navigateToSplashScreen();
+            //   },
+            //   child: Text('Cancel'),
+            // ),
             TextButton(
               onPressed: () {
                 _performImmediateUpdate();

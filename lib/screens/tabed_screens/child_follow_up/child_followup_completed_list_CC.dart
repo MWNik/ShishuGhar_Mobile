@@ -4,7 +4,6 @@ import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_textfield.dart';
-import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown_for_filter.dart';
 import 'package:shishughar/database/helper/creche_helper/creche_data_helper.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';

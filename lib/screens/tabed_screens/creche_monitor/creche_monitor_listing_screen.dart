@@ -10,6 +10,8 @@ import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitor/creche_monitor_tab.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/creche_monitor_response_model.dart';
 import '../../../style/styles.dart';
 
@@ -37,6 +39,7 @@ class _CrecheMonitorListingScreenState
   String lng = 'en';
   List<Translation> translats = [];
   bool isOnlyUnsynched = false;
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   @override
   void initState() {
@@ -46,6 +49,7 @@ class _CrecheMonitorListingScreenState
 
   Future<void> initializeData() async {
     lng = (await Validate().readString(Validate.sLanguage))!;
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
     List<String> valueNames = [
       CustomText.VisitNotes,
       CustomText.Creches,
@@ -161,7 +165,7 @@ class _CrecheMonitorListingScreenState
                       return GestureDetector(
                         onTap: () async {
                           final cmgUid = selectedItem.cmguid;
-                          bool isEdited=await Validate().checkEditable(selectedItem.created_at, 7);
+                          bool isEdited=await Validate().checkEditable(selectedItem.created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
                           await _navigateToFormPage(
                               cmgUid,
                               Global.getItemValues(responce!, 'date_of_visit'),

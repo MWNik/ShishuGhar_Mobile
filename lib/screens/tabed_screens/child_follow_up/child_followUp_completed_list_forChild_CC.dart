@@ -177,6 +177,8 @@ class _ChildFollowUpsListingScreenState
                               DateTime.parse(Validate().currentDate())
                                   .subtract(Duration(days: 7));
                           var backDateSD = date.subtract(Duration(days: 7));
+
+
                           if (Global.validString(child_followup_guid)) {
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(

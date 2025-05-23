@@ -10,8 +10,10 @@ import 'package:shishughar/utils/validate.dart';
 
 import '../../../../custom_widget/custom_text.dart';
 import '../../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
+import '../../../../database/helper/backdated_configiration_helper.dart';
 import '../../../../database/helper/cashbook/receipt/cashbook_receipt_response_helper.dart';
 import '../../../../database/helper/translation_language_helper.dart';
+import '../../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../../utils/globle_method.dart';
 import 'cashbook_expenses_details_screen.dart';
 
@@ -38,6 +40,8 @@ class _CashBookExpensesListingSCreenState
   String? role;
   DateTime applicableDate = Validate().stringToDate("2024-12-31");
   DateTime now = DateTime.parse(Validate().currentDate());
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   void initState() {
     super.initState();
@@ -50,6 +54,9 @@ class _CashBookExpensesListingSCreenState
     lng = (await Validate().readString(Validate.sLanguage))!;
     var date = await Validate().readString(Validate.date);
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
+    backdatedConfigirationModel = await BackdatedConfigirationHelper()
+        .excuteBackdatedConfigirationModel(CustomText.cashbook);
+
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -97,8 +104,8 @@ class _CashBookExpensesListingSCreenState
                       cashbookGuid = Validate().randomGuid();
                       var backDate = now.isBefore(applicableDate)
                           ? DateTime(1992)
-                          : DateTime.parse(Validate().currentDate())
-                              .subtract(Duration(days: 7));
+                          : Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.parse(Validate().currentDate())
+                              .subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):DateTime(1992);
                       if (minDate != null) {
                         if (minDate!.isBefore(backDate)) {
                           minDate = backDate;
@@ -212,9 +219,8 @@ class _CashBookExpensesListingSCreenState
                                         expensesData[index].cashbook_guid;
                                     var backDate = now.isBefore(applicableDate)
                                         ? DateTime(1992)
-                                        : DateTime.parse(
-                                                Validate().currentDate())
-                                            .subtract(Duration(days: 7));
+                                        : Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.parse(Validate().currentDate())
+                                        .subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):DateTime(1992);
                                     if (minDate != null) {
                                       if (minDate!.isBefore(backDate)) {
                                         minDate = backDate;
@@ -228,17 +234,18 @@ class _CashBookExpensesListingSCreenState
                                         expensesData[index]
                                             .created_at
                                             .toString());
-                                    var date = DateTime(created_at.year,
-                                        created_at.month, created_at.day);
-                                    bool isEditable = date
-                                        .add(Duration(days: 8))
-                                        .isAfter(DateTime.parse(
-                                            Validate().currentDate()));
-                                    if (isEditable) {
-                                      isEditable = now.isBefore(applicableDate);
-                                    }
 
-                                    bool isEdited=await Validate().checkEditable(expensesData[index].created_at, 7);
+                                    // var date = DateTime(created_at.year,
+                                    //     created_at.month, created_at.day);
+                                    // bool isEditable = date
+                                    //     .add(Duration(days: 8))
+                                    //     .isAfter(DateTime.parse(
+                                    //         Validate().currentDate()));
+                                    // if (isEditable) {
+                                    //   isEditable = now.isBefore(applicableDate);
+                                    // }
+
+                                    bool isEdited=await Validate().checkEditable(expensesData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
                                     bool isUnEditable=true;
                                     if(isEdited && role == CustomText.crecheSupervisor){
                                       isUnEditable=false;

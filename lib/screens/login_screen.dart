@@ -41,6 +41,7 @@ import '../api/form_logic_api.dart';
 import '../api/language_translation_api.dart';
 import '../api/village_profile_meta_api.dart';
 import '../custom_widget/double_button_dailog.dart';
+import '../database/helper/backdated_configiration_helper.dart';
 import '../database/helper/creche_helper/creche_data_helper.dart';
 import '../database/helper/form_logic_helper.dart';
 import '../database/helper/height_weight_boys_girls_helper.dart';
@@ -49,11 +50,13 @@ import '../database/helper/mst_supervisor_helper.dart';
 import '../database/helper/translation_language_helper.dart';
 import '../database/helper/vaccines_helper.dart';
 import '../database/helper/village_profile/village_profile_response_helper.dart';
+import '../model/apimodel/backdated_configiration_api_model.dart';
 import '../model/apimodel/form_logic_api_model.dart';
 import '../model/apimodel/mapping_login_model.dart';
 import '../model/apimodel/master_data_model.dart';
 import '../model/apimodel/mater_data_other_model.dart';
 import '../model/apimodel/translation_language_api_model.dart';
+import '../model/databasemodel/backdated_configiration_model.dart';
 import '../utils/constants.dart';
 import '../utils/globle_method.dart';
 import 'package:http/http.dart';
@@ -579,6 +582,25 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     if (logisResponce.statusCode == 200) {
       Map<String, dynamic> responseData = json.decode(logisResponce.body);
       await initFormLogic(FormLogicApiModel.fromJson(responseData));
+      await callBackdatedConfigirationData(mContext, userName, password, token, userRole);
+    } else {
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(logisResponce.body, 'message'),
+          'ok',
+          false,
+          context);
+    }
+  }
+
+  Future<void> callBackdatedConfigirationData(BuildContext mContext, String userName,
+      String password, String token, String userRole)
+  async {
+    var logisResponce =
+    await MasterApiService().backdatedConfigiration(userName, password, token);
+    if (logisResponce.statusCode == 200) {
+      Map<String, dynamic> responseData = json.decode(logisResponce.body);
+      await initBackdatedConfigirationData(BackdatedConfigirationModelApiModel.fromJson(responseData));
       await callMasterData(mContext, userName, password, token, userRole);
     } else {
       Navigator.pop(mContext);
@@ -591,7 +613,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   }
 
   Future<void> callMasterData(BuildContext mContext, String userName,
-      String password, String token, String userRole) async {
+      String password, String token, String userRole)
+  async {
     var msterDataResponse =
         await MasterApiService().fetchmasterData(userName, password, token);
 
@@ -629,6 +652,15 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         await FormLogicDataHelper().insertFormLogic(formLogicList);
       } else {
         print("Not Insert formlogic data into the database");
+      }
+    }
+  }
+
+  Future<void> initBackdatedConfigirationData(BackdatedConfigirationModelApiModel? item) async {
+    if (item != null) {
+      List<BackdatedConfigirationModel>? items = item.backdatedConfigirationModel;
+      if (items.isNotEmpty) {
+        await BackdatedConfigirationHelper().insertBackdatedConfigirationModel(items);
       }
     }
   }

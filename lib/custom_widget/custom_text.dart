@@ -371,8 +371,10 @@ class CustomText {
   static String Severe = "Severe";
   static String illness = "illness";
   static String ChildHealthDetail = "Health Detail";
+  static String ChildHealthDetails = "Health Details";
   static String ChildImmunizationDetails = "Immunization";
   static String ChildEventDetail = "Event Detail";
+  static String EventDetails = "Event Details";
   static String Grievance = "Grievance";
   static String IssueSubmit = "Issue Submit";
   static String ChildDetails = "Child Details";

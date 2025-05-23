@@ -11,9 +11,11 @@ import 'package:shishughar/utils/validate.dart';
 import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown_for_filter.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/creche_monitor_response_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
@@ -42,6 +44,7 @@ class _CrecheMonitorListingScreenState
   List<CrecheMonitorResponseModel> unsynchedList = [];
   List<CrecheMonitorResponseModel> allList = [];
   bool isDraftAvailable = false;
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   @override
   void initState() {
@@ -67,6 +70,7 @@ class _CrecheMonitorListingScreenState
       CustomText.delete,
       CustomText.Cancel
     ];
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translatsLabel = value);
@@ -267,7 +271,7 @@ class _CrecheMonitorListingScreenState
                         return GestureDetector(
                           onTap: () async {
                             final cmgUid = filterData[index].cmguid;
-                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, 7);
+                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
 
                             final allowRefresh =
                                 await Navigator.of(context).push(

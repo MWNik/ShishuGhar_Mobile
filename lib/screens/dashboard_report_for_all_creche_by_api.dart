@@ -575,10 +575,15 @@ class _DashboardReportSupeByApiState
 
   Future callApiForDashboardApi() async {
     var token = await Validate().readString(Validate.appToken);
+    String? userName;
+    var role = await Validate().readString(Validate.role);
+    if (role == CustomText.crecheSupervisor) {
+      userName = await Validate().readString(Validate.userName);
+    }
     var network = await Validate().checkNetworkConnection();
     if (network) {
       showLoaderDialog(context);
-      var response = await DashboardReportApi().callDashboardSupReportApi(
+      var response = await DashboardReportApi().callDashboardSupReportApi(userName,
           selectedYear,
           selectedMonth!,
           selectedState,

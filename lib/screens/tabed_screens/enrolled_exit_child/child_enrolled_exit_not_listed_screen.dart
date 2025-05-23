@@ -14,10 +14,12 @@ import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/custom_textfield.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../database/helper/village_data_helper.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/tabVillage_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../enrolled_child_terms_condition.dart';
@@ -65,6 +67,8 @@ class _NotEnrolledChildrenListedScreenState
   List<Map<String, dynamic>> unsynchedList = [];
   String? role;
   List<Map<String, dynamic>> allList = [];
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   @override
   void initState() {
@@ -85,6 +89,7 @@ class _NotEnrolledChildrenListedScreenState
     }
     role = (await Validate().readString(Validate.role))!;
     genderList = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.enrollExitChild);
     relationChilddata =
         await OptionsModelHelper().getMstCommonOptions('Relation', lng);
     List<String> valueItems = [
@@ -768,7 +773,10 @@ class _NotEnrolledChildrenListedScreenState
 
   Future<String?> callDateOfExit(String CHHGUID) async {
     String? maxDateOfExit=await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
-    return await Validate().callMinDate(maxDateOfExit, 15);
+    if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+      return await Validate().callMinDate(maxDateOfExit, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+    }else return null;
+
   }
 
   bool isDateInRange(DateTime targetDate) {

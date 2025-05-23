@@ -26,6 +26,7 @@ import '../custom_widget/custom_string_dropdown.dart';
 import '../custom_widget/custom_textfield.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.dart';
 import '../custom_widget/single_poup_dailog.dart';
+import '../database/helper/backdated_configiration_helper.dart';
 import '../database/helper/block_data_helper.dart';
 import '../database/helper/creche_helper/creche_data_helper.dart';
 import '../database/helper/district_data_helper.dart';
@@ -33,6 +34,7 @@ import '../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../database/helper/gram_panchayat_data_helper.dart';
 import '../database/helper/state_data_helper.dart';
 import '../database/helper/village_data_helper.dart';
+import '../model/databasemodel/backdated_configiration_model.dart';
 import '../model/databasemodel/tabBlock_model.dart';
 import '../model/databasemodel/tabDistrict_model.dart';
 import '../model/databasemodel/tabGramPanchayat_model.dart';
@@ -102,6 +104,8 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
   bool isOnlyUnsynched = false;
   List<HouseHoldTabResponceMosdel> unsynchedList = [];
   List<HouseHoldTabResponceMosdel> allList = [];
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   void validateDates() {
     if (calStartDate != null && calEndDate != null) {
@@ -241,6 +245,7 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
     var panchayatId = await Validate().readInt(Validate.panchayatId);
     role = await Validate().readString(Validate.role);
     var creches = await CrecheDataHelper().getCrecheResponceItem(widget.crecheId);
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.houseHoldForm);
     if(creches.length>0){
       crecheOpeningDate=Global.getItemValues(creches.first.responces, 'creche_opening_date');
       crecheClosingDate=Global.getItemValues(creches.first.responces, 'creche_closing_date');
@@ -1064,7 +1069,10 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                             onTap: () async {
                               // Handle item tap here
                               print('Item $index tapped');
-                              String? minDate=await Validate().requredOnlyMinimum(filterData[index].created_at, 7);
+                              String? minDate;
+                              if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                                minDate=await Validate().requredOnlyMinimum(filterData[index].created_at, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                              }
                               String? maxDate=filterData[index].created_at;
                               var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
@@ -1793,7 +1801,10 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                         String hhGuid = '';
                         if (!Global.validString(hhGuid)) {
                           hhGuid = Validate().randomGuid();
-                          String? minDate=await Validate().requredOnlyMinimum(null, 7);
+                          String? minDate;
+                          if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                            minDate=await Validate().requredOnlyMinimum(null, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                          }
                           print("line $hhGuid");
                           var refStatus = await Navigator.of(context).push(
                             MaterialPageRoute(

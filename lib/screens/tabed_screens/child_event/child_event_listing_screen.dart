@@ -9,8 +9,10 @@ import 'package:shishughar/screens/tabed_screens/child_event/enrolled_child_even
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/child_event_tab_response_model.dart';
 import '../../../style/styles.dart';
 import 'child_event_detail_view_screen.dart';
@@ -47,6 +49,7 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
   List<String> existingDates = [];
   bool isOnlyUnsyched = false;
   String? role;
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
 
   void initState() {
@@ -61,7 +64,7 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
     if (lngtr != null) {
       lng = lngtr;
     }
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.EventDetails);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -113,7 +116,10 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
                 String chilevenGuid = '';
                 if (!(Global.validString(chilevenGuid))) {
                   chilevenGuid = Validate().randomGuid();
-                  String? minDate=await Validate().callMinDate(widget.dateOfEnrollment, 30);
+                  String? minDate;
+                  if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                    minDate=await Validate().callMinDate(widget.dateOfEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                  }
                   var refStatus = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
@@ -176,8 +182,12 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                          bool isEdited=await Validate().checkEditable(filterEventData[index].created_at, 15);
-                          String? minDate=await Validate().callMinDate(widget.dateOfEnrollment, 30);
+                          bool isEdited=await Validate().checkEditable(filterEventData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
+                          String? minDate;
+                          if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                            minDate=await Validate().callMinDate(widget.dateOfEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                          }
+                          
                           bool isUnEditable=true;
                           if(isEdited&&role == CustomText.crecheSupervisor){
                             isUnEditable=false;

@@ -22,6 +22,7 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new
 import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen_growth.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/height_weight_boys_girls_helper.dart';
@@ -33,6 +34,7 @@ import '../../../model/apimodel/tabWeight_for_age_Boys _model.dart';
 import '../../../model/apimodel/tabWeight_for_age_Girls _model.dart';
 import '../../../model/apimodel/tabWeight_to_Height_Boys_model.dart';
 import '../../../model/apimodel/tabWeight_to_Height_Girls_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
@@ -140,7 +142,7 @@ class _ChildGrowthExpendedFormState
   List<TabWeightforageGirlsModel> tabWeightforageGirls = [];
   List<TabWeightToHeightBoysModel> tabWeightToHeightBoys = [];
   List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls = [];
-
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   bool recrdedUpload = false;
   String lng = 'en';
@@ -157,8 +159,9 @@ class _ChildGrowthExpendedFormState
 
 
   Future<void> initializeData() async {
-    if(widget.lastGrowthDate!=null){
-      String? minDate=await Validate().callMinDate(widget.lastGrowthDate.toString(), 10);
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.childGrowthMonitoring);
+    if(widget.lastGrowthDate!=null&&Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+      String? minDate=await Validate().callMinDate(widget.lastGrowthDate.toString(), backdatedConfigirationModel!.back_dated_data_entry_allowed!);
       if(Global.validString(minDate)){
         caMinDate=Validate().stringToDate(minDate!);
       }else caMinDate=widget.lastGrowthDate;
@@ -1278,7 +1281,11 @@ class _ChildGrowthExpendedFormState
           // isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           items: items,
           readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(itemsAnswred, quesItem)
+              ? (quesItem.fieldname == 'measurement_equipment')?
+          isMesurement(myMap[measurement_date!.fieldname])?
+          logic!.callReadableLogic(itemsAnswred, quesItem)
+              :true
+              :logic!.callReadableLogic(itemsAnswred, quesItem)
               : true,
           selectedItem: itemsAnswred[quesItem.fieldname!].toString(),
           isVisible: logic!.callDependingLogic(itemsAnswred, quesItem),
@@ -1558,7 +1565,8 @@ class _ChildGrowthExpendedFormState
           initialvalue: itemsAnswred[quesItem.fieldname!],
           readable: role == CustomText.crecheSupervisor
               ? (quesItem.fieldname == 'height')?
-          isMesurement(myMap[measurement_date!.fieldname])?logic!.callReadableLogic(itemsAnswred, quesItem)
+          isMesurement(myMap[measurement_date!.fieldname])?
+          logic!.callReadableLogic(itemsAnswred, quesItem)
               :true
               :logic!.callReadableLogic(itemsAnswred, quesItem)
               : true,
@@ -2164,10 +2172,12 @@ class _ChildGrowthExpendedFormState
               if(itemMap['do_you_have_height_weight'].toString()=='1'){
                 Map<String, dynamic> childItem= {};
                 itemMap.forEach((key, value) {
-                  if(key=='height'||key=='do_you_have_height_weight'){
+                  if(key=='height'||key=='do_you_have_height_weight'||key=='measurement_equipment'){
                     if(key=='height' && Global.stringToDouble(value.toString())>0) {
                       childItem[key] = value;
                     }else   if(key!='height'){
+                      childItem[key] = value;
+                    }else if(key=='measurement_equipment' && Global.stringToInt(value.toString())>0) {
                       childItem[key] = value;
                     }
                   }

@@ -6,9 +6,11 @@ import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_r
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_health/child_health_response_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/child_health_respose_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
@@ -46,6 +48,7 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
   List<String> existingDates = [];
   bool isOnlyUnsyched = false;
   String? role;
+  BackdatedConfigirationModel? backdatedConfigirationModel;
   // DateTime? maxDate;
 
   void initState() {
@@ -61,7 +64,7 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
     if (lngtr != null) {
       lng = lngtr;
     }
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.ChildHealthDetails);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -110,7 +113,10 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                 String child_health_guid = '';
                 if (!(Global.validString(child_health_guid))) {
                   child_health_guid = Validate().randomGuid();
-                  String? minDate=await Validate().callMinDate(widget.dateofEnrollment, 30);
+                  String? minDate;
+                  if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                    minDate=await Validate().callMinDate(widget.dateofEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                  }
                   var refStatus = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
@@ -174,8 +180,12 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
                       return GestureDetector(
                         onTap: () async {
 
-                          bool isEdited=await Validate().checkEditable(filterhealthData[index].created_at, 15);
-                          String? minDate=await Validate().callMinDate(widget.dateofEnrollment, 30);
+                          bool isEdited=await Validate().checkEditable(filterhealthData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
+                          String? minDate;
+                          if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                            minDate=await Validate().callMinDate(widget.dateofEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                          }
+                          
                           bool isUnEditable=true;
                           if(isEdited && role == CustomText.crecheSupervisor){
                             isUnEditable=false;

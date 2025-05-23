@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:archive/archive.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -22,6 +23,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../custom_widget/single_poup_dailog.dart';
+import '../model/databasemodel/backdated_configiration_model.dart';
 import '../model/databasemodel/child_attendance_responce_model.dart';
 import '../model/databasemodel/child_growth_responce_model.dart';
 import 'custom_calender.dart';
@@ -224,7 +226,7 @@ class Validate {
 
   String currentDate() {
     var now = new DateTime.now();
-    var formatter = new DateFormat('yyyy-MM-dd');
+      var formatter = new DateFormat('yyyy-MM-dd');
     return formatter.format(now);
   }
 
@@ -785,20 +787,22 @@ class Validate {
     return picked;
   }
 
-  Future<bool> checkEditable(String? createdDate,int days) async {
+  Future<bool> checkEditable(String? createdDate,int? days) async {
     bool returnStatus = true;
-    if (Global.validString(createdDate)) {
-      var creation = DateTime.parse(createdDate.toString());
-      var datePart = DateTime(creation.year, creation.month, creation.day);
-      var now = DateTime.now();
-      var nowDatePart = DateTime(now.year, now.month, now.day);
-      returnStatus = datePart.add(Duration(days: days)).isAfter(nowDatePart);
-    }
-    var date = await Validate().readString(Validate.date);
-    var applicableDate = Validate().stringToDate(date ?? "2025-03-31");
-    var now = DateTime.parse(Validate().currentDate());
-    print('checkEditable  ${now.isBefore(applicableDate) ? true : returnStatus}');
-    return now.isBefore(applicableDate) ? true : returnStatus;
+    if(days!=null){
+      if (Global.validString(createdDate)) {
+        var creation = DateTime.parse(createdDate.toString());
+        var datePart = DateTime(creation.year, creation.month, creation.day);
+        var now = DateTime.now();
+        var nowDatePart = DateTime(now.year, now.month, now.day);
+        returnStatus = datePart.add(Duration(days: days!)).isAfter(nowDatePart);
+      }
+      var date = await Validate().readString(Validate.date);
+      var applicableDate = Validate().stringToDate(date ?? "2025-03-31");
+      var now = DateTime.parse(Validate().currentDate());
+      return now.isBefore(applicableDate) ? true : returnStatus;
+    }return returnStatus;
+
   }
 
   Future<String?> callMinDate(String? validateDate,int days) async {
@@ -836,4 +840,24 @@ class Validate {
     return now.isBefore(applicableDate) ? null : minDate;
     // return maxDateOfExit;
   }
+
+  int? callEditfromCnfig(BackdatedConfigirationModel? backdatedConfigirationModel)  {
+    if(Global.validToInt(backdatedConfigirationModel?.data_edit_allowed)>0){
+      return backdatedConfigirationModel?.data_edit_allowed;
+    }else return null;
+  }
+
+
+
+  String ungzip(String base64Data) {
+    // Decode base64
+    Uint8List compressedBytes = base64.decode(base64Data);
+
+    // Decompress using GZipDecoder from 'archive' package
+    List<int> decompressed = GZipDecoder().decodeBytes(compressedBytes);
+
+    // Convert to UTF-8 String
+    return utf8.decode(decompressed);
+  }
+
 }

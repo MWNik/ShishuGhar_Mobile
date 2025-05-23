@@ -7,9 +7,11 @@ import 'package:shishughar/utils/globle_method.dart';
 
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/cmc_cbm/creche_monitering_checklist_CBM_response_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/validate.dart';
 import 'creche_Monitering_CBM_tab_screen.dart';
@@ -32,6 +34,8 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
   bool isOnlyUnsyched = false;
   List<CmcCBMResponseModel> usynchedList = [];
   List<CmcCBMResponseModel> allList = [];
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   @override
   void initState() {
@@ -45,6 +49,8 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
     if (lngtr != null) {
       lng = lngtr;
     }
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
+
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -151,7 +157,7 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
                         onTap: () async {
                           var cbmguid = cmcCBMData[index].cbmguid;
                           if (Global.validString(cbmguid)) {
-                            bool isEdited=await Validate().checkEditable(cmcCBMData[index].created_at, 7);
+                            bool isEdited=await Validate().checkEditable(cmcCBMData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>

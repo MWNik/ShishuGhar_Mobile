@@ -20,6 +20,7 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_immunization/child_immunization_meta_fileds_helper.dart';
 import '../../../database/helper/child_immunization/child_immunization_response_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
@@ -29,6 +30,7 @@ import '../../../database/helper/vaccines_helper.dart';
 import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/child_immunization_response_model.dart';
 import '../../../model/dynamic_screen_model/enrolled_children_responce_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
@@ -81,6 +83,8 @@ class _ChildImmunizationExpendedScreenSatet
   int childAgeInDays = 0;
   int tabCount = 2;
   DateTime? lastDate;
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   Future<void> initializeData() async {
     bool isLoading = true;
@@ -94,7 +98,7 @@ class _ChildImmunizationExpendedScreenSatet
         Global.getItemValues(widget.enrolledItem!.responces!, 'child_dob'));
     childAgeInDays = Validate().calculateAgeInDays(dateTime!);
     print("childAgeInDays $childAgeInDays");
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.ChildImmunization);
     labelControlls.clear();
     List<String> valueNames = [
       CustomText.Save,
@@ -764,7 +768,7 @@ class _ChildImmunizationExpendedScreenSatet
                         print(type);
                         if (Global.validString(
                             createAtVaccines[vaccines[index].name!])) {
-                          var editDate=await Validate().checkEditable(createAtVaccines[vaccines[index].name!], 15);
+                          var editDate=await Validate().checkEditable(createAtVaccines[vaccines[index].name!], Validate().callEditfromCnfig(backdatedConfigirationModel));
                           if(editDate) {
                             await createVaccine(
                                 vaccines[index].name!,

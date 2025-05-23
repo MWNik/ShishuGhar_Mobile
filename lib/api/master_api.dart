@@ -45,4 +45,24 @@ class MasterApiService {
       return Response('Internal server error - $e', 500);
     }
   }
+
+
+  Future<Response> backdatedConfigiration(String username, String pwd, String token) async {
+    var url = Uri.parse(
+        '${Constants.baseUrl}method/backdated_configiration');
+    var headers = {'Authorization': token.trim()};
+    final body = {
+      "usr": username.trim(),
+      "pwd": pwd.trim()
+    };
+    try {
+      var response = await http.post(url, headers: headers, body: body);
+      print('master data other : ${response.body}.');
+      return response;
+
+    } catch (e) {
+      print('Internal server error: ${e}');
+      return Response('Internal server error - $e', 500);
+    }
+  }
 }

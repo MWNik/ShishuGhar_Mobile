@@ -208,6 +208,8 @@ class HeightWeightBoysGirlsHelper {
     }
     return tabWeightToHeightGirls;
   }
+
+
   Future<List<TabWeightToHeightGirlsModel>> callWeightToHeightGirls24Or0() async {
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.rawQuery('select * from tabWeightToHeightGirls WHERE (age_type = 0 AND length < 65) OR (age_type = 24 AND length >= 65)');
@@ -221,6 +223,7 @@ class HeightWeightBoysGirlsHelper {
     }
     return tabWeightToHeightGirls;
   }
+
 
   Future<void> insertHeightForAgeBoys(
       List<TabHeightforageBoysModel> heightforageBoys) async {

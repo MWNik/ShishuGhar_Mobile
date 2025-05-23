@@ -18,9 +18,11 @@ import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart
 import 'package:shishughar/utils/validate.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_time_picker.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/creche_monitoring/creche_monitoring_response_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/creche_monitor_response_model.dart';
 import '../../../utils/globle_method.dart';
 
@@ -70,6 +72,7 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
   ScrollController _scrollController = ScrollController();
   var applicableDate = Validate().stringToDate(Validate.date);
   var now = DateTime.parse(Validate().currentDate());
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   @override
   void initState() {
@@ -98,7 +101,7 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     _role = await Validate().readString(Validate.role);
     username = (await Validate().readString(Validate.userName))!;
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
     List<String> valueNames = [
       CustomText.Creches,
       CustomText.Next,
@@ -268,7 +271,7 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
           minDate: quesItem.fieldname == 'date_of_visit'
               ? now.isBefore(applicableDate)
                   ? null
-                  : DateTime.now().subtract(Duration(days: 7))
+                  : Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.now().subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):null
               : null,
           // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
           calenderValidate: logic!.calenderValidation(_myMap, quesItem),

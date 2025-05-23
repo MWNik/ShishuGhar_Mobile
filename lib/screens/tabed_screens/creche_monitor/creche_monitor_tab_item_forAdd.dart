@@ -25,11 +25,13 @@ import '../../../../database/helper/form_logic_helper.dart';
 import '../../../../model/apimodel/creche_database_responce_model.dart';
 import '../../../../model/dynamic_screen_model/creche_monitor_response_model.dart';
 import '../../../../utils/globle_method.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/block_data_helper.dart';
 import '../../../database/helper/district_data_helper.dart';
 import '../../../database/helper/gram_panchayat_data_helper.dart';
 import '../../../database/helper/state_data_helper.dart';
 import '../../../database/helper/village_data_helper.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/tabBlock_model.dart';
 import '../../../model/databasemodel/tabDistrict_model.dart';
 import '../../../model/databasemodel/tabGramPanchayat_model.dart';
@@ -85,6 +87,8 @@ class _CrecheMonitorTabItemForAddState
   List<TabBlock> allBlockRecords = [];
   var applicableDate = Validate().stringToDate(Validate.date);
   var now = DateTime.parse(Validate().currentDate());
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   @override
   void initState() {
@@ -117,7 +121,7 @@ class _CrecheMonitorTabItemForAddState
     allBlockRecords = await BlockDataHelper().getTabBlockList();
     allGpRecords = await GramPanchayatDataHelper().getTabGramPanchayatList();
     allVillageRecords = await VillageDataHelper().getTabVillageList();
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
     List<String> valueNames = [
       CustomText.Creches,
       CustomText.Next,
@@ -455,7 +459,7 @@ class _CrecheMonitorTabItemForAddState
           minDate: quesItem.fieldname == 'date_of_visit'
               ? now.isBefore(applicableDate)
                   ? null
-                  : DateTime.now().subtract(Duration(days: 7))
+                  : Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.now().subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):null
               : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd

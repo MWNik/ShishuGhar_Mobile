@@ -11,12 +11,14 @@ import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/creche_database_responce_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/child_growth_responce_model.dart';
 import '../../../model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
 import '../../../model/dynamic_screen_model/enrolled_children_responce_model.dart';
@@ -50,6 +52,8 @@ class _ChildReferralListingScreenState
   DateTime? minDate;
   var applicableDate = Validate().stringToDate("2024-12-31");
   var now = DateTime.parse(Validate().currentDate());
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   @override
   void initState() {
@@ -60,6 +64,7 @@ class _ChildReferralListingScreenState
   Future<void> initializeData() async {
     var date = await Validate().readString(Validate.date);
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.ChildReffrel);
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -214,27 +219,29 @@ class _ChildReferralListingScreenState
                                 .toString()
                                 .split('#!');
 
-
-                            var backDate = now.isBefore(applicableDate)
-                                ? DateTime(1992)
-                                : DateTime.parse(Validate().currentDate())
-                                    .subtract(Duration(days: 7));
-                            if (backDate.isAfter(DateTime.parse(keyParts[0]))) {
-                              minDate = backDate;
-                            } else {
-                              minDate = DateTime.parse(keyParts[0]);
-                            }
-                            if (minDate != null) {
-                              List<int> parts = Validate()
-                                  .currentDate()
-                                  .split('-')
-                                  .map(int.parse)
-                                  .toList();
-                              if (DateTime(minDate!.year, minDate!.month)
-                                  .isBefore(DateTime(parts[0], parts[1]))) {
-                                minDate = DateTime(parts[0], parts[1], 1);
+                            if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                              var backDate = now.isBefore(applicableDate)
+                                  ? DateTime(1992)
+                                  : DateTime.parse(Validate().currentDate())
+                                  .subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!));
+                              if (backDate.isAfter(DateTime.parse(keyParts[0]))) {
+                                minDate = backDate;
+                              } else {
+                                minDate = DateTime.parse(keyParts[0]);
+                              }
+                              if (minDate != null) {
+                                List<int> parts = Validate()
+                                    .currentDate()
+                                    .split('-')
+                                    .map(int.parse)
+                                    .toList();
+                                if (DateTime(minDate!.year, minDate!.month)
+                                    .isBefore(DateTime(parts[0], parts[1]))) {
+                                  minDate = DateTime(parts[0], parts[1], 1);
+                                }
                               }
                             }
+
 
                             var child_referral_guid = '';
                             if (!Global.validString(child_referral_guid)) {

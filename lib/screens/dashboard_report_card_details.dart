@@ -517,10 +517,11 @@ class _DashboardReportCardDetailState
   Future callApiForDashboardApi() async {
     var token = await Validate().readString(Validate.appToken);
     var network = await Validate().checkNetworkConnection();
+    var userName = await Validate().readString(Validate.userName);
     if (network) {
       showLoaderDialog(context);
       var response = await DashboardReportApi().callDashboardCardDetailsApi(
-          widget.query_type,selectedYear,
+          userName,widget.query_type,selectedYear,
           selectedMonth!, selectedState, selectedDistrict, selectedBlock,
           selectedGramPanchayat, selectedVillage, selectedCreche,
           token!);

@@ -9,10 +9,12 @@ import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown_for_filter.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/cmc_cbm/creche_monitering_checklist_CBM_response_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/validate.dart';
@@ -37,6 +39,8 @@ class _cmcCBMListingScreenState extends State<AllcmcCBMListingScreen> {
   bool isOnlyUnsynched = false;
   List<CmcCBMResponseModel> unsynchedList = [];
   List<CmcCBMResponseModel> allList = [];
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   @override
   void initState() {
@@ -50,6 +54,7 @@ class _cmcCBMListingScreenState extends State<AllcmcCBMListingScreen> {
     if (lngtr != null) {
       lng = lngtr;
     }
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
     List<String> valueItems = [
       CustomText.VisitNotes,
       CustomText.Creches,
@@ -254,7 +259,7 @@ class _cmcCBMListingScreenState extends State<AllcmcCBMListingScreen> {
                         return GestureDetector(
                           onTap: () async {
                             var cbmguid = filterData[index].cbmguid;
-                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, 7);
+                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
 
                             if (Global.validString(cbmguid)) {
                               var refStatus = await Navigator.of(context).push(

@@ -40,6 +40,7 @@ import '../api/creche_committie_download_api.dart';
 import '../api/creche_data_api.dart';
 import '../api/creche_monetering_checkList_cbm_api.dart';
 import '../api/creche_monitoring_api.dart';
+import '../api/creche_profile_data_upload_api.dart';
 import '../api/download_data_api.dart';
 import '../api/form_logic_api.dart';
 import '../api/hh_data_upload_api.dart';
@@ -49,6 +50,7 @@ import '../api/user_manual_pdf_api.dart';
 import '../api/village_profile_meta_api.dart';
 import '../custom_widget/double_button_dailog.dart';
 import '../database/helper/anthromentory/child_growth_response_helper.dart';
+import '../database/helper/backdated_configiration_helper.dart';
 import '../database/helper/block_data_helper.dart';
 import '../database/helper/cashbook/expences/cashbook_response_expences_helper.dart';
 import '../database/helper/cashbook/receipt/cashbook_receipt_response_helper.dart';
@@ -65,6 +67,7 @@ import '../database/helper/cmc_CC/creche_monitering_checklist_CC_response_helper
 import '../database/helper/cmc_alm/creche_monitering_checkList_ALM_response_helper.dart';
 import '../database/helper/cmc_cbm/creche_monitering_checklist_CBM_response_helper.dart';
 import '../database/helper/creche_comite_meeting/creche_committie_response_helper.dart';
+import '../database/helper/creche_helper/creche_care_giver_helper.dart';
 import '../database/helper/creche_monitoring/creche_monitoring_response_helper.dart';
 import '../database/helper/district_data_helper.dart';
 import '../database/helper/dynamic_screen_helper/house_hold_children_helper.dart';
@@ -84,10 +87,12 @@ import '../database/helper/user_manual_fields_meta_helper.dart';
 import '../database/helper/vaccines_helper.dart';
 import '../database/helper/village_data_helper.dart';
 import '../database/helper/village_profile/village_profile_response_helper.dart';
+import '../model/apimodel/backdated_configiration_api_model.dart';
 import '../model/apimodel/form_logic_api_model.dart';
 import '../model/apimodel/master_data_model.dart';
 import '../model/apimodel/mater_data_other_model.dart';
 import '../model/apimodel/translation_language_api_model.dart';
+import '../model/databasemodel/backdated_configiration_model.dart';
 import '../model/databasemodel/tabBlock_model.dart';
 import '../model/databasemodel/tabDistrict_model.dart';
 import '../model/databasemodel/tabGramPanchayat_model.dart';
@@ -237,8 +242,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                       locationControlls, CustomText.ok, lngtr!),
                                   false,
                                   context);
-                          }
-                          else {
+                          } else {
                             if (pendindTaskCount == 0) {
                               List<dynamic> visitNotes = [];
                               if (role == CustomText.clusterCoordinator)
@@ -297,8 +301,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                   false,
                                   context);
                           }
-                        }
-                        else if (i == 1) {
+                        } else if (i == 1) {
                           String refStatus = '';
                           if (role == CustomText.crecheSupervisor) {
                             if (pendindTaskCount > 0) {
@@ -398,10 +401,29 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                           if (refStatus == 'itemRefresh') {
                             await initializeData();
                           }
-                        }
-                        else if (i == 2) {
-                          totalApiCount = 27;
-                          callMasterData(context);
+                        } else if (i == 2) {
+                          var network =
+                              await Validate().checkNetworkConnection();
+                          if (network) {
+                            var crecheProfile =
+                                await CrecheDataHelper().callCrecheForUpload();
+                            if (crecheProfile.isNotEmpty) {
+                              uploadCreCheProfile(context);
+                            } else {
+                              totalApiCount = 27;
+                              callMasterData(context);
+                            }
+                          } else {
+                            Validate().singleButtonPopup(
+                                Global.returnTrLable(
+                                    locationControlls,
+                                    CustomText.nointernetconnectionavailable,
+                                    lngtr!),
+                                Global.returnTrLable(
+                                    locationControlls, CustomText.ok, lngtr!),
+                                false,
+                                context);
+                          }
                         }
                         // else if (i == 3) {
                         //   try {
@@ -975,35 +997,35 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
         await MstSuperVisorHelper().inserts(master.tabSuperVisor!);
       }
 
-      /////////Height Weight for age
-      // if (master.tabHeightforAgeBoys != null) {
-      //   await HeightWeightBoysGirlsHelper()
-      //       .insertHeightForAgeBoys(master.tabHeightforAgeBoys!);
-      // }
+      ///////Height Weight for age
+      if (master.tabHeightforAgeBoys != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertHeightForAgeBoys(master.tabHeightforAgeBoys!);
+      }
 
-      // if (master.tabHeightforAgeGirls != null) {
-      //   await HeightWeightBoysGirlsHelper()
-      //       .insertHeightForAgeGirls(master.tabHeightforAgeGirls!);
-      // }
+      if (master.tabHeightforAgeGirls != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertHeightForAgeGirls(master.tabHeightforAgeGirls!);
+      }
 
-      // if (master.tabWeightforAgeBoys != null) {
-      //   await HeightWeightBoysGirlsHelper()
-      //       .insertWeightForAgeBoys(master.tabWeightforAgeBoys!);
-      // }
+      if (master.tabWeightforAgeBoys != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertWeightForAgeBoys(master.tabWeightforAgeBoys!);
+      }
 
-      // if (master.tabWeightforAgeGirls != null) {
-      //   await HeightWeightBoysGirlsHelper()
-      //       .insertWeightForAgeGirls(master.tabWeightforAgeGirls!);
-      // }
-      // if (master.tabWeightToHeightBoys != null) {
-      //   await HeightWeightBoysGirlsHelper()
-      //       .insertWeightToHeightBoys(master.tabWeightToHeightBoys!);
-      // }
+      if (master.tabWeightforAgeGirls != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertWeightForAgeGirls(master.tabWeightforAgeGirls!);
+      }
+      if (master.tabWeightToHeightBoys != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertWeightToHeightBoys(master.tabWeightToHeightBoys!);
+      }
 
-      // if (master.tabWeightToHeightGirls != null) {
-      //   await HeightWeightBoysGirlsHelper()
-      //       .insertWeightToHeightGirls(master.tabWeightToHeightGirls!);
-      // }
+      if (master.tabWeightToHeightGirls != null) {
+        await HeightWeightBoysGirlsHelper()
+            .insertWeightToHeightGirls(master.tabWeightToHeightGirls!);
+      }
 
       if (master.tabVaccines != null) {
         await VaccinesDataHelper().insert(master.tabVaccines!);
@@ -1099,7 +1121,34 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
     if (translateResponce.statusCode == 200) {
       Map<String, dynamic> responseData = json.decode(translateResponce.body);
       await initTranslation(TranslationModel.fromJson(responseData));
-      // await callMasterData( mContext, userName, password, token);
+      await callBackdatedConfigirationData(
+          mContext, userName, password, token, villagesListString);
+    } else {
+      Navigator.pop(mContext);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(translateResponce.body, 'message'),
+          Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
+          false,
+          context);
+    }
+  }
+
+  Future<void> callBackdatedConfigirationData(
+      BuildContext mContext,
+      String userName,
+      String password,
+      String token,
+      String villagesListString) async {
+    downloadedApi = 5;
+    updateLoadingText(dialogSetState);
+    var backdatedConfigResponce = await MasterApiService()
+        .backdatedConfigiration(userName, password, token);
+
+    if (backdatedConfigResponce.statusCode == 200) {
+      Map<String, dynamic> responseData =
+          json.decode(backdatedConfigResponce.body);
+      await initBackdatedConfigirationData(
+          BackdatedConfigirationModelApiModel.fromJson(responseData));
       if (role == CustomText.crecheSupervisor.trim())
         await getCrecheData(mContext, userName, password, token);
       else
@@ -1108,10 +1157,22 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
     } else {
       Navigator.pop(mContext);
       Validate().singleButtonPopup(
-          Global.errorBodyToString(translateResponce.body, 'message'),
+          Global.errorBodyToString(backdatedConfigResponce.body, 'message'),
           Global.returnTrLable(locationControlls, CustomText.ok, lngtr!),
           false,
           context);
+    }
+  }
+
+  Future<void> initBackdatedConfigirationData(
+      BackdatedConfigirationModelApiModel? item) async {
+    if (item != null) {
+      List<BackdatedConfigirationModel>? items =
+          item.backdatedConfigirationModel;
+      if (items.isNotEmpty) {
+        await BackdatedConfigirationHelper()
+            .insertBackdatedConfigirationModel(items);
+      }
     }
   }
 
@@ -1128,7 +1189,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
       if (msterDataResponse.statusCode == 200) {
         MasterDataModel masterDataApiModel =
             MasterDataModel.fromJson(json.decode(msterDataResponse.body));
-        Validate().saveString(Validate.date, masterDataApiModel.backDateDataEntry ?? "2025-03-31");
+        Validate().saveString(Validate.date,
+            masterDataApiModel.backDateDataEntry ?? "2025-03-31");
         await initMasterData(masterDataApiModel);
         await downMaster(mContext, userName, password, token);
       } else if (msterDataResponse.statusCode == 401) {
@@ -2629,7 +2691,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
     var creCheMonitoring = await CmcCCTabResponseHelper().getCcForUpload();
     var crecheCheckIn =
         await CheckInResponseHelper().callCrecheCheckInResponses();
-    var growthMeasurement = await ChildGrowthResponseHelper().callChildGrowthResponsesForUpload();
+    var growthMeasurement =
+        await ChildGrowthResponseHelper().callChildGrowthResponsesForUpload();
     var grievanceData =
         await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
 
@@ -2642,5 +2705,124 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
         ImageFileData.length;
 
     return totalPendingCount;
+  }
+
+  Future<void> uploadCreCheProfile(BuildContext mContext) async {
+    var crecheProfiles = await CrecheDataHelper().callCrecheForUpload();
+    if (crecheProfiles.length > 0) {
+      var token = await Validate().readString(Validate.appToken);
+      showLoaderNewDialog(context);
+      for (int i = 0; i < crecheProfiles.length; i++) {
+        var element = crecheProfiles[i];
+        var cItems =
+            await CrecheCareGiverHelper().callCareGiverUpload(element.name!);
+        Map<String, dynamic> resultMap = jsonDecode(element.responces!);
+        List<dynamic> childrensList = [];
+
+        for (var cItem in cItems) {
+          childrensList.add(jsonDecode(cItem.responces!));
+        }
+        if (childrensList.length > 0) {
+          resultMap['creche_caregiver_table'] = childrensList;
+        }
+
+        if (element.name != null) {
+          var responce =
+              await CrecheDataResponceUploadApi().crecheCareGiverUploadUpdate(
+            token!,
+            jsonEncode(resultMap),
+            element.name!,
+          );
+          if (responce.statusCode == 200) {
+            Validate().saveString(
+                Validate.dataUploadDateTime, Validate().currentDateTime());
+            await updateCreCheProFile(responce);
+            if ((crecheProfiles.indexOf(element)) ==
+                (crecheProfiles.length - 1)) {
+              Navigator.pop(mContext);
+              totalApiCount = 27;
+              callMasterData(context);
+            }
+          } else if (responce.statusCode == 401) {
+            Navigator.pop(mContext);
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.remove(Validate.Password);
+            ScaffoldMessenger.of(mContext).showSnackBar(
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lngtr!))),
+            );
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (mContext) => LoginScreen(),
+                ));
+          } else {
+            Navigator.pop(mContext);
+            return;
+          }
+        } else {
+          var responce = await CrecheDataResponceUploadApi()
+              .crecheCareGiverUpload(token!, jsonEncode(resultMap));
+          if (responce.statusCode == 200) {
+            await updateCreCheProFile(responce);
+            if ((crecheProfiles.indexOf(element)) ==
+                (crecheProfiles.length - 1)) {
+              Navigator.pop(mContext);
+              totalApiCount = 27;
+              callMasterData(context);
+            }
+          } else if (responce.statusCode == 401) {
+            Navigator.pop(mContext);
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.remove(Validate.Password);
+            ScaffoldMessenger.of(mContext).showSnackBar(
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lngtr!))),
+            );
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (mContext) => LoginScreen(),
+                ));
+          } else {
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  Future<void> updateCreCheProFile(Response value) async {
+    try {
+      Map<String, dynamic> resultMap = jsonDecode(value.body);
+      print(" responce $resultMap");
+      await CrecheDataHelper().updateDownloadeData(resultMap);
+    } catch (e) {
+      print("exp ${e.toString()}");
+    }
+  }
+
+  showLoaderNewDialog(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                SizedBox(height: 10.h),
+                Text("Please wait...")
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

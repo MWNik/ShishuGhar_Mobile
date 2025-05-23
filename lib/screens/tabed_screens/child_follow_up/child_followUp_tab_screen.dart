@@ -28,7 +28,7 @@ class ChildFollowUpTabScreen extends StatefulWidget {
   final int? child_id;
   final int creche_id;
   final bool isEditable;
-  final DateTime minDate;
+  final DateTime? minDate;
 
   ChildFollowUpTabScreen(
       {super.key,

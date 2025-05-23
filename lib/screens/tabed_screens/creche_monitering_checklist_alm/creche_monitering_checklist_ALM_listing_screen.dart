@@ -6,9 +6,11 @@ import 'package:shishughar/utils/globle_method.dart';
 
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/cmc_alm/creche_monitering_checkList_ALM_response_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/creche_Monitering_checkList_ALM_response_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/validate.dart';
@@ -32,7 +34,8 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
   bool isOnlyUnsyched = false;
   List<CmcALMResponseModel> usynchedList = [];
   List<CmcALMResponseModel> allList = [];
-
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+  
   @override
   void initState() {
     super.initState();
@@ -45,6 +48,9 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
     if (lngtr != null) {
       lng = lngtr;
     }
+
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
+
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -150,7 +156,7 @@ class _cmcALMListingScreenState extends State<cmcALMListingScreen> {
                       return GestureDetector(
                         onTap: () async {
                           var cbmguid = cmcALMData[index].almguid;
-                          bool isEdited=await Validate().checkEditable(cmcALMData[index].created_at, 7);
+                          bool isEdited=await Validate().checkEditable(cmcALMData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
                           if (Global.validString(cbmguid)) {
                             var refStatus = await Navigator.of(context).push(
                                 MaterialPageRoute(

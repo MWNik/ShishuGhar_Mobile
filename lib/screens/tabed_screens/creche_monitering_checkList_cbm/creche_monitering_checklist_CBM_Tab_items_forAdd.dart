@@ -34,6 +34,8 @@ import '../../../../model/dynamic_screen_model/creche_monitering_checkList_cbm_r
 import '../../../../model/dynamic_screen_model/options_model.dart';
 import '../../../../utils/globle_method.dart';
 import '../../../../utils/validate.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../house_hold/depending_logic.dart';
 
 class CmcCBMTabItemSCreenForAdd extends StatefulWidget {
@@ -86,6 +88,7 @@ class _CmcCBMTabItemSCreenForAddState extends State<CmcCBMTabItemSCreenForAdd> {
   int? isEditFromExisting = 0;
   var applicableDate = Validate().stringToDate(Validate.date);
   var now = DateTime.parse(Validate().currentDate());
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   @override
   void initState() {
@@ -98,7 +101,7 @@ class _CmcCBMTabItemSCreenForAddState extends State<CmcCBMTabItemSCreenForAdd> {
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     _role = await Validate().readString(Validate.role);
     username = (await Validate().readString(Validate.userName))!;
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
     List<String> valueNames = [
       CustomText.Creches,
       CustomText.Next,
@@ -558,7 +561,7 @@ class _CmcCBMTabItemSCreenForAddState extends State<CmcCBMTabItemSCreenForAdd> {
           minDate: quesItem.fieldname == 'date_of_visit'
               ? now.isBefore(applicableDate)
                   ? null
-                  : DateTime.now().subtract(Duration(days: 7))
+                  :Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.now().subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):null
               : null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd

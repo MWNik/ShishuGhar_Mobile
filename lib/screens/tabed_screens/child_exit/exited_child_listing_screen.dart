@@ -14,10 +14,12 @@ import 'package:shishughar/screens/tabed_screens/child_exit/exit_enrolld_child/e
 import 'package:shishughar/screens/tabed_screens/child_exit/exit_enrolld_child/exit_enrolled_details_screen.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_exit/child_exit_response_Helper.dart';
 import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/child_exit_response_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../screens/tabed_screens/child_exit/exited_child_detail_view_screen.dart';
@@ -58,6 +60,9 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
   String? selectedItemDrop;
   String? selectedReason;
   String? role;
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+  
+  
 
   Future<void> initializeData() async {
     role = (await Validate().readString(Validate.role))!;
@@ -67,7 +72,8 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
       lng = lngtr;
     }
     genderList = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper()
+        .excuteBackdatedConfigirationModel(CustomText.child_exit);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -335,7 +341,7 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
                           //     selectedItem['responces'], 'date_of_enrollment');
                           String? minDate=await callMinDate(Global.getItemValues(
                               selectedItem['responces'], 'date_of_enrollment'));
-                          bool isEdit = await  Validate().checkEditable(selectedItem['created_at'],15);
+                          bool isEdit = await  Validate().checkEditable(selectedItem['created_at'],Validate().callEditfromCnfig(backdatedConfigirationModel));
                           // var created_at = DateTime.parse(
                           //     selectedItem['created_at'].toString());
                           // var date = DateTime(created_at.year, created_at.month,
@@ -692,6 +698,8 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
   // }
 
   Future<String?> callMinDate(String dateOfEnrollment) async {
-    return await Validate().callMinDate(dateOfEnrollment, 15);
+    if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+      return await Validate().callMinDate(dateOfEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+    }return null;
   }
 }

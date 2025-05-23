@@ -5,10 +5,12 @@ import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/creche_comite_meeting/creche_committie_response_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/creche_committie_response_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/validate.dart';
@@ -41,6 +43,8 @@ class _CrecheCommitteListingScreenState
   String? role;
   var applicableDate = Validate().stringToDate(Validate.date);
   var now = DateTime.parse(Validate().currentDate());
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   @override
   void initState() {
@@ -55,6 +59,7 @@ class _CrecheCommitteListingScreenState
     if (lngtr != null) {
       lng = lngtr;
     }
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.crecheMeeting);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -116,7 +121,10 @@ class _CrecheCommitteListingScreenState
                 String ccGuid = '';
                 if (!Global.validString(ccGuid)) {
                   ccGuid = Validate().randomGuid();
-                  String? minDate=await Validate().requredOnlyMinimum(null, 7);
+                  String? minDate;
+                  if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                    minDate=await Validate().requredOnlyMinimum(null, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                  }
                   var refStatus = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
@@ -176,8 +184,11 @@ class _CrecheCommitteListingScreenState
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () async {
-                          bool isEdited=await Validate().checkEditable(filterData[index].created_at, 7);
-                          String? minDate=await Validate().requredOnlyMinimum(null, 7);
+                          bool isEdited=await Validate().checkEditable(filterData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
+                          String? minDate;
+                          if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                            minDate=await Validate().requredOnlyMinimum(null, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                          }
                           bool isUnEditable=true;
                           if(isEdited&&role == CustomText.crecheSupervisor){
                             isUnEditable=false;

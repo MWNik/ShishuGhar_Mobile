@@ -27,7 +27,7 @@ class DatabaseHelper {
       print("Opening existing database");
     }
     database = await openDatabase(path,
-        version: 5,
+        version: 4,
         onUpgrade: (db, oldVersion, newVersion) =>
             upgradeVersion(db, oldVersion, newVersion));
 
@@ -94,35 +94,46 @@ class DatabaseHelper {
             "sd3": "NUMERIC",
             "sd4": "NUMERIC",
           };
-        // table tabWeightforAgeGirls
-          await addColumnsToTable(db,'tabWeightforAgeGirls',newColumns);
+          // table tabWeightforAgeGirls
+          await addColumnsToTable(db, 'tabWeightforAgeGirls', newColumns);
 
           // table tabWeightforAgeBoys
-          await addColumnsToTable(db,'tabWeightforAgeBoys',newColumns);
+          await addColumnsToTable(db, 'tabWeightforAgeBoys', newColumns);
 
           // table tabHeightforAgeBoys
-          await addColumnsToTable(db,'tabHeightforAgeBoys',newColumns);
+          await addColumnsToTable(db, 'tabHeightforAgeBoys', newColumns);
 
           // table tabHeightforAgeGirls
-          await addColumnsToTable(db,'tabHeightforAgeGirls',newColumns);
+          await addColumnsToTable(db, 'tabHeightforAgeGirls', newColumns);
 
           // table tabWeightToHeightBoys
-          await addColumnsToTable(db,'tabWeightToHeightBoys',newColumns);
+          await addColumnsToTable(db, 'tabWeightToHeightBoys', newColumns);
 
           // table tabWeightToHeightGirls
-          await addColumnsToTable(db,'tabWeightToHeightGirls',newColumns);
+          await addColumnsToTable(db, 'tabWeightToHeightGirls', newColumns);
 
-        } catch (e) {
-          print("$e");
-        }
-      }
-      if (oldVersion == 4 && newVersion > 4) {
-        try {
-          // table tabWeightToHeightBoys
-          await addNewColoumn(db,'tabWeightToHeightBoys','age_type','INTEGER');
+            // table tabWeightToHeightBoys
+            await addNewColoumn(
+                db, 'tabWeightToHeightBoys', 'age_type', 'INTEGER');
 
-          // table tabWeightToHeightGirls
-          await addNewColoumn(db,'tabWeightToHeightGirls','age_type','INTEGER');
+            // table tabWeightToHeightGirls
+            await addNewColoumn(
+                db, 'tabWeightToHeightGirls', 'age_type', 'INTEGER');
+
+          await db.execute('''CREATE TABLE "backdated_configiration" (
+	"name"	INTEGER,
+	"unique_id"	TEXT,
+	"supervisor_id"	TEXT,
+	"doctype"	TEXT,
+	"back_dated_data_entry_allowed"	INTEGER,
+	"partner_id"	INTEGER,
+	"data_edit_allowed"	INTEGER,
+	"creation"	TEXT,
+	"module"	TEXT,
+	"type"	TEXT,
+	"date"	TEXT,
+	PRIMARY KEY("unique_id","type")
+);''');
 
         } catch (e) {
           print("$e");
@@ -241,7 +252,7 @@ class DatabaseHelper {
       print("Failed deleting usynched records - $e");
     }
   }
-   
+
   Future deleteAllRecords() async {
     await openDb();
     await database!.delete('sqlite_sequence');
@@ -350,13 +361,15 @@ class DatabaseHelper {
   Future addNewColoumn(Database db, String tableName, String columnName,
       String columnType) async {
     try {
-      await db.execute('ALTER TABLE $tableName ADD COLUMN $columnName $columnType');
+      await db
+          .execute('ALTER TABLE $tableName ADD COLUMN $columnName $columnType');
     } catch (e) {
       print(e);
     }
   }
 
-  Future<void> addColumnsToTable(Database db,String tableName, Map<String, String> columns) async {
+  Future<void> addColumnsToTable(
+      Database db, String tableName, Map<String, String> columns) async {
     // String query = "ALTER TABLE $tableName";
     //
     // // Convert the map into SQL statements
@@ -373,7 +386,8 @@ class DatabaseHelper {
     //   print(e);
     // }
     for (var entry in columns.entries) {
-      String query = "ALTER TABLE $tableName ADD COLUMN ${entry.key} ${entry.value};";
+      String query =
+          "ALTER TABLE $tableName ADD COLUMN ${entry.key} ${entry.value};";
       try {
         await db.execute(query);
         print("Added column: ${entry.key} ${entry.value}");
@@ -381,6 +395,6 @@ class DatabaseHelper {
         print("Error adding column ${entry.key}: $e");
       }
     }
-     // Print the query (for debugging)
+    // Print the query (for debugging)
   }
 }

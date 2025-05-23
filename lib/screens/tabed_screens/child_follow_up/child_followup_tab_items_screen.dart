@@ -40,7 +40,7 @@ class ChildFollowupTabItemsScreen extends StatefulWidget {
   final Function(int) changeTab;
   final int tabIndex;
   final int totalTab;
-  final DateTime minDate;
+   DateTime? minDate;
 
   ChildFollowupTabItemsScreen(
       {super.key,

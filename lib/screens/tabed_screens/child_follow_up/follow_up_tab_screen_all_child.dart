@@ -6,7 +6,9 @@ import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../style/styles.dart';
 import 'completed_followups_listing_screen_all.dart';
 
@@ -38,6 +40,8 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenAllChild>
   double screenWidth = 0.0;
   double tabWidth = 100.0; // Approximate width of each tab
   bool tabIsScrollable = false;
+
+
 
   void initState() {
     super.initState();
@@ -175,6 +179,7 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenAllChild>
 
   Future<void> initializeData() async {
     lng = (await Validate().readString(Validate.sLanguage))!;
+
     translats.clear();
     List<String> valueNames = [
       CustomText.Save,

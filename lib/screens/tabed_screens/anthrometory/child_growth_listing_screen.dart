@@ -5,9 +5,11 @@ import 'package:shishughar/custom_widget/custom_appbar.dart';
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/child_growth_responce_model.dart';
 import '../../../model/databasemodel/tabVillage_model.dart';
 import '../../../style/styles.dart';
@@ -45,6 +47,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
   bool isCalenderView = false;
   String? role;
   DateTime applicableDate = Validate().stringToDate("2024-12-31");
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   void initState() {
     super.initState();
@@ -60,7 +63,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
     }
     var date = await Validate().readString(Validate.date);
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.childGrowthMonitoring);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -760,11 +763,11 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreen> {
 
   bool callMeasurementEditableDate(String? date) {
     bool isEditable = true;
-    if (Global.validString(date)) {
+    if (Global.validString(date) && Global.validToInt(backdatedConfigirationModel?.data_edit_allowed)>0) {
       DateTime? selectedDate = DateTime.parse(date.toString());
       DateTime currentDate = DateTime.parse(Validate().currentDate());
       DateTime editableDate =
-          DateTime(selectedDate.year, selectedDate.month + 1, 11);
+          DateTime(selectedDate.year, selectedDate.month + 1, Global.validToInt(backdatedConfigirationModel?.data_edit_allowed)+1);
       if (currentDate.isBefore(editableDate)) {
         isEditable = true;
       } else {

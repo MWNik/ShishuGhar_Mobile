@@ -16,6 +16,7 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new
 import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/follow_up/child_followUp_response_helper.dart';
@@ -24,6 +25,7 @@ import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
@@ -47,6 +49,8 @@ class ChildReferralTabItemsScreen extends StatefulWidget {
   final DateTime? minDate;
   final bool isEditable;
   final bool isEditableForDischage;
+
+
 
   const ChildReferralTabItemsScreen(
       {super.key,
@@ -88,6 +92,8 @@ class _ChildFollowUpTabItemSCreenState
   String? saveNext = CustomText.Next;
   String? childStatus;
   List<HouseHoldFielItemdModel> multselectItemTab = [];
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   // bool reffrralDateRedable = false;
 
@@ -101,6 +107,10 @@ class _ChildFollowUpTabItemSCreenState
     enrolldDate = DateTime.parse(widget.enrollDate).subtract(Duration(days: 1));
     role = await Validate().readString(Validate.role);
     userName = (await Validate().readString(Validate.userName))!;
+
+    backdatedConfigirationModel = await BackdatedConfigirationHelper()
+        .excuteBackdatedConfigirationModel(CustomText.childReferral);
+
     List<String> valueNames = [
       CustomText.Creches,
       CustomText.Next,
@@ -893,7 +903,7 @@ class _ChildFollowUpTabItemSCreenState
     } else if (fieldname == 'date_of_referral') {
       // var cDate = Global.validString(myMap['date_of_referral'])?DateTime.parse(myMap['date_of_referral']):DateTime.parse(Validate().currentDate());
       var cDate = DateTime.parse(Validate().currentDate());
-      var minDate = cDate.subtract(Duration(days: 7));
+      var minDate = Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?cDate.subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):cDate;
       List<int> parts =
           widget.scheduleDate.toString().split('-').map(int.parse).toList();
       var setDate = DateTime(parts[0], parts[1], parts[2]);

@@ -225,6 +225,7 @@ class _ReffralTabScreenState extends State<ReffralTabScreen>
   }
 
   Future<void> initializeData() async {
+
     lng = (await Validate().readString(Validate.sLanguage))!;
     translats.clear();
     List<String> valueNames = [

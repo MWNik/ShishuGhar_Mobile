@@ -24,16 +24,19 @@ import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
+import '../database/helper/backdated_configiration_helper.dart';
 import '../database/helper/child_immunization/child_immunization_response_helper.dart';
 import '../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../database/helper/creche_helper/creche_data_helper.dart';
 import '../database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import '../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../database/helper/translation_language_helper.dart';
+import '../model/databasemodel/backdated_configiration_model.dart';
 import '../model/dynamic_screen_model/child_referral_response_model.dart';
 import 'child_growth_child_chart/weight_for_age_boys_girls_screen.dart';
 
 class EnrolledChildDetailScreen extends StatefulWidget {
+
   final String CHHGUID;
   final String EnrolledChilGUID;
   final int HHname;
@@ -90,6 +93,8 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
     CustomText.ChildHealthDetail,
     CustomText.ChildEventDetail,
   ];
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   List<BottomNavigationBarItem> initBottomBar() {
     List<BottomNavigationBarItem> bottomItem = [];
@@ -471,7 +476,7 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
   Future<void> onclick(int i, String imsgeItem) async {
     print("Role =======> $role");
     if (i == 0) {
-      bool isEdit =await  Validate().checkEditable(enrolledItem!.created_at,15);
+      bool isEdit = await  Validate().checkEditable(enrolledItem!.created_at,Validate().callEditfromCnfig(backdatedConfigirationModel));
 
       String? minDate = await callDateOfExit(enrolledItem!.CHHGUID!);
       EnrolledExitChilrenTab.childName =
@@ -734,7 +739,7 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
         }
       }
     }
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.enrollExitChild);
     await setLabelTextData();
     setState(() {});
   }
@@ -819,8 +824,10 @@ class _EnrolledChildDetailScreenState extends State<EnrolledChildDetailScreen> {
   }
 
   Future<String?> callDateOfExit(String CHHGUID) async {
-    // return await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
     String? maxDateOfExit=await EnrolledExitChilrenResponceHelper().maxDateOfExit(CHHGUID);
-    return await Validate().callMinDate(maxDateOfExit, 15);
+    if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+      return await Validate().callMinDate(maxDateOfExit, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+    }else return null;
+
   }
 }

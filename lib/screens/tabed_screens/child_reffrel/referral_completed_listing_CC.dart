@@ -20,6 +20,9 @@ import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
+import '../../../database/helper/backdated_configiration_helper.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
+
 class ReferallCompletedListForCC extends StatefulWidget {
   String? enrolledChildGUID;
   bool isHomeScreen;
@@ -52,6 +55,8 @@ class _ReferallCompletedListForCCState
   String? role;
   String? child_name;
   String? child_id;
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   @override
   void initState() {
@@ -66,6 +71,9 @@ class _ReferallCompletedListForCCState
     if (lngtr != null) {
       lng = lngtr;
     }
+
+    backdatedConfigirationModel = await BackdatedConfigirationHelper()
+        .excuteBackdatedConfigirationModel(CustomText.ChildReffrel);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -376,7 +384,7 @@ class _ReferallCompletedListForCCState
                                     filteredReferral[index]
                                         ['child_referral_guid'];
 
-                                bool isEdited=await Validate().checkEditable(filteredReferral[index]['created_at'], 7);
+                                bool isEdited=await Validate().checkEditable(filteredReferral[index]['created_at'], Validate().callEditfromCnfig(backdatedConfigirationModel));
                                 bool isEditableForDischage=isEdited;
                                 if(Global.validString(Global.getItemValues(filteredReferral[index]['responces'], 'discharge_date'))
                                     && Global.getItemValues(filteredReferral[index]['responces'], 'child_status')=='2'){

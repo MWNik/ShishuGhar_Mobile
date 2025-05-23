@@ -7,10 +7,12 @@ import 'package:shishughar/database/helper/child_attendence/child_attendence_hel
 import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_attendence/attendance_responce_helper.dart';
 import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/child_attendance_responce_model.dart';
 import '../../../model/databasemodel/child_for_attendence_model.dart';
 import '../../../model/databasemodel/tabVillage_model.dart';
@@ -53,7 +55,7 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
   String? role;
   DateTime applicableDate = Validate().stringToDate("2024-12-31");
   var now = DateTime.parse(Validate().currentDate());
-
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   @override
   void initState() {
@@ -70,7 +72,7 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
     }
     var date = await Validate().readString(Validate.date);
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.Childattendance);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -113,12 +115,11 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
             todayDate.month == maxDate!.month &&
             todayDate.year == maxDate!.year) {
           maxDate = maxDate!.subtract(Duration(days: 1));
-        } else if (maxDate!.isBefore(DateTime.parse(Validate().currentDate())
-            .subtract(Duration(days: 10)))) {
+        } else if (maxDate!.isBefore(DateTime.parse(Validate().currentDate()).subtract(Duration(days: 10)))) {
           maxDate = now.isBefore(applicableDate)
               ? null
-              : DateTime.parse(Validate().currentDate())
-                  .subtract(Duration(days: 10));
+              : Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.parse(Validate().currentDate())
+                  .subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):null;
         }
       }
     } else {
@@ -126,7 +127,8 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
     }
     maxDate = now.isBefore(applicableDate)
         ? null
-        : DateTime.parse(Validate().currentDate()).subtract(Duration(days: 10));
+        : Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.parse(Validate().currentDate())
+        .subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):null;
 
     unsynchedList = childAttendance
         .where((element) => element.is_edited == 1 || element.is_edited == 2)
@@ -594,26 +596,6 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
     return returnValue;
   }
 
-  // Future<void> callDatesList() async {
-  //   var data =
-  //   await ChildAttendanceResponceHelper().callChilsAttendanceAllResponces();
-  //   if(data.length!=0) {
-  //     List<String> dateStringData = [];
-  //     data.forEach((element) {
-  //       dateStringData
-  //           .add(
-  //           Global.getItemValues(element.responces!, 'date_of_attendance'));
-  //     });
-  //     var dateList = dateStringData.map((dateString) {
-  //       List<int> dateParts = dateString.split('-').map(int.parse).toList();
-  //       return DateTime(dateParts[0], dateParts[1], dateParts[2]);
-  //     }).toList();
-  //     maxDate = dateList
-  //         .reduce((value, element) => value.isAfter(element) ? value : element);
-  //     var maDateString = '${maxDate!.year}-${maxDate!.month}-${maxDate!.day}';
-  //   }else maxDate=null;
-  //   setState(() {});
-  // }
 
   Future<void> callDatesList() async {
     List<String> dateStringData = [];
@@ -636,7 +618,6 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
     if (maxDate == null) {
       maxDate = DateTime.now().subtract(Duration(days: 30));
     }
-    // lastGrowthDate = '${maxDate.year}-${maxDate.month}-${maxDate.day}';
   }
 
   Future<DateTime?> callDatesAlredDateList(String date) async {

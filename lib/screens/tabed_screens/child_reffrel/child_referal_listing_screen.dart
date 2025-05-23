@@ -16,17 +16,20 @@ import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/custom_textfield.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown_for_filter.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/creche_database_responce_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/databasemodel/child_growth_responce_model.dart';
 import '../../../style/styles.dart';
 import 'child_refferal_tab_screen.dart';
 
 class ChildReferralListingScreen extends StatefulWidget {
   String tabTitle;
+
   ChildReferralListingScreen({
     super.key,
     required this.tabTitle,
@@ -57,6 +60,7 @@ class _ChildReferralListingScreenState
   String? selectedCreche;
   var applicableDate = Validate().stringToDate("2024-12-31");
   var now = DateTime.parse(Validate().currentDate());
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   @override
   void initState() {
@@ -67,6 +71,9 @@ class _ChildReferralListingScreenState
   Future<void> initializeData() async {
     var date = await Validate().readString(Validate.date);
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
+    backdatedConfigirationModel = await BackdatedConfigirationHelper()
+        .excuteBackdatedConfigirationModel(CustomText.ChildReffrel);
+
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -87,7 +94,6 @@ class _ChildReferralListingScreenState
       CustomText.Filter,
       CustomText.Creches,
       CustomText.clear
-      
     ];
 
     await TranslationDataHelper()
@@ -126,8 +132,7 @@ class _ChildReferralListingScreenState
     sortedMap.forEach((key, value) {
       List<dynamic> childItem = value as List<dynamic>;
       childItem.forEach((element) {
-        if (Global.stringToDouble(
-                    element['weight_for_height'].toString()) ==
+        if (Global.stringToDouble(element['weight_for_height'].toString()) ==
                 1 ||
             // Global.stringToDouble(element['weight_for_height'].toString()) ==
             //     2 ||
@@ -138,7 +143,8 @@ class _ChildReferralListingScreenState
           Map<String, dynamic> growthData = {};
           growthData['childenrollguid'] = element['childenrollguid'];
           growthData['cgmguid'] = element['cgmguid'];
-          growthData['measurement_taken_date'] = element['measurement_taken_date'];
+          growthData['measurement_taken_date'] =
+              element['measurement_taken_date'];
           childWith['$key#!${element['childenrollguid']}'] = growthData;
         }
       });
@@ -376,62 +382,62 @@ class _ChildReferralListingScreenState
                               .toList()[index]
                               .toString()
                               .split('#!');
-                          var backDate = now.isBefore(applicableDate)
-                              ? DateTime(1992)
-                              : DateTime.parse(Validate().currentDate())
-                                  .subtract(Duration(days: 7));
-                          if (backDate.isAfter(DateTime.parse(keyParts[0]))) {
-                            minDate = backDate;
-                          } else {
-                            minDate = DateTime.parse(keyParts[0]);
-                          }
-                          if (minDate != null) {
-                            List<int> parts = Validate()
-                                .currentDate()
-                                .split('-')
-                                .map(int.parse)
-                                .toList();
-                            if (DateTime(minDate!.year, minDate!.month)
-                                .isBefore(DateTime(parts[0], parts[1]))) {
-                              minDate = DateTime(parts[0], parts[1], 1);
+                          if (Global.validToInt(backdatedConfigirationModel
+                                  ?.back_dated_data_entry_allowed) >
+                              0) {
+                            var backDate = now.isBefore(applicableDate)
+                                ? DateTime(1992)
+                                : DateTime.parse(Validate().currentDate())
+                                    .subtract(Duration(days: backdatedConfigirationModel
+                                !.back_dated_data_entry_allowed!));
+                            if (backDate.isAfter(DateTime.parse(keyParts[0]))) {
+                              minDate = backDate;
+                            } else {
+                              minDate = DateTime.parse(keyParts[0]);
+                            }
+                            if (minDate != null) {
+                              List<int> parts = Validate()
+                                  .currentDate()
+                                  .split('-')
+                                  .map(int.parse)
+                                  .toList();
+                              if (DateTime(minDate!.year, minDate!.month)
+                                  .isBefore(DateTime(parts[0], parts[1]))) {
+                                minDate = DateTime(parts[0], parts[1], 1);
+                              }
                             }
                           }
-
                           var child_referral_guid = '';
                           if (!Global.validString(child_referral_guid)) {
                             child_referral_guid = Validate().randomGuid();
-                            var refStatus = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) => ChildReferralTabScreen(
-                                        tabTitle: widget.tabTitle,
-                                        GrowthMonitoringGUID: callDataByKey(
-                                            filteredGrowthGuidByDate.keys
-                                                .toList()[index],
-                                            'cgmguid'),
-                                        enrolChildGuid: callDataByKey(
-                                            filteredGrowthGuidByDate.keys
-                                                .toList()[index],
-                                            'childenrollguid'),
-                                        creche_id: creche_id,
-                                        ChildDOB: callDataByKey(
-                                            filteredGrowthGuidByDate.keys
-                                                .toList()[index],
-                                            'child_dob'),
-                                        enrollDate: callDataByKey(
-                                            filteredGrowthGuidByDate.keys.toList()[index],
-                                            'date_of_enrollment'),
-                                        child_id: childId,
-                                        child_referral_guid: child_referral_guid,
-                                        childName: childName,
-                                        childId: childIdGen,
-                                        scheduleDate: callDataByKey(
-                                            filteredGrowthGuidByDate.keys
-                                                .toList()[index],
-                                            'measurement_taken_date'),
-                                        minDate: minDate,
-                                        isEditable: true,
-                                        isEditableForDischage: true,
-                                        isDischarge: false)));
+                            var refStatus = await Navigator.of(context).push(MaterialPageRoute(
+                                builder: (BuildContext context) => ChildReferralTabScreen(
+                                    tabTitle: widget.tabTitle,
+                                    GrowthMonitoringGUID: callDataByKey(
+                                        filteredGrowthGuidByDate.keys
+                                            .toList()[index],
+                                        'cgmguid'),
+                                    enrolChildGuid: callDataByKey(
+                                        filteredGrowthGuidByDate.keys
+                                            .toList()[index],
+                                        'childenrollguid'),
+                                    creche_id: creche_id,
+                                    ChildDOB: callDataByKey(
+                                        filteredGrowthGuidByDate.keys
+                                            .toList()[index],
+                                        'child_dob'),
+                                    enrollDate: callDataByKey(
+                                        filteredGrowthGuidByDate.keys.toList()[index],
+                                        'date_of_enrollment'),
+                                    child_id: childId,
+                                    child_referral_guid: child_referral_guid,
+                                    childName: childName,
+                                    childId: childIdGen,
+                                    scheduleDate: callDataByKey(filteredGrowthGuidByDate.keys.toList()[index], 'measurement_taken_date'),
+                                    minDate: minDate,
+                                    isEditable: true,
+                                    isEditableForDischage: true,
+                                    isDischarge: false)));
 
                             if (refStatus == 'itemRefresh') {
                               await fetchAllAnthroRecords();
@@ -538,7 +544,8 @@ class _ChildReferralListingScreenState
                                           Text(
                                             Validate().displeDateFormate(
                                                 callDataByKey(
-                                                    filteredGrowthGuidByDate.keys
+                                                    filteredGrowthGuidByDate
+                                                        .keys
                                                         .toList()[index],
                                                     'measurement_taken_date')),
                                             style: Styles.cardBlue10,
@@ -589,9 +596,9 @@ class _ChildReferralListingScreenState
     var enrolledGUID = growthData['childenrollguid'];
     var cgmguid = growthData['cgmguid'];
     var measurement_taken_date = growthData['measurement_taken_date'];
-    if('measurement_taken_date'==valueKey){
+    if ('measurement_taken_date' == valueKey) {
       returnValue = measurement_taken_date;
-    }else if (valueKey != 'cgmguid') {
+    } else if (valueKey != 'cgmguid') {
       var reffItems = enrolledChildrenList
           .where((element) => element.ChildEnrollGUID == enrolledGUID)
           .toList();

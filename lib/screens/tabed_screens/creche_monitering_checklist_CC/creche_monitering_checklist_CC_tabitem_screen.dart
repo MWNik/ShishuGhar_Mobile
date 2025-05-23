@@ -13,6 +13,7 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.da
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/cmc_CC/creche_monitering_checklist_CC_response_helper.dart';
 import '../../../database/helper/cmc_alm/creche_monitering_checkList_ALM_response_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
@@ -22,6 +23,7 @@ import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
@@ -65,7 +67,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
   bool _isLoading = true;
   var applicableDate = Validate().stringToDate(Validate.date);
   var now = DateTime.parse(Validate().currentDate());
-
+  BackdatedConfigirationModel? backdatedConfigirationModel;
   Map<String, dynamic> _myMap = {};
   int? isEditExisting;
   @override
@@ -79,7 +81,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     _role = await Validate().readString(Validate.role);
     username = (await Validate().readString(Validate.userName))!;
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
     List<String> valueNames = [
       CustomText.Creches,
       CustomText.Next,
@@ -319,7 +321,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
           minDate: quesItem.fieldname == 'date_of_visit'
               ? now.isBefore(applicableDate)
                   ? null
-                  : DateTime.now().subtract(Duration(days: 7))
+                  : Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.now().subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):null
               : null,
           fieldName: quesItem.fieldname,
           // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,

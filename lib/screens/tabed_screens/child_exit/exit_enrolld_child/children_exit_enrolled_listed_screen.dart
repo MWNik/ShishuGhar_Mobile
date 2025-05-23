@@ -14,8 +14,10 @@ import '../../../../custom_widget/custom_text.dart';
 import '../../../../custom_widget/custom_textfield.dart';
 import '../../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
+import '../../../../database/helper/backdated_configiration_helper.dart';
 import '../../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../../database/helper/village_data_helper.dart';
+import '../../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../../model/databasemodel/tabVillage_model.dart';
 import '../../../../model/dynamic_screen_model/options_model.dart';
 import '../../../enrolled_child_details_screen_new.dart';
@@ -50,6 +52,8 @@ class _EnrolledChildrenListedScreenState
   List<Map<String, dynamic>> allList = [];
   bool isOnlyUnsynched = false;
   String? role;
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   @override
   void initState() {
@@ -65,7 +69,8 @@ class _EnrolledChildrenListedScreenState
       lng = lngtr;
     }
     genderList = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
-
+    backdatedConfigirationModel = await BackdatedConfigirationHelper()
+        .excuteBackdatedConfigirationModel(CustomText.child_exit);
     relationChilddata =
         await OptionsModelHelper().getMstCommonOptions('Relation', lng);
     List<String> valueItems = [
@@ -617,6 +622,8 @@ class _EnrolledChildrenListedScreenState
   }
 
   Future<String?> callMinDate(String dateOfEnrollment) async {
-    return await Validate().callMinDate(dateOfEnrollment, 15);
+    if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+    return await Validate().callMinDate(dateOfEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+    }return null;
   }
 }

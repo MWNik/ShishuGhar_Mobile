@@ -36,10 +36,12 @@ import '../api/creche_monitoring_api.dart';
 import '../api/creche_profile_data_upload_api.dart';
 import '../api/hh_data_upload_api.dart';
 import '../api/image_file_api.dart';
+import '../api/master_api.dart';
 import '../api/village_profile_meta_api.dart';
 import '../custom_widget/custom_btn.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_custom_checkbox.dart';
 import '../database/helper/anthromentory/child_growth_response_helper.dart';
+import '../database/helper/backdated_configiration_helper.dart';
 import '../database/helper/cashbook/expences/cashbook_response_expences_helper.dart';
 import '../database/helper/cashbook/receipt/cashbook_receipt_response_helper.dart';
 import '../database/helper/check_in/check_in_response_helper.dart';
@@ -65,7 +67,9 @@ import '../database/helper/follow_up/child_followUp_response_helper.dart';
 import '../database/helper/image_file_tab_responce_helper.dart';
 import '../database/helper/translation_language_helper.dart';
 import '../database/helper/village_profile/village_profile_response_helper.dart';
+import '../model/apimodel/backdated_configiration_api_model.dart';
 import '../model/apimodel/translation_language_api_model.dart';
+import '../model/databasemodel/backdated_configiration_model.dart';
 import '../utils/validate.dart';
 import 'login_screen.dart';
 
@@ -103,6 +107,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     } else {
       return WillPopScope(
         onWillPop: () async {
+          await callBackdatedConfigirationData();
           Navigator.pop(context, 'itemRefresh');
           return true;
         },
@@ -111,7 +116,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
             text: (lng != null)
                 ? Global.returnTrLable(locationControlls, CustomText.sync, lng!)
                 : "",
-            onTap: () {
+            onTap: () async {
+              await callBackdatedConfigirationData();
               Navigator.pop(context, 'itemRefresh');
             },
           ),
@@ -6080,5 +6086,42 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
     setState(() {
       loadingText = newText;
     });
+  }
+
+  Future<void> callBackdatedConfigirationData()
+  async {
+    var checkInte = await Validate()
+        .checkNetworkConnection();
+    if (checkInte) {
+      loadingText = Global.returnTrLable(
+          locationControlls, CustomText.pleaseWait, lng!);;
+    showLoaderDialog(context);
+    var token = await Validate().readString(Validate.appToken);
+    var userName = await Validate().readString(Validate.userName);
+    var password = await Validate().readString(Validate.Password);
+    var backdatedConfigResponce =
+    await MasterApiService().backdatedConfigiration(userName!, password!, token!);
+
+    if (backdatedConfigResponce.statusCode == 200) {
+      Map<String, dynamic> responseData = json.decode(backdatedConfigResponce.body);
+      await initBackdatedConfigirationData(BackdatedConfigirationModelApiModel.fromJson(responseData));
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+      // Validate().singleButtonPopup(
+      //     Global.errorBodyToString(backdatedConfigResponce.body, 'message'),
+      //     Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+      //     false,
+      //     context);
+    }
+  }}
+
+  Future<void> initBackdatedConfigirationData(BackdatedConfigirationModelApiModel? item) async {
+    if (item != null) {
+      List<BackdatedConfigirationModel>? items = item.backdatedConfigirationModel;
+      if (items.isNotEmpty) {
+        await BackdatedConfigirationHelper().insertBackdatedConfigirationModel(items);
+      }
+    }
   }
 }

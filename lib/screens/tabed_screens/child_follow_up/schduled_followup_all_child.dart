@@ -7,11 +7,13 @@ import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_h
 import 'package:shishughar/utils/globle_method.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/follow_up/child_followUp_response_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/creche_database_responce_model.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/validate.dart';
@@ -43,6 +45,7 @@ class _ChildFollowUpsListingScreenState
   TextEditingController Searchcontroller = TextEditingController();
   DateTime applicableDate = Validate().stringToDate('2024-12-31');
   var now = DateTime.parse(Validate().currentDate());
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   @override
   void initState() {
@@ -58,6 +61,8 @@ class _ChildFollowUpsListingScreenState
     }
     var date = await Validate().readString(Validate.date);
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
+    backdatedConfigirationModel = await BackdatedConfigirationHelper()
+        .excuteBackdatedConfigirationModel(CustomText.childFollowUp);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -258,44 +263,46 @@ class _ChildFollowUpsListingScreenState
                       return GestureDetector(
                         onTap: () async {
                           var child_followup_guid =
-                              filteredFollowUp[index]['child_followup_guid'];
+                          filteredFollowUp[index]['child_followup_guid'];
                           if (Global.validString(child_followup_guid)) {
                             var followUpDate = filteredFollowUp[index]
-                                    ['followup_visit_date']
+                            ['followup_visit_date']
                                 .split('-')
                                 .map(int.parse)
                                 .toList();
+
                             var date = DateTime(followUpDate[0],
                                 followUpDate[1], followUpDate[2]);
-                            if (date.subtract(Duration(days: 7)).isBefore(
-                                    DateTime.parse(Validate().currentDate())) &&
+
+                            if (date.subtract(Duration(days: Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?backdatedConfigirationModel!.back_dated_data_entry_allowed!:7)).isBefore(
+                                DateTime.parse(Validate().currentDate())) &&
                                 date.isAfter(
                                     DateTime.parse(Validate().currentDate())
-                                        .subtract(Duration(days: 8)))) {
+                                        .subtract(Duration(days: Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?backdatedConfigirationModel!.back_dated_data_entry_allowed!+1:8)))) {
                               // if(date.isAfter(DateTime.parse(Validate().currentDate()).subtract(Duration(days: 8))))
 
                               // if (date.subtract(Duration(days: 1)).isBefore(
                               //     DateTime.parse(Validate().currentDate()))) {
                               var backDate = now.isBefore(applicableDate)
                                   ? DateTime(1992)
-                                  : DateTime.parse(Validate().currentDate())
-                                      .subtract(Duration(days: 7));
-                              var backDateSD = date.subtract(Duration(days: 7));
+                                    : Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.parse(Validate().currentDate())
+                              .subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):DateTime(1992);
+                              var backDateSD = Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?date.subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):date.subtract(Duration(days: 7));
                               var refStatus = await Navigator.of(context).push(MaterialPageRoute(
                                   builder: (BuildContext context) => ChildFollowUpTabScreen(
                                       tabTitle: widget.tabTitle,
                                       child_referral_guid:
-                                          filteredFollowUp[index]
-                                              ['child_referral_guid'],
+                                      filteredFollowUp[index]
+                                      ['child_referral_guid'],
                                       discharge_date: "",
                                       followup_visit_date:
-                                          filteredFollowUp[index]
-                                              ['followup_visit_date'],
+                                      filteredFollowUp[index]
+                                      ['followup_visit_date'],
                                       schedule_date: filteredFollowUp[index]
-                                          ['followup_visit_date'],
+                                      ['followup_visit_date'],
                                       enrollChildGuid: Global.getItemValues(
                                           filteredFollowUp[index]
-                                              ['enrResponces'],
+                                          ['enrResponces'],
                                           'childenrollguid'),
                                       creche_id: Global.stringToInt(
                                           Global.getItemValues(filteredFollowUp[index]['enrResponces'], 'creche_id')),

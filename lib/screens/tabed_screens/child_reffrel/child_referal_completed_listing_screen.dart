@@ -11,10 +11,12 @@ import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/custom_textfield.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/creche_database_responce_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
 import 'child_refferal_tab_screen.dart';
@@ -52,6 +54,7 @@ class _ChildReferralListingScreenState
   bool isOnlyUnsyched = false;
   var applicableDate = Validate().stringToDate("2024-12-31");
   var now = DateTime.parse(Validate().currentDate());
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   @override
   void initState() {
@@ -67,6 +70,7 @@ class _ChildReferralListingScreenState
     }
     var date = await Validate().readString(Validate.date);
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.ChildReffrel);
     List<String> valueItems = [
       CustomText.Enrolled,
       CustomText.ChildName,
@@ -332,7 +336,10 @@ class _ChildReferralListingScreenState
                                   'creche_id'));
                           var child_referral_guid =
                               filteredReferral[index]['child_referral_guid'];
-                          String? minDate=await Validate().callMinDate(filteredReferral[index]['date_of_referral'], 7);
+                          String? minDate;
+                          if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                            minDate=await Validate().callMinDate(filteredReferral[index]['date_of_referral'], backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                          }
                           // var backDate = now.isBefore(applicableDate)
                           //     ? DateTime(1992)
                           //     : DateTime.parse(Validate().currentDate())
@@ -355,8 +362,7 @@ class _ChildReferralListingScreenState
                           //     minDate = DateTime(parts[0], parts[1], 1);
                           //   }
                           // }
-
-                          bool isEdited=await Validate().checkEditable(filteredReferral[index]['created_at'], 7);
+                          bool isEdited=await Validate().checkEditable(filteredReferral[index]['created_at'], Validate().callEditfromCnfig(backdatedConfigirationModel));
                           bool isEditableForDischage=isEdited;
                           if(Global.validString(Global.getItemValues(filteredReferral[index]['responces'], 'discharge_date'))
                           && Global.getItemValues(filteredReferral[index]['responces'], 'child_status')=='2'){

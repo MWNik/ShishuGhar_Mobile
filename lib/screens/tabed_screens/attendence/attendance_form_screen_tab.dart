@@ -6,6 +6,7 @@ import 'package:shishughar/database/helper/child_attendence/child_attendance_hel
 import 'package:shishughar/utils/globle_method.dart';
 
 import '../../../custom_widget/custom_text.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_attendence/attendance_responce_helper.dart';
 import '../../../database/helper/child_attendence/child_attendance_field_helper.dart';
 import '../../../database/helper/child_attendence/child_attendence_helper.dart';
@@ -13,6 +14,7 @@ import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/validate.dart';
@@ -68,6 +70,8 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
   bool tabIsScrollable = false;
   var now = DateTime.parse(Validate().currentDate());
   var applicableDate = DateTime.parse("2024-12-31");
+  BackdatedConfigirationModel? backdatedConfigirationModel;
+
 
   @override
   void initState() {
@@ -81,6 +85,7 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
     role = (await Validate().readString(Validate.role))!;
     AddAttendanceScreenFormTab.maxDate = widget.lastGrowthDate;
     AddAttendanceScreenFormTab.minDate = widget.minGrowthDate;
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.Childattendance);
     lng = (await Validate().readString(Validate.sLanguage))!;
     translatsLabel.clear();
     List<String> valueNames = [
@@ -464,9 +469,9 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
       isEditable = role == CustomText.crecheSupervisor.trim()
           ? now.isBefore(applicableDate)
               ? true
-              : (date
-                  .add(Duration(days: 3))
-                  .isAfter(DateTime.parse(Validate().currentDate())))
+              : Global.validToInt(backdatedConfigirationModel?.data_edit_allowed)>0?(date
+                  .add(Duration(days: backdatedConfigirationModel!.data_edit_allowed!))
+                  .isAfter(DateTime.parse(Validate().currentDate()))):true
           : false;
 
       // isEditable = role == CustomText.crecheSupervisor.trim() ? true : false;

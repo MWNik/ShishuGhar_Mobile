@@ -10,8 +10,10 @@ import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
+import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/creche_helper/creche_care_giver_helper.dart';
 import '../../../model/apimodel/caregiver_responce_model.dart';
+import '../../../model/databasemodel/backdated_configiration_model.dart';
 import 'creche_care_giver_tab.dart';
 
 class CrecheCareGivers extends StatefulWidget {
@@ -36,6 +38,7 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
   bool isOnlyUnsynched = false;
   List<CareGiverResponceModel> unsynchedList = [];
   List<CareGiverResponceModel> allList = [];
+  BackdatedConfigirationModel? backdatedConfigirationModel;
 
   @override
   void initState() {
@@ -49,6 +52,9 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
     if (lngtr != null) {
       lng = lngtr;
     }
+    backdatedConfigirationModel = await BackdatedConfigirationHelper()
+        .excuteBackdatedConfigirationModel(CustomText.crecheCaregiver);
+
     List<String> valueItems = [
       CustomText.Search,
       CustomText.Creches_,
@@ -92,7 +98,11 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
                   String hhGuid = '';
                   if (!Global.validString(hhGuid)) {
                     hhGuid = Validate().randomGuid();
-                    String? minDate=await Validate().requredOnlyMinimum(null, 15);
+                    String? minDate;
+                    if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                      minDate=await Validate().requredOnlyMinimum(null, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                    }
+                    
                     print("line $hhGuid");
                     var refStatus = await Navigator.of(context).push(
                         MaterialPageRoute(
@@ -172,8 +182,11 @@ class _CrecheCareGiversState extends State<CrecheCareGivers> {
                             //     .stringToDate(backDate ?? "2024-12-31");
                             // var now = DateTime.parse(Validate().currentDate());
 
-                            bool isEdited=await Validate().checkEditable(caregiverData[index].created_at, 7);
-                            String? minDate=await Validate().requredOnlyMinimum(null, 15);
+                            bool isEdited=await Validate().checkEditable(caregiverData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
+                            String? minDate;
+                            if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                              minDate=await Validate().requredOnlyMinimum(null, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                            }
                             bool isUnEditable=false;
                             if(isEdited && role == CustomText.crecheSupervisor){
                               isUnEditable=isEdited;
