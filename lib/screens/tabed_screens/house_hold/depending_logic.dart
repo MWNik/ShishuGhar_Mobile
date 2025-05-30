@@ -1448,375 +1448,7 @@ class DependingLogic {
     return retuenValu;
   }
 
-  // static int AutoColorCreateByHeightWight(
-  //     List<TabHeightforageBoysModel> tabHeightforageBoys,
-  //     List<TabHeightforageGirlsModel> tHeightforageGirls,
-  //     List<TabWeightforageBoysModel> tabWeightforageBoys,
-  //     List<TabWeightforageGirlsModel> tabWeightforageGirls,
-  //     List<TabWeightToHeightBoysModel> tabWeightToHeightBoys,
-  //     List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls,
-  //     String fieldname,
-  //     String gender,
-  //     Map<String, dynamic> cWidgetDatamap)
-  // {
-  //   int retuenValu = 0;
-  //
-  //   if (fieldname == 'weight_for_age'|| fieldname == 're_weight_for_age') {
-  //     var age = cWidgetDatamap['age_months'];
-  //     var weight = cWidgetDatamap['weight'];
-  //     if(fieldname == 're_weight_for_age'){
-  //       weight = cWidgetDatamap['re_weight'];
-  //        age = cWidgetDatamap['re_age_months'];
-  //     }
-  //
-  //     if (age != null && weight != null) {
-  //       if (gender == '1') {
-  //         var filtredItem = tabWeightforageBoys
-  //             .where((element) =>
-  //                 Global.retrunValidNum(element.age_in_days) == age)
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-  //             retuenValu = 1;
-  //           } else if (Global.validNum(weight.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(weight.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             retuenValu = 2;
-  //           } else if (Global.validNum(weight.toString()) >
-  //               filtredItem[0].green!) {
-  //             retuenValu = 3;
-  //           }
-  //         }
-  //       } else if (gender == '2' || gender == '3') {
-  //         var filtredItem = tabWeightforageGirls
-  //             .where((element) =>
-  //                 Global.retrunValidNum(element.age_in_days) == age)
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-  //             retuenValu = 1;
-  //           } else if (Global.validNum(weight.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(weight.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             retuenValu = 2;
-  //           } else if (Global.validNum(weight.toString()) >
-  //               filtredItem[0].green!) {
-  //             retuenValu = 3;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   else if (fieldname == 'height_for_age'|| fieldname == 're_height_for_age') {
-  //     var age = cWidgetDatamap['age_months'];
-  //     var height = cWidgetDatamap['height'];
-  //     var measurement_equipment = cWidgetDatamap['measurement_equipment'];
-  //     if(fieldname == 're_height_for_age'){
-  //        age = cWidgetDatamap['re_age_months'];
-  //        height = cWidgetDatamap['re_height'];
-  //        measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
-  //     }
-  //
-  //     if (age != null && height != null) {
-  //       if (age < (25 * 30) && height > 0 && measurement_equipment == '1') {
-  //         ///Stediometer
-  //         height = Global.stringToDouble(height.toString()) + 0.7;
-  //       } else if (age > (24 * 30) &&
-  //           height > 0 &&
-  //           measurement_equipment == '2') {
-  //         ///Infantometer
-  //         height = Global.stringToDouble(height.toString()) - 0.7;
-  //       }
-  //       if (gender == '1') {
-  //         var filtredItem = tabHeightforageBoys
-  //             .where((element) =>
-  //                 Global.retrunValidNum(element.age_in_days) == age)
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
-  //             retuenValu = 1;
-  //           } else if (Global.validNum(height.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(height.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             retuenValu = 2;
-  //           } else if (Global.validNum(height.toString()) >
-  //               filtredItem[0].green!) {
-  //             retuenValu = 3;
-  //           }
-  //         }
-  //       } else if (gender == '2' || gender == '3') {
-  //         var filtredItem = tHeightforageGirls
-  //             .where((element) =>
-  //                 Global.retrunValidNum(element.age_in_days) == age)
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
-  //             retuenValu = 1;
-  //           } else if (Global.validNum(height.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(height.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             retuenValu = 2;
-  //           } else if (Global.validNum(height.toString()) >
-  //               filtredItem[0].green!) {
-  //             retuenValu = 3;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   else if (fieldname == 'weight_for_height'||fieldname == 're_weight_for_height') {
-  //     var weight = cWidgetDatamap['weight'];
-  //     var height = cWidgetDatamap['height'];
-  //     var measurement_equipment = cWidgetDatamap['measurement_equipment'];
-  //     if(fieldname == 're_weight_for_height'){
-  //        weight = cWidgetDatamap['re_weight'];
-  //        height = cWidgetDatamap['re_height'];
-  //        measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
-  //     }
-  //
-  //     if (weight != null && height != null) {
-  //       if (height > 0 && measurement_equipment == '1') {
-  //         ///Stediometer
-  //         height = Global.stringToDouble(height.toString()) + 0.7;
-  //       } else if (height > 0 && measurement_equipment == '2') {
-  //         ///Infantometer
-  //         height = Global.stringToDouble(height.toString()) - 0.7;
-  //       }
-  //       if (gender == '1') {
-  //         var filtredItem = tabWeightToHeightBoys
-  //             .where((element) =>
-  //                 element.length ==
-  //                 Global.roundToNearest(Global.validNum(height.toString())))
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-  //             retuenValu = 1;
-  //           } else if (Global.validNum(weight.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(weight.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             retuenValu = 2;
-  //           } else if (Global.validNum(weight.toString()) >
-  //               filtredItem[0].green!) {
-  //             retuenValu = 3;
-  //           }
-  //         }
-  //       } else if (gender == '2' || gender == '3') {
-  //         var filtredItem = tabWeightToHeightGirls
-  //             .where((element) =>
-  //                 element.length ==
-  //                 Global.roundToNearest(Global.validNum(height.toString())))
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-  //             retuenValu = 1;
-  //           } else if (Global.validNum(weight.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(weight.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             retuenValu = 2;
-  //           } else if (Global.validNum(weight.toString()) >
-  //               filtredItem[0].green!) {
-  //             retuenValu = 3;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //
-  //   return retuenValu;
-  // }
-  //
-  // static String AutoColorCreateByHeightWightString(
-  //     List<TabHeightforageBoysModel> tabHeightforageBoys,
-  //     List<TabHeightforageGirlsModel> tHeightforageGirls,
-  //     List<TabWeightforageBoysModel> tabWeightforageBoys,
-  //     List<TabWeightforageGirlsModel> tabWeightforageGirls,
-  //     List<TabWeightToHeightBoysModel> tabWeightToHeightBoys,
-  //     List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls,
-  //     String fieldname,
-  //     String gender,
-  //     Map<String, dynamic> cWidgetDatamap)
-  // {
-  //   String growthValue = '';
-  //
-  //   if (fieldname == 'weight_for_age'||fieldname == 're_weight_for_age') {
-  //     var age = cWidgetDatamap['age_months'];
-  //     var weight = cWidgetDatamap['weight'];
-  //     if(fieldname == 're_weight_for_age'){
-  //        age = cWidgetDatamap['re_age_months'];
-  //        weight = cWidgetDatamap['re_weight'];
-  //     }
-  //
-  //     if (age != null && weight != null) {
-  //       if (gender == '1') {
-  //         var filtredItem = tabWeightforageBoys
-  //             .where((element) =>
-  //                 Global.retrunValidNum(element.age_in_days) == age)
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-  //             growthValue = "<=${filtredItem[0].red!}";
-  //           } else if (Global.validNum(weight.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(weight.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             growthValue =
-  //                 ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
-  //           } else if (Global.validNum(weight.toString()) >
-  //               filtredItem[0].green!) {
-  //             growthValue = ">${filtredItem[0].green!}";
-  //           }
-  //         }
-  //       } else if (gender == '2' || gender == '3') {
-  //         var filtredItem = tabWeightforageGirls
-  //             .where((element) =>
-  //                 Global.retrunValidNum(element.age_in_days) == age)
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-  //             growthValue = "<=${filtredItem[0].red!}";
-  //           } else if (Global.validNum(weight.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(weight.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             growthValue =
-  //                 ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
-  //           } else if (Global.validNum(weight.toString()) >
-  //               filtredItem[0].green!) {
-  //             growthValue = ">${filtredItem[0].green!}";
-  //           }
-  //         }
-  //       }
-  //     }
-  //   } else if (fieldname == 'height_for_age'||fieldname == 're_height_for_age') {
-  //     var age = cWidgetDatamap['age_months'];
-  //     var height = cWidgetDatamap['height'];
-  //     var measurement_equipment = cWidgetDatamap['measurement_equipment'];
-  //     if(fieldname == 're_height_for_age'){
-  //        age = cWidgetDatamap['re_age_months'];
-  //        height = cWidgetDatamap['re_height'];
-  //        measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
-  //     }
-  //
-  //     if (age != null && height != null) {
-  //       if (age < (25 * 30) && height > 0 && measurement_equipment == '1') {
-  //         ///Stediometer
-  //         height = Global.stringToDouble(height.toString()) + 0.7;
-  //       } else if (age > (24 * 30) &&
-  //           height > 0 &&
-  //           measurement_equipment == '2') {
-  //         ///Infantometer
-  //         height = Global.stringToDouble(height.toString()) - 0.7;
-  //       }
-  //       if (gender == '1') {
-  //         var filtredItem = tabHeightforageBoys
-  //             .where((element) =>
-  //                 Global.retrunValidNum(element.age_in_days) == age)
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
-  //             growthValue = "<=${filtredItem[0].red!}";
-  //           } else if (Global.validNum(height.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(height.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             growthValue =
-  //                 ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
-  //           } else if (Global.validNum(height.toString()) >
-  //               filtredItem[0].green!) {
-  //             growthValue = ">${filtredItem[0].green!}";
-  //           }
-  //         }
-  //       } else if (gender == '2' || gender == '3') {
-  //         var filtredItem = tHeightforageGirls
-  //             .where((element) =>
-  //                 Global.retrunValidNum(element.age_in_days) == age)
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(height.toString()) <= filtredItem[0].red!) {
-  //             growthValue = "<=${filtredItem[0].red!}";
-  //           } else if (Global.validNum(height.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(height.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             growthValue =
-  //                 ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
-  //           } else if (Global.validNum(height.toString()) >
-  //               filtredItem[0].green!) {
-  //             growthValue = ">${filtredItem[0].green!}";
-  //           }
-  //         }
-  //       }
-  //     }
-  //   } else if (fieldname == 'weight_for_height'||fieldname == 're_weight_for_height') {
-  //     var weight = cWidgetDatamap['weight'];
-  //     var height = cWidgetDatamap['height'];
-  //     var measurement_equipment = cWidgetDatamap['measurement_equipment'];
-  //     if(fieldname == 're_weight_for_height'){
-  //        weight = cWidgetDatamap['re_weight'];
-  //        height = cWidgetDatamap['re_height'];
-  //        measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
-  //     }
-  //
-  //     if (weight != null && height != null) {
-  //       if (height > 0 && measurement_equipment == '1') {
-  //         ///Stediometer
-  //         height = Global.stringToDouble(height.toString()) + 0.7;
-  //       } else if (height > 0 && measurement_equipment == '2') {
-  //         ///Infantometer
-  //         height = Global.stringToDouble(height.toString()) - 0.7;
-  //       }
-  //       if (gender == '1') {
-  //         var filtredItem = tabWeightToHeightBoys
-  //             .where((element) =>
-  //                 element.length ==
-  //                 Global.roundToNearest(Global.validNum(height.toString())))
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-  //             growthValue = "<=${filtredItem[0].red!}";
-  //           } else if (Global.validNum(weight.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(weight.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             growthValue =
-  //                 ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
-  //           } else if (Global.validNum(weight.toString()) >
-  //               filtredItem[0].green!) {
-  //             growthValue = ">${filtredItem[0].green!}";
-  //           }
-  //         }
-  //       } else if (gender == '2' || gender == '3') {
-  //         var filtredItem = tabWeightToHeightGirls
-  //             .where((element) =>
-  //                 element.length ==
-  //                 Global.roundToNearest(Global.validNum(height.toString())))
-  //             .toList();
-  //         if (filtredItem.length > 0) {
-  //           if (Global.validNum(weight.toString()) <= filtredItem[0].red!) {
-  //             growthValue = "<=${filtredItem[0].red!}";
-  //           } else if (Global.validNum(weight.toString()) <=
-  //                   filtredItem[0].yellow_max! &&
-  //               Global.validNum(weight.toString()) >
-  //                   filtredItem[0].yellow_min!) {
-  //             growthValue =
-  //                 ">${filtredItem[0].yellow_min!}-<=${filtredItem[0].yellow_max!}";
-  //           } else if (Global.validNum(weight.toString()) >
-  //               filtredItem[0].green!) {
-  //             growthValue = ">${filtredItem[0].green!}";
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //
-  //   return growthValue;
-  // }
+
 
 
   static int AutoColorCreateByHeightWightNew(
@@ -1848,19 +1480,18 @@ class DependingLogic {
           Global.retrunValidNum(element.age_in_days) == age)
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleThreeTr(weight.toString()) < Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!)) {
+            if (weight < filtredItem[0].sd3neg!) {
               // Weight-for-age < -3SD   >>  Severely stunted
               retuenValu = 1;
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >=
-                Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleThreeTr(weight.toString()) <
-                    Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (weight >= filtredItem[0].sd3neg! && weight < filtredItem[0].sd2neg!) {
               // Weight-for-age < -2SD to -3SD   >> Stunted
               retuenValu = 2;
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleThreeTr(weight.toString()) <= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2!)) {
+            } else if (weight >= filtredItem[0].sd2neg! && weight <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               retuenValu = 3;
+            } else if (weight > filtredItem[0].sd2!) {
+              // Normal – (-2SD to +2SD) – Green colour
+              retuenValu = 4;
             }
           }
 
@@ -1870,19 +1501,18 @@ class DependingLogic {
           Global.retrunValidNum(element.age_in_days) == age)
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleThreeTr(weight.toString()) < Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!)) {
+            if (weight < filtredItem[0].sd3neg!) {
               // Weight-for-age < -3SD   >>  Severely stunted
               retuenValu = 1;
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >=
-                Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleThreeTr(weight.toString()) <
-                    Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (weight >= filtredItem[0].sd3neg! && weight < filtredItem[0].sd2neg!) {
               // Weight-for-age < -2SD to -3SD   >> Stunted
               retuenValu = 2;
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleThreeTr(weight.toString()) <= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2!)) {
+            } else if (weight >= filtredItem[0].sd2neg! && weight <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               retuenValu = 3;
+            } else if (weight > filtredItem[0].sd2!) {
+              // Normal – (-2SD to +2SD) – Green colour
+              retuenValu = 4;
             }
           }
         }
@@ -1899,7 +1529,7 @@ class DependingLogic {
       }
 
       if (age != null && height != null) {
-        if (age < Global.getbackDaysByMonth(mesurmentTakenDate,24) && height > 0 && measurement_equipment == '1') {
+        if (age <= Global.getbackDaysByMonth(mesurmentTakenDate,24) && height > 0 && measurement_equipment == '1') {
           ///Stediometer
           height = Global.stringToDouble(height.toString()) + 0.7;
         } else if (age > Global.getbackDaysByMonth(mesurmentTakenDate,24) &&
@@ -1914,19 +1544,18 @@ class DependingLogic {
           Global.retrunValidNum(element.age_in_days) == age)
               .toList();
           if (filtredItem.length > 0) {
-            if ( Global.stringToDoubleTr(height.toString()) < Global.roundAfterTwoDecimalTr(filtredItem[0].sd3neg!)) {
+            if (height < filtredItem[0].sd3neg!) {
               // Height-for-age < -3SD   >>  Severely stunted
               retuenValu = 1;
-            } else if (Global.stringToDoubleTr(height.toString()) >=
-                Global.roundAfterTwoDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleTr(height.toString()) <
-                    Global.roundAfterTwoDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (height >= filtredItem[0].sd3neg! && height < filtredItem[0].sd2neg!) {
               // HHeight-for-age < -2SD to -3SD   >>  Stunted
               retuenValu = 2;
-            } else if (Global.stringToDoubleTr(height.toString()) >= Global.roundAfterTwoDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleTr(height.toString()) <= Global.roundAfterTwoDecimalTr(filtredItem[0].sd2!)) {
+            } else if (height >= filtredItem[0].sd2neg! && height <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               retuenValu = 3;
+            } else if (height > filtredItem[0].sd2!) {
+              // Normal – (-2SD to +2SD) – Green colour
+              retuenValu = 4;
             }
           }
         } else if (gender == '2' || gender == '3') {
@@ -1935,19 +1564,18 @@ class DependingLogic {
           Global.retrunValidNum(element.age_in_days) == age)
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleTr(height.toString()) < Global.roundAfterTwoDecimalTr(filtredItem[0].sd3neg!)) {
+            if (height < filtredItem[0].sd3neg!) {
               // Height-for-age < -3SD   >>  Severely stunted
               retuenValu = 1;
-            } else if (Global.stringToDoubleTr(height.toString()) >=
-                Global.roundAfterTwoDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleTr(height.toString()) <
-                    Global.roundAfterTwoDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (height >= filtredItem[0].sd3neg! && height < filtredItem[0].sd2neg!) {
               // HHeight-for-age < -2SD to -3SD   >>  Stunted
               retuenValu = 2;
-            } else if (Global.stringToDoubleTr(height.toString()) >= Global.roundAfterTwoDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleTr(height.toString()) <= Global.roundAfterTwoDecimalTr(filtredItem[0].sd2!)) {
+            } else if (height >= filtredItem[0].sd2neg! && height <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               retuenValu = 3;
+            } else if (height > filtredItem[0].sd2!) {
+              // Normal – (-2SD to +2SD) – Green colour
+              retuenValu = 4;
             }
           }
         }
@@ -1966,7 +1594,7 @@ class DependingLogic {
       if (weight != null && height != null) {
         if (height > 0 && measurement_equipment == '1') {
           ///Stediometer
-          height = Global.stringToDoubleTr(height.toString()) + 0.7;
+          height = height + 0.7;
         } else if (height > 0 && measurement_equipment == '2') {
           ///Infantometer
           // height = Global.stringToDoubleTr(height.toString()) - 0.7;
@@ -1979,19 +1607,18 @@ class DependingLogic {
               fHeight)
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleThreeTr(weight.toString()) < Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!)) {
+            if (weight <  filtredItem[0].sd3neg!) {
               // Weight-for-height < -3SD  Severely wasted
               retuenValu = 1;
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >=
-                Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleThreeTr(weight.toString()) <
-                    Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (weight  >= filtredItem[0].sd3neg! && weight < filtredItem[0].sd2neg!) {
               // Weight-for-height < -2SD to -3SD  Wasted
               retuenValu = 2;
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleThreeTr(weight.toString()) <= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2!)) {
+            } else if (weight >= filtredItem[0].sd2neg! && weight <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               retuenValu = 3;
+            } else if (weight > filtredItem[0].sd2!) {
+              // Normal – (-2SD to +2SD) – Green colour
+              retuenValu = 4;
             }
           }
         } else if (gender == '2' || gender == '3') {
@@ -2001,19 +1628,18 @@ class DependingLogic {
               Global.roundToNearest(Global.validNum(height.toString())))
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleThreeTr(weight.toString()) < Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!)) {
+            if (weight <  filtredItem[0].sd3neg!) {
               // Weight-for-height < -3SD  Severely wasted
               retuenValu = 1;
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >=
-                Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleThreeTr(weight.toString()) <
-                    Global.roundAfterThreeDecimalTr( filtredItem[0].sd2neg!)) {
+            } else if (weight >= filtredItem[0].sd3neg! && weight < filtredItem[0].sd2neg!) {
               // Weight-for-height < -2SD to -3SD  Wasted
               retuenValu = 2;
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleThreeTr(weight.toString()) <= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2!)) {
+            } else if (weight >= filtredItem[0].sd2neg! && weight <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               retuenValu = 3;
+            } else if (weight > filtredItem[0].sd2!) {
+              // Normal – (-2SD to +2SD) – Green colour
+              retuenValu = 4;
             }
           }
         }
@@ -2052,7 +1678,7 @@ class DependingLogic {
           Global.retrunValidNum(element.age_in_days) == age)
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleThreeTr(weight.toString()) < Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!)) {
+            if (weight < filtredItem[0].sd3neg!) {
               // Weight-for-age < -3SD   >>  Severely stunted
               // growthValue = "<${filtredItem[0].sd3neg!}";
               double zScore = Global.calculateZScore(weight,
@@ -2060,10 +1686,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >=
-                Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleThreeTr(weight.toString()) <
-                    Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (weight >= filtredItem[0].sd3neg! && weight < filtredItem[0].sd2neg!) {
               // Weight-for-age < -2SD to -3SD   >> Stunted
               // growthValue = ">=${filtredItem[0].sd3neg!} < ${filtredItem[0].sd2neg!}";
               double zScore = Global.calculateZScore(weight,
@@ -2071,8 +1694,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleThreeTr(weight.toString()) <= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2!)) {
+            } else if (weight >= filtredItem[0].sd2neg! && weight <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               // growthValue = ">=${filtredItem[0].sd2neg!} <= ${filtredItem[0].sd2!}";
               double zScore = Global.calculateZScore(weight,
@@ -2088,7 +1710,7 @@ class DependingLogic {
           Global.retrunValidNum(element.age_in_days) == age)
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleThreeTr(weight.toString()) < Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!)) {
+            if (weight < filtredItem[0].sd3neg!) {
               // Weight-for-age < -3SD   >>  Severely stunted
               // growthValue = "<${filtredItem[0].sd3neg!}";
               double zScore = Global.calculateZScore(weight,
@@ -2096,10 +1718,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >=
-                Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleThreeTr(weight.toString()) <
-                    Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (weight >= filtredItem[0].sd3neg! && weight < filtredItem[0].sd2neg!) {
               // Weight-for-age < -2SD to -3SD   >> Stunted
               // growthValue = ">=${filtredItem[0].sd3neg!} < ${filtredItem[0].sd2neg!}";
               double zScore = Global.calculateZScore(weight,
@@ -2107,8 +1726,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleThreeTr(weight.toString()) <= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2!)) {
+            } else if (weight >= filtredItem[0].sd2neg! && weight <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               // growthValue = ">=${filtredItem[0].sd2neg!} <= ${filtredItem[0].sd2!}";
               double zScore = Global.calculateZScore(weight,
@@ -2148,7 +1766,7 @@ class DependingLogic {
           Global.retrunValidNum(element.age_in_days) == age)
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleTr(height.toString()) < Global.roundAfterTwoDecimalTr(filtredItem[0].sd3neg!)) {
+            if (height < filtredItem[0].sd3neg!) {
               // Height-for-age < -3SD   >>  Severely stunted
               // growthValue = "<${filtredItem[0].sd3neg!}";
               double zScore = Global.calculateZScore(height,
@@ -2156,10 +1774,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleTr(height.toString()) >=
-                Global.roundAfterTwoDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleTr(height.toString()) <
-                    Global.roundAfterTwoDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (height >= filtredItem[0].sd3neg! && height < filtredItem[0].sd2neg!) {
               // HHeight-for-age < -2SD to -3SD   >>  Stunted
               // growthValue = ">=${filtredItem[0].sd3neg!} < ${filtredItem[0].sd2neg!}";
               double zScore = Global.calculateZScore(height,
@@ -2167,8 +1782,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleTr(height.toString()) >= Global.roundAfterTwoDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleTr(height.toString()) <= Global.roundAfterTwoDecimalTr(filtredItem[0].sd2!)) {
+            } else if (height >= filtredItem[0].sd2neg! && height <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               // growthValue = ">=${filtredItem[0].sd2neg!} <= ${filtredItem[0].sd2!}";
               double zScore = Global.calculateZScore(height,
@@ -2184,7 +1798,7 @@ class DependingLogic {
           Global.retrunValidNum(element.age_in_days) == age)
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleTr(height.toString()) < Global.roundAfterTwoDecimalTr(filtredItem[0].sd3neg!)) {
+            if (height < filtredItem[0].sd3neg!) {
               // Height-for-age < -3SD   >>  Severely stunted
               // growthValue = "<${filtredItem[0].sd3neg!}";
               double zScore = Global.calculateZScore(height,
@@ -2192,10 +1806,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleTr(height.toString()) >=
-                Global.roundAfterTwoDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleTr(height.toString()) <
-                    Global.roundAfterTwoDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (height >= filtredItem[0].sd3neg! && height < filtredItem[0].sd2neg!) {
               // HHeight-for-age < -2SD to -3SD   >>  Stunted
               // growthValue = ">=${filtredItem[0].sd3neg!} < ${filtredItem[0].sd2neg!}";
               double zScore = Global.calculateZScore(height,
@@ -2203,8 +1814,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleTr(height.toString()) >= Global.roundAfterTwoDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleTr(height.toString()) <= Global.roundAfterTwoDecimalTr(filtredItem[0].sd2!)) {
+            } else if (height >= filtredItem[0].sd2neg! && height <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               // growthValue = ">=${filtredItem[0].sd2neg!} <= ${filtredItem[0].sd2!}";
               double zScore = Global.calculateZScore(height,
@@ -2274,7 +1884,7 @@ class DependingLogic {
               roundedHeight && element.age_type==preHeight ))
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleThreeTr(weight.toString()) < Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!)) {
+            if (weight < filtredItem[0].sd3neg!) {
               // Weight-for-height < -3SD  Severely wasted
               // growthValue = "<${filtredItem[0].sd3neg!}";
               double zScore = Global.calculateZScore(weight,
@@ -2282,10 +1892,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >=
-                Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleThreeTr(weight.toString()) <
-                    Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (weight >= filtredItem[0].sd3neg! && weight < filtredItem[0].sd2neg!) {
               // Weight-for-height < -2SD to -3SD  Wasted
               // growthValue = ">=${filtredItem[0].sd3neg!} < ${filtredItem[0].sd2neg!}";
               double zScore = Global.calculateZScore(weight,
@@ -2293,8 +1900,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleThreeTr(weight.toString()) <= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2!)) {
+            } else if (weight >= filtredItem[0].sd2neg! && weight <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               // growthValue = ">=${filtredItem[0].sd2neg!} <= ${filtredItem[0].sd2!}";
               double zScore = Global.calculateZScore(weight,
@@ -2313,7 +1919,7 @@ class DependingLogic {
               Global.roundToNearest(Global.validNum(height.toString())) && element.age_type==preHeight))
               .toList();
           if (filtredItem.length > 0) {
-            if (Global.stringToDoubleThreeTr(weight.toString()) < Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!)) {
+            if (weight < filtredItem[0].sd3neg!) {
               // Weight-for-height < -3SD  Severely wasted
               // growthValue = "<${filtredItem[0].sd3neg!}";
 
@@ -2322,10 +1928,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].l).toDouble(),
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >=
-                Global.roundAfterThreeDecimalTr(filtredItem[0].sd3neg!) &&
-                Global.stringToDoubleThreeTr(weight.toString()) <
-                    Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)) {
+            } else if (weight >= filtredItem[0].sd3neg! && weight < filtredItem[0].sd2neg!) {
               // Weight-for-height < -2SD to -3SD  Wasted
 
               double zScore = Global.calculateZScore(weight,
@@ -2334,8 +1937,7 @@ class DependingLogic {
                   Global.retrunValidNum(filtredItem[0].s).toDouble());
               // growthValue = ">=${filtredItem[0].sd3neg!} < ${filtredItem[0].sd2neg!}";
               growthValue = "$zScore";
-            } else if (Global.stringToDoubleThreeTr(weight.toString()) >= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2neg!)
-                && Global.stringToDoubleThreeTr(weight.toString()) <= Global.roundAfterThreeDecimalTr(filtredItem[0].sd2!)) {
+            } else if (weight >= filtredItem[0].sd2neg! && weight <= filtredItem[0].sd2!) {
               // Normal – (-2SD to +2SD) – Green colour
               double zScore = Global.calculateZScore(weight,
                   Global.retrunValidNum(filtredItem[0].m).toDouble(),

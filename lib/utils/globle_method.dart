@@ -150,7 +150,7 @@ class Global {
         DateTime? dateValue = Validate().stringToDateNull(date!);
         if (dateValue != null) {
           DateTime newDate = DateTime(
-              dateValue.year, dateValue.month - 25, dateValue.day);
+              dateValue.year, dateValue.month - month, dateValue.day);
           days = Validate().calculateAgeInDaysEx(newDate, dateValue);
         }
       }
@@ -254,7 +254,19 @@ class Global {
     // Step 5: Compute Z-score
     double zScore = numerator / denominator;
 
+    if (zScore <= -3) {
+     var sd3neg = (M * pow(1 + L * S * (-3), 1 / L)).toDouble();
+     var sd2neg = (M * pow(1 + L * S * (-2), 1 / L)).toDouble();
+     var sd23neg = (sd2neg - sd3neg).toDouble();
+      zScore = (-3 + (value - sd3neg) / sd23neg).toDouble();
+    }else if (zScore >= 3) {
+      var sd3pos = (M * pow(1 + L * S * (3), 1 / L)).toDouble();
+      var sd2pos = (M * pow(1 + L * S * (2), 1 / L)).toDouble();
+      var sd23pos = (sd3pos - sd2pos).toDouble();
+      zScore = (3 + (value - sd3pos) / sd23pos).toDouble();
+    }
     return stringToDouble(zScore.toStringAsFixed(2));
+   // return zScore;
   }
 
   static String returnTrLable(
