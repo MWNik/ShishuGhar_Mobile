@@ -1287,13 +1287,13 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     callInitBlock();
   }
 
-  void checkZscoreValue(double weight,double m,double l,double s){
-    double value=Global.retrunValidNum(m).toDouble();
-    double zScore = Global.calculateZScore(weight,m,l,s);
-    int days = Global.getbackDaysByMonth('2025-04-01',25);
-    print('zScore $zScore  $days');
-
-  }
+  // void checkZscoreValue(double weight,double m,double l,double s){
+  //   double value=Global.retrunValidNum(m).toDouble();
+  //   double zScore = Global.calculateZScore(weight,m,l,s);
+  //   int days = Global.getbackDaysByMonth('2025-04-01',25);
+  //   print('zScore $zScore  $days');
+  //
+  // }
 
 
   Future<void> callInsertHouseHoldFields(HouseHoldFieldModel items) async {

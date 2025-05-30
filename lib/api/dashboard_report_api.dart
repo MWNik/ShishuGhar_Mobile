@@ -3,7 +3,7 @@ import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import '../utils/constants.dart';
 import '../utils/validate.dart';
-import 'package:dio/dio.dart' as dio;
+
 
 class DashboardReportApi {
   Future<http.Response> callDashboardReportApi(
