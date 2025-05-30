@@ -81,6 +81,7 @@ class _ChildGrowthExpendedFormState
   List<Translation> translatsLabel = [];
   List<int> mesureMonths = [1, 4, 7, 10];
   List<String> hiddenItem = [
+    'dob_when_measurement_taken',
     'age_months',
     'measurement_date',
     'weight_for_age',
@@ -609,6 +610,7 @@ class _ChildGrowthExpendedFormState
             calucalteDate = Validate().calculateAgeInDays(date);
           cWidgetDatamap = {};
           cWidgetDatamap['age_months'] = calucalteDate;
+          cWidgetDatamap['dob_when_measurement_taken'] = Global.getItemValues(filterdData[i].responces, 'child_dob');
           cWidgetDatamap['do_you_have_height_weight'] = 1;
           if (!widget.isNew && cWidgetDatamap['measurement_taken_date']==null) {
             cWidgetDatamap['measurement_taken_date'] =
@@ -629,6 +631,7 @@ class _ChildGrowthExpendedFormState
           } else
             calucalteDate = Validate().calculateAgeInDays(date);
           cWidgetDatamap['age_months'] = calucalteDate;
+          cWidgetDatamap['dob_when_measurement_taken'] = Global.getItemValues(filterdData[i].responces, 'child_dob');
           //    commented By Satish dafult date remove show old record to copy to new
           if (!widget.isNew && cWidgetDatamap['measurement_taken_date'] == null) {
             cWidgetDatamap['measurement_taken_date'] =
@@ -944,6 +947,7 @@ class _ChildGrowthExpendedFormState
           item['chhguid'] = element.CHHGUID;
           item['child_id'] = element.name;
           item['cgmguid'] = widget.cgmguid;
+
           // if (((Global.stringToInt(
           //     item['do_you_have_height_weight'].toString()) !=
           //     1) ||
@@ -962,6 +966,7 @@ class _ChildGrowthExpendedFormState
             item.remove('height_for_age_zscore');
             item.remove('measurement_equipment');
             item.remove('measurement_taken_date');
+            item.remove('dob_when_measurement_taken');
             item.remove('height');
             item.remove('weight');
             item['do_you_have_height_weight'] = 0;
