@@ -130,4 +130,10 @@ class ChildAttendenceHelper {
         'UPDATE child_attendence SET date_of_attendance = ? where childattenguid=?',
         [date_of_attendance, ChildAttenGUID]);
   }
+
+  Future<List<Map<String, dynamic>>> excuteIsNotSubmitedDate() async {
+    return await DatabaseHelper.database!.rawQuery(
+        '''select * from (SELECT creche_id,MIN(max_date_of_records) AS min_of_max_dates FROM (   SELECT   creche_id,  MAX(date_of_attendance) AS max_date_of_records  FROM    child_attendance_responce   GROUP BY     creche_id) WHERE max_date_of_records < DATE('now')) as date_records left join tab_creche_response as creche on date_records.creche_id=creche.name''',
+        );
+  }
 }

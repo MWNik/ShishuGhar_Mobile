@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
@@ -9,6 +11,10 @@ import 'package:shishughar/screens/children_enrollment_profile.dart';
 import 'package:shishughar/screens/home_replica_screen.dart';
 import 'package:shishughar/screens/synchronization_screen.dart';
 import 'package:shishughar/screens/synchronization_screen_new.dart';
+import 'package:shishughar/screens/tabed_screens/anthrometory/child_growth_listing_screen.dart';
+import 'package:shishughar/screens/tabed_screens/attendence/attendance_listed_screen.dart';
+import 'package:shishughar/screens/tabed_screens/child_follow_up/follow_up_tab_screen_all_child.dart';
+import 'package:shishughar/screens/tabed_screens/child_reffrel/reffral_tab_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creshe/cereche_listed_screen.dart';
 import 'package:shishughar/screens/tabed_screens/enrolled_children/children_enrolled_for_cc_listed.dart';
 import 'package:shishughar/screens/visit_notes.dart';
@@ -19,12 +25,12 @@ import '../style/styles.dart';
 import '../utils/globle_method.dart';
 import '../utils/validate.dart';
 import 'dashboard_report_for_all_creche_by_api.dart';
-import 'linelistedhouseholld.dart';
 
 class DashboardScreen extends StatefulWidget {
   int? index;
+  String? payload;
 
-  DashboardScreen({super.key, this.index});
+  DashboardScreen({super.key, this.index,this.payload});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -97,7 +103,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .callTranslateString(valueNames)
         .then((value) => dashboardControlls.addAll(value));
     Navigator.pop(context);
+
+    print('sreenNevigate ${widget.payload}');
     setState(() {});
+
+    if(Global.validString(widget.payload)){
+      var item=jsonDecode(widget.payload!);
+      switch(item['type']){
+        case 'Upload data':
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => SynchronizationScreenNew(),
+          ));
+          break;
+        case 'Child Referral':
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ReffralTabScreen(
+              tabTitle: CustomText.FlaggedChilderen,
+            ),
+          ));
+          break;
+        case 'Child Attendance':
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => AttendanceListedScreen(
+              creche_nameId: Global.stringToInt(item['creche_id']),
+              creche_name: item['creche_name'],
+            ),
+          ));
+          break;
+          case 'Growth Monitoring':
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ChildGrowthListingScreen(
+              creche_nameId:  Global.stringToInt(item['creche_id']),
+              creche_name: item['creche_name'],
+            ),
+          ));
+          break;
+          case 'Follow up':
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => FollowUpTabScreenAllChild(
+              tabTitle: CustomText.fllowUp,
+              tabOneTitle: CustomText.schduleDate,
+              tabTwoTitle: CustomText.complted,
+            ),
+          ));
+          break;
+        default:'';
+      }
+    }
   }
 
   Future setOnClick(int index) async {

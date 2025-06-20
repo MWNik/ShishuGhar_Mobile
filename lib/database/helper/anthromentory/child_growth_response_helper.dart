@@ -401,4 +401,26 @@ Future<ChildGrowthMetaResponseModel?> callMaxAnthroResponce(
 
     return items;
   }
+
+  Future<List<ChildGrowthMetaResponseModel>> anthroDataForEnrolledAdd(
+      String selectedDate, int crecheId) async {
+    var query =
+    'SELECT * FROM child_anthormentry_responce WHERE strftime(?, measurement_date) <= ? AND creche_id = ? and responces NOTNULL ORDER BY measurement_date DESC limit 1';
+
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery(query, ['%Y-%m', selectedDate,crecheId]);
+
+    List<ChildGrowthMetaResponseModel> items = [];
+    result.forEach((itemMap) {
+      items.add(ChildGrowthMetaResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
+  Future<List<Map<String, dynamic>>> excuteIsNotSubmitedDate() async {
+    return await DatabaseHelper.database!.rawQuery(
+      '''select * from (SELECT creche_id,MIN(max_date_of_records) AS min_of_max_dates FROM (   SELECT   creche_id,  MAX(measurement_date) AS max_date_of_records  FROM    child_anthormentry_responce   GROUP BY     creche_id) WHERE max_date_of_records < DATE('now')) as date_records left join tab_creche_response as creche on date_records.creche_id=creche.name''',
+    );
+  }
 }

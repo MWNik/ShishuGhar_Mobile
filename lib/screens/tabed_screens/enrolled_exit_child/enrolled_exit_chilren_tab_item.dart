@@ -22,6 +22,7 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
+import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/house_hold_children_helper.dart';
 import '../../../database/helper/enrolled_children/enrolled_children_field_helper.dart';
@@ -1024,10 +1025,11 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
       });
 
       if (Global.stringToInt(myMap['measurement_taken'].toString()) > 0) {
+
         var colorIndicatorItems = widgets.where((item) =>
             colorIndicatorForMeasure.contains(item.fieldname)).toList();
         if (colorIndicatorItems.length > 0) {
-
+          Map<String, dynamic> newChild={};
           Map<String, dynamic> childResponce = {
             'weight': myMap['weight'],
             'height': myMap['height'],
@@ -1038,8 +1040,9 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
                 Validate().stringToDate(myMap['measurement_date'])),
             'measurement_equipment': myMap['measurement_equipment'],
           };
+          newChild=childResponce;
           colorIndicatorItems.forEach((item) {
-            myMap[item.fieldname!] = DependingLogic.AutoColorCreateByHeightWightNew(
+            var itemColor = DependingLogic.AutoColorCreateByHeightWightNew(
                     tabHeightforageBoys,
                     tHeightforageGirls,
                     tabWeightforageBoys,
@@ -1050,7 +1053,8 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
                     myMap['gender_id'],
                 myMap['measurement_date'],
                     childResponce);
-
+            myMap[item.fieldname!]=itemColor;
+            newChild[item.fieldname!]=itemColor;
             var zscroreValue= DependingLogic.AutoColorCreateByHeightWightStringNew(
                     tabHeightforageBoys,
                     tHeightforageGirls,
@@ -1062,11 +1066,16 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
                     myMap['gender_id'],
                 myMap['measurement_date'],
                     childResponce);
+            newChild['${item.fieldname}_zscore']=zscroreValue;
             myMap['${item.fieldname}_zscore'] =zscroreValue;
 
           });
 
+          await callUpdateAnthroRecord(myMap['date_of_enrollment'],newChild);
         }
+
+
+
       }
 
 
@@ -1445,5 +1454,52 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
       // }
     }
     return screenItems;
+  }
+
+  Future<void> callUpdateAnthroRecord(String enrollmentDate,Map<String, dynamic> itemStrodeColor) async{
+      var lastRecord=await ChildGrowthResponseHelper().anthroDataForEnrolledAdd(enrollmentDate,widget.crecheId);
+      if (lastRecord.length > 0) {
+        if (lastRecord.first.responces != null) {
+          Map<String, dynamic> responseData = jsonDecode(lastRecord.first.responces!);
+          var childs = responseData['anthropromatic_details'];
+          if (childs != null) {
+            List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(responseData['anthropromatic_details']);
+            var childItem = children
+                .where((element) => element['childenrollguid'] == widget.EnrolledChilGUID)
+                .toList();
+            if(childItem.length==0){
+              Map<String, dynamic> newChild=itemStrodeColor;
+              newChild['do_you_have_height_weight']=myMap['measurement_taken'];
+              newChild['dob_when_measurement_taken']=myMap['child_dob'];
+              newChild['measurement_equipment']=myMap['measurement_equipment'];
+              newChild['measurement_taken_date']=myMap['measurement_date'];
+              newChild['s_flag']='0';
+              newChild['thr']='0';
+              newChild['vhsnd']='1';
+              newChild['awc']='0';
+              newChild['any_medical_major_illness']='0';
+              newChild['childenrollguid']=widget.EnrolledChilGUID;
+              newChild['chhguid']=widget.cHHGuid;
+              newChild['cgmguid']=lastRecord.first.cgmguid;
+              print("print $newChild");
+              children.add(newChild);
+
+              responseData['anthropromatic_details'] = children;
+              var measurementDate = responseData['measurement_date'];
+              var responcesJs = jsonEncode(responseData);
+              var name = responseData['name'];
+              print("responcesJs $responcesJs");
+              await ChildGrowthResponseHelper().insertUpdate(
+                  lastRecord.first.cgmguid!,
+                  measurementDate,
+                  name as int?,
+                  widget.crecheId,
+                  responcesJs,
+                  responseData['created_by'],
+                  responseData['created_on'],Validate().currentDateTime(),userName);
+            }
+          }
+        }
+      }
   }
 }

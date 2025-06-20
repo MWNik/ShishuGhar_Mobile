@@ -3,16 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'dart:async';
 
-import 'package:shishughar/screens/dashboardscreen.dart';
 import 'package:shishughar/screens/login_screen.dart';
 import 'package:shishughar/style/styles.dart';
 
 import '../utils/validate.dart';
 import 'dashboardscreen_new.dart';
-import 'location_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+   SplashScreen({super.key,this.payload});
+  String? payload;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -96,10 +95,10 @@ class _SplashScreenState extends State<SplashScreen> {
             builder: (context) =>
             panchayatId != null
                 ? DashboardScreen(
-              index: 0,
+              index: 0,payload:widget.payload
             ) // Redirect to LocationScreen if username is not null
                 : (userName != null && password != null)
-                ?  DashboardScreen(index: 0)
+                ?  DashboardScreen(index: 0,payload:widget.payload)
                 : LoginScreen()));
 
   }

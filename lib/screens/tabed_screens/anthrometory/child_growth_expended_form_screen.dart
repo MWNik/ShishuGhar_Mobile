@@ -363,7 +363,7 @@ class _ChildGrowthExpendedFormState
                     filterDataQu(value);
                   },
                   hintText: (lng != null)
-                      ? Global.returnTrLable(translatsLabel, 'Search', lng!)
+                      ? Global.returnTrLable(translatsLabel, 'Search', lng)
                       : '',
                   prefixIcon: Image.asset(
                     "assets/search.png",
@@ -1043,6 +1043,7 @@ class _ChildGrowthExpendedFormState
             item['weight_for_age_zscore'] = weight_for_age_zscore;
             item['weight_for_height_zscore'] = weight_for_height_zscore;
             item['height_for_age_zscore'] = height_for_age_zscore;
+            item['s_flag'] = 1;
 
           }
           childValues.add(item);
@@ -1075,12 +1076,12 @@ class _ChildGrowthExpendedFormState
             if (item != null) {
               var element = mesureItem[i];
               var validationMsg = logic!.validationMessge(item, element);
-              if (isMesurement(myMap[measurement_date!.fieldname]) == false &&
-                  (element.fieldname == 'height' ||
-                      element.fieldname == 'measurement_equipment') &&
-                  Global.validString(validationMsg)) {
-                validationMsg = '';
-              }
+              // if (isMesurement(myMap[measurement_date!.fieldname]) == false &&
+              //     (element.fieldname == 'height' ||
+              //         element.fieldname == 'measurement_equipment') &&
+              //     Global.validString(validationMsg)) {
+              //   validationMsg = '';
+              // }
               if (Global.validString(validationMsg)) {
                 validStatus = false;
                 Validate().singleButtonPopup(
@@ -1112,7 +1113,7 @@ class _ChildGrowthExpendedFormState
                           context);
                       return validStatus;
                     } else if (Global.stringToDouble(height.toString()) == 0) {
-                      if (isMesurement(myMap[measurement_date!.fieldname])) {
+                      // if (isMesurement(myMap[measurement_date!.fieldname])) {
                         validStatus = false;
                         Validate().singleButtonPopup(
                             Global.returnTrLable(translatsLabel,
@@ -1122,7 +1123,7 @@ class _ChildGrowthExpendedFormState
                             false,
                             context);
                         return validStatus;
-                      }
+                      // }
                     } else if (Global.stringToDouble(weight.toString()) == 0) {
                       validStatus = false;
                       Validate().singleButtonPopup(
@@ -1278,20 +1279,22 @@ class _ChildGrowthExpendedFormState
               translatsLabel, CustomText.select_here, lng!),
           titleText:
           Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
-          isRequred: quesItem.fieldname == 'measurement_equipment'
-              ? isMesurement(myMap[measurement_date!.fieldname])
-              ? logic!.dependeOnMendotory(itemsAnswred, quesItem)
-              : 0
-              : logic!.dependeOnMendotory(itemsAnswred, quesItem),
-          // isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
+          // isRequred: quesItem.fieldname == 'measurement_equipment'
+          //     ? isMesurement(myMap[measurement_date!.fieldname])
+          //     ? logic!.dependeOnMendotory(itemsAnswred, quesItem)
+          //     : 0
+          //     : logic!.dependeOnMendotory(itemsAnswred, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           items: items,
+          // readable: role == CustomText.crecheSupervisor
+          //     ? (quesItem.fieldname == 'measurement_equipment')?
+          // isMesurement(myMap[measurement_date!.fieldname])?
+          // logic!.callReadableLogic(itemsAnswred, quesItem)
+          //     :true
+          //     :logic!.callReadableLogic(itemsAnswred, quesItem)
+          //     : true,
           readable: role == CustomText.crecheSupervisor
-              ? (quesItem.fieldname == 'measurement_equipment')?
-          isMesurement(myMap[measurement_date!.fieldname])?
-          logic!.callReadableLogic(itemsAnswred, quesItem)
-              :true
-              :logic!.callReadableLogic(itemsAnswred, quesItem)
-              : true,
+              ?  logic!.callReadableLogic(itemsAnswred, quesItem):true,
           selectedItem: itemsAnswred[quesItem.fieldname!].toString(),
           isVisible: logic!.callDependingLogic(itemsAnswred, quesItem),
           onChanged: (value) {
@@ -1560,21 +1563,24 @@ class _ChildGrowthExpendedFormState
           titleText:
           Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
-          isRequred: quesItem.fieldname == 'height'
-              ? (isMesurement(myMap[measurement_date!.fieldname])
-              ? logic!.dependeOnMendotory(itemsAnswred, quesItem)
-              : 0)
-              : logic!.dependeOnMendotory(itemsAnswred, quesItem),
-          // isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
+          // isRequred: quesItem.fieldname == 'height'
+          //     ? (isMesurement(myMap[measurement_date!.fieldname])
+          //     ? logic!.dependeOnMendotory(itemsAnswred, quesItem)
+          //     : 0)
+          //     : logic!.dependeOnMendotory(itemsAnswred, quesItem),
+          isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
           maxlength: quesItem.length,
           initialvalue: itemsAnswred[quesItem.fieldname!],
+          // readable: role == CustomText.crecheSupervisor
+          //     ? (quesItem.fieldname == 'height')?
+          // isMesurement(myMap[measurement_date!.fieldname])?
+          // logic!.callReadableLogic(itemsAnswred, quesItem)
+          //     :true
+          //     :logic!.callReadableLogic(itemsAnswred, quesItem)
+          //     : true,
           readable: role == CustomText.crecheSupervisor
-              ? (quesItem.fieldname == 'height')?
-          isMesurement(myMap[measurement_date!.fieldname])?
-          logic!.callReadableLogic(itemsAnswred, quesItem)
-              :true
-              :logic!.callReadableLogic(itemsAnswred, quesItem)
-              : true,
+              ? logic!.callReadableLogic(itemsAnswred, quesItem):
+    true,
           isVisible: logic!.callDependingLogic(itemsAnswred, quesItem),
           fieldName: quesItem.fieldname!,
           onChanged: (value) {
@@ -1603,16 +1609,16 @@ class _ChildGrowthExpendedFormState
     }
   }
 
-  bool isMesurement(String? mesureDate) {
-    bool ismesure = false;
-    if(Global.validString(mesureDate)){
-    List<int> parts = mesureDate.toString().split('-').map(int.parse).toList();
-    var month = parts[1];
-    if (mesureMonths.contains(month)) {
-      ismesure = true;
-    }}
-    return ismesure;
-  }
+  // bool isMesurement(String? mesureDate) {
+  //   bool ismesure = false;
+  //   if(Global.validString(mesureDate)){
+  //   List<int> parts = mesureDate.toString().split('-').map(int.parse).toList();
+  //   var month = parts[1];
+  //   if (mesureMonths.contains(month)) {
+  //     ismesure = true;
+  //   }}
+  //   return ismesure;
+  // }
 
   widgetTypeWidgetinlessForMulti(HouseHoldFielItemdModel quesItem,
       Map<String, dynamic> itemsAnswred, String ChildEnrollGUID) {
@@ -1922,8 +1928,11 @@ class _ChildGrowthExpendedFormState
                           currentChildRecord.first['height'].toString()) < 1) {
 
                         itemMap.forEach((key, value) {
-                          if (key == 'height') {
-                            if ((Global.stringToDouble(value.toString()) > 0)) {
+                          if (key == 'height'||key == 'measurement_equipment') {
+                            if ((Global.stringToDouble(value.toString()) > 0)&&key == 'height') {
+                              childItem[key] = value;
+                            }
+                            if ((Global.stringToDouble(value.toString()) > 0)&&key == 'measurement_equipment') {
                               childItem[key] = value;
                             }
                           }
@@ -2851,12 +2860,12 @@ class _ChildGrowthExpendedFormState
 
       var validationMsg = logic!.validationMessge(cWidgetDatamap, popItem[i]);
 
-      if (isMesurement(cWidgetDatamap['re_measurement_taken_date']) == false &&
-          (popItem[i].fieldname == 're_height' ||
-              popItem[i].fieldname == 're_measurement_equipment') &&
-          Global.validString(validationMsg)) {
-        validationMsg = '';
-      }
+      // if (isMesurement(cWidgetDatamap['re_measurement_taken_date']) == false &&
+      //     (popItem[i].fieldname == 're_height' ||
+      //         popItem[i].fieldname == 're_measurement_equipment') &&
+      //     Global.validString(validationMsg)) {
+      //   validationMsg = '';
+      // }
       if (Global.validString(validationMsg)) {
         validStatus = false;
         Validate().singleButtonPopup(
