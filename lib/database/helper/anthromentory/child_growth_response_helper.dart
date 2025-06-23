@@ -420,7 +420,7 @@ Future<ChildGrowthMetaResponseModel?> callMaxAnthroResponce(
 
   Future<List<Map<String, dynamic>>> excuteIsNotSubmitedDate() async {
     return await DatabaseHelper.database!.rawQuery(
-      '''select * from (SELECT creche_id,MIN(max_date_of_records) AS min_of_max_dates FROM (   SELECT   creche_id,  MAX(measurement_date) AS max_date_of_records  FROM    child_anthormentry_responce   GROUP BY     creche_id) WHERE max_date_of_records < DATE('now')) as date_records left join tab_creche_response as creche on date_records.creche_id=creche.name''',
+      '''SELECT * FROM ( SELECT    creche_id,    MIN(max_month) AS min_of_max_months  FROM ( SELECT  creche_id,    MAX(strftime('%Y-%m', date(measurement_date))) AS max_month FROM  child_anthormentry_responce GROUP BY creche_id ) WHERE max_month < strftime('%Y-%m', 'now')) AS date_records LEFT JOIN tab_creche_response AS creche  ON date_records.creche_id = creche.name''',
     );
   }
 }

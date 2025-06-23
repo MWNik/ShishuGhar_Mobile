@@ -129,7 +129,8 @@ void main() async {
   await FlutterLocalNotificationsPlugin().getNotificationAppLaunchDetails();
 
   String? initialPayload = notificationAppLaunchDetails?.notificationResponse?.payload;
-
+  var anthroItems = await ChildGrowthResponseHelper().excuteIsNotSubmitedDate();
+  print("checkWorondition $anthroItems");
   await NotificationService.initialize((payload) {
     if (payload != null && payload.isNotEmpty) {
       if(Global.validString(payload)){
