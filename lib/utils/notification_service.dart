@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/utils/constants.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -66,6 +71,28 @@ class NotificationService {
     );
   }
 
+  static Future<bool> checkAndroidNotificationPermission() async {
+    if (!Platform.isAndroid) return true;
 
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    if (androidInfo.version.sdkInt >= 33) { // Android 13+
+      final result = await _notificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.areNotificationsEnabled();
+      return result ?? false;
+    }
+    return true;
+  }
+
+  static Future requestPermission() async {
+    if (!Platform.isAndroid) return true;
+
+    if (await Permission.notification.isGranted) {
+      return true;
+    }
+
+    final status = await Permission.notification.request();
+    return status.isGranted;
+  }
 
 }

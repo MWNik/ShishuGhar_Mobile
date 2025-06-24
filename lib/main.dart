@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -131,6 +132,15 @@ void main() async {
   String? initialPayload = notificationAppLaunchDetails?.notificationResponse?.payload;
   var anthroItems = await ChildGrowthResponseHelper().excuteIsNotSubmitedDate();
   print("checkWorondition $anthroItems");
+  if (Platform.isAndroid) {
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    if (androidInfo.version.sdkInt >= 33) {
+      var isEnable=await NotificationService.checkAndroidNotificationPermission();
+          if(!isEnable){
+            NotificationService.requestPermission();
+          }
+    }
+  }
   await NotificationService.initialize((payload) {
     if (payload != null && payload.isNotEmpty) {
       if(Global.validString(payload)){
@@ -401,6 +411,7 @@ Future<Map<String, dynamic>> allChildWithlatest() async {
 Future<void> checkConditionAndNotify() async {
   var items = await checkCondition();
   if (items.isNotEmpty) {
+
     for (var entry in items.entries) {
       await NotificationService.showNotification(
         title: entry.key,
