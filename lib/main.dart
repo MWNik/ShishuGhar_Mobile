@@ -200,7 +200,7 @@ Future<Map<String, dynamic>> checkCondition() async {
   var pendindTaskCount = await callCountForUpload();
   var attendenceItem = await ChildAttendenceHelper().excuteIsNotSubmitedDate();
   var anthroItems = await ChildGrowthResponseHelper().excuteIsNotSubmitedDate();
-  var reffralItems = await allChildWithlatest();
+  var reffralItems = await excuteReffralItems();
   var followupsItes =  await ChildFollowUpTabResponseHelper().allChildSchduledFollowp();
   print("checkWorondition $pendindTaskCount");
   if (pendindTaskCount > 0) {
@@ -223,11 +223,11 @@ Future<Map<String, dynamic>> checkCondition() async {
     }
   }
   if (anthroItems.isNotEmpty) {
-    var date = anthroItems.first['min_of_max_dates'];
-    var crecheName =Global.getItemValues(attendenceItem.first['responces'], 'creche_name');
+    var date = anthroItems.first['min_of_max_months'];
+    var crecheName =Global.getItemValues(anthroItems.first['responces'], 'creche_name');
     if (Global.validString(date)&& Global.validString(crecheName)) {
       Map<String, String> body = {};
-      body['creche_id']=attendenceItem.first['creche_id'].toString();
+      body['creche_id']=anthroItems.first['creche_id'].toString();
       body['creche_name']=crecheName;
       body['type']=CustomText.GrowthMonitoring;
       body['message']= 'You have not submitted growth monitoring of child a ${crecheName} creche after $date.';
@@ -321,7 +321,7 @@ Future<int> callCountForUpload() async {
   return totalPendingCount;
 }
 
-Future<Map<String, dynamic>> allChildWithlatest() async {
+Future<Map<String, dynamic>> excuteReffralItems() async {
   var childAnthro = await ChildGrowthResponseHelper().allAnthormentryDisableOCT();
   Map<String, dynamic> growthGuidByDate = {};
   List<String> childrenIdList = [];
