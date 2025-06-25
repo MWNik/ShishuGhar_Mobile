@@ -198,17 +198,19 @@ Future<void> initWorkManager() async {
 Future<Map<String, dynamic>> checkCondition() async {
   Map<String, dynamic> notiItems = {};
   var pendindTaskCount = await callCountForUpload();
-  var attendenceItem = await ChildAttendenceHelper().excuteIsNotSubmitedDate();
-  var anthroItems = await ChildGrowthResponseHelper().excuteIsNotSubmitedDate();
-  var reffralItems = await excuteReffralItems();
-  var followupsItes =  await ChildFollowUpTabResponseHelper().allChildSchduledFollowp();
-  print("checkWorondition $pendindTaskCount");
+  var role = await Validate().readString(Validate.role);
   if (pendindTaskCount > 0) {
     Map<String, String> body = {};
     body['message']= 'You have completed $pendindTaskCount records for upload. Please upload now.';
     body['type']=CustomText.uploadData;
     notiItems[CustomText.uploadData] =body;
   }
+  if(role== CustomText.crecheSupervisor){
+  var attendenceItem = await ChildAttendenceHelper().excuteIsNotSubmitedDate();
+  var anthroItems = await ChildGrowthResponseHelper().excuteIsNotSubmitedDate();
+  var reffralItems = await excuteReffralItems();
+  var followupsItes =  await ChildFollowUpTabResponseHelper().allChildSchduledFollowp();
+
   if (attendenceItem.isNotEmpty) {
 
     var date = attendenceItem.first['min_of_max_dates'];
@@ -246,6 +248,7 @@ Future<Map<String, dynamic>> checkCondition() async {
     body['type']=CustomText.fllowUp;
     notiItems[CustomText.fllowUp] =body;
 
+  }
   }
   return notiItems;
 }
