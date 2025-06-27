@@ -508,4 +508,26 @@ class Global {
     }
     return teStates;
   }
+
+  static String replaceSpecialSymbol({
+    required String message,
+    String? addedValue,
+    String? tempValue,
+  }) {
+    String updatedMessage = message;
+
+    if (tempValue != null && tempValue.isNotEmpty) {
+      updatedMessage = updatedMessage.replaceAll(RegExp('@', caseSensitive: false), tempValue);
+    }
+
+    if (addedValue != null && addedValue.isNotEmpty) {
+      updatedMessage = updatedMessage.replaceAll(RegExp('#', caseSensitive: false), addedValue);
+    }
+
+    return updatedMessage;
+  }
+
+
+
+
 }

@@ -61,6 +61,8 @@ class _DashboardReportSupeByApiState
   OptionsModel? selectedGramPanchayat;
   OptionsModel? selectedVillage;
   OptionsModel? selectedCreche;
+  OptionsModel? selectedCrecheStatus;
+  OptionsModel? selectedPartner;
 
   List<OptionsModel> mstStates = [];
   List<OptionsModel> mstDistrict = [];
@@ -68,6 +70,8 @@ class _DashboardReportSupeByApiState
   List<OptionsModel> mstGP = [];
   List<OptionsModel> mstVillage = [];
   List<OptionsModel> mstcreches = [];
+  List<OptionsModel> crecheStatus = [];
+  List<OptionsModel> parterns = [];
 
   List<TabState> states = [];
   List<TabDistrict> district = [];
@@ -128,6 +132,8 @@ class _DashboardReportSupeByApiState
       CustomText.Block,
       CustomText.GramPanchayat,
       CustomText.Village,
+      CustomText.CrecheStatus,
+      CustomText.Partner,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -375,6 +381,38 @@ class _DashboardReportSupeByApiState
                             });
                           },
                         ),
+                        DynamicCustomDropdownField(
+                          hintText: Global.returnTrLable(
+                              translats, CustomText.Selecthere, lng),
+                          titleText: Global.returnTrLable(
+                              translats, CustomText.CrecheStatus, lng),
+                          isRequred: 0,
+                          items: crecheStatus,
+                          selectedItem: selectedCrecheStatus != null
+                              ? selectedCrecheStatus?.name
+                              : null,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedCrecheStatus = value;
+                            });
+                          },
+                        ),
+                        parterns.length>0?DynamicCustomDropdownField(
+                          hintText: Global.returnTrLable(
+                              translats, CustomText.Selecthere, lng),
+                          titleText: Global.returnTrLable(
+                              translats, CustomText.Partner, lng),
+                          isRequred: 0,
+                          items: parterns,
+                          selectedItem: selectedPartner != null
+                              ? selectedPartner?.name
+                              : null,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedPartner = value;
+                            });
+                          },
+                        ):SizedBox(),
                         SizedBox(
                           height: 10.h,
                         ),
@@ -592,6 +630,8 @@ class _DashboardReportSupeByApiState
           selectedGramPanchayat,
           selectedVillage,
           selectedCreche,
+          selectedCrecheStatus,
+          selectedPartner,
           token!);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
@@ -713,6 +753,11 @@ class _DashboardReportSupeByApiState
     villages = await VillageDataHelper().getTabVillageList();
     mstStates = Global.callSatates(states, lng);
     creches = await CrecheDataHelper().getCrecheResponce();
+    crecheStatus = await OptionsModelHelper().getMstCommonOptions('Creche Status', lng);
+    parterns = await OptionsModelHelper().getPartnerMstCommonOptions('Partner', {});
+    if(parterns.isEmpty){
+      parterns = await OptionsModelHelper().getMstCommonOptions('Partner', lng);
+    }
 
     if (mstStates.length == 1) {
       selectedState = mstStates.first;
@@ -736,6 +781,12 @@ class _DashboardReportSupeByApiState
       selectedVillage = mstVillage.first;
       mstcreches = Global.callFiltersCreches(creches, lng, selectedVillage);
     }
+    if (parterns.length == 1) {
+      selectedPartner = parterns.first;
+    }
+    if (crecheStatus.length == 1) {
+      selectedCrecheStatus = crecheStatus.first;
+    }
 
     setState(() {});
   }
@@ -747,6 +798,8 @@ class _DashboardReportSupeByApiState
     selectedGramPanchayat = null;
     selectedVillage = null;
     selectedCreche = null;
+    selectedCrecheStatus = null;
+    selectedPartner = null;
 
     mstStates = [];
     mstDistrict = [];
@@ -754,6 +807,8 @@ class _DashboardReportSupeByApiState
     mstGP = [];
     mstVillage = [];
     mstcreches = [];
+    crecheStatus = [];
+    parterns = [];
     await fetchStateList();
     await callApiForDashboardApi();
   }

@@ -42,11 +42,14 @@ class DashboardReportCardDetailScreen extends StatefulWidget {
   OptionsModel? selectedGramPanchayat;
   OptionsModel? selectedVillage;
   OptionsModel? selectedCreche;
+  OptionsModel? selectedCrecheStatus;
+  OptionsModel? selectedPartner;
 
    DashboardReportCardDetailScreen({
     super.key,required this.title,required this.query_type,required this.month,required this.year,
     this.selectedState, this.selectedDistrict, this.selectedBlock,
-    this.selectedGramPanchayat, this.selectedVillage, this.selectedCreche
+    this.selectedGramPanchayat, this.selectedVillage, this.selectedCreche,this.selectedCrecheStatus,
+     this.selectedPartner
   });
 
   @override
@@ -74,6 +77,8 @@ class _DashboardReportCardDetailState
   OptionsModel? selectedGramPanchayat;
   OptionsModel? selectedVillage;
   OptionsModel? selectedCreche;
+  OptionsModel? selectedCrecheStatus;
+  OptionsModel? selectedPartner;
 
   List<OptionsModel> mstStates = [];
   List<OptionsModel> mstDistrict = [];
@@ -81,6 +86,8 @@ class _DashboardReportCardDetailState
   List<OptionsModel> mstGP = [];
   List<OptionsModel> mstVillage = [];
   List<OptionsModel> mstcreches = [];
+  List<OptionsModel> crecheStatus = [];
+  List<OptionsModel> parterns = [];
 
   List<TabState> states = [];
   List<TabDistrict> district = [];
@@ -139,7 +146,8 @@ class _DashboardReportCardDetailState
       CustomText.November,
       CustomText.December,
       CustomText.select_here,
-      CustomText.crecheNotAvailable,
+      CustomText.crecheNotAvailable,CustomText.CrecheStatus,
+      CustomText.Partner,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -380,6 +388,38 @@ class _DashboardReportCardDetailState
                           });
                         },
                       ),
+                      DynamicCustomDropdownField(
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.Selecthere, lng),
+                        titleText: Global.returnTrLable(
+                            translats, CustomText.CrecheStatus, lng),
+                        isRequred: 0,
+                        items: crecheStatus,
+                        selectedItem: selectedCrecheStatus != null
+                            ? selectedCrecheStatus?.name
+                            : null,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedCrecheStatus = value;
+                          });
+                        },
+                      ),
+                      parterns.length>0?DynamicCustomDropdownField(
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.Selecthere, lng),
+                        titleText: Global.returnTrLable(
+                            translats, CustomText.Partner, lng),
+                        isRequred: 0,
+                        items: parterns,
+                        selectedItem: selectedPartner != null
+                            ? selectedPartner?.name
+                            : null,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedPartner = value;
+                          });
+                        },
+                      ):SizedBox(),
                       SizedBox(
                         height: 10.h,
                       ),
@@ -523,7 +563,7 @@ class _DashboardReportCardDetailState
       var response = await DashboardReportApi().callDashboardCardDetailsApi(
           userName,widget.query_type,selectedYear,
           selectedMonth!, selectedState, selectedDistrict, selectedBlock,
-          selectedGramPanchayat, selectedVillage, selectedCreche,
+          selectedGramPanchayat, selectedVillage, selectedCreche,selectedCrecheStatus,selectedPartner,
           token!);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
@@ -660,7 +700,11 @@ class _DashboardReportCardDetailState
     villages = await VillageDataHelper().getTabVillageList();
     mstStates = Global.callSatates(states, lng);
     creches = await CrecheDataHelper().getCrecheResponce();
-
+    crecheStatus = await OptionsModelHelper().getMstCommonOptions('Creche Status', lng);
+    parterns = await OptionsModelHelper().getPartnerMstCommonOptions('Partner', {});
+    if(parterns.isEmpty){
+      parterns = await OptionsModelHelper().getMstCommonOptions('Partner', lng);
+    }
     if (mstStates.length == 1) {
       selectedState = mstStates.first;
       mstDistrict = Global.callDistrict(district, lng, selectedState);
@@ -714,6 +758,16 @@ class _DashboardReportCardDetailState
       selectedCreche = widget.selectedCreche;
     }
 
+    if (parterns.length>0&&widget.selectedPartner!=null) {
+      selectedPartner = widget.selectedPartner;
+    }else if(parterns.length == 1){
+      selectedPartner = parterns.first;
+    }
+    if (crecheStatus.length>0&&widget.selectedCrecheStatus!=null) {
+      selectedCrecheStatus = widget.selectedCrecheStatus;
+    }else if(crecheStatus.length == 1){
+      selectedPartner = crecheStatus.first;
+    }
 
 
 
@@ -732,6 +786,8 @@ class _DashboardReportCardDetailState
     selectedGramPanchayat = null;
     selectedVillage = null;
     selectedCreche = null;
+    selectedPartner = null;
+    selectedCrecheStatus = null;
 
     widget.selectedState = null;
     widget.selectedDistrict = null;
@@ -739,6 +795,8 @@ class _DashboardReportCardDetailState
     widget.selectedGramPanchayat = null;
     widget.selectedVillage = null;
     widget.selectedCreche = null;
+    widget.selectedPartner = null;
+    widget.selectedCrecheStatus = null;
 
     mstStates = [];
     mstDistrict = [];
@@ -746,6 +804,8 @@ class _DashboardReportCardDetailState
     mstGP = [];
     mstVillage = [];
     mstcreches = [];
+    crecheStatus = [];
+    parterns = [];
     await fetchStateList();
     await callApiForDashboardApi();
   }

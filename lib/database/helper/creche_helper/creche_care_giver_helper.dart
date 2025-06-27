@@ -19,7 +19,9 @@ class CrecheCareGiverHelper {
     await DatabaseHelper.database!.transaction((txn) async{
       var batch = txn.batch();
       for (var item in careGiversList) {
+        if(Global.validString(item.CGGUID)){
         batch.insert('tab_caregiver_response',item.toJson(),conflictAlgorithm: ConflictAlgorithm.replace);
+     }
       }
       await batch.commit(noResult: true);
     });

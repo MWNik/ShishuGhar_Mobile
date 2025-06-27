@@ -46,7 +46,9 @@ import 'database/helper/follow_up/child_followUp_response_helper.dart';
 import 'database/helper/image_file_tab_responce_helper.dart';
 import 'database/helper/requisition/requisition_response_helper.dart';
 import 'database/helper/stock/stock_response_helper.dart';
+import 'database/helper/translation_language_helper.dart';
 import 'database/helper/village_profile/village_profile_response_helper.dart';
+import 'model/apimodel/translation_language_api_model.dart';
 import 'utils/notification_service.dart';
 
 // @pragma('vm:entry-point')
@@ -199,9 +201,20 @@ Future<Map<String, dynamic>> checkCondition() async {
   Map<String, dynamic> notiItems = {};
   var pendindTaskCount = await callCountForUpload();
   var role = await Validate().readString(Validate.role);
+  var lan =(await Validate().readString(Validate.sLanguage))!;
+  List<String> valueNames = [
+    CustomText.UploadDataNotification,
+    CustomText.AttendenceNotification,
+  CustomText.RedFlagNotification,
+  CustomText.GrowthMonitoringNotification,
+  CustomText.FollowupNotification];
+
+  List<Translation> translats = await TranslationDataHelper()
+      .callTranslateString(valueNames);
+
   if (pendindTaskCount > 0) {
     Map<String, String> body = {};
-    body['message']= 'You have completed $pendindTaskCount records for upload. Please upload now.';
+    body['message']= Global.replaceSpecialSymbol(message:Global.returnTrLable(translats, CustomText.UploadDataNotification, lan),tempValue:pendindTaskCount.toString());
     body['type']=CustomText.uploadData;
     notiItems[CustomText.uploadData] =body;
   }
@@ -216,11 +229,12 @@ Future<Map<String, dynamic>> checkCondition() async {
     var date = attendenceItem.first['min_of_max_dates'];
     var crecheName =Global.getItemValues(attendenceItem.first['responces'], 'creche_name');
     if (Global.validString(date) && Global.validString(crecheName)) {
+      var formateDate=Validate().displeDateFormate(date);
       Map<String, String> body = {};
       body['creche_id']=attendenceItem.first['creche_id'].toString();
       body['creche_name']=crecheName;
       body['type']=CustomText.childAttendance;
-      body['message']= 'You have not submitted attendance of child at ${crecheName} creche after $date.';
+      body['message']= Global.replaceSpecialSymbol(message:Global.returnTrLable(translats, CustomText.AttendenceNotification, lan),addedValue:crecheName,tempValue: formateDate);
       notiItems[CustomText.childAttendance] =body;
     }
   }
@@ -228,23 +242,24 @@ Future<Map<String, dynamic>> checkCondition() async {
     var date = anthroItems.first['min_of_max_months'];
     var crecheName =Global.getItemValues(anthroItems.first['responces'], 'creche_name');
     if (Global.validString(date)&& Global.validString(crecheName)) {
+      var formateDate=Validate().displeDateFormateMonthYear(date);
       Map<String, String> body = {};
       body['creche_id']=anthroItems.first['creche_id'].toString();
       body['creche_name']=crecheName;
       body['type']=CustomText.GrowthMonitoring;
-      body['message']= 'You have not submitted growth monitoring of child a ${crecheName} creche after $date.';
+      body['message']= Global.replaceSpecialSymbol(message:Global.returnTrLable(translats, CustomText.GrowthMonitoringNotification, lan),addedValue:crecheName,tempValue: formateDate);
       notiItems[CustomText.GrowthMonitoring] =body;
     }
   }
   if (reffralItems.isNotEmpty) {
     Map<String, String> body = {};
-    body['message']= 'Red flag child visit is pending. Please complete and sync.';
+    body['message']=Global.returnTrLable(translats, CustomText.RedFlagNotification, lan);
     body['type']=CustomText.ChildReffrel;
     notiItems[CustomText.ChildReffrel] =body;
   }
   if (followupsItes.isNotEmpty) {
     Map<String, String> body = {};
-    body['message']='Child follow up visit is pending. Please complete and sync.';
+    body['message']=Global.returnTrLable(translats, CustomText.FollowupNotification, lan);
     body['type']=CustomText.fllowUp;
     notiItems[CustomText.fllowUp] =body;
 
@@ -414,7 +429,6 @@ Future<Map<String, dynamic>> excuteReffralItems() async {
 Future<void> checkConditionAndNotify() async {
   var items = await checkCondition();
   if (items.isNotEmpty) {
-
     for (var entry in items.entries) {
       await NotificationService.showNotification(
         title: entry.key,

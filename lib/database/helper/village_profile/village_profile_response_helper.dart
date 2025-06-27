@@ -15,6 +15,25 @@ class VillageProfileResponseHelper {
     print("object");
   }
 
+  Future<void> insertsNew(VillageProfileResponseModel item) async {
+    try {
+      final map = item.toJson();
+      print("Inserting: ${map.toString()}"); // Verify the data
+
+      final id = await DatabaseHelper.database!.insert(
+        'tabVillage_response',
+        map,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      print("Inserting: ${map['name']}");
+
+      print(" row iInsertedd: $id"); // Should print non-zero for success
+    } catch (e) {
+      debugPrint("Insert error: $e");
+      rethrow; // Let the caller handle the error
+    }
+  }
+
   Future<List<VillageProfileResponseModel>> getVillageProfilebyName(
       int vName) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!
@@ -76,20 +95,16 @@ class VillageProfileResponseHelper {
   }
 
   Future<void> villageProfileDataDownload(Map<String, dynamic> item) async {
-    List<Map<String, dynamic>> growth =
-        List<Map<String, dynamic>>.from(item['Data']);
-    print(growth);
-
-    // List to collect VillageProfileResponseModel items
-    // List<VillageProfileResponseModel> itemsList = [];
-
-    // Process each element and add to the list
     try {
-      await DatabaseHelper.database!.transaction((txn) async {
-        Batch batch = txn.batch();
-        for (var element in growth) {
+      List<Map<String, dynamic>> growth =
+          List<Map<String, dynamic>>.from(item['Data']);
+      print(growth);
+        List<VillageProfileResponseModel> items=[];
+      for (var i = 0; i < growth.length;) {
+        try {
+          var element = growth[i];
           var growthData = element['Village'];
-          var items = VillageProfileResponseModel(
+          var item = VillageProfileResponseModel(
             village_code: growthData['village_code'],
             village_name: growthData['village_name'],
             name: growthData['name'],
@@ -100,17 +115,41 @@ class VillageProfileResponseHelper {
             updated_by: growthData['app_updated_by'],
             created_at: growthData['appcreated_on'],
             created_by: growthData['appcreated_by'],
-            responces:
-                await jsonEncode(Validate().keyesFromResponce(growthData)),
+            responces: await jsonEncode(
+                Validate().keyesFromResponce(growthData)),
           );
-          batch.insert('tabVillage_response', items.toJson(),
-              conflictAlgorithm: ConflictAlgorithm.replace);
-          await batch.commit(noResult: true);
-          // itemsList.add(items);
+          items.add(item);
+          print('item village $i -> $element');
+
+        }catch(e){
+          print('item village catch $i -> $e  ');
+        }finally {
+          i++;
+          print('item village $i ->');
         }
-      });
+
+      }
+      if(items.isNotEmpty){
+          await insertWhole(items);
+      }
+
     } on Exception catch (e) {
-      // TODO
+      debugPrint("Error inserting Village Profile data -> $e");
+    }
+  }
+
+  Future<void> insertWhole(List<VillageProfileResponseModel> items,) async {
+    try {
+      await DatabaseHelper.database!.transaction((txn) async {
+        var batch = txn.batch();
+        for (var element in items) {
+          batch.insert('tabVillage_response', element.toJson(),
+              conflictAlgorithm: ConflictAlgorithm.replace);
+
+        }
+        await batch.commit(noResult: true);
+      });
+    }on Exception catch (e) {
       debugPrint("Error inserting Village Profile data -> $e");
     }
   }

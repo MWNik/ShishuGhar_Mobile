@@ -31,8 +31,10 @@ class CrecehDataDownloadApi {
       'usr': username,
       'pwd': pwd,
     };
+    var json=jsonEncode(parameters);
     try {
-      var responce = await http.post(url, headers: headers, body: jsonEncode(parameters));
+      var responce = await http.post(url, headers: headers, body: json);
+      print('crech data : ${responce.body}.');
       return responce;
     } catch (e) {
       return Response('Internal server error - $e', 500);

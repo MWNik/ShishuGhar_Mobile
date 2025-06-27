@@ -39,6 +39,8 @@ class DashboardReportApi {
       OptionsModel? selectedGramPanchayat,
       OptionsModel? selectedVillage,
       OptionsModel? selectedCreche,
+      OptionsModel? selectedCrecheStatus,
+      OptionsModel? selectedPartner,
       String token) async {
     var endurl =
         '${Constants.baseUrl}method/frappe.val.ph_report_card.dashboard_section_one';
@@ -71,6 +73,12 @@ class DashboardReportApi {
     }
     if (selectedCreche != null) {
       body['creche_id'] = '${selectedCreche.name}';
+    }
+    if (selectedCrecheStatus != null) {
+      body['c_status'] = '${selectedCrecheStatus.name}';
+    }
+    if (selectedPartner != null) {
+      body['partner_id'] = '${selectedPartner.name}';
     }
 
     print('body $body');
@@ -150,6 +158,8 @@ class DashboardReportApi {
       OptionsModel? selectedGramPanchayat,
       OptionsModel? selectedVillage,
       OptionsModel? selectedCreche,
+      OptionsModel? selectedCrecheStatus,
+      OptionsModel? selectedPartner,
       String token) async {
     var endurl =
         '${Constants.baseUrl}method/frappe.val.ph_report_card_detail.fetch_card_data';
@@ -182,6 +192,13 @@ class DashboardReportApi {
     if (selectedCreche != null) {
       body['creche_id'] = '${selectedCreche.name}';
     }
+    if (selectedCrecheStatus != null) {
+      body['c_status'] = '${selectedCrecheStatus.name}';
+    }
+    if (selectedPartner != null) {
+      body['partner_id'] = '${selectedPartner.name}';
+    }
+
     print('body $body');
     try {
       var response =

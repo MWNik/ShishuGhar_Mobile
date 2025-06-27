@@ -51,7 +51,7 @@ class VillageProfileMetaApi {
     };
     try {
       var responce = await http.post(url, headers: headers, body: jsonEncode(parameters));
-      print(responce.body);
+      print('village resp data : ${responce.body}.');
       return responce;
     } catch (e) {
       return Response('Internal server error - $e', 500);

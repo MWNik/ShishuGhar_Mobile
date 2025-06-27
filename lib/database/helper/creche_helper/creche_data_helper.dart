@@ -17,82 +17,204 @@ class CrecheDataHelper {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<void> insertWhole(List<CresheDatabaseResponceModel> crecheList,
-      List<CareGiverResponceModel> careGiversList) async {
-    await DatabaseHelper.database!.transaction((txn) async {
-      var batch = txn.batch();
-      for (var element in crecheList) {
-        batch.insert('tab_creche_response', element.toJson(),
-            conflictAlgorithm: ConflictAlgorithm.replace);
+  // Future<void> insertWhole(List<CresheDatabaseResponceModel> crecheList,
+  //     List<CareGiverResponceModel> careGiversList) async {
+  //   await DatabaseHelper.database!.transaction((txn) async {
+  //     var batch = txn.batch();
+  //     for (var element in crecheList) {
+  //       if(Global.validString(element.name.toString())){
+  //       batch.insert('tab_creche_response', element.toJson(),
+  //           conflictAlgorithm: ConflictAlgorithm.replace);}
+  //     }
+  //     await batch.commit(noResult: true);
+  //   });
+  //   if(careGiversList.isNotEmpty){
+  //     await CrecheCareGiverHelper().insertWhole(careGiversList);
+  //   }
+  //
+  // }
+
+  Future<void> insertWhole(
+      List<CresheDatabaseResponceModel> crecheList,
+      List<CareGiverResponceModel> careGiversList,
+      ) async {
+    // Get a reference to the database
+    final db = DatabaseHelper.database;
+    if (db == null) {
+      throw Exception('Database not initialized');
+    }
+
+    try {
+      // Start transaction
+      await db.transaction((txn) async {
+        // Use batch for bulk inserts
+        final batch = txn.batch();
+
+        // Insert creche data
+        for (final element in crecheList) {
+          if (Global.validString(element.name.toString())) {
+            batch.insert(
+              'tab_creche_response',
+              element.toJson(),
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          }
+        }
+
+        // Commit the batch within the transaction
+        await batch.commit(noResult: true);
+
+        // Transaction will automatically commit if no exception occurs
+      });
+
+      // Insert care givers after the transaction completes
+      var careGiverItem= careGiversList.where((element) =>Global.validString(element.CGGUID)).toList();
+      if (careGiverItem.isNotEmpty) {
+        await CrecheCareGiverHelper().insertWhole(careGiverItem);
       }
-      await batch.commit(noResult: true);
-    });
-    await CrecheCareGiverHelper().insertWhole(careGiversList);
+    } catch (e) {
+      print('Error in insertWhole: $e');
+      rethrow;
+    }
   }
 
+  // Future<void> downloadCrecheData(Map<String, dynamic> item) async {
+  //   List<Map<String, dynamic>> hhData =
+  //       List<Map<String, dynamic>>.from(item['Data']);
+  //   await DatabaseHelper.database!.delete('tab_creche_response');
+  //   await DatabaseHelper.database!.delete('tab_caregiver_response');
+  //   List<CresheDatabaseResponceModel> crecheList = [];
+  //   List<CareGiverResponceModel> careGiversList = [];
+  //   hhData.forEach((element) async {
+  //     var hhData = element['Creche'];
+  //     if (hhData != null) {
+  //       List<Map<String, dynamic>> careGiver =
+  //           List<Map<String, dynamic>>.from(hhData['creche_caregiver_table']);
+  //       hhData.remove('creche_caregiver_table');
+  //       var name = hhData['name'];
+  //       var appCreatedby = hhData['app_created_by'];
+  //       var appCreatedOn = hhData['app_created_on'];
+  //       var appUpdatedby = hhData['app_updated_by'];
+  //       var appUpdatedOn = hhData['app_updated_on'];
+  //       var finalHHData = Validate().keyesFromResponce(hhData);
+  //       var hhDtaResponce = jsonEncode(finalHHData);
+  //
+  //       var item = CresheDatabaseResponceModel(
+  //           responces: hhDtaResponce,
+  //           is_uploaded: 1,
+  //           is_edited: 0,
+  //           is_deleted: 0,
+  //           name: name,
+  //           update_at: appUpdatedOn,
+  //           updated_by: appUpdatedby,
+  //           created_by: appCreatedby,
+  //           created_at: appCreatedOn);
+  //       // await inserts(item);
+  //       crecheList.add(item);
+  //       careGiver.forEach((element) async {
+  //         var chName = element['name'];
+  //         var chappCreatedOn = element['appcreated_on'];
+  //         var chappCreatedBy = element['appcreated_by'];
+  //         var chappUpdatedOn = element['app_updated_on'];
+  //         var chappUpdatedby = element['app_updated_by'];
+  //         var cgGUID = Global.validToString(element['cgguid'].toString());
+  //         var finalCHHData = Validate().keyesFromResponce(element);
+  //         var cHHDtaResponce = jsonEncode(finalCHHData);
+  //
+  //         var item = CareGiverResponceModel(
+  //             CGGUID: cgGUID,
+  //             responces: cHHDtaResponce,
+  //             is_uploaded: 1,
+  //             is_edited: 0,
+  //             is_deleted: 0,
+  //             name: chName,
+  //             parent: name,
+  //             update_at: chappUpdatedOn,
+  //             updated_by: chappUpdatedby,
+  //             created_by: chappCreatedBy,
+  //             created_at: chappCreatedOn);
+  //         // await CrecheCareGiverHelper().inserts(item);
+  //         careGiversList.add(item);
+  //       });
+  //
+  //       await insertWhole(crecheList, careGiversList);
+  //     }
+  //   });
+  // }
+
   Future<void> downloadCrecheData(Map<String, dynamic> item) async {
-    List<Map<String, dynamic>> hhData =
-        List<Map<String, dynamic>>.from(item['Data']);
+    List<Map<String, dynamic>> hhData = List<Map<String, dynamic>>.from(item['Data']);
+
     await DatabaseHelper.database!.delete('tab_creche_response');
     await DatabaseHelper.database!.delete('tab_caregiver_response');
-    List<CresheDatabaseResponceModel> crecheList = [];
-    List<CareGiverResponceModel> careGiversList = [];
-    hhData.forEach((element) async {
+
+    for (var element in hhData) {
+      List<CresheDatabaseResponceModel> crecheList = [];
+      List<CareGiverResponceModel> careGiversList = [];
+
       var hhData = element['Creche'];
       if (hhData != null) {
         List<Map<String, dynamic>> careGiver =
-            List<Map<String, dynamic>>.from(hhData['creche_caregiver_table']);
+        List<Map<String, dynamic>>.from(hhData['creche_caregiver_table']);
         hhData.remove('creche_caregiver_table');
+
         var name = hhData['name'];
         var appCreatedby = hhData['app_created_by'];
         var appCreatedOn = hhData['app_created_on'];
         var appUpdatedby = hhData['app_updated_by'];
         var appUpdatedOn = hhData['app_updated_on'];
+
         var finalHHData = Validate().keyesFromResponce(hhData);
         var hhDtaResponce = jsonEncode(finalHHData);
 
-        var item = CresheDatabaseResponceModel(
-            responces: hhDtaResponce,
-            is_uploaded: 1,
-            is_edited: 0,
-            is_deleted: 0,
-            name: name,
-            update_at: appUpdatedOn,
-            updated_by: appUpdatedby,
-            created_by: appCreatedby,
-            created_at: appCreatedOn);
-        // await inserts(item);
-        crecheList.add(item);
-        careGiver.forEach((element) async {
+        var crecheItem = CresheDatabaseResponceModel(
+          responces: hhDtaResponce,
+          is_uploaded: 1,
+          is_edited: 0,
+          is_deleted: 0,
+          name: name,
+          update_at: appUpdatedOn,
+          updated_by: appUpdatedby,
+          created_by: appCreatedby,
+          created_at: appCreatedOn,
+        );
+
+        crecheList.add(crecheItem);
+
+        for (var element in careGiver) {
           var chName = element['name'];
           var chappCreatedOn = element['appcreated_on'];
           var chappCreatedBy = element['appcreated_by'];
           var chappUpdatedOn = element['app_updated_on'];
           var chappUpdatedby = element['app_updated_by'];
           var cgGUID = Global.validToString(element['cgguid'].toString());
+
           var finalCHHData = Validate().keyesFromResponce(element);
           var cHHDtaResponce = jsonEncode(finalCHHData);
 
-          var item = CareGiverResponceModel(
-              CGGUID: cgGUID,
-              responces: cHHDtaResponce,
-              is_uploaded: 1,
-              is_edited: 0,
-              is_deleted: 0,
-              name: chName,
-              parent: name,
-              update_at: chappUpdatedOn,
-              updated_by: chappUpdatedby,
-              created_by: chappCreatedBy,
-              created_at: chappCreatedOn);
-          // await CrecheCareGiverHelper().inserts(item);
-          careGiversList.add(item);
-        });
+          var careGiverItem = CareGiverResponceModel(
+            CGGUID: cgGUID,
+            responces: cHHDtaResponce,
+            is_uploaded: 1,
+            is_edited: 0,
+            is_deleted: 0,
+            name: chName,
+            parent: name,
+            update_at: chappUpdatedOn,
+            updated_by: chappUpdatedby,
+            created_by: chappCreatedBy,
+            created_at: chappCreatedOn,
+          );
 
+          careGiversList.add(careGiverItem);
+        }
+
+        // ✅ This await is now properly awaited in the loop
         await insertWhole(crecheList, careGiversList);
       }
-    });
+    }
   }
+
 
   Future<void> updateDownloadeData(Map<String, dynamic> item) async {
     var hhData = item['data'];

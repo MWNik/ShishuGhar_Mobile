@@ -35,6 +35,8 @@ class CustomText {
   static String VisitOn = "Visit On : ";
   static String Creche = "Creche : ";
   static String Creches = "Creche";
+  static String CrecheStatus = "Creche Status";
+  static String Partner = "Partner";
   static String Creches_ = "Creches";
   static String Password = "Password";
   static String Rollout = "Rollout";
@@ -645,4 +647,11 @@ class CustomText {
   static String October =  "October";
   static String November =  "November";
   static String December = "December";
+
+  ////Notification text/////
+  static String UploadDataNotification = "You have completed records for upload";
+  static String AttendenceNotification = "You have not submitted attendance of child";
+  static String GrowthMonitoringNotification = "You have not submitted growth monitoring of child";
+  static String RedFlagNotification = "Red flag child visit is pending. Please complete and sync";
+  static String FollowupNotification = "Child follow up visit is pending. Please complete and sync";
 }

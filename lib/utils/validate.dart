@@ -375,6 +375,16 @@ class Validate {
     return result;
   }
 
+  String displeDateFormateMonthYear(String? inputDate) {
+    String result = '';
+    if (inputDate != null) {
+      DateTime originalFormat = DateFormat('yyyy-MM').parse(inputDate);
+      String newFormat = DateFormat('MMM-yyyy').format(originalFormat);
+      result = newFormat;
+    }
+    return result;
+  }
+
   String displeDateFormateMobileDateTimeFormate(String inputDate) {
     DateTime originalFormat =
         DateFormat('yyyy-MM-dd HH:mm:ss').parse(inputDate);
