@@ -41,7 +41,10 @@ class DashboardReportApi {
       OptionsModel? selectedCreche,
       OptionsModel? selectedCrecheStatus,
       OptionsModel? selectedPartner,
-      String token) async {
+      String token,
+      String? usr,
+      String? psd,
+      ) async {
     var endurl =
         '${Constants.baseUrl}method/frappe.val.ph_report_card.dashboard_section_one';
     var headers = {
@@ -80,6 +83,13 @@ class DashboardReportApi {
     if (selectedPartner != null) {
       body['partner_id'] = '${selectedPartner.name}';
     }
+    if (usr != null) {
+      body['usr'] = usr;
+    }
+    if (psd != null) {
+      body['pwd'] = psd;
+    }
+
 
     print('body $body');
     // var itemBody=jsonEncode(body);
@@ -160,7 +170,8 @@ class DashboardReportApi {
       OptionsModel? selectedCreche,
       OptionsModel? selectedCrecheStatus,
       OptionsModel? selectedPartner,
-      String token) async {
+      String token,String? usr,
+      String? psd,) async {
     var endurl =
         '${Constants.baseUrl}method/frappe.val.ph_report_card_detail.fetch_card_data';
     var headers = {
@@ -198,11 +209,18 @@ class DashboardReportApi {
     if (selectedPartner != null) {
       body['partner_id'] = '${selectedPartner.name}';
     }
+    if (usr != null) {
+      body['usr'] = usr;
+    }
+    if (psd != null) {
+      body['pwd'] = psd;
+    }
 
     print('body $body');
     try {
+      // headers: headers,
       var response =
-          await http.post(Uri.parse(endurl), headers: headers, body: body);
+          await http.post(Uri.parse(endurl),  body: body);
       print(response.body);
 
       return response;

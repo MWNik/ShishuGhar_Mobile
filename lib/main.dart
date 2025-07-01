@@ -201,7 +201,7 @@ Future<Map<String, dynamic>> checkCondition() async {
   Map<String, dynamic> notiItems = {};
   var pendindTaskCount = await callCountForUpload();
   var role = await Validate().readString(Validate.role);
-  var lan =(await Validate().readString(Validate.sLanguage))!;
+  var lan =await Validate().readString(Validate.sLanguage)??"en";
   List<String> valueNames = [
     CustomText.UploadDataNotification,
     CustomText.AttendenceNotification,

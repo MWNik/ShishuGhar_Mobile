@@ -170,8 +170,8 @@ class _DashboardReportSupeByApiState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 30),
+                          padding: const EdgeInsets.only(
+                              left: 15,right: 15, top: 20,bottom: 10),
                           child: Row(
                             children: [
                               Image.asset(
@@ -200,6 +200,22 @@ class _DashboardReportSupeByApiState
                           ),
                         ),
                         SizedBox(),
+                        parterns.length>0?DynamicCustomDropdownField(
+                          hintText: Global.returnTrLable(
+                              translats, CustomText.Selecthere, lng),
+                          titleText: Global.returnTrLable(
+                              translats, CustomText.Partner, lng),
+                          isRequred: 0,
+                          items: parterns,
+                          selectedItem: selectedPartner != null
+                              ? selectedPartner?.name
+                              : null,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedPartner = value;
+                            });
+                          },
+                        ):SizedBox(),
                         DynamicCustomDropdownField(
                           hintText: Global.returnTrLable(
                               translats, CustomText.select_here, lng),
@@ -397,24 +413,8 @@ class _DashboardReportSupeByApiState
                             });
                           },
                         ),
-                        parterns.length>0?DynamicCustomDropdownField(
-                          hintText: Global.returnTrLable(
-                              translats, CustomText.Selecthere, lng),
-                          titleText: Global.returnTrLable(
-                              translats, CustomText.Partner, lng),
-                          isRequred: 0,
-                          items: parterns,
-                          selectedItem: selectedPartner != null
-                              ? selectedPartner?.name
-                              : null,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedPartner = value;
-                            });
-                          },
-                        ):SizedBox(),
                         SizedBox(
-                          height: 10.h,
+                          height: 5.h,
                         ),
                         Padding(
                           padding: EdgeInsets.all(3.0),
@@ -544,6 +544,8 @@ class _DashboardReportSupeByApiState
                                                 selectedGramPanchayat,
                                             selectedVillage: selectedVillage,
                                             selectedCreche: selectedCreche,
+                                            selectedCrecheStatus: selectedCrecheStatus,
+                                            selectedPartner: selectedPartner,
                                           )));
                                 }
                                 // else{
@@ -614,9 +616,13 @@ class _DashboardReportSupeByApiState
   Future callApiForDashboardApi() async {
     var token = await Validate().readString(Validate.appToken);
     String? userName;
+    String? usr=await Validate().readString(Validate.userName);
+    String? pswd=await Validate().readString(Validate.Password);
     var role = await Validate().readString(Validate.role);
     if (role == CustomText.crecheSupervisor) {
-      userName = await Validate().readString(Validate.userName);
+      userName = usr;
+      usr=null;
+      pswd=null;
     }
     var network = await Validate().checkNetworkConnection();
     if (network) {
@@ -632,7 +638,7 @@ class _DashboardReportSupeByApiState
           selectedCreche,
           selectedCrecheStatus,
           selectedPartner,
-          token!);
+          token!,usr,pswd);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data['data'] != null) {
@@ -786,6 +792,11 @@ class _DashboardReportSupeByApiState
     }
     if (crecheStatus.length == 1) {
       selectedCrecheStatus = crecheStatus.first;
+    }else if(crecheStatus.length > 1){
+      var items=crecheStatus.where((element) => element.name==3.toString()) .toList();
+      if(items.isNotEmpty){
+      selectedCrecheStatus = items.first;
+      }
     }
 
     setState(() {});

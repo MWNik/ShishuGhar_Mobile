@@ -19,7 +19,6 @@ import '../database/helper/creche_helper/creche_data_helper.dart';
 import '../database/helper/district_data_helper.dart';
 import '../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../database/helper/gram_panchayat_data_helper.dart';
-import '../database/helper/mst_common_helper.dart';
 import '../database/helper/state_data_helper.dart';
 import '../database/helper/village_data_helper.dart';
 import '../model/apimodel/creche_database_responce_model.dart';
@@ -31,7 +30,6 @@ import '../model/databasemodel/tabstate_model.dart';
 import 'login_screen.dart';
 
 class DashboardReportCardDetailScreen extends StatefulWidget {
-
   final String title;
   final String query_type;
   final String month;
@@ -45,12 +43,20 @@ class DashboardReportCardDetailScreen extends StatefulWidget {
   OptionsModel? selectedCrecheStatus;
   OptionsModel? selectedPartner;
 
-   DashboardReportCardDetailScreen({
-    super.key,required this.title,required this.query_type,required this.month,required this.year,
-    this.selectedState, this.selectedDistrict, this.selectedBlock,
-    this.selectedGramPanchayat, this.selectedVillage, this.selectedCreche,this.selectedCrecheStatus,
-     this.selectedPartner
-  });
+  DashboardReportCardDetailScreen(
+      {super.key,
+      required this.title,
+      required this.query_type,
+      required this.month,
+      required this.year,
+      this.selectedState,
+      this.selectedDistrict,
+      this.selectedBlock,
+      this.selectedGramPanchayat,
+      this.selectedVillage,
+      this.selectedCreche,
+      this.selectedCrecheStatus,
+      this.selectedPartner});
 
   @override
   _DashboardReportCardDetailState createState() =>
@@ -108,10 +114,10 @@ class _DashboardReportCardDetailState
     months = getMonthList(Global.stringToInt(years.first.name));
     var crrentMonth = DateTime.now().month;
     selectedMonth = months[crrentMonth - 1].name;
-    selectedYear=widget.year;
-    if(widget.year!=null){
+    selectedYear = widget.year;
+    if (widget.year != null) {
       months = getMonthList(Global.stringToInt(selectedYear));
-      selectedMonth=widget.month;
+      selectedMonth = widget.month;
     }
 
     await fetchStateList();
@@ -146,7 +152,8 @@ class _DashboardReportCardDetailState
       CustomText.November,
       CustomText.December,
       CustomText.select_here,
-      CustomText.crecheNotAvailable,CustomText.CrecheStatus,
+      CustomText.crecheNotAvailable,
+      CustomText.CrecheStatus,
       CustomText.Partner,
     ];
     await TranslationDataHelper()
@@ -178,8 +185,8 @@ class _DashboardReportCardDetailState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 30),
+                        padding: const EdgeInsets.only(
+                            left: 15,right: 15, top: 20,bottom: 10),
                         child: Row(
                           children: [
                             Image.asset(
@@ -208,6 +215,24 @@ class _DashboardReportCardDetailState
                         ),
                       ),
                       SizedBox(),
+                      parterns.length > 0
+                          ? DynamicCustomDropdownField(
+                              hintText: Global.returnTrLable(
+                                  translats, CustomText.Selecthere, lng),
+                              titleText: Global.returnTrLable(
+                                  translats, CustomText.Partner, lng),
+                              isRequred: 0,
+                              items: parterns,
+                              selectedItem: selectedPartner != null
+                                  ? selectedPartner?.name
+                                  : null,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedPartner = value;
+                                });
+                              },
+                            )
+                          : SizedBox(),
                       DynamicCustomDropdownField(
                         hintText: Global.returnTrLable(
                             translats, CustomText.select_here, lng),
@@ -215,9 +240,8 @@ class _DashboardReportCardDetailState
                             translats, CustomText.state, lng),
                         items: mstStates,
                         isRequred: 0,
-                        selectedItem: selectedState != null
-                            ? selectedState?.name
-                            : null,
+                        selectedItem:
+                            selectedState != null ? selectedState?.name : null,
                         onChanged: (value) async {
                           selectedState = value;
                           selectedDistrict = null;
@@ -225,12 +249,12 @@ class _DashboardReportCardDetailState
                           selectedGramPanchayat = null;
                           selectedVillage = null;
                           selectedCreche = null;
-                          mstDistrict = Global.callDistrict(
-                              district, lng, selectedState);
+                          mstDistrict =
+                              Global.callDistrict(district, lng, selectedState);
                           if (mstDistrict.length == 1) {
                             selectedDistrict = mstDistrict.first;
-                            mstBlock = Global.callBlocks(
-                                block, lng, selectedDistrict);
+                            mstBlock =
+                                Global.callBlocks(block, lng, selectedDistrict);
                             if (mstBlock.length == 1) {
                               selectedBlock = mstBlock.first;
                               mstGP = Global.callGramPanchyats(
@@ -270,7 +294,8 @@ class _DashboardReportCardDetailState
                           selectedGramPanchayat = null;
                           selectedVillage = null;
                           selectedCreche = null;
-                          mstBlock = Global.callBlocks(block, lng, selectedDistrict);
+                          mstBlock =
+                              Global.callBlocks(block, lng, selectedDistrict);
                           if (mstBlock.length == 1) {
                             selectedBlock = mstBlock.first;
                             mstGP = Global.callGramPanchyats(
@@ -300,9 +325,8 @@ class _DashboardReportCardDetailState
                             translats, CustomText.Block, lng),
                         items: mstBlock,
                         isRequred: 0,
-                        selectedItem: selectedBlock != null
-                            ? selectedBlock?.name
-                            : null,
+                        selectedItem:
+                            selectedBlock != null ? selectedBlock?.name : null,
                         onChanged: (value) async {
                           selectedBlock = value;
                           selectedGramPanchayat = null;
@@ -404,24 +428,8 @@ class _DashboardReportCardDetailState
                           });
                         },
                       ),
-                      parterns.length>0?DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.Selecthere, lng),
-                        titleText: Global.returnTrLable(
-                            translats, CustomText.Partner, lng),
-                        isRequred: 0,
-                        items: parterns,
-                        selectedItem: selectedPartner != null
-                            ? selectedPartner?.name
-                            : null,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedPartner = value;
-                          });
-                        },
-                      ):SizedBox(),
                       SizedBox(
-                        height: 10.h,
+                        height: 5.h,
                       ),
                       Padding(
                         padding: EdgeInsets.all(3.0),
@@ -520,23 +528,22 @@ class _DashboardReportCardDetailState
                           child: Padding(
                             padding: EdgeInsets.all(5),
                             child: Container(
-                              width: double
-                                  .infinity, // Takes full width of grid cell
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff5A5A5A).withOpacity(0.2),
-                                    offset: Offset(0, 3),
-                                    blurRadius: 6,
-                                    spreadRadius: 0,
-                                  ),
-                                ],
-                                color: Color(0xffF2F7FF),
-                                borderRadius: BorderRadius.circular(5.r),
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                              ),
-                              child: callCardItem(items[index])
-                            ),
+                                width: double
+                                    .infinity, // Takes full width of grid cell
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff5A5A5A).withOpacity(0.2),
+                                      offset: Offset(0, 3),
+                                      blurRadius: 6,
+                                      spreadRadius: 0,
+                                    ),
+                                  ],
+                                  color: Color(0xffF2F7FF),
+                                  borderRadius: BorderRadius.circular(5.r),
+                                  border: Border.all(color: Color(0xffE7F0FF)),
+                                ),
+                                child: callCardItem(items[index])),
                           ),
                         );
                       },
@@ -557,14 +564,30 @@ class _DashboardReportCardDetailState
   Future callApiForDashboardApi() async {
     var token = await Validate().readString(Validate.appToken);
     var network = await Validate().checkNetworkConnection();
-    var userName = await Validate().readString(Validate.userName);
+    String? userName=null;
+    String? usr=await Validate().readString(Validate.userName);
+    String? pswd=await Validate().readString(Validate.Password);
+    if (role == CustomText.crecheSupervisor) {
+      userName = usr;
+      usr=null;
+      pswd=null;
+    }
     if (network) {
       showLoaderDialog(context);
       var response = await DashboardReportApi().callDashboardCardDetailsApi(
-          userName,widget.query_type,selectedYear,
-          selectedMonth!, selectedState, selectedDistrict, selectedBlock,
-          selectedGramPanchayat, selectedVillage, selectedCreche,selectedCrecheStatus,selectedPartner,
-          token!);
+          userName,
+          widget.query_type,
+          selectedYear,
+          selectedMonth!,
+          selectedState,
+          selectedDistrict,
+          selectedBlock,
+          selectedGramPanchayat,
+          selectedVillage,
+          selectedCreche,
+          selectedCrecheStatus,
+          selectedPartner,
+          token!,usr,pswd);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data['data'] != null) {
@@ -700,27 +723,28 @@ class _DashboardReportCardDetailState
     villages = await VillageDataHelper().getTabVillageList();
     mstStates = Global.callSatates(states, lng);
     creches = await CrecheDataHelper().getCrecheResponce();
-    crecheStatus = await OptionsModelHelper().getMstCommonOptions('Creche Status', lng);
-    parterns = await OptionsModelHelper().getPartnerMstCommonOptions('Partner', {});
-    if(parterns.isEmpty){
+    crecheStatus =
+        await OptionsModelHelper().getMstCommonOptions('Creche Status', lng);
+    parterns =
+        await OptionsModelHelper().getPartnerMstCommonOptions('Partner', {});
+    if (parterns.isEmpty) {
       parterns = await OptionsModelHelper().getMstCommonOptions('Partner', lng);
     }
     if (mstStates.length == 1) {
       selectedState = mstStates.first;
       mstDistrict = Global.callDistrict(district, lng, selectedState);
     }
-    if(mstStates.length>0 && widget.selectedState!=null){
+    if (mstStates.length > 0 && widget.selectedState != null) {
       selectedState = widget.selectedState;
       mstDistrict = Global.callDistrict(district, lng, selectedState);
     }
-
 
     if (mstDistrict.length == 1) {
       selectedDistrict = mstDistrict.first;
       mstBlock = Global.callBlocks(block, lng, selectedDistrict);
     }
 
-    if(mstDistrict.length>0 && widget.selectedDistrict!=null){
+    if (mstDistrict.length > 0 && widget.selectedDistrict != null) {
       selectedDistrict = widget.selectedDistrict;
       mstBlock = Global.callBlocks(block, lng, selectedDistrict);
     }
@@ -729,7 +753,7 @@ class _DashboardReportCardDetailState
       selectedBlock = mstBlock.first;
       mstGP = Global.callGramPanchyats(gramPanchayat, lng, selectedBlock);
     }
-    if(mstBlock.length > 0&& widget.selectedBlock!=null){
+    if (mstBlock.length > 0 && widget.selectedBlock != null) {
       selectedBlock = widget.selectedBlock;
       mstGP = Global.callGramPanchyats(gramPanchayat, lng, selectedBlock);
     }
@@ -739,7 +763,7 @@ class _DashboardReportCardDetailState
       mstVillage =
           Global.callFiltersVillages(villages, lng, selectedGramPanchayat);
     }
-    if(mstGP.length >0&&widget.selectedGramPanchayat!=null){
+    if (mstGP.length > 0 && widget.selectedGramPanchayat != null) {
       selectedGramPanchayat = widget.selectedGramPanchayat;
       mstVillage =
           Global.callFiltersVillages(villages, lng, selectedGramPanchayat);
@@ -749,37 +773,37 @@ class _DashboardReportCardDetailState
       selectedVillage = mstVillage.first;
       mstcreches = Global.callFiltersCreches(creches, lng, selectedVillage);
     }
-    if(mstVillage.length >0 &&widget.selectedVillage!=null){
+    if (mstVillage.length > 0 && widget.selectedVillage != null) {
       selectedVillage = widget.selectedVillage;
       mstcreches = Global.callFiltersCreches(creches, lng, selectedVillage);
     }
 
-    if(mstcreches.length >0&&widget.selectedCreche!=null){
+    if (mstcreches.length > 0 && widget.selectedCreche != null) {
       selectedCreche = widget.selectedCreche;
     }
 
-    if (parterns.length>0&&widget.selectedPartner!=null) {
+    if (parterns.length > 0 && widget.selectedPartner != null) {
       selectedPartner = widget.selectedPartner;
-    }else if(parterns.length == 1){
+    } else if (parterns.length == 1) {
       selectedPartner = parterns.first;
     }
-    if (crecheStatus.length>0&&widget.selectedCrecheStatus!=null) {
+    if (crecheStatus.length > 0 && widget.selectedCrecheStatus != null) {
       selectedCrecheStatus = widget.selectedCrecheStatus;
-    }else if(crecheStatus.length == 1){
-      selectedPartner = crecheStatus.first;
+    } else if (crecheStatus.length == 1) {
+      selectedCrecheStatus = crecheStatus.first;
+    } else if (crecheStatus.length > 1) {
+      var items = crecheStatus
+          .where((element) => element.name == 3.toString())
+          .toList();
+      if (items.isNotEmpty) {
+        selectedCrecheStatus = items.first;
+      }
     }
-
-
-
-
-
-
-
 
     setState(() {});
   }
 
-  void cleaAllFilter() async{
+  void cleaAllFilter() async {
     selectedState = null;
     selectedDistrict = null;
     selectedBlock = null;
@@ -810,41 +834,40 @@ class _DashboardReportCardDetailState
     await callApiForDashboardApi();
   }
 
-    Widget callCardItem(Map<String, dynamic> item) {
-      return Padding(
-        padding: EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: item.entries.map((entry) {
-            if (entry.key.toLowerCase().contains('guid')) return SizedBox();
-            return Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    entry.key,
-                    style: Styles.blue125,
-                    overflow:TextOverflow.ellipsis,
-                  ),
-                ),
-                SizedBox(width: 5),
-                Text(
-                  ':',
-                  textAlign: TextAlign.left,
+  Widget callCardItem(Map<String, dynamic> item) {
+    return Padding(
+      padding: EdgeInsets.all(5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: item.entries.map((entry) {
+          if (entry.key.toLowerCase().contains('guid')) return SizedBox();
+          return Row(
+            children: [
+              Expanded(
+                child: Text(
+                  entry.key,
                   style: Styles.blue125,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(width: 5),
-                Expanded(
-                    child:Text(
-                      entry.value.toString(),
-                      textAlign: TextAlign.left,
-                      style: Styles.black3125,
-                      overflow:TextOverflow.ellipsis,
-                    )),
-              ],
-            );
-          }).toList(),
-        ),
-      );
-    }
-
+              ),
+              SizedBox(width: 5),
+              Text(
+                ':',
+                textAlign: TextAlign.left,
+                style: Styles.blue125,
+              ),
+              SizedBox(width: 5),
+              Expanded(
+                  child: Text(
+                entry.value.toString(),
+                textAlign: TextAlign.left,
+                style: Styles.black3125,
+                overflow: TextOverflow.ellipsis,
+              )),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
 }
