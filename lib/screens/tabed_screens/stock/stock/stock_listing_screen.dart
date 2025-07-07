@@ -195,223 +195,226 @@ class _StockListingScreenState extends State<StockListingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     return isLoading
         ? Center(
             child: CircularProgressIndicator(),
           )
-        : Scaffold(
-            body: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: AnimatedRollingSwitch(
-                      isOnlyUnsynched: isOnlyUnsynched,
-                      title1:
-                          Global.returnTrLable(translats, CustomText.all, lng),
-                      title2: Global.returnTrLable(
-                          translats, CustomText.usynchedAndDraft, lng),
-                      onChange: (value) async {
-                        setState(() {
-                          isOnlyUnsynched = value;
-                        });
-                        await fetchStockData();
-                      },
+        : SafeArea(
+          child: Scaffold(
+              body: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: AnimatedRollingSwitch(
+                        isOnlyUnsynched: isOnlyUnsynched,
+                        title1:
+                            Global.returnTrLable(translats, CustomText.all, lng),
+                        title2: Global.returnTrLable(
+                            translats, CustomText.usynchedAndDraft, lng),
+                        onChange: (value) async {
+                          setState(() {
+                            isOnlyUnsynched = value;
+                          });
+                          await fetchStockData();
+                        },
+                      ),
                     ),
-                  ),
-                  (filteredList.isNotEmpty)
-                      ? Expanded(
-                          child: ListView.builder(
-                              itemCount: filteredList.length,
-                              shrinkWrap: true,
-                              physics: BouncingScrollPhysics(),
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (BuildContext context, int index) {
-                                var selectedItem = filteredList[index];
-                                return GestureDetector(
-                                  onTap: () async {
-                                    String guid = Global.getItemValues(
-                                        selectedItem['responces'], 'sguid');
-                                    if (!Global.validString(guid)) {
-                                      guid = await Validate().randomGuid();
-                                    }
+                    (filteredList.isNotEmpty)
+                        ? Expanded(
+                            child: ListView.builder(
+                                itemCount: filteredList.length,
+                                shrinkWrap: true,
+                                physics: BouncingScrollPhysics(),
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (BuildContext context, int index) {
+                                  var selectedItem = filteredList[index];
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      String guid = Global.getItemValues(
+                                          selectedItem['responces'], 'sguid');
+                                      if (!Global.validString(guid)) {
+                                        guid = await Validate().randomGuid();
+                                      }
 
-                                    dynamic currentMonthList = Iterable.empty();
-                                    if (Global.validString(
-                                        selectedItem['responces'])) {
-                                      currentMonthList =
-                                          jsonDecode(selectedItem['responces'])[
-                                              'stock_list'];
-                                    }
+                                      dynamic currentMonthList = Iterable.empty();
+                                      if (Global.validString(
+                                          selectedItem['responces'])) {
+                                        currentMonthList =
+                                            jsonDecode(selectedItem['responces'])[
+                                                'stock_list'];
+                                      }
 
-                                    dynamic requisitionList =
-                                        jsonDecode(selectedItem['RResponce'])[
-                                            'requisition_list'];
-                                    var itemList = generateStockItemList(
-                                        List<Map<String, dynamic>>.from(
-                                            currentMonthList),
-                                        List<Map<String, dynamic>>.from(
-                                            requisitionList));
-                                    var refStatus = await Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                StockDetails(
-                                                  sguid: guid,
-                                                  month: Global.stringToInt(
-                                                      Global.getItemValues(
-                                                          selectedItem[
-                                                              'RResponce'],
-                                                          'month')),
-                                                  year: Global.stringToInt(
-                                                      Global.getItemValues(
-                                                          selectedItem[
-                                                              'RResponce'],
-                                                          'year')),
-                                                  creche_id: widget.creche_id,
-                                                  itemList: itemList,
-                                                    isEdit:role==CustomText.crecheSupervisor
-                                                )));
-                                    if (refStatus == CustomText.itemRefresh) {
-                                      fetchStockData();
-                                    }
-                                  },
-                                  child: Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 5.h),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Color(0xff5A5A5A)
-                                                  .withOpacity(0.2),
-                                              offset: Offset(0, 3),
-                                              blurRadius: 6,
-                                              spreadRadius: 0,
-                                            ),
-                                          ],
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: Color(0xffE7F0FF)),
-                                          borderRadius:
-                                              BorderRadius.circular(10.r)),
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10.w, vertical: 8.h),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  '${Global.returnTrLable(translats, 'Month', lng!).trim()} :',
-                                                  style: Styles.black104,
-                                                ),
-                                                Text(
-                                                  '${Global.returnTrLable(translats, 'Year', lng!).trim()} :',
-                                                  style: Styles.black104,
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.2),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(width: 10),
-                                            SizedBox(
-                                              height: 10.h,
-                                              width: 2,
-                                              child: VerticalDivider(
-                                                color: Color(0xffE6E6E6),
+                                      dynamic requisitionList =
+                                          jsonDecode(selectedItem['RResponce'])[
+                                              'requisition_list'];
+                                      var itemList = generateStockItemList(
+                                          List<Map<String, dynamic>>.from(
+                                              currentMonthList),
+                                          List<Map<String, dynamic>>.from(
+                                              requisitionList));
+                                      var refStatus = await Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  StockDetails(
+                                                    sguid: guid,
+                                                    month: Global.stringToInt(
+                                                        Global.getItemValues(
+                                                            selectedItem[
+                                                                'RResponce'],
+                                                            'month')),
+                                                    year: Global.stringToInt(
+                                                        Global.getItemValues(
+                                                            selectedItem[
+                                                                'RResponce'],
+                                                            'year')),
+                                                    creche_id: widget.creche_id,
+                                                    itemList: itemList,
+                                                      isEdit:role==CustomText.crecheSupervisor
+                                                  )));
+                                      if (refStatus == CustomText.itemRefresh) {
+                                        fetchStockData();
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 5.h),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Color(0xff5A5A5A)
+                                                    .withOpacity(0.2),
+                                                offset: Offset(0, 3),
+                                                blurRadius: 6,
+                                                spreadRadius: 0,
                                               ),
-                                            ),
-                                            SizedBox(width: 10),
-                                            Expanded(
-                                                child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  getOptionsFromName(
-                                                      Global.stringToInt(
-                                                          Global.getItemValues(
-                                                              selectedItem[
-                                                                  'RResponce'],
-                                                              'month')),
-                                                      'Months'),
-                                                  style: Styles.cardBlue10,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
+                                            ],
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                color: Color(0xffE7F0FF)),
+                                            borderRadius:
+                                                BorderRadius.circular(10.r)),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 10.w, vertical: 8.h),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '${Global.returnTrLable(translats, 'Month', lng!).trim()} :',
+                                                    style: Styles.black104,
+                                                  ),
+                                                  Text(
+                                                    '${Global.returnTrLable(translats, 'Year', lng!).trim()} :',
+                                                    style: Styles.black104,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(width: 10),
+                                              SizedBox(
+                                                height: 10.h,
+                                                width: 2,
+                                                child: VerticalDivider(
+                                                  color: Color(0xffE6E6E6),
                                                 ),
-                                                Text(
-                                                  getOptionsFromName(
-                                                      Global.stringToInt(
-                                                          Global.getItemValues(
-                                                              selectedItem[
-                                                                  'RResponce'],
-                                                              'year')),
-                                                      'Year'),
-                                                  style: Styles.cardBlue10,
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.2),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ],
-                                            )),
-                                            SizedBox(width: 5),
-                                            selectedItem['is_edited'] == 0 &&
-                                                    selectedItem[
-                                                            'is_uploaded'] ==
-                                                        1
-                                                ? Image.asset(
-                                                    "assets/sync.png",
-                                                    scale: 1.5,
-                                                  )
-                                                : selectedItem['is_edited'] ==
-                                                            1 &&
-                                                        selectedItem[
-                                                                'is_uploaded'] ==
-                                                            0
-                                                    ? Image.asset(
-                                                        "assets/sync_gray.png",
-                                                        scale: 1.5,
-                                                      )
-                                                    : Icon(
-                                                        Icons.error_outline,
-                                                        color:
-                                                            Colors.red,
-                                                        shadows: [
-                                                          BoxShadow(
-                                                              spreadRadius: 2,
-                                                              blurRadius: 4,
-                                                              color: Colors
-                                                                  .red.shade200)
-                                                        ],
-                                                      )
-                                          ],
+                                              ),
+                                              SizedBox(width: 10),
+                                              Expanded(
+                                                  child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    getOptionsFromName(
+                                                        Global.stringToInt(
+                                                            Global.getItemValues(
+                                                                selectedItem[
+                                                                    'RResponce'],
+                                                                'month')),
+                                                        'Months'),
+                                                    style: Styles.cardBlue10,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  Text(
+                                                    getOptionsFromName(
+                                                        Global.stringToInt(
+                                                            Global.getItemValues(
+                                                                selectedItem[
+                                                                    'RResponce'],
+                                                                'year')),
+                                                        'Year'),
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              )),
+                                              SizedBox(width: 5),
+                                              selectedItem['is_edited'] == 0 &&
+                                                      selectedItem[
+                                                              'is_uploaded'] ==
+                                                          1
+                                                  ? Image.asset(
+                                                      "assets/sync.png",
+                                                      scale: 1.5,
+                                                    )
+                                                  : selectedItem['is_edited'] ==
+                                                              1 &&
+                                                          selectedItem[
+                                                                  'is_uploaded'] ==
+                                                              0
+                                                      ? Image.asset(
+                                                          "assets/sync_gray.png",
+                                                          scale: 1.5,
+                                                        )
+                                                      : Icon(
+                                                          Icons.error_outline,
+                                                          color:
+                                                              Colors.red,
+                                                          shadows: [
+                                                            BoxShadow(
+                                                                spreadRadius: 2,
+                                                                blurRadius: 4,
+                                                                color: Colors
+                                                                    .red.shade200)
+                                                          ],
+                                                        )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }))
-                      : Expanded(
-                          child: Center(
-                            child: Text(Global.returnTrLable(
-                                translats, CustomText.NorecordAvailable, lng)),
-                          ),
-                        )
-                ],
+                                  );
+                                }))
+                        : Expanded(
+                            child: Center(
+                              child: Text(Global.returnTrLable(
+                                  translats, CustomText.NorecordAvailable, lng)),
+                            ),
+                          )
+                  ],
+                ),
               ),
             ),
-          );
+        );
   }
 }

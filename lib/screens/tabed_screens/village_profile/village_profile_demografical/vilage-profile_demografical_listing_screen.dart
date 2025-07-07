@@ -89,215 +89,218 @@ class _DemograficalListingScreenState extends State<DemograficalListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: widget.isEditable
-          ? InkWell(
-              onTap: () async {
-                String dGuid = '';
-                if (!Global.validString(dGuid)) {
-                  Map<String, dynamic> emptyMap = {};
-                  dGuid = Validate().randomGuid();
-                  var refStatus = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              DemograficalDetailsScreen(
-                                  vName: widget.vName,
-                                  dGuid: dGuid,
-                                  demoRec: emptyMap,
-                                  isEditable: widget.isEditable)));
-                  if (refStatus == CustomText.itemRefresh) {
-                    await fetchDemoList();
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: widget.isEditable
+            ? InkWell(
+                onTap: () async {
+                  String dGuid = '';
+                  if (!Global.validString(dGuid)) {
+                    Map<String, dynamic> emptyMap = {};
+                    dGuid = Validate().randomGuid();
+                    var refStatus = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                DemograficalDetailsScreen(
+                                    vName: widget.vName,
+                                    dGuid: dGuid,
+                                    demoRec: emptyMap,
+                                    isEditable: widget.isEditable)));
+                    if (refStatus == CustomText.itemRefresh) {
+                      await fetchDemoList();
+                    }
                   }
-                }
-              },
-              child: Image.asset(
-                "assets/add_btn.png",
-                scale: 2.7,
-                color: Color(0xff5979AA),
-              ),
-            )
-          : null,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        child: Column(children: [
-          Expanded(
-            child: (demoListMap.length > 0)
-                ? ListView.builder(
-                    itemCount: demoListMap.length,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () async {
-                          // var lstDate=await callDatesAlredDateList(Global.getItemValues(childEventData[index].responces!, 'date'));
-                          var refStatus = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      // EnrolledChildDetailsSccreen(
-                                      //   childEventGuid: childEventData[index]
-                                      //       .child_event_guid,
-                                      //   enName: widget.enName!,
-                                      //   chilenrolledGUID: childEventData[index].childenrolledguid,
-                                      //   creche_id: widget.creche_id,
-                                      //     lastDate:lastDate,
-                                      //     // maxDate:maxDate,
-                                      //   childId: widget.childId,
-                                      //   childName: widget.childName,
-                                      // )
-                                      DemograficalDetailsScreen(
-                                          vName: widget.vName,
-                                          dGuid: demoListMap[index]
-                                              ['demo_guid'],
-                                          demoRec: demoListMap[index],
-                                          isEditable: widget.isEditable)));
-                          if (refStatus == CustomText.itemRefresh) {
-                            await fetchDemoList();
-                          }
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff5A5A5A).withOpacity(
-                                        0.2), // Shadow color with opacity
-                                    offset: Offset(
-                                        0, 3), // Horizontal and vertical offset
-                                    blurRadius: 6, // Blur radius
-                                    spreadRadius: 0, // Spread radius
-                                  ),
-                                ],
-                                color: Colors.white,
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 8.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.year, lng).trim()} : ',
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 1) :',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 2) :',
-                                        strutStyle: StrutStyle(height: 1.2),
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 3) :',
-                                        strutStyle: StrutStyle(height: 1.2),
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 4) :',
-                                        strutStyle: StrutStyle(height: 1.2),
-                                        style: Styles.black104,
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10),
-                                  SizedBox(
-                                    height: 40.h,
-                                    width: 2,
-                                    child: VerticalDivider(
-                                      color: Color(0xffE6E6E6),
+                },
+                child: Image.asset(
+                  "assets/add_btn.png",
+                  scale: 2.7,
+                  color: Color(0xff5979AA),
+                ),
+              )
+            : null,
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          child: Column(children: [
+            Expanded(
+              child: (demoListMap.length > 0)
+                  ? ListView.builder(
+                      itemCount: demoListMap.length,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () async {
+                            // var lstDate=await callDatesAlredDateList(Global.getItemValues(childEventData[index].responces!, 'date'));
+                            var refStatus = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        // EnrolledChildDetailsSccreen(
+                                        //   childEventGuid: childEventData[index]
+                                        //       .child_event_guid,
+                                        //   enName: widget.enName!,
+                                        //   chilenrolledGUID: childEventData[index].childenrolledguid,
+                                        //   creche_id: widget.creche_id,
+                                        //     lastDate:lastDate,
+                                        //     // maxDate:maxDate,
+                                        //   childId: widget.childId,
+                                        //   childName: widget.childName,
+                                        // )
+                                        DemograficalDetailsScreen(
+                                            vName: widget.vName,
+                                            dGuid: demoListMap[index]
+                                                ['demo_guid'],
+                                            demoRec: demoListMap[index],
+                                            isEditable: widget.isEditable)));
+                            if (refStatus == CustomText.itemRefresh) {
+                              await fetchDemoList();
+                            }
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff5A5A5A).withOpacity(
+                                          0.2), // Shadow color with opacity
+                                      offset: Offset(
+                                          0, 3), // Horizontal and vertical offset
+                                      blurRadius: 6, // Blur radius
+                                      spreadRadius: 0, // Spread radius
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
+                                  ],
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xffE7F0FF)),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w, vertical: 8.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          callOptionValue(
-                                              demoListMap[index]['year_id'],
-                                              yearOptions),
-                                          maxLines: 1,
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
+                                          '${Global.returnTrLable(translats, CustomText.year, lng).trim()} : ',
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Global.validToString(
-                                              demoListMap[index]
-                                                      ['population_q1']
-                                                  .toString()),
-                                          maxLines: 1,
+                                          '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 1) :',
+                                          style: Styles.black104,
                                           strutStyle: StrutStyle(height: 1.2),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          Global.validToString(
-                                              demoListMap[index]
-                                                      ['population_q2']
-                                                  .toString()),
-                                          maxLines: 1,
+                                          '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 2) :',
                                           strutStyle: StrutStyle(height: 1.2),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Global.validToString(
-                                              demoListMap[index]
-                                                      ['population_q3']
-                                                  .toString()),
-                                          maxLines: 1,
+                                          '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 3) :',
                                           strutStyle: StrutStyle(height: 1.2),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Global.validToString(
-                                              demoListMap[index]
-                                                      ['population_q4']
-                                                  .toString()),
-                                          maxLines: 1,
+                                          '${Global.returnTrLable(translats, CustomText.population, lng)}(${Global.returnTrLable(translats, CustomText.quarter, lng)} 4) :',
                                           strutStyle: StrutStyle(height: 1.2),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
+                                          style: Styles.black104,
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(width: 5),
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        height: 30.h,
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 40.h,
+                                      width: 2,
+                                      child: VerticalDivider(
+                                        color: Color(0xffE6E6E6),
                                       ),
-                                    ],
-                                  )
-                                ],
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            callOptionValue(
+                                                demoListMap[index]['year_id'],
+                                                yearOptions),
+                                            maxLines: 1,
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.validToString(
+                                                demoListMap[index]
+                                                        ['population_q1']
+                                                    .toString()),
+                                            maxLines: 1,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.validToString(
+                                                demoListMap[index]
+                                                        ['population_q2']
+                                                    .toString()),
+                                            maxLines: 1,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.validToString(
+                                                demoListMap[index]
+                                                        ['population_q3']
+                                                    .toString()),
+                                            maxLines: 1,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.validToString(
+                                                demoListMap[index]
+                                                        ['population_q4']
+                                                    .toString()),
+                                            maxLines: 1,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 30.h,
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    })
-                : Center(
-                    child: Text(Global.returnTrLable(
-                        translats, CustomText.NorecordAvailable, lng)),
-                  ),
-          )
-        ]),
+                        );
+                      })
+                  : Center(
+                      child: Text(Global.returnTrLable(
+                          translats, CustomText.NorecordAvailable, lng)),
+                    ),
+            )
+          ]),
+        ),
       ),
     );
   }

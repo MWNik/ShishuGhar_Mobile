@@ -876,132 +876,135 @@ class _StockExpendableDetailScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          toolbarHeight: 60,
-          backgroundColor: Color(0xff5979AA),
-          leading: Padding(
-            padding: EdgeInsets.only(left: 10.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context, 'itemRefresh');
-              },
-              child: Icon(
-                Icons.arrow_back_ios_sharp,
-                size: 20,
-                color: Colors.white,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            toolbarHeight: 60,
+            backgroundColor: Color(0xff5979AA),
+            leading: Padding(
+              padding: EdgeInsets.only(left: 10.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context, 'itemRefresh');
+                },
+                child: Icon(
+                  Icons.arrow_back_ios_sharp,
+                  size: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-          title: RichText(
-            text: TextSpan(
-              children: [
-                WidgetSpan(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        Global.returnTrLable(
-                            translats, CustomText.stockDetails, lng),
-                        style: Styles.white145,
-                      ),
-                      Text(
-                        creche_name ?? '',
-                        style: Styles.white126P,
-                      ),
-                      // Add additional TextSpans here if needed
-                    ],
-                  ),
-                )
-              ],
+            title: RichText(
+              text: TextSpan(
+                children: [
+                  WidgetSpan(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          Global.returnTrLable(
+                              translats, CustomText.stockDetails, lng),
+                          style: Styles.white145,
+                        ),
+                        Text(
+                          creche_name ?? '',
+                          style: Styles.white126P,
+                        ),
+                        // Add additional TextSpans here if needed
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
+            centerTitle: true,
           ),
-          centerTitle: true,
-        ),
-        body: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            '${getOptionsFromName(widget.month, 'Months')} - ${getOptionsFromName(widget.year, 'Year')}',
-                            style: Styles.black145,
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                      child: Row(
-                        children: [
-                          Expanded(
-                              child: CustomTextFieldRow(
-                            controller: _textController,
-                            onChanged: (value) {
-                              print(value);
-                              filterDataQu(value);
-                            },
-                            hintText: Global.returnTrLable(
-                                translats, CustomText.Search, lng),
-                            prefixIcon: Image.asset(
-                              "assets/search.png",
-                              scale: 2.4,
-                            ),
-                          ))
-                        ],
-                      ),
-                    ),
-                    Divider(),
-                    Flexible(
-                        fit: FlexFit.loose,
-                        child: (stock_item_list.isNotEmpty)
-                            ? itemCard(
-                                List<Map<String, dynamic>>.from(
-                                    filtered_stock_items_list),
-                                allItems,
-                                0)
-                            : Center(
-                                child: Text(Global.returnTrLable(
-                                    translats, CustomText.noItemsAvail, lng)),
-                              )),
-                    Divider(),
-                    Padding(
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    children: [
+                      Padding(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                            EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '${getOptionsFromName(widget.month, 'Months')} - ${getOptionsFromName(widget.year, 'Year')}',
+                              style: Styles.black145,
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                         child: Row(
                           children: [
                             Expanded(
-                                child: CElevatedButton(
-                              color: Color(0xffF26BA3),
-                              onPressed: () {
-                                nextTab(0, context);
+                                child: CustomTextFieldRow(
+                              controller: _textController,
+                              onChanged: (value) {
+                                print(value);
+                                filterDataQu(value);
                               },
-                              text: Global.returnTrLable(
-                                  translats, CustomText.back, lng!),
-                            )),
-                            SizedBox(width: 10),
-                            Expanded(
-                                child: CElevatedButton(
-                              color: Color(0xff369A8D),
-                              onPressed: () {
-                                nextTab(1, context);
-                              },
-                              text: Global.returnTrLable(
-                                  translats, CustomText.Submit, lng!),
+                              hintText: Global.returnTrLable(
+                                  translats, CustomText.Search, lng),
+                              prefixIcon: Image.asset(
+                                "assets/search.png",
+                                scale: 2.4,
+                              ),
                             ))
                           ],
-                        ))
-                  ],
-                ),
-              ));
+                        ),
+                      ),
+                      Divider(),
+                      Flexible(
+                          fit: FlexFit.loose,
+                          child: (stock_item_list.isNotEmpty)
+                              ? itemCard(
+                                  List<Map<String, dynamic>>.from(
+                                      filtered_stock_items_list),
+                                  allItems,
+                                  0)
+                              : Center(
+                                  child: Text(Global.returnTrLable(
+                                      translats, CustomText.noItemsAvail, lng)),
+                                )),
+                      Divider(),
+                      Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  child: CElevatedButton(
+                                color: Color(0xffF26BA3),
+                                onPressed: () {
+                                  nextTab(0, context);
+                                },
+                                text: Global.returnTrLable(
+                                    translats, CustomText.back, lng!),
+                              )),
+                              SizedBox(width: 10),
+                              Expanded(
+                                  child: CElevatedButton(
+                                color: Color(0xff369A8D),
+                                onPressed: () {
+                                  nextTab(1, context);
+                                },
+                                text: Global.returnTrLable(
+                                    translats, CustomText.Submit, lng!),
+                              ))
+                            ],
+                          ))
+                    ],
+                  ),
+                )),
+    );
   }
 }

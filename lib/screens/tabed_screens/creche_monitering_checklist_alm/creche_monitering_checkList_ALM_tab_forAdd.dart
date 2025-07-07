@@ -89,87 +89,89 @@ class _CmcALMTabSCreenForAddState extends State<CmcALMTabSCreenForAdd>
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
-
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return WillPopScope(
-          onWillPop: () async {
-            widget.isViewScreen
-                ? Navigator.pop(context, CustomText.itemRefresh)
-                : Validate().showExitDialog(context, translatsLabel, lng);
-            return false;
-          },
-          child: Scaffold(
-            appBar: AppBar(
-              toolbarHeight: 70,
-              backgroundColor: Color(0xff5979AA),
-              leading: Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: GestureDetector(
-                  onTap: () {
-                    widget.isViewScreen
-                        ? Navigator.pop(context, CustomText.itemRefresh)
-                        : Validate()
-                            .showExitDialog(context, translatsLabel, lng);
-                  },
-                  child: Icon(
-                    Icons.arrow_back_ios_sharp,
-                    size: 20,
-                    color: Colors.white,
+      return SafeArea(
+        child: WillPopScope(
+            onWillPop: () async {
+              widget.isViewScreen
+                  ? Navigator.pop(context, CustomText.itemRefresh)
+                  : Validate().showExitDialog(context, translatsLabel, lng);
+              return false;
+            },
+            child: Scaffold(
+              appBar: AppBar(
+                toolbarHeight: 70,
+                backgroundColor: Color(0xff5979AA),
+                leading: Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: GestureDetector(
+                    onTap: () {
+                      widget.isViewScreen
+                          ? Navigator.pop(context, CustomText.itemRefresh)
+                          : Validate()
+                              .showExitDialog(context, translatsLabel, lng);
+                    },
+                    child: Icon(
+                      Icons.arrow_back_ios_sharp,
+                      size: 20,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-              title: Column(
-                children: [
-                  Text(
-                    Global.returnTrLable(
-                        translatsLabel, CustomText.VisitNote, lng!),
-                    style: Styles.white145,
-                  ),
-                  // Text(
-                  //   widget.crecheName!=null?widget.crecheName!:'',
-                  //   style: Styles.white145,
-                  // )
-                ],
-              ),
-              centerTitle: true,
-              bottom: _isLoading
-                  ? null
-                  : TabBar(
-                      indicatorColor: Color(0xffF26BA3),
-                      unselectedLabelColor: Colors.grey.shade300,
-                      unselectedLabelStyle: Styles.white124P,
-                      labelColor: Colors.white,
-                      controller: _tabController,
-                      isScrollable: tabIsScrollable,
-                      labelPadding: EdgeInsets.zero,
-                      // tabAlignment: TabAlignment.start,
-                      tabAlignment: tabIsScrollable ? TabAlignment.start : null,
-                      tabs: tabController(),
-                      onTap: (index) {
-                        if (_tabController.indexIsChanging) {
-                          _tabController.index = _tabController.previousIndex;
-
-                          handleTabChange(index, _tabController.previousIndex);
-                        } else {
-                          print("object 1 $index");
-                          return;
-                        }
-                      },
+                title: Column(
+                  children: [
+                    Text(
+                      Global.returnTrLable(
+                          translatsLabel, CustomText.VisitNote, lng!),
+                      style: Styles.white145,
                     ),
-            ),
-            body: Column(children: [
-              Expanded(
-                  child: TabBarView(
-                controller: _tabController,
-                physics: NeverScrollableScrollPhysics(),
-                children: tabControllerScreen(),
-              ))
-            ]),
-          ));
+                    // Text(
+                    //   widget.crecheName!=null?widget.crecheName!:'',
+                    //   style: Styles.white145,
+                    // )
+                  ],
+                ),
+                centerTitle: true,
+                bottom: _isLoading
+                    ? null
+                    : TabBar(
+                        indicatorColor: Color(0xffF26BA3),
+                        unselectedLabelColor: Colors.grey.shade300,
+                        unselectedLabelStyle: Styles.white124P,
+                        labelColor: Colors.white,
+                        controller: _tabController,
+                        isScrollable: tabIsScrollable,
+                        labelPadding: EdgeInsets.zero,
+                        // tabAlignment: TabAlignment.start,
+                        tabAlignment: tabIsScrollable ? TabAlignment.start : null,
+                        tabs: tabController(),
+                        onTap: (index) {
+                          if (_tabController.indexIsChanging) {
+                            _tabController.index = _tabController.previousIndex;
+
+                            handleTabChange(index, _tabController.previousIndex);
+                          } else {
+                            print("object 1 $index");
+                            return;
+                          }
+                        },
+                      ),
+              ),
+              body: Column(children: [
+                Expanded(
+                    child: TabBarView(
+                  controller: _tabController,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: tabControllerScreen(),
+                ))
+              ]),
+            )),
+      );
     }
   }
 

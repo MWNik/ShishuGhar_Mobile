@@ -24,91 +24,94 @@ class _ResetPaswordScreenState extends State<ResetPaswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppbar(
-        text: CustomText.resetpassword,
-        onTap: () {
-          Navigator.pop(context);
-        },
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Spacer(),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  CustomText.resetpassword,
-                  style: Styles.blue247,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5.h),
-                  child: Text(
-                    CustomText.Newemailmustbeunique,
-                    style: Styles.black126P,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomAppbar(
+          text: CustomText.resetpassword,
+          onTap: () {
+            Navigator.pop(context);
+          },
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Spacer(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    CustomText.resetpassword,
+                    style: Styles.blue247,
                   ),
-                ),
-                SizedBox(
-                  height: 15.h,
-                ),
-                CustomTextField(
-                  titleText: CustomText.EmailAddress,
-                  controller: emailController,
-                  hintText: CustomText.typehere,
-                  fillColor: Color(0xffF2F7FF),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20.h),
-                  child: CElevatedButton(
-                    onPressed: () async {
-                      RegExp regex =
-                          RegExp(r'^[\w-\m.]+@([\w-]+\.)+[\w-]{2,4}$');
-                      if (emailController.text.isEmpty) {
-                        Validate().singleButtonPopup("Email required",CustomText.ok,false,context);
-                      } else if (!regex.hasMatch(emailController.text.trim())) {
-                        Validate().singleButtonPopup("Invalid email format",CustomText.ok,false,context);
-                        return;
-                      } else {
-                        var network = await Validate().checkNetworkConnection();
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5.h),
+                    child: Text(
+                      CustomText.Newemailmustbeunique,
+                      style: Styles.black126P,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  CustomTextField(
+                    titleText: CustomText.EmailAddress,
+                    controller: emailController,
+                    hintText: CustomText.typehere,
+                    fillColor: Color(0xffF2F7FF),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20.h),
+                    child: CElevatedButton(
+                      onPressed: () async {
+                        RegExp regex =
+                            RegExp(r'^[\w-\m.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        if (emailController.text.isEmpty) {
+                          Validate().singleButtonPopup("Email required",CustomText.ok,false,context);
+                        } else if (!regex.hasMatch(emailController.text.trim())) {
+                          Validate().singleButtonPopup("Invalid email format",CustomText.ok,false,context);
+                          return;
+                        } else {
+                          var network = await Validate().checkNetworkConnection();
 
-                        if (network) {
-                          showLoaderDialog(context);
-                          var responce = await ResetPaswordScreenApiService()
-                              .getResetPaswordScreenApi(emailController.text.trim());
-                          Navigator.pop(context);
-                          if (responce.statusCode == 200) {
+                          if (network) {
+                            showLoaderDialog(context);
+                            var responce = await ResetPaswordScreenApiService()
+                                .getResetPaswordScreenApi(emailController.text.trim());
+                            Navigator.pop(context);
+                            if (responce.statusCode == 200) {
+                              Validate().singleButtonPopup(
+                                  Global.errorBodyToStringFromList(responce.body),CustomText.ok,
+                                  true,
+                                  context);
+                            }
+                            else {
+                              Validate().singleButtonPopup(
+                                  Global.errorBodyToStringFromList(responce.body),CustomText.ok,
+                                  true,
+                                  context);
+                            }
+                          }else{
                             Validate().singleButtonPopup(
-                                Global.errorBodyToStringFromList(responce.body),CustomText.ok,
-                                true,
+                                CustomText.nointernetconnectionavailable,CustomText.ok,
+                                false,
                                 context);
                           }
-                          else {
-                            Validate().singleButtonPopup(
-                                Global.errorBodyToStringFromList(responce.body),CustomText.ok,
-                                true,
-                                context);
-                          }
-                        }else{
-                          Validate().singleButtonPopup(
-                              CustomText.nointernetconnectionavailable,CustomText.ok,
-                              false,
-                              context);
                         }
-                      }
-                    },
-                    text: CustomText.Submit,
+                      },
+                      text: CustomText.Submit,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Spacer(),
-          Image.asset("assets/bottomloginImage.png"),
-        ],
+            Spacer(),
+            Image.asset("assets/bottomloginImage.png"),
+          ],
+        ),
       ),
     );
   }

@@ -97,97 +97,100 @@ class _ChildReferralTabScreenState extends State<ChildReferralTabScreen>
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return WillPopScope(
-        onWillPop: () async {
-          Navigator.pop(context, 'itemRefresh');
-          return false;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 60,
-            backgroundColor: Color(0xff5979AA),
-            leading: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context, 'itemRefresh');
-                },
-                child: Icon(
-                  Icons.arrow_back_ios_sharp,
-                  size: 20,
-                  color: Colors.white,
+      return SafeArea(
+        child: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context, 'itemRefresh');
+            return false;
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 60,
+              backgroundColor: Color(0xff5979AA),
+              leading: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context, 'itemRefresh');
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios_sharp,
+                    size: 20,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-            title: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                RichText(
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  text: TextSpan(children: [
-                    WidgetSpan(
-                      child: Text(
-                        '${widget.childName} ',
-                        style: Styles.white145,
-                        textAlign: TextAlign.center,
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RichText(
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    text: TextSpan(children: [
+                      WidgetSpan(
+                        child: Text(
+                          '${widget.childName} ',
+                          style: Styles.white145,
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    WidgetSpan(
-                      child: Text(
-                        '-${widget.childId}',
-                        style: Styles.white145,
-                        textAlign: TextAlign.center,
-                        softWrap: true,
-                        // overflow: TextOverflow.ellipsis,
-                      ),
-                    )
-                  ]),
-                ),
-                Text(
-                  Global.returnTrLable(translatsLabel, widget.tabTitle, lng),
-                  style: Styles.white126P,
-                ),
-              ],
-            ),
-            centerTitle: true,
-            bottom: _isLoading
-                ? null
-                : TabBar(
-                    indicatorColor: Colors.white,
-                    unselectedLabelColor: Colors.grey.shade300,
-                    unselectedLabelStyle: Styles.white124P,
-                    labelColor: Colors.white,
-                    controller: _tabController,
-                    isScrollable: false,
-                    tabs: tabController(),
-                    onTap: (index) {
-                      if (_tabController.indexIsChanging) {
-                        _tabController.index = _tabController.previousIndex;
-
-                        handleTabChange(index, _tabController.previousIndex);
-                      } else {
-                        print("object 1 $index");
-                        return;
-                      }
-                    },
+                      WidgetSpan(
+                        child: Text(
+                          '-${widget.childId}',
+                          style: Styles.white145,
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                          // overflow: TextOverflow.ellipsis,
+                        ),
+                      )
+                    ]),
                   ),
+                  Text(
+                    Global.returnTrLable(translatsLabel, widget.tabTitle, lng),
+                    style: Styles.white126P,
+                  ),
+                ],
+              ),
+              centerTitle: true,
+              bottom: _isLoading
+                  ? null
+                  : TabBar(
+                      indicatorColor: Colors.white,
+                      unselectedLabelColor: Colors.grey.shade300,
+                      unselectedLabelStyle: Styles.white124P,
+                      labelColor: Colors.white,
+                      controller: _tabController,
+                      isScrollable: false,
+                      tabs: tabController(),
+                      onTap: (index) {
+                        if (_tabController.indexIsChanging) {
+                          _tabController.index = _tabController.previousIndex;
+
+                          handleTabChange(index, _tabController.previousIndex);
+                        } else {
+                          print("object 1 $index");
+                          return;
+                        }
+                      },
+                    ),
+            ),
+            body: Column(children: [
+              Expanded(
+                  child: TabBarView(
+                controller: _tabController,
+                physics: NeverScrollableScrollPhysics(),
+                children: tabControllerScreen(),
+              ))
+            ]),
           ),
-          body: Column(children: [
-            Expanded(
-                child: TabBarView(
-              controller: _tabController,
-              physics: NeverScrollableScrollPhysics(),
-              children: tabControllerScreen(),
-            ))
-          ]),
         ),
       );
     }

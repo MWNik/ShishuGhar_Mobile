@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -527,7 +528,19 @@ class Global {
     return updatedMessage;
   }
 
-
+ static void applyDisplayCutout(Color statusBarColor) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: statusBarColor, // Set status bar color
+      statusBarIconBrightness: Brightness.light, // Set icons to dark (black)
+      systemNavigationBarColor: Colors.transparent, // Transparent navigation bar
+      systemNavigationBarIconBrightness: Brightness.dark, // Dark nav bar icons
+    ));
+    // Ensure proper cutout handling
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: [SystemUiOverlay.top], // Ensure status bar is visible
+    );
+  }
 
 
 }

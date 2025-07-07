@@ -102,339 +102,342 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
     } else {
-      return WillPopScope(
-        onWillPop: () async {
-          await callBackdatedConfigirationData();
-          Navigator.pop(context, 'itemRefresh');
-          return true;
-        },
-        child: Scaffold(
-          appBar: CustomAppbar(
-            text: (lng != null)
-                ? Global.returnTrLable(locationControlls, CustomText.sync, lng!)
-                : "",
-            onTap: () async {
-              await callBackdatedConfigirationData();
-              Navigator.pop(context, 'itemRefresh');
-            },
-          ),
-          body: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    syncCount > 0
-                        ? Flexible(
-                            child: DynamicCustomCheckboxWithLabel(
-                              label: Global.returnTrLable(locationControlls,
-                                  CustomText.selectAllForUpload, lng!),
-                              initialValue: selectAllOpt,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectAllOpt = value;
-                                });
-                              },
+      return SafeArea(
+        child: WillPopScope(
+          onWillPop: () async {
+            await callBackdatedConfigirationData();
+            Navigator.pop(context, 'itemRefresh');
+            return true;
+          },
+          child: Scaffold(
+            appBar: CustomAppbar(
+              text: (lng != null)
+                  ? Global.returnTrLable(locationControlls, CustomText.sync, lng!)
+                  : "",
+              onTap: () async {
+                await callBackdatedConfigirationData();
+                Navigator.pop(context, 'itemRefresh');
+              },
+            ),
+            body: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      syncCount > 0
+                          ? Flexible(
+                              child: DynamicCustomCheckboxWithLabel(
+                                label: Global.returnTrLable(locationControlls,
+                                    CustomText.selectAllForUpload, lng!),
+                                initialValue: selectAllOpt,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectAllOpt = value;
+                                  });
+                                },
+                              ),
+                            )
+                          : SizedBox(
+                              width: 20,
                             ),
-                          )
-                        : SizedBox(
-                            width: 20,
-                          ),
-                    // Spacer(),
-                    Flexible(
-                      flex: syncCount > 0 ? 1 : 2,
-                      child: AnimatedRollingSwitch(
-                        isOnlyUnsynched: isUnsynched,
-                        title1: Global.returnTrLable(
-                            locationControlls, CustomText.all, lng!),
-                        title2: Global.returnTrLable(
-                            locationControlls, CustomText.unsynched, lng!),
-                        onChange: (value) async {
-                          setState(() {
-                            isUnsynched = value;
-                          });
-                          await callUploadData();
-                        },
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 10.h,
-                ),
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: syncInfo.keys.toList().length,
-                      shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        return isUnsynched
-                            ? (unsyncCount(
-                                      syncInfo[syncInfo.keys.toList()[index]] ??
-                                          '',
-                                    ) >
-                                    0
-                                ? GestureDetector(
-                                    onTap: () async {
-                                      var checkInte = await Validate()
-                                          .checkNetworkConnection();
-                                      if (checkInte) {
-                                        if (userRole == 'Creche Supervisor') {
-                                          if (selectAllOpt == 0) {
-                                            if (index > 0 && index < 9)
-                                              await uploadDataSequence1(
-                                                  context, index);
-                                            else
-                                              await methods[index](context);
+                      // Spacer(),
+                      Flexible(
+                        flex: syncCount > 0 ? 1 : 2,
+                        child: AnimatedRollingSwitch(
+                          isOnlyUnsynched: isUnsynched,
+                          title1: Global.returnTrLable(
+                              locationControlls, CustomText.all, lng!),
+                          title2: Global.returnTrLable(
+                              locationControlls, CustomText.unsynched, lng!),
+                          onChange: (value) async {
+                            setState(() {
+                              isUnsynched = value;
+                            });
+                            await callUploadData();
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                        itemCount: syncInfo.keys.toList().length,
+                        shrinkWrap: true,
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          return isUnsynched
+                              ? (unsyncCount(
+                                        syncInfo[syncInfo.keys.toList()[index]] ??
+                                            '',
+                                      ) >
+                                      0
+                                  ? GestureDetector(
+                                      onTap: () async {
+                                        var checkInte = await Validate()
+                                            .checkNetworkConnection();
+                                        if (checkInte) {
+                                          if (userRole == 'Creche Supervisor') {
+                                            if (selectAllOpt == 0) {
+                                              if (index > 0 && index < 9)
+                                                await uploadDataSequence1(
+                                                    context, index);
+                                              else
+                                                await methods[index](context);
+                                            }
+                                          } else {
+                                            await methods[index](context);
                                           }
-                                        } else {
-                                          await methods[index](context);
-                                        }
-                                      } else
-                                        Validate().singleButtonPopup(
-                                            Global.returnTrLable(
-                                                locationControlls,
-                                                CustomText
-                                                    .nointernetconnectionavailable,
-                                                lng!),
-                                            Global.returnTrLable(
-                                                locationControlls,
-                                                CustomText.ok,
-                                                lng!),
-                                            true,
-                                            context);
-                                    },
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 5.h),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Color(0xff5A5A5A)
-                                                    .withOpacity(
-                                                        0.2), // Shadow color with opacity
-                                                offset: Offset(0,
-                                                    3), // Horizontal and vertical offset
-                                                blurRadius: 6, // Blur radius
-                                                spreadRadius:
-                                                    0, // Spread radius
-                                              ),
-                                            ],
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: Color(0xffE7F0FF)),
-                                            borderRadius:
-                                                BorderRadius.circular(10.r)),
-                                        height: 42.h,
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10.w, vertical: 8.h),
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  // Content (RichText)
-                                                  Expanded(
-                                                    child: RichText(
-                                                      strutStyle: StrutStyle(
-                                                          height: 1.h),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      text: TextSpan(
-                                                        text:
-                                                            "${syncInfo.keys.toList()[index]} : ",
-                                                        style: Styles
-                                                            .urbanblack157,
-                                                        children: parseBoldText(
-                                                            syncInfo[syncInfo
-                                                                        .keys
-                                                                        .toList()[
-                                                                    index]] ??
-                                                                '',
-                                                            Styles.blue125,
-                                                            Styles.black144.copyWith(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                            Styles.red185.copyWith(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold)),
+                                        } else
+                                          Validate().singleButtonPopup(
+                                              Global.returnTrLable(
+                                                  locationControlls,
+                                                  CustomText
+                                                      .nointernetconnectionavailable,
+                                                  lng!),
+                                              Global.returnTrLable(
+                                                  locationControlls,
+                                                  CustomText.ok,
+                                                  lng!),
+                                              true,
+                                              context);
+                                      },
+                                      child: Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 5.h),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Color(0xff5A5A5A)
+                                                      .withOpacity(
+                                                          0.2), // Shadow color with opacity
+                                                  offset: Offset(0,
+                                                      3), // Horizontal and vertical offset
+                                                  blurRadius: 6, // Blur radius
+                                                  spreadRadius:
+                                                      0, // Spread radius
+                                                ),
+                                              ],
+                                              color: Colors.white,
+                                              border: Border.all(
+                                                  color: Color(0xffE7F0FF)),
+                                              borderRadius:
+                                                  BorderRadius.circular(10.r)),
+                                          height: 42.h,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 10.w, vertical: 8.h),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    // Content (RichText)
+                                                    Expanded(
+                                                      child: RichText(
+                                                        strutStyle: StrutStyle(
+                                                            height: 1.h),
+                                                        overflow:
+                                                            TextOverflow.ellipsis,
+                                                        text: TextSpan(
+                                                          text:
+                                                              "${syncInfo.keys.toList()[index]} : ",
+                                                          style: Styles
+                                                              .urbanblack157,
+                                                          children: parseBoldText(
+                                                              syncInfo[syncInfo
+                                                                          .keys
+                                                                          .toList()[
+                                                                      index]] ??
+                                                                  '',
+                                                              Styles.blue125,
+                                                              Styles.black144.copyWith(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                              Styles.red185.copyWith(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  selectAllOpt == 1
-                                                      ? Image.asset(
-                                                          checkAllForUpload(
-                                                              syncInfo
-                                                                      .keys
-                                                                      .toList()[
-                                                                  index]),
-                                                          scale: 4.4,
-                                                          color: Colors.grey,
-                                                        )
-                                                      : Image.asset(
-                                                          "assets/sync_icon.png",
-                                                          scale: 4.4,
-                                                          color: Colors.grey,
-                                                        ),
-                                                ],
-                                              ),
-                                              // Image to the right
-                                            ],
+                                                    selectAllOpt == 1
+                                                        ? Image.asset(
+                                                            checkAllForUpload(
+                                                                syncInfo
+                                                                        .keys
+                                                                        .toList()[
+                                                                    index]),
+                                                            scale: 4.4,
+                                                            color: Colors.grey,
+                                                          )
+                                                        : Image.asset(
+                                                            "assets/sync_icon.png",
+                                                            scale: 4.4,
+                                                            color: Colors.grey,
+                                                          ),
+                                                  ],
+                                                ),
+                                                // Image to the right
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                : SizedBox())
-                            : GestureDetector(
-                                onTap: () async {
-                                  var checkInte =
-                                      await Validate().checkNetworkConnection();
-                                  if (checkInte) {
-                                    if (userRole == 'Creche Supervisor') {
-                                      if (selectAllOpt == 0) {
-                                        if (index > 0 && index < 9)
-                                          await uploadDataSequence1(
-                                              context, index);
-                                        else
-                                          await methods[index](context);
+                                    )
+                                  : SizedBox())
+                              : GestureDetector(
+                                  onTap: () async {
+                                    var checkInte =
+                                        await Validate().checkNetworkConnection();
+                                    if (checkInte) {
+                                      if (userRole == 'Creche Supervisor') {
+                                        if (selectAllOpt == 0) {
+                                          if (index > 0 && index < 9)
+                                            await uploadDataSequence1(
+                                                context, index);
+                                          else
+                                            await methods[index](context);
+                                        }
+                                      } else {
+                                        await methods[index](context);
                                       }
-                                    } else {
-                                      await methods[index](context);
-                                    }
-                                  } else
-                                    Validate().singleButtonPopup(
-                                        Global.returnTrLable(
-                                            locationControlls,
-                                            CustomText
-                                                .nointernetconnectionavailable,
-                                            lng!),
-                                        Global.returnTrLable(locationControlls,
-                                            CustomText.ok, lng!),
-                                        true,
-                                        context);
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 5.h),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Color(0xff5A5A5A).withOpacity(
-                                                0.2), // Shadow color with opacity
-                                            offset: Offset(0,
-                                                3), // Horizontal and vertical offset
-                                            blurRadius: 6, // Blur radius
-                                            spreadRadius: 0, // Spread radius
-                                          ),
-                                        ],
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Color(0xffE7F0FF)),
-                                        borderRadius:
-                                            BorderRadius.circular(10.r)),
-                                    height: 42.h,
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10.w, vertical: 8.h),
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              // Content (RichText)
-                                              Expanded(
-                                                child: RichText(
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.h),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  text: TextSpan(
-                                                    text:
-                                                        "${syncInfo.keys.toList()[index]} : ",
-                                                    style: Styles.urbanblack157,
-                                                    children: parseBoldText(
-                                                        syncInfo[syncInfo.keys
-                                                                    .toList()[
-                                                                index]] ??
-                                                            '',
-                                                        Styles.blue125,
-                                                        Styles.black144
-                                                            .copyWith(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                        Styles.red185.copyWith(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold)),
+                                    } else
+                                      Validate().singleButtonPopup(
+                                          Global.returnTrLable(
+                                              locationControlls,
+                                              CustomText
+                                                  .nointernetconnectionavailable,
+                                              lng!),
+                                          Global.returnTrLable(locationControlls,
+                                              CustomText.ok, lng!),
+                                          true,
+                                          context);
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 5.h),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Color(0xff5A5A5A).withOpacity(
+                                                  0.2), // Shadow color with opacity
+                                              offset: Offset(0,
+                                                  3), // Horizontal and vertical offset
+                                              blurRadius: 6, // Blur radius
+                                              spreadRadius: 0, // Spread radius
+                                            ),
+                                          ],
+                                          color: Colors.white,
+                                          border: Border.all(
+                                              color: Color(0xffE7F0FF)),
+                                          borderRadius:
+                                              BorderRadius.circular(10.r)),
+                                      height: 42.h,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w, vertical: 8.h),
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                // Content (RichText)
+                                                Expanded(
+                                                  child: RichText(
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.h),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    text: TextSpan(
+                                                      text:
+                                                          "${syncInfo.keys.toList()[index]} : ",
+                                                      style: Styles.urbanblack157,
+                                                      children: parseBoldText(
+                                                          syncInfo[syncInfo.keys
+                                                                      .toList()[
+                                                                  index]] ??
+                                                              '',
+                                                          Styles.blue125,
+                                                          Styles.black144
+                                                              .copyWith(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                          Styles.red185.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              selectAllOpt == 1
-                                                  ? Image.asset(
-                                                      checkAllForUpload(syncInfo
-                                                          .keys
-                                                          .toList()[index]),
-                                                      scale: 4.4,
-                                                      color: Colors.grey,
-                                                    )
-                                                  : Image.asset(
-                                                      "assets/sync_icon.png",
-                                                      scale: 4.4,
-                                                      color: Colors.grey,
-                                                    ),
-                                            ],
-                                          ),
-                                          // Image to the right
-                                        ],
+                                                selectAllOpt == 1
+                                                    ? Image.asset(
+                                                        checkAllForUpload(syncInfo
+                                                            .keys
+                                                            .toList()[index]),
+                                                        scale: 4.4,
+                                                        color: Colors.grey,
+                                                      )
+                                                    : Image.asset(
+                                                        "assets/sync_icon.png",
+                                                        scale: 4.4,
+                                                        color: Colors.grey,
+                                                      ),
+                                              ],
+                                            ),
+                                            // Image to the right
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                      }),
-                ),
-                SizedBox(
-                  height: 10.h,
-                ),
-                syncCount > 0
-                    ? selectAllOpt == 1
-                        ? CElevatedButton(
-                            text: Global.returnTrLable(locationControlls, CustomText.uploadAll , lng!),
-                            color: Color(0xff369A8D),
-                            onPressed: () async {
-                              var checkInte =
-                                  await Validate().checkNetworkConnection();
-                              if (checkInte) {
-                                await uploadDataSequence1(context, 5);
-                              } else
-                                Validate().singleButtonPopup(
-                                    Global.returnTrLable(
-                                        locationControlls,
-                                        CustomText
-                                            .nointernetconnectionavailable,
-                                        lng!),
-                                    Global.returnTrLable(
-                                        locationControlls, CustomText.ok, lng!),
-                                    true,
-                                    context);
-                            },
-                          )
-                        : SizedBox()
-                    : SizedBox()
-              ],
+                                );
+                        }),
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  syncCount > 0
+                      ? selectAllOpt == 1
+                          ? CElevatedButton(
+                              text: Global.returnTrLable(locationControlls, CustomText.uploadAll , lng!),
+                              color: Color(0xff369A8D),
+                              onPressed: () async {
+                                var checkInte =
+                                    await Validate().checkNetworkConnection();
+                                if (checkInte) {
+                                  await uploadDataSequence1(context, 5);
+                                } else
+                                  Validate().singleButtonPopup(
+                                      Global.returnTrLable(
+                                          locationControlls,
+                                          CustomText
+                                              .nointernetconnectionavailable,
+                                          lng!),
+                                      Global.returnTrLable(
+                                          locationControlls, CustomText.ok, lng!),
+                                      true,
+                                      context);
+                              },
+                            )
+                          : SizedBox()
+                      : SizedBox()
+                ],
+              ),
             ),
           ),
         ),

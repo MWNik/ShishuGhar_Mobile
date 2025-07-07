@@ -114,370 +114,373 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context, 'itemRefresh');
-        return false;
-      },
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: CustomAppbar(
-          text: Global.returnTrLable(
-              translats, CustomText.enrolled_children, lng),
-          onTap: () => Navigator.pop(context, 'itemRefresh'),
-        ),
-        endDrawer: SafeArea(
-          child: Drawer(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 30),
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              "assets/filter_icon.png",
-                              scale: 2.4,
-                            ),
-                            SizedBox(
-                              width: 10.w,
-                            ),
-                            Text(
-                              Global.returnTrLable(
-                                  translats, CustomText.Filter, lng),
-                              style: Styles.labelcontrollerfont,
-                            ),
-                            Spacer(),
-                            InkWell(
-                                onTap: () async {
-                                  _scaffoldKey.currentState!.closeEndDrawer();
-                                  // cleaAllFilter();
-                                },
-                                child: Image.asset(
-                                  'assets/cross.png',
-                                  color: Colors.grey,
-                                  scale: 4,
-                                )),
-                          ],
-                        ),
-                      ),
-                      SizedBox(),
-                      // DynamicCustomTextFieldInt(
-                      //   initialvalue: ageLimit,
-                      //   hintText:
-                      //   Global.returnTrLable(translats, CustomText.ageInMonthEn, lng),
-                      //   onChanged: (value) {
-                      //     ageLimit = value;
-                      //   },
-                      // ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: DynamicCustomTextFieldInt(
-                              // width: MediaQuery.of(context).size.width * 0.36,
-                              initialvalue: minAgeLimit,
-                              hintText: Global.returnTrLable(
-                                  translats, CustomText.minAgeInMonthEn, lng),
-                              // isRequred: 1,
-                              onChanged: (value) {
-                                minAgeLimit = value;
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: DynamicCustomTextFieldInt(
-                              // width: MediaQuery.of(context).size.width * 0.36,
-                              initialvalue: maxAgeLimit,
-                              hintText: Global.returnTrLable(
-                                  translats, CustomText.maxAgeInMonthEn, lng),
-                              onChanged: (value) {
-                                maxAgeLimit = value;
-                              },
-                            ),
-                          )
-                        ],
-                      ),
-                      DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.Gender, lng),
-                        items: genderList,
-                        selectedItem: selectedItemDrop,
-                        onChanged: (value) {
-                          selectedItemDrop = value?.name;
-                        },
-                      ),
-                      DynamicCustomDropdownForFilterField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.Creches, lng),
-                        items: creches,
-                        selectedItem: selectedCreche,
-                        onChanged: (value) {
-                          selectedCreche = value?.name;
-                        },
-                      ),
-                      SizedBox(
-                        height: 10.h,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(3.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    translats, 'Clear', lng!),
-                                color: Color(0xffF26BA3),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  cleaAllFilter();
-                                },
-                              ),
-                            ),
-                            // Spacer(),
-                            SizedBox(width: 4.w),
-                            Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    translats, 'Search', lng!),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  filteredGetData(context);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 25),
-                        child: AnimatedRollingSwitch(
-                          title1: Global.returnTrLable(
-                              translats, CustomText.all, lng),
-                          title2: Global.returnTrLable(
-                              translats, CustomText.unsynched, lng),
-                          isOnlyUnsynched: isOnlyUnsyched,
-                          onChange: (value) async {
-                            setState(() {
-                              isOnlyUnsyched = value;
-                            });
-                            await fetchChildHHDataList();
-                          },
-                        ),
-                      )
-                    ]),
-              )),
-        ),
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-          child: Column(children: [
-            Row(
-              children: [
-                Expanded(
-                    child: CustomTextFieldRow(
-                  controller: Searchcontroller,
-                  onChanged: (value) {
-                    print(value);
-                    filterDataQu(value);
-                  },
-                  hintText:
-                      Global.returnTrLable(translats, CustomText.Search, lng),
-                  prefixIcon: Image.asset(
-                    "assets/search.png",
-                    scale: 2.4,
-                  ),
-                )),
-                SizedBox(
-                  width: 10.w,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, 'itemRefresh');
+          return false;
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: CustomAppbar(
+            text: Global.returnTrLable(
+                translats, CustomText.enrolled_children, lng),
+            onTap: () => Navigator.pop(context, 'itemRefresh'),
+          ),
+          endDrawer: SafeArea(
+            child: Drawer(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    _scaffoldKey.currentState!.openEndDrawer();
-                  },
-                  child: Image.asset(
-                    "assets/filter_icon.png",
-                    scale: 2.4,
-                  ),
-                )
-              ],
-            ),
-            Expanded(
-              child: (filterData.length > 0)
-                  ? ListView.builder(
-                      itemCount: filterData.length,
-                      shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () async {
-                            var selectedItem = filterData[index];
-                            // Validate().saveInt(Validate.crecheSelectedItem,
-                            //     Global.stringToInt(Global.getItemValues(selectedItem['responces'], 'creche_id'))
-                            //         );
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    EnrolledChildDetailScreen(
-                                        CHHGUID: selectedItem['CHHGUID'],
-                                        crechId: Global.stringToInt(
-                                            Global.getItemValues(
-                                                selectedItem['responces'],
-                                                'creche_id')),
-                                        HHname: Global.stringToInt(
-                                            selectedItem['HHname'].toString()),
-                                        enName: Global.stringToInt(
-                                            selectedItem['name'].toString()),
-                                        EnrolledChilGUID:
-                                            selectedItem['ChildEnrollGUID'])));
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 30),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                "assets/filter_icon.png",
+                                scale: 2.4,
+                              ),
+                              SizedBox(
+                                width: 10.w,
+                              ),
+                              Text(
+                                Global.returnTrLable(
+                                    translats, CustomText.Filter, lng),
+                                style: Styles.labelcontrollerfont,
+                              ),
+                              Spacer(),
+                              InkWell(
+                                  onTap: () async {
+                                    _scaffoldKey.currentState!.closeEndDrawer();
+                                    // cleaAllFilter();
+                                  },
+                                  child: Image.asset(
+                                    'assets/cross.png',
+                                    color: Colors.grey,
+                                    scale: 4,
+                                  )),
+                            ],
+                          ),
+                        ),
+                        SizedBox(),
+                        // DynamicCustomTextFieldInt(
+                        //   initialvalue: ageLimit,
+                        //   hintText:
+                        //   Global.returnTrLable(translats, CustomText.ageInMonthEn, lng),
+                        //   onChanged: (value) {
+                        //     ageLimit = value;
+                        //   },
+                        // ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: DynamicCustomTextFieldInt(
+                                // width: MediaQuery.of(context).size.width * 0.36,
+                                initialvalue: minAgeLimit,
+                                hintText: Global.returnTrLable(
+                                    translats, CustomText.minAgeInMonthEn, lng),
+                                // isRequred: 1,
+                                onChanged: (value) {
+                                  minAgeLimit = value;
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: DynamicCustomTextFieldInt(
+                                // width: MediaQuery.of(context).size.width * 0.36,
+                                initialvalue: maxAgeLimit,
+                                hintText: Global.returnTrLable(
+                                    translats, CustomText.maxAgeInMonthEn, lng),
+                                onChanged: (value) {
+                                  maxAgeLimit = value;
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                        DynamicCustomDropdownField(
+                          hintText: Global.returnTrLable(
+                              translats, CustomText.Gender, lng),
+                          items: genderList,
+                          selectedItem: selectedItemDrop,
+                          onChanged: (value) {
+                            selectedItemDrop = value?.name;
                           },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5.h),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(
-                                          0.2), // Shadow color with opacity
-                                      offset: Offset(0,
-                                          3), // Horizontal and vertical offset
-                                      blurRadius: 6, // Blur radius
-                                      spreadRadius: 0, // Spread radius
-                                    ),
-                                  ],
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w, vertical: 8.h),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
-                                          style: Styles.black104,
-                                        ),
-                                        Text(
-                                          '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
-                                          style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1.2),
-                                        ),
-                                        Text(
-                                          '${Global.returnTrLable(translats, CustomText.careGiverName, lng).trim()} : ',
-                                          style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1.2),
-                                        ),
-                                        Text(
-                                          '${Global.returnTrLable(translats, CustomText.ageInMonth, lng).trim()} : ',
-                                          style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1.2),
-                                        ),
-                                        Text(
-                                          '${Global.returnTrLable(translats, CustomText.Village, lng).trim()} : ',
-                                          style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1.2),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(width: 10),
-                                    SizedBox(
-                                      height: 40.h,
-                                      width: 2,
-                                      child: VerticalDivider(
-                                        color: Color(0xffE6E6E6),
+                        ),
+                        DynamicCustomDropdownForFilterField(
+                          hintText: Global.returnTrLable(
+                              translats, CustomText.Creches, lng),
+                          items: creches,
+                          selectedItem: selectedCreche,
+                          onChanged: (value) {
+                            selectedCreche = value?.name;
+                          },
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(3.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      translats, 'Clear', lng!),
+                                  color: Color(0xffF26BA3),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    cleaAllFilter();
+                                  },
+                                ),
+                              ),
+                              // Spacer(),
+                              SizedBox(width: 4.w),
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      translats, 'Search', lng!),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    filteredGetData(context);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 25),
+                          child: AnimatedRollingSwitch(
+                            title1: Global.returnTrLable(
+                                translats, CustomText.all, lng),
+                            title2: Global.returnTrLable(
+                                translats, CustomText.unsynched, lng),
+                            isOnlyUnsynched: isOnlyUnsyched,
+                            onChange: (value) async {
+                              setState(() {
+                                isOnlyUnsyched = value;
+                              });
+                              await fetchChildHHDataList();
+                            },
+                          ),
+                        )
+                      ]),
+                )),
+          ),
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+            child: Column(children: [
+              Row(
+                children: [
+                  Expanded(
+                      child: CustomTextFieldRow(
+                    controller: Searchcontroller,
+                    onChanged: (value) {
+                      print(value);
+                      filterDataQu(value);
+                    },
+                    hintText:
+                        Global.returnTrLable(translats, CustomText.Search, lng),
+                    prefixIcon: Image.asset(
+                      "assets/search.png",
+                      scale: 2.4,
+                    ),
+                  )),
+                  SizedBox(
+                    width: 10.w,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    },
+                    child: Image.asset(
+                      "assets/filter_icon.png",
+                      scale: 2.4,
+                    ),
+                  )
+                ],
+              ),
+              Expanded(
+                child: (filterData.length > 0)
+                    ? ListView.builder(
+                        itemCount: filterData.length,
+                        shrinkWrap: true,
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: () async {
+                              var selectedItem = filterData[index];
+                              // Validate().saveInt(Validate.crecheSelectedItem,
+                              //     Global.stringToInt(Global.getItemValues(selectedItem['responces'], 'creche_id'))
+                              //         );
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      EnrolledChildDetailScreen(
+                                          CHHGUID: selectedItem['CHHGUID'],
+                                          crechId: Global.stringToInt(
+                                              Global.getItemValues(
+                                                  selectedItem['responces'],
+                                                  'creche_id')),
+                                          HHname: Global.stringToInt(
+                                              selectedItem['HHname'].toString()),
+                                          enName: Global.stringToInt(
+                                              selectedItem['name'].toString()),
+                                          EnrolledChilGUID:
+                                              selectedItem['ChildEnrollGUID'])));
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 5.h),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0xff5A5A5A).withOpacity(
+                                            0.2), // Shadow color with opacity
+                                        offset: Offset(0,
+                                            3), // Horizontal and vertical offset
+                                        blurRadius: 6, // Blur radius
+                                        spreadRadius: 0, // Spread radius
                                       ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
+                                    ],
+                                    color: Colors.white,
+                                    border: Border.all(color: Color(0xffE7F0FF)),
+                                    borderRadius: BorderRadius.circular(10.r)),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w, vertical: 8.h),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            Global.getItemValues(
-                                                filterData[index]['responces'],
-                                                'child_name'),
-                                            style: Styles.cardBlue10,
-                                            overflow: TextOverflow.ellipsis,
+                                            '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
+                                            style: Styles.black104,
                                           ),
                                           Text(
-                                            Global.getItemValues(
-                                                filterData[index]['responces'],
-                                                'child_id'),
-                                            style: Styles.cardBlue10,
+                                            '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
+                                            style: Styles.black104,
                                             strutStyle: StrutStyle(height: 1.2),
-                                            overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
-                                            Global.getItemValues(
-                                                filterData[index]['responces'],
-                                                'name_of_primary_caregiver'),
-                                            style: Styles.cardBlue10,
+                                            '${Global.returnTrLable(translats, CustomText.careGiverName, lng).trim()} : ',
+                                            style: Styles.black104,
                                             strutStyle: StrutStyle(height: 1.2),
-                                            overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
-                                            Global.getItemValues(
-                                                filterData[index]['responces'],
-                                                'age_at_enrollment_in_months'),
-                                            style: Styles.cardBlue10,
+                                            '${Global.returnTrLable(translats, CustomText.ageInMonth, lng).trim()} : ',
+                                            style: Styles.black104,
                                             strutStyle: StrutStyle(height: 1.2),
-                                            overflow: TextOverflow.ellipsis,
                                           ),
                                           Text(
-                                            callVillageName(filterData[index]
-                                                ['hhResponce']),
-                                            style: Styles.cardBlue10,
+                                            '${Global.returnTrLable(translats, CustomText.Village, lng).trim()} : ',
+                                            style: Styles.black104,
                                             strutStyle: StrutStyle(height: 1.2),
-                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    SizedBox(width: 5),
-                                    (filterData[index]['is_edited'] == 0 &&
-                                            filterData[index]['is_uploaded'] ==
-                                                1)
-                                        ? Image.asset(
-                                            "assets/sync.png",
-                                            scale: 1.5,
-                                          )
-                                        : Image.asset(
-                                            "assets/sync_gray.png",
-                                            scale: 1.5,
-                                          )
-                                  ],
+                                      SizedBox(width: 10),
+                                      SizedBox(
+                                        height: 40.h,
+                                        width: 2,
+                                        child: VerticalDivider(
+                                          color: Color(0xffE6E6E6),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              Global.getItemValues(
+                                                  filterData[index]['responces'],
+                                                  'child_name'),
+                                              style: Styles.cardBlue10,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(
+                                              Global.getItemValues(
+                                                  filterData[index]['responces'],
+                                                  'child_id'),
+                                              style: Styles.cardBlue10,
+                                              strutStyle: StrutStyle(height: 1.2),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(
+                                              Global.getItemValues(
+                                                  filterData[index]['responces'],
+                                                  'name_of_primary_caregiver'),
+                                              style: Styles.cardBlue10,
+                                              strutStyle: StrutStyle(height: 1.2),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(
+                                              Global.getItemValues(
+                                                  filterData[index]['responces'],
+                                                  'age_at_enrollment_in_months'),
+                                              style: Styles.cardBlue10,
+                                              strutStyle: StrutStyle(height: 1.2),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(
+                                              callVillageName(filterData[index]
+                                                  ['hhResponce']),
+                                              style: Styles.cardBlue10,
+                                              strutStyle: StrutStyle(height: 1.2),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 5),
+                                      (filterData[index]['is_edited'] == 0 &&
+                                              filterData[index]['is_uploaded'] ==
+                                                  1)
+                                          ? Image.asset(
+                                              "assets/sync.png",
+                                              scale: 1.5,
+                                            )
+                                          : Image.asset(
+                                              "assets/sync_gray.png",
+                                              scale: 1.5,
+                                            )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng)),
-                    ),
-            ),
-            SizedBox(height: 10.h)
-          ]),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text(Global.returnTrLable(
+                            translats, CustomText.NorecordAvailable, lng)),
+                      ),
+              ),
+              SizedBox(height: 10.h)
+            ]),
+          ),
         ),
       ),
     );

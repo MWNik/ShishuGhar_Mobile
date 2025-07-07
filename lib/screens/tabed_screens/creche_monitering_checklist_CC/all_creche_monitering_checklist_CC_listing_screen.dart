@@ -96,364 +96,367 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context, 'itemRefresh');
-        return false;
-      },
-      child: Scaffold(
-        floatingActionButton: InkWell(
-          onTap: () async {
-            String ccGuid = '';
-            if (!(Global.validString(ccGuid))) {
-              ccGuid = Validate().randomGuid();
-              var refStatus = await Navigator.of(context).push(
-                  MaterialPageRoute(
-                      //change
-                      builder: (BuildContext context) => CmcCCTabSCreenForAdd(
-                          cmc_cc_guid: ccGuid,
-                          isEdit: false,
-                          isViewScreen: false)));
-              if (refStatus == 'itemRefresh') {
-                await fetchCmcCCRecords();
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, 'itemRefresh');
+          return false;
+        },
+        child: Scaffold(
+          floatingActionButton: InkWell(
+            onTap: () async {
+              String ccGuid = '';
+              if (!(Global.validString(ccGuid))) {
+                ccGuid = Validate().randomGuid();
+                var refStatus = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                        //change
+                        builder: (BuildContext context) => CmcCCTabSCreenForAdd(
+                            cmc_cc_guid: ccGuid,
+                            isEdit: false,
+                            isViewScreen: false)));
+                if (refStatus == 'itemRefresh') {
+                  await fetchCmcCCRecords();
+                }
               }
-            }
-          },
-          child: Image.asset(
-            "assets/add_btn.png",
-            scale: 2.7,
-            color: Color(0xff5979AA),
-          ),
-        ),
-        key: _scaffoldKey,
-        appBar: CustomAppbar(
-          text: Global.returnTrLable(translats, CustomText.VisitNotes, lng),
-          onTap: () => Navigator.pop(context, 'itemRefresh'),
-        ),
-        endDrawer: SafeArea(
-          child: Drawer(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 30),
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              "assets/filter_icon.png",
-                              scale: 2.4,
-                            ),
-                            SizedBox(
-                              width: 10.w,
-                            ),
-                            Text(
-                              Global.returnTrLable(translats, CustomText.Filter, lng),
-                              style: Styles.labelcontrollerfont,
-                            ),
-                            Spacer(),
-                            InkWell(
-                                onTap: () async {
-                                  _scaffoldKey.currentState!.closeEndDrawer();
-                                  // cleaAllFilter();
-                                },
-                                child: Image.asset(
-                                  'assets/cross.png',
-                                  color: Colors.grey,
-                                  scale: 4,
-                                )),
-                          ],
-                        ),
-                      ),
-                      SizedBox(),
-                      DynamicCustomDropdownForFilterField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.Creches, lng),
-                        items: creches,
-                        selectedItem: selectedCreche,
-                        onChanged: (value) {
-                          selectedCreche = value?.name;
-                        },
-                      ),
-                      SizedBox(
-                        height: 10.h,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(3.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    translats, 'Clear', lng),
-                                color: Color(0xffF26BA3),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  cleaAllFilter();
-                                },
-                              ),
-                            ),
-                            // Spacer(),
-                            SizedBox(width: 4.w),
-                            Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    translats, 'Search', lng),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  filteredGetData(context);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 25),
-                        child: AnimatedRollingSwitch(
-                          title1: Global.returnTrLable(
-                              translats, CustomText.all, lng),
-                          title2: Global.returnTrLable(
-                              translats, CustomText.usynchedAndDraft, lng),
-                          isOnlyUnsynched: isOnlyUnsynched ?? false,
-                          onChange: (value) async {
-                            setState(() {
-                              isOnlyUnsynched = value;
-                            });
-                            await fetchCmcCCRecords();
-                          },
-                        ),
-                      )
-                    ]),
-              )),
-        ),
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
-          child: Column(children: [
-            Row(
-              children: [
-                Expanded(child: SizedBox()),
-                SizedBox(
-                  width: 10.w,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    _scaffoldKey.currentState!.openEndDrawer();
-                  },
-                  child: Image.asset(
-                    "assets/filter_icon.png",
-                    scale: 2.4,
-                  ),
-                )
-              ],
+            },
+            child: Image.asset(
+              "assets/add_btn.png",
+              scale: 2.7,
+              color: Color(0xff5979AA),
             ),
-            Expanded(
-              child: (filterData.length > 0) //change
-                  ? ListView.builder(
-                      itemCount: filterData.length,
-                      shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () async {
-                            var ccGuid = filterData[index].cmc_cc_guid;
-                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
-
-                            if (Global.validString(ccGuid)) {
-                              var refStatus = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          CmcCCTabSCreenForAdd(
-                                              cmc_cc_guid: ccGuid!,
-                                              isEdit: true,
-                                              date_of_visit:
-                                                  Global.getItemValues(
-                                                      filterData[index]
-                                                          .responces!,
-                                                      'date_of_visit'),
-                                              isViewScreen:isEdited==true?false:true)));
-
-                              if (refStatus == 'itemRefresh') {
-                                await fetchCmcCCRecords();
-                              }
-                            }
+          ),
+          key: _scaffoldKey,
+          appBar: CustomAppbar(
+            text: Global.returnTrLable(translats, CustomText.VisitNotes, lng),
+            onTap: () => Navigator.pop(context, 'itemRefresh'),
+          ),
+          endDrawer: SafeArea(
+            child: Drawer(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 30),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                "assets/filter_icon.png",
+                                scale: 2.4,
+                              ),
+                              SizedBox(
+                                width: 10.w,
+                              ),
+                              Text(
+                                Global.returnTrLable(translats, CustomText.Filter, lng),
+                                style: Styles.labelcontrollerfont,
+                              ),
+                              Spacer(),
+                              InkWell(
+                                  onTap: () async {
+                                    _scaffoldKey.currentState!.closeEndDrawer();
+                                    // cleaAllFilter();
+                                  },
+                                  child: Image.asset(
+                                    'assets/cross.png',
+                                    color: Colors.grey,
+                                    scale: 4,
+                                  )),
+                            ],
+                          ),
+                        ),
+                        SizedBox(),
+                        DynamicCustomDropdownForFilterField(
+                          hintText: Global.returnTrLable(
+                              translats, CustomText.Creches, lng),
+                          items: creches,
+                          selectedItem: selectedCreche,
+                          onChanged: (value) {
+                            selectedCreche = value?.name;
                           },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5.h),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(
-                                          0.2), // Shadow color with opacity
-                                      offset: Offset(0,
-                                          3), // Horizontal and vertical offset
-                                      blurRadius: 6, // Blur radius
-                                      spreadRadius: 0, // Spread radius
-                                    ),
-                                  ],
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w, vertical: 8.h),
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.Creches, lng)} : ',
-                                            style: Styles.black104,
-                                          ),
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.datevisit, lng).trim()} : ',
-                                            style: Styles.black104,
-                                            strutStyle: StrutStyle(height: 1.2),
-                                          ),
-                                        ],
+                        ),
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(3.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      translats, 'Clear', lng),
+                                  color: Color(0xffF26BA3),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    cleaAllFilter();
+                                  },
+                                ),
+                              ),
+                              // Spacer(),
+                              SizedBox(width: 4.w),
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      translats, 'Search', lng),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    filteredGetData(context);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 25),
+                          child: AnimatedRollingSwitch(
+                            title1: Global.returnTrLable(
+                                translats, CustomText.all, lng),
+                            title2: Global.returnTrLable(
+                                translats, CustomText.usynchedAndDraft, lng),
+                            isOnlyUnsynched: isOnlyUnsynched ?? false,
+                            onChange: (value) async {
+                              setState(() {
+                                isOnlyUnsynched = value;
+                              });
+                              await fetchCmcCCRecords();
+                            },
+                          ),
+                        )
+                      ]),
+                )),
+          ),
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
+            child: Column(children: [
+              Row(
+                children: [
+                  Expanded(child: SizedBox()),
+                  SizedBox(
+                    width: 10.w,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    },
+                    child: Image.asset(
+                      "assets/filter_icon.png",
+                      scale: 2.4,
+                    ),
+                  )
+                ],
+              ),
+              Expanded(
+                child: (filterData.length > 0) //change
+                    ? ListView.builder(
+                        itemCount: filterData.length,
+                        shrinkWrap: true,
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: () async {
+                              var ccGuid = filterData[index].cmc_cc_guid;
+                              bool isEdited=await Validate().checkEditable(filterData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
+
+                              if (Global.validString(ccGuid)) {
+                                var refStatus = await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            CmcCCTabSCreenForAdd(
+                                                cmc_cc_guid: ccGuid!,
+                                                isEdit: true,
+                                                date_of_visit:
+                                                    Global.getItemValues(
+                                                        filterData[index]
+                                                            .responces!,
+                                                        'date_of_visit'),
+                                                isViewScreen:isEdited==true?false:true)));
+
+                                if (refStatus == 'itemRefresh') {
+                                  await fetchCmcCCRecords();
+                                }
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 5.h),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0xff5A5A5A).withOpacity(
+                                            0.2), // Shadow color with opacity
+                                        offset: Offset(0,
+                                            3), // Horizontal and vertical offset
+                                        blurRadius: 6, // Blur radius
+                                        spreadRadius: 0, // Spread radius
                                       ),
-                                      SizedBox(width: 10),
-                                      SizedBox(
-                                        height: 30.h,
-                                        width: 2,
-                                        child: VerticalDivider(
-                                          color: Color(0xffE6E6E6),
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
+                                    ],
+                                    color: Colors.white,
+                                    border: Border.all(color: Color(0xffE7F0FF)),
+                                    borderRadius: BorderRadius.circular(10.r)),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w, vertical: 8.h),
+                                  child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: [
                                             Text(
-                                              callCreCheName(
-                                                  Global.getItemValues(
-                                                      filterData[index]
-                                                          .responces,
-                                                      'creche_id')),
-                                              style: Styles.cardBlue10,
-                                              overflow: TextOverflow.ellipsis,
+                                              '${Global.returnTrLable(translats, CustomText.Creches, lng)} : ',
+                                              style: Styles.black104,
                                             ),
                                             Text(
-                                              (Global.validString(
-                                                      Global.getItemValues(
-                                                          filterData[index]
-                                                              .responces,
-                                                          'date_of_visit')))
-                                                  ? Validate()
-                                                      .displeDateFormate(
-                                                          Global.getItemValues(
-                                                              filterData[index]
-                                                                  .responces,
-                                                              'date_of_visit'))
-                                                  : '',
-                                              style: Styles.cardBlue10,
-                                              overflow: TextOverflow.ellipsis,
-                                              strutStyle:
-                                                  StrutStyle(height: 1.2),
+                                              '${Global.returnTrLable(translats, CustomText.datevisit, lng).trim()} : ',
+                                              style: Styles.black104,
+                                              strutStyle: StrutStyle(height: 1.2),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      SizedBox(width: 5),
-                                      (filterData[index].is_edited == 0 &&
-                                              filterData[index].is_uploaded ==
-                                                  1)
-                                          ? Image.asset(
-                                              "assets/sync.png",
-                                              scale: 1.5,
-                                            )
-                                          : (filterData[index].is_edited == 1 &&
-                                                  filterData[index]
-                                                          .is_uploaded ==
-                                                      0)
-                                              ? Image.asset(
-                                                  "assets/sync_gray.png",
-                                                  scale: 1.5,
-                                                )
-                                              : Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons
-                                                          .error_outline_outlined,
-                                                      color:
-                                                          Colors.red,
-                                                      shadows: [
-                                                        BoxShadow(
-                                                            spreadRadius: 2,
-                                                            blurRadius: 4,
+                                        SizedBox(width: 10),
+                                        SizedBox(
+                                          height: 30.h,
+                                          width: 2,
+                                          child: VerticalDivider(
+                                            color: Color(0xffE6E6E6),
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                callCreCheName(
+                                                    Global.getItemValues(
+                                                        filterData[index]
+                                                            .responces,
+                                                        'creche_id')),
+                                                style: Styles.cardBlue10,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                (Global.validString(
+                                                        Global.getItemValues(
+                                                            filterData[index]
+                                                                .responces,
+                                                            'date_of_visit')))
+                                                    ? Validate()
+                                                        .displeDateFormate(
+                                                            Global.getItemValues(
+                                                                filterData[index]
+                                                                    .responces,
+                                                                'date_of_visit'))
+                                                    : '',
+                                                style: Styles.cardBlue10,
+                                                overflow: TextOverflow.ellipsis,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(width: 5),
+                                        (filterData[index].is_edited == 0 &&
+                                                filterData[index].is_uploaded ==
+                                                    1)
+                                            ? Image.asset(
+                                                "assets/sync.png",
+                                                scale: 1.5,
+                                              )
+                                            : (filterData[index].is_edited == 1 &&
+                                                    filterData[index]
+                                                            .is_uploaded ==
+                                                        0)
+                                                ? Image.asset(
+                                                    "assets/sync_gray.png",
+                                                    scale: 1.5,
+                                                  )
+                                                : Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons
+                                                            .error_outline_outlined,
+                                                        color:
+                                                            Colors.red,
+                                                        shadows: [
+                                                          BoxShadow(
+                                                              spreadRadius: 2,
+                                                              blurRadius: 4,
+                                                              color: Colors
+                                                                  .red.shade200)
+                                                        ],
+                                                      ),
+                                                      InkWell(
+                                                        onTap: () async {
+                                                          showDeleteDialog(
+                                                              filterData[index]);
+                                                          // setState(() {});
+                                                        },
+                                                        child: Container(
+                                                          margin: EdgeInsets.only(
+                                                              left: 8
+                                                                  .w), // Optional spacing from content
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(50),
                                                             color: Colors
-                                                                .red.shade200)
-                                                      ],
-                                                    ),
-                                                    InkWell(
-                                                      onTap: () async {
-                                                        showDeleteDialog(
-                                                            filterData[index]);
-                                                        // setState(() {});
-                                                      },
-                                                      child: Container(
-                                                        margin: EdgeInsets.only(
-                                                            left: 8
-                                                                .w), // Optional spacing from content
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(50),
-                                                          color: Colors
-                                                              .red.shade300,
-                                                        ),
-                                                        child: Padding(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  horizontal:
-                                                                      2.w,
-                                                                  vertical:
-                                                                      2.h),
-                                                          child: Icon(
-                                                            Icons
-                                                                .delete_rounded,
-                                                            color: Colors
-                                                                .white,
-                                                            size: 16,
+                                                                .red.shade300,
+                                                          ),
+                                                          child: Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        2.w,
+                                                                    vertical:
+                                                                        2.h),
+                                                            child: Icon(
+                                                              Icons
+                                                                  .delete_rounded,
+                                                              color: Colors
+                                                                  .white,
+                                                              size: 16,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                )
-                                    ]),
+                                                    ],
+                                                  )
+                                      ]),
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      })
-                  : Center(
-                      child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng)),
-                    ),
-            ),
-          ]),
+                          );
+                        })
+                    : Center(
+                        child: Text(Global.returnTrLable(
+                            translats, CustomText.NorecordAvailable, lng)),
+                      ),
+              ),
+            ]),
+          ),
         ),
       ),
     );

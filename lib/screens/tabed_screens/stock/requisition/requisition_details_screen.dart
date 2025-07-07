@@ -314,220 +314,223 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        actions: [SizedBox()],
-        automaticallyImplyLeading: false,
-        toolbarHeight: 60,
-        backgroundColor: Color(0xff5979AA),
-        leading: Padding(
-          padding: EdgeInsets.only(left: 10.0),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context, 'itemRefresh');
-            },
-            child: Icon(
-              Icons.arrow_back_ios_sharp,
-              size: 20,
-              color: Colors.white,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          actions: [SizedBox()],
+          automaticallyImplyLeading: false,
+          toolbarHeight: 60,
+          backgroundColor: Color(0xff5979AA),
+          leading: Padding(
+            padding: EdgeInsets.only(left: 10.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context, 'itemRefresh');
+              },
+              child: Icon(
+                Icons.arrow_back_ios_sharp,
+                size: 20,
+                color: Colors.white,
+              ),
             ),
           ),
-        ),
-        title: RichText(
-          text: TextSpan(
-            children: [
-              WidgetSpan(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      Global.returnTrLable(
-                          translats, CustomText.requiDetails, lng!),
-                      style: Styles.white145,
-                    ),
-                    Text(
-                      creche_name ?? '',
-                      style: Styles.white126P,
-                    ),
-                    // Add additional TextSpans here if needed
-                  ],
-                ),
-              )
-            ],
+          title: RichText(
+            text: TextSpan(
+              children: [
+                WidgetSpan(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        Global.returnTrLable(
+                            translats, CustomText.requiDetails, lng!),
+                        style: Styles.white145,
+                      ),
+                      Text(
+                        creche_name ?? '',
+                        style: Styles.white126P,
+                      ),
+                      // Add additional TextSpans here if needed
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      endDrawer: SafeArea(
-          child: Drawer(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20), bottomLeft: Radius.circular(20))),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 17),
-          child: Column(
-            children: [
-              Text(
-                Global.returnTrLable(translats, CustomText.removedItem, lng),
-                style: TextStyle(
-                    color: Colors.purple[400],
-                    fontSize: 18,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500),
-              ),
-              Flexible(
-                  fit: FlexFit.loose,
-                  child: removedItemList.isNotEmpty
-                      ? itemCard(removedItemList, allItems, 1)
-                      : Center(
-                          child: Text(Global.returnTrLable(
-                              translats, CustomText.noREmovedItem, lng)),
-                        )),
-              Divider(),
-              SizedBox(height: 5),
-              Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  child: CElevatedButton(
-                      text:
-                          Global.returnTrLable(translats, CustomText.add, lng),
-                      color: Colors.red[500],
-                      onPressed: () {
-                        if (addbackList.isNotEmpty) {
-                          filteredPartnerStock.addAll(addbackList);
-                          addbackList.forEach((element) {
-                            removedItemList.remove(element);
-                          });
-                          addbackList.clear();
-                        } else {
-                          Validate().singleButtonPopup(
-                              Global.returnTrLable(
-                                  translats, CustomText.selectItemForAdd, lng),
-                              Global.returnTrLable(
-                                  translats, CustomText.ok, lng),
-                              false,
-                              context);
-                        }
-                        setState(() {});
-                      }))
-            ],
-          ),
-        ),
-      )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: _isLoading
-          ? SizedBox()
-          : removedItemList.isEmpty || !widget.isEdit
-              ? SizedBox()
-              : Padding(
-                  padding: EdgeInsets.only(bottom: 80),
-                  child: FloatingActionButton(
-                    backgroundColor: Color(0xff5979AA),
-                    onPressed: () {
-                      _scaffoldKey.currentState!.openEndDrawer();
-                    },
-                    child: Image.asset(
-                      "assets/add_btn.png",
-                      scale: 2.7,
-                      color: Colors.white,
-                    ),
-                  ),
+        endDrawer: SafeArea(
+            child: Drawer(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20), bottomLeft: Radius.circular(20))),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 17),
+            child: Column(
+              children: [
+                Text(
+                  Global.returnTrLable(translats, CustomText.removedItem, lng),
+                  style: TextStyle(
+                      color: Colors.purple[400],
+                      fontSize: 18,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500),
                 ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${getOptionsFromName(widget.month, 'Months')} - ${getOptionsFromName(widget.year, 'Year')}',
-                          style: Styles.black12700,
-                        )
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CustomTextFieldRow(
-                            controller: textController,
-                            onChanged: (value) {
-                              print(value);
-                              filterDataQu(value);
-                            },
-                            hintText: Global.returnTrLable(
-                                translats, CustomText.Search, lng),
-                            prefixIcon: Image.asset(
-                              "assets/search.png",
-                              scale: 2.4,
-                            ),
-                          ),
-                        ),
-                        // SizedBox(
-                        //   width: 10.w,
-                        // ),
-                        // GestureDetector(
-                        //   onTap: () {
-                        //     _scaffoldKey.currentState!.openEndDrawer();
-                        //   },
-                        //   child: Image.asset(
-                        //     "assets/filter_icon.png",
-                        //     scale: 2.4,
-                        //   ),
-                        // )
-                      ],
-                    ),
-                  ),
-                  Flexible(
+                Flexible(
                     fit: FlexFit.loose,
-                    child: (filteredPartnerStock.isNotEmpty)
-                        ? itemCard(filteredPartnerStock, allItems, 0)
+                    child: removedItemList.isNotEmpty
+                        ? itemCard(removedItemList, allItems, 1)
                         : Center(
                             child: Text(Global.returnTrLable(
-                                translats, CustomText.noItemsAvail, lng))),
+                                translats, CustomText.noREmovedItem, lng)),
+                          )),
+                Divider(),
+                SizedBox(height: 5),
+                Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: CElevatedButton(
+                        text:
+                            Global.returnTrLable(translats, CustomText.add, lng),
+                        color: Colors.red[500],
+                        onPressed: () {
+                          if (addbackList.isNotEmpty) {
+                            filteredPartnerStock.addAll(addbackList);
+                            addbackList.forEach((element) {
+                              removedItemList.remove(element);
+                            });
+                            addbackList.clear();
+                          } else {
+                            Validate().singleButtonPopup(
+                                Global.returnTrLable(
+                                    translats, CustomText.selectItemForAdd, lng),
+                                Global.returnTrLable(
+                                    translats, CustomText.ok, lng),
+                                false,
+                                context);
+                          }
+                          setState(() {});
+                        }))
+              ],
+            ),
+          ),
+        )),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: _isLoading
+            ? SizedBox()
+            : removedItemList.isEmpty || !widget.isEdit
+                ? SizedBox()
+                : Padding(
+                    padding: EdgeInsets.only(bottom: 80),
+                    child: FloatingActionButton(
+                      backgroundColor: Color(0xff5979AA),
+                      onPressed: () {
+                        _scaffoldKey.currentState!.openEndDrawer();
+                      },
+                      child: Image.asset(
+                        "assets/add_btn.png",
+                        scale: 2.7,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-
-                  // Spacer(),
-                  Divider(),
-                  Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${getOptionsFromName(widget.month, 'Months')} - ${getOptionsFromName(widget.year, 'Year')}',
+                            style: Styles.black12700,
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                       child: Row(
                         children: [
                           Expanded(
-                              child: CElevatedButton(
-                            color: Color(0xffF26BA3),
-                            onPressed: () {
-                              nextTab(0, context);
-                            },
-                            text: Global.returnTrLable(
-                                translats, CustomText.back, lng!),
-                          )),
-                          widget.isEdit ? SizedBox(width: 10) : SizedBox(),
-                          widget.isEdit
-                              ? Expanded(
-                                  child: CElevatedButton(
-                                  color: Color(0xff369A8D),
-                                  onPressed: () {
-                                    nextTab(1, context);
-                                  },
-                                  text: Global.returnTrLable(
-                                      translats, CustomText.Submit, lng!),
-                                ))
-                              : SizedBox()
+                            child: CustomTextFieldRow(
+                              controller: textController,
+                              onChanged: (value) {
+                                print(value);
+                                filterDataQu(value);
+                              },
+                              hintText: Global.returnTrLable(
+                                  translats, CustomText.Search, lng),
+                              prefixIcon: Image.asset(
+                                "assets/search.png",
+                                scale: 2.4,
+                              ),
+                            ),
+                          ),
+                          // SizedBox(
+                          //   width: 10.w,
+                          // ),
+                          // GestureDetector(
+                          //   onTap: () {
+                          //     _scaffoldKey.currentState!.openEndDrawer();
+                          //   },
+                          //   child: Image.asset(
+                          //     "assets/filter_icon.png",
+                          //     scale: 2.4,
+                          //   ),
+                          // )
                         ],
-                      ))
-                ],
+                      ),
+                    ),
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: (filteredPartnerStock.isNotEmpty)
+                          ? itemCard(filteredPartnerStock, allItems, 0)
+                          : Center(
+                              child: Text(Global.returnTrLable(
+                                  translats, CustomText.noItemsAvail, lng))),
+                    ),
+
+                    // Spacer(),
+                    Divider(),
+                    Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                        child: Row(
+                          children: [
+                            Expanded(
+                                child: CElevatedButton(
+                              color: Color(0xffF26BA3),
+                              onPressed: () {
+                                nextTab(0, context);
+                              },
+                              text: Global.returnTrLable(
+                                  translats, CustomText.back, lng!),
+                            )),
+                            widget.isEdit ? SizedBox(width: 10) : SizedBox(),
+                            widget.isEdit
+                                ? Expanded(
+                                    child: CElevatedButton(
+                                    color: Color(0xff369A8D),
+                                    onPressed: () {
+                                      nextTab(1, context);
+                                    },
+                                    text: Global.returnTrLable(
+                                        translats, CustomText.Submit, lng!),
+                                  ))
+                                : SizedBox()
+                          ],
+                        ))
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 

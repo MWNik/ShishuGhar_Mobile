@@ -124,90 +124,93 @@ class _ChildImmunizationExpendedScreenSatet
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 60,
-          backgroundColor: Color(0xff5979AA),
-          leading: Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context, 'itemRefresh');
-              },
-              child: Icon(
-                Icons.arrow_back_ios_sharp,
-                size: 20,
-                color: Colors.white,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 60,
+            backgroundColor: Color(0xff5979AA),
+            leading: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context, 'itemRefresh');
+                },
+                child: Icon(
+                  Icons.arrow_back_ios_sharp,
+                  size: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-          title: RichText(
-            text: TextSpan(
-              children: [
-              WidgetSpan(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${widget.childName}',
-                      style: Styles.white145,
-                    ),
-                    Text(
-                      '${widget.childHHID}',
-                      style: Styles.white126P,
-                    ),
-                    // Add additional TextSpans here if needed
-                  ],
-                ),
-              )
-              ],
-            ),
-          ),
-          centerTitle: true,
-        ),
-        body: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Column(
+            title: RichText(
+              text: TextSpan(
                 children: [
-                  Divider(),
-                  Expanded(
-                      child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: SingleChildScrollView(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: cParentWidget(),
-                    )),
-                  )),
-                  Divider(),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: Row(children: [
-                      Expanded(
-                          child: CElevatedButton(
-                        color: Color(0xffF26BA3),
-                        onPressed: () {
-                          nextTab(0, context);
-                        },
-                        text: Global.returnTrLable(
-                            labelControlls, CustomText.back, lng!),
-                      )),
-                      SizedBox(width: 10),
-                      Expanded(
-                          child: CElevatedButton(
-                        color: Color(0xff369A8D),
-                        onPressed: () {
-                          nextTab(1, context);
-                        },
-                        text: Global.returnTrLable(
-                            labelControlls,  CustomText.Submit, lng!),
-                      ))
-                    ]),
-                  )
+                WidgetSpan(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${widget.childName}',
+                        style: Styles.white145,
+                      ),
+                      Text(
+                        '${widget.childHHID}',
+                        style: Styles.white126P,
+                      ),
+                      // Add additional TextSpans here if needed
+                    ],
+                  ),
+                )
                 ],
-              ));
+              ),
+            ),
+            centerTitle: true,
+          ),
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    Divider(),
+                    Expanded(
+                        child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      child: SingleChildScrollView(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: cParentWidget(),
+                      )),
+                    )),
+                    Divider(),
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      child: Row(children: [
+                        Expanded(
+                            child: CElevatedButton(
+                          color: Color(0xffF26BA3),
+                          onPressed: () {
+                            nextTab(0, context);
+                          },
+                          text: Global.returnTrLable(
+                              labelControlls, CustomText.back, lng!),
+                        )),
+                        SizedBox(width: 10),
+                        Expanded(
+                            child: CElevatedButton(
+                          color: Color(0xff369A8D),
+                          onPressed: () {
+                            nextTab(1, context);
+                          },
+                          text: Global.returnTrLable(
+                              labelControlls,  CustomText.Submit, lng!),
+                        ))
+                      ]),
+                    )
+                  ],
+                )),
+    );
   }
 
   List<Widget> cParentWidget() {

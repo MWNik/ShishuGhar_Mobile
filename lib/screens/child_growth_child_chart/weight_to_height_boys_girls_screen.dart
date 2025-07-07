@@ -181,77 +181,80 @@ class _WeightToHeightBoysGirlsScreenState
   Widget build(BuildContext context) {
     var orientation = MediaQuery.of(context).orientation;
     print(child);
-    return WillPopScope(
-      onWillPop: () async {
-        await SystemChrome.setPreferredOrientations([
-          DeviceOrientation.portraitUp,
-          DeviceOrientation.portraitDown,
-        ]);
-        return true;
-      },
-      child: Scaffold(
-        appBar: CustomChildAppbar(
-          text: Global.returnTrLable(translats, CustomText.GrowthChart, lng),
-          subTitle1: widget.childName,
-          subTitle2: widget.childId,
-          onTap: () {
-            SystemChrome.setPreferredOrientations([
-              DeviceOrientation.portraitDown,
-              DeviceOrientation.portraitUp,
-            ]);
-            Navigator.pop(context);
-          },
-        ),
-        body: (child!.length == 0)
-            ? Center(
-          child: Text(Global.returnTrLable(
-              translats, CustomText.NorecordAvailable, lng)),
-        )
-            : SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: orientation == Orientation.portrait
-                    ? MultiLineChart(
-                        crechId: widget.crechId,
-                        coordinatesOne: red_cor!,
-                        child: child!,
-                        childName: widget.childName,
-                        childId: widget.childId,
-                        coordinatesTwo: green_cor!,
-                        coordinatesThree: yellow_max!,
-                        coordinatesFour: yellow_min!,
-                        gender: widget.gender_id,
-                        maxX: maxX!,
-                        maxY: maxY!,
-                        heading: CustomText.WeightforHeight,
-                        bottomName: "Height",
-                        leftName: "Weight",
-                  minX: minX!,
-                        // minX: minX!,
-                        childenrollguid: widget.childenrollguid,
-                      )
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: MultiLineChart(
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          await SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+            DeviceOrientation.portraitDown,
+          ]);
+          return true;
+        },
+        child: Scaffold(
+          appBar: CustomChildAppbar(
+            text: Global.returnTrLable(translats, CustomText.GrowthChart, lng),
+            subTitle1: widget.childName,
+            subTitle2: widget.childId,
+            onTap: () {
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.portraitDown,
+                DeviceOrientation.portraitUp,
+              ]);
+              Navigator.pop(context);
+            },
+          ),
+          body: (child!.length == 0)
+              ? Center(
+            child: Text(Global.returnTrLable(
+                translats, CustomText.NorecordAvailable, lng)),
+          )
+              : SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: orientation == Orientation.portrait
+                      ? MultiLineChart(
                           crechId: widget.crechId,
+                          coordinatesOne: red_cor!,
+                          child: child!,
                           childName: widget.childName,
                           childId: widget.childId,
-                          childenrollguid: widget.childenrollguid,
-                          coordinatesOne: yellow_max!,
                           coordinatesTwo: green_cor!,
-                          coordinatesThree: red_cor!,
+                          coordinatesThree: yellow_max!,
                           coordinatesFour: yellow_min!,
                           gender: widget.gender_id,
+                          maxX: maxX!,
+                          maxY: maxY!,
+                          heading: CustomText.WeightforHeight,
                           bottomName: "Height",
                           leftName: "Weight",
-                          heading: CustomText.WeightforHeight,
-                          maxY: maxY!,
-                          child: child!,
-                          maxX: maxX!,
+                    minX: minX!,
                           // minX: minX!,
-                          minX: minX!,
-                        ),
-                      )),
+                          childenrollguid: widget.childenrollguid,
+                        )
+                      : SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: MultiLineChart(
+                            crechId: widget.crechId,
+                            childName: widget.childName,
+                            childId: widget.childId,
+                            childenrollguid: widget.childenrollguid,
+                            coordinatesOne: yellow_max!,
+                            coordinatesTwo: green_cor!,
+                            coordinatesThree: red_cor!,
+                            coordinatesFour: yellow_min!,
+                            gender: widget.gender_id,
+                            bottomName: "Height",
+                            leftName: "Weight",
+                            heading: CustomText.WeightforHeight,
+                            maxY: maxY!,
+                            child: child!,
+                            maxX: maxX!,
+                            // minX: minX!,
+                            minX: minX!,
+                          ),
+                        )),
+        ),
       ),
     );
   }

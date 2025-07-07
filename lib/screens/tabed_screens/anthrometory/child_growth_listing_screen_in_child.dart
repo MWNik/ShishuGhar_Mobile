@@ -197,152 +197,68 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomChildAppbar(
-        text: Global.returnTrLable(translats, CustomText.anthropomertry, lng),
-        subTitle1: widget.childName,
-        subTitle2: widget.childId,
-        onTap: () => Navigator.pop(context),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        child: Column(
-          children: [
-            Expanded(
-              child: (childHHData.length > 0)
-                  ? ListView.builder(
-                      itemCount: childHHData.length,
-                      shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () async {},
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5.h),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(
-                                          0.2), // Shadow color with opacity
-                                      offset: Offset(0,
-                                          3), // Horizontal and vertical offset
-                                      blurRadius: 6, // Blur radius
-                                      spreadRadius: 0, // Spread radius
-                                    ),
-                                  ],
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w, vertical: 8.h),
-                                child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '${Global.returnTrLable(translats, 'Measurement Date', lng).trim()} : ',
-                                                style: Styles.black104,
-                                              ),
-                                              callGetChildDataFromAnthro(
-                                                          childHHData[index]
-                                                              .responces!,
-                                                          'do_you_have_height_weight') ==
-                                                      '1'
-                                                  ? Text(
-                                                      '${Global.returnTrLable(translats, "Height", lng).trim()} : ',
-                                                      style: Styles.black104,
-                                                      strutStyle: StrutStyle(
-                                                          height: 1.2),
-                                                    )
-                                                  : SizedBox(),
-                                              // callGetChildDataFromAnthro(
-                                              //             childHHData[index]
-                                              //                 .responces!,
-                                              //             'do_you_have_height_weight') ==
-                                              //         '1'
-                                              //     ? Text(
-                                              //         '${Global.returnTrLable(translats, "Height", lng).trim()} : ',
-                                              //         style: Styles.black104,
-                                              //         strutStyle:
-                                              //             StrutStyle(height: 1),
-                                              //       )
-                                              //     : SizedBox(),
-                                              callGetChildDataFromAnthro(
-                                                          childHHData[index]
-                                                              .responces!,
-                                                          'do_you_have_height_weight') ==
-                                                      '1'
-                                                  ? Text(
-                                                      '${Global.returnTrLable(translats, 'Weight', lng).trim()} : ',
-                                                      style: Styles.black104,
-                                                      strutStyle: StrutStyle(
-                                                          height: 1.2),
-                                                    )
-                                                  : SizedBox(),
-                                              Text(
-                                                '${Global.returnTrLable(translats, CustomText.childAgeInDaysbrac, lng).trim()} : ',
-                                                style: Styles.black104,
-                                                strutStyle:
-                                                    StrutStyle(height: 1.2),
-                                              ),
-                                              callGetChildDataFromAnthro(
-                                                          childHHData[index]
-                                                              .responces!,
-                                                          'do_you_have_height_weight') ==
-                                                      '1'
-                                                  ? Text(
-                                                      '${Global.returnTrLable(translats, 'Measurement Equipment', lng).trim()} : ',
-                                                      style: Styles.black104,
-                                                      strutStyle: StrutStyle(
-                                                          height: 1.2),
-                                                    )
-                                                  : Text(
-                                                      '${Global.returnTrLable(translats, 'Measurement taken', lng).trim()} : ',
-                                                      style: Styles.black104,
-                                                      strutStyle: StrutStyle(
-                                                          height: 1.2)),
-                                            ],
-                                          ),
-                                          SizedBox(width: 10),
-                                          SizedBox(
-                                            height: 30.h,
-                                            width: 2,
-                                            child: VerticalDivider(
-                                              color: Color(0xffE6E6E6),
-                                            ),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomChildAppbar(
+          text: Global.returnTrLable(translats, CustomText.anthropomertry, lng),
+          subTitle1: widget.childName,
+          subTitle2: widget.childId,
+          onTap: () => Navigator.pop(context),
+        ),
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          child: Column(
+            children: [
+              Expanded(
+                child: (childHHData.length > 0)
+                    ? ListView.builder(
+                        itemCount: childHHData.length,
+                        shrinkWrap: true,
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: () async {},
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 5.h),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0xff5A5A5A).withOpacity(
+                                            0.2), // Shadow color with opacity
+                                        offset: Offset(0,
+                                            3), // Horizontal and vertical offset
+                                        blurRadius: 6, // Blur radius
+                                        spreadRadius: 0, // Spread radius
+                                      ),
+                                    ],
+                                    color: Colors.white,
+                                    border: Border.all(color: Color(0xffE7F0FF)),
+                                    borderRadius: BorderRadius.circular(10.r)),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w, vertical: 8.h),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  Validate().displeDateFormate(
-                                                      Global.getItemValues(
-                                                          childHHData[index]
-                                                              .responces!,
-                                                          'measurement_date')),
-                                                  style: Styles.cardBlue10,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
+                                                  '${Global.returnTrLable(translats, 'Measurement Date', lng).trim()} : ',
+                                                  style: Styles.black104,
                                                 ),
                                                 callGetChildDataFromAnthro(
                                                             childHHData[index]
@@ -350,46 +266,41 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                             'do_you_have_height_weight') ==
                                                         '1'
                                                     ? Text(
-                                                        callGetChildDataFromAnthro(
-                                                            childHHData[index]
-                                                                .responces!,
-                                                            'height')!,
-                                                        style:
-                                                            Styles.cardBlue10,
+                                                        '${Global.returnTrLable(translats, "Height", lng).trim()} : ',
+                                                        style: Styles.black104,
                                                         strutStyle: StrutStyle(
                                                             height: 1.2),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
                                                       )
                                                     : SizedBox(),
+                                                // callGetChildDataFromAnthro(
+                                                //             childHHData[index]
+                                                //                 .responces!,
+                                                //             'do_you_have_height_weight') ==
+                                                //         '1'
+                                                //     ? Text(
+                                                //         '${Global.returnTrLable(translats, "Height", lng).trim()} : ',
+                                                //         style: Styles.black104,
+                                                //         strutStyle:
+                                                //             StrutStyle(height: 1),
+                                                //       )
+                                                //     : SizedBox(),
                                                 callGetChildDataFromAnthro(
                                                             childHHData[index]
                                                                 .responces!,
                                                             'do_you_have_height_weight') ==
                                                         '1'
                                                     ? Text(
-                                                        callGetChildDataFromAnthro(
-                                                            childHHData[index]
-                                                                .responces!,
-                                                            'weight')!,
-                                                        style:
-                                                            Styles.cardBlue10,
+                                                        '${Global.returnTrLable(translats, 'Weight', lng).trim()} : ',
+                                                        style: Styles.black104,
                                                         strutStyle: StrutStyle(
                                                             height: 1.2),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
                                                       )
                                                     : SizedBox(),
                                                 Text(
-                                                  callGetChildDataFromAnthro(
-                                                      childHHData[index]
-                                                          .responces!,
-                                                      'age_months')!,
-                                                  style: Styles.cardBlue10,
+                                                  '${Global.returnTrLable(translats, CustomText.childAgeInDaysbrac, lng).trim()} : ',
+                                                  style: Styles.black104,
                                                   strutStyle:
                                                       StrutStyle(height: 1.2),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
                                                 ),
                                                 callGetChildDataFromAnthro(
                                                             childHHData[index]
@@ -397,86 +308,221 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                             'do_you_have_height_weight') ==
                                                         '1'
                                                     ? Text(
-                                                        getMesumentEqupment(
-                                                            childHHData[index]
-                                                                .responces!,
-                                                            'measurement_equipment'),
-                                                        style:
-                                                            Styles.cardBlue10,
+                                                        '${Global.returnTrLable(translats, 'Measurement Equipment', lng).trim()} : ',
+                                                        style: Styles.black104,
                                                         strutStyle: StrutStyle(
                                                             height: 1.2),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
                                                       )
                                                     : Text(
-                                                        '${Global.returnTrLable(translats, CustomText.No, lng).trim()}',
-                                                        style:
-                                                            Styles.cardBlue10,
+                                                        '${Global.returnTrLable(translats, 'Measurement taken', lng).trim()} : ',
+                                                        style: Styles.black104,
                                                         strutStyle: StrutStyle(
-                                                            height: 1.2),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
+                                                            height: 1.2)),
                                               ],
                                             ),
-                                          ),
-                                          (childHHData[index].is_edited == 0 &&
-                                                  childHHData[index]
-                                                          .is_uploaded ==
-                                                      1)
-                                              ? Image.asset(
-                                                  "assets/sync.png",
-                                                  scale: 1.5,
-                                                )
-                                              : Image.asset(
-                                                  "assets/sync_gray.png",
-                                                  scale: 1.5,
-                                                )
-                                        ],
-                                      ),
-                                      SizedBox(height: 5),
-                                      // DynamicMultiCheckGrowthGridView(
-                                      //   titleText:'Illness',
-                                      //   items: inless,
-                                      //   readable:true,
-                                      //   selectedItem: callGetChildDataFromAnthro(
-                                      //       childHHData[index].responces!,
-                                      //       'illness_id'),
-                                      //   onChanged: (value) {
-                                      //   },
-                                      // ),
-                                      callGetChildDataFromAnthro(
-                                                  childHHData[index].responces!,
-                                                  'do_you_have_height_weight') ==
-                                              '1'
-                                          ? Text(
-                                              '${Global.returnTrLable(translats, 'Z - Score', lng).trim()}',
-                                              style: Styles.black104,
-                                            )
-                                          : SizedBox(),
-                                      callGetChildDataFromAnthro(
-                                                  childHHData[index].responces!,
-                                                  'do_you_have_height_weight') ==
-                                              '1'
-                                          ? SizedBox(height: 5)
-                                          : SizedBox(),
-                                      callGetChildDataFromAnthro(
-                                                  childHHData[index].responces!,
-                                                  'do_you_have_height_weight') ==
-                                              '1'
-                                          ? Container(
-                                              padding: EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                border: Border.all(
-                                                    color: Color(0xffE0E0E0)),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.r),
+                                            SizedBox(width: 10),
+                                            SizedBox(
+                                              height: 30.h,
+                                              width: 2,
+                                              child: VerticalDivider(
+                                                color: Color(0xffE6E6E6),
                                               ),
-                                              child: Row(
+                                            ),
+                                            SizedBox(width: 10),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
                                                 children: [
-                                                  Expanded(
-                                                    child: Column(
+                                                  Text(
+                                                    Validate().displeDateFormate(
+                                                        Global.getItemValues(
+                                                            childHHData[index]
+                                                                .responces!,
+                                                            'measurement_date')),
+                                                    style: Styles.cardBlue10,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  callGetChildDataFromAnthro(
+                                                              childHHData[index]
+                                                                  .responces!,
+                                                              'do_you_have_height_weight') ==
+                                                          '1'
+                                                      ? Text(
+                                                          callGetChildDataFromAnthro(
+                                                              childHHData[index]
+                                                                  .responces!,
+                                                              'height')!,
+                                                          style:
+                                                              Styles.cardBlue10,
+                                                          strutStyle: StrutStyle(
+                                                              height: 1.2),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        )
+                                                      : SizedBox(),
+                                                  callGetChildDataFromAnthro(
+                                                              childHHData[index]
+                                                                  .responces!,
+                                                              'do_you_have_height_weight') ==
+                                                          '1'
+                                                      ? Text(
+                                                          callGetChildDataFromAnthro(
+                                                              childHHData[index]
+                                                                  .responces!,
+                                                              'weight')!,
+                                                          style:
+                                                              Styles.cardBlue10,
+                                                          strutStyle: StrutStyle(
+                                                              height: 1.2),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        )
+                                                      : SizedBox(),
+                                                  Text(
+                                                    callGetChildDataFromAnthro(
+                                                        childHHData[index]
+                                                            .responces!,
+                                                        'age_months')!,
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  callGetChildDataFromAnthro(
+                                                              childHHData[index]
+                                                                  .responces!,
+                                                              'do_you_have_height_weight') ==
+                                                          '1'
+                                                      ? Text(
+                                                          getMesumentEqupment(
+                                                              childHHData[index]
+                                                                  .responces!,
+                                                              'measurement_equipment'),
+                                                          style:
+                                                              Styles.cardBlue10,
+                                                          strutStyle: StrutStyle(
+                                                              height: 1.2),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        )
+                                                      : Text(
+                                                          '${Global.returnTrLable(translats, CustomText.No, lng).trim()}',
+                                                          style:
+                                                              Styles.cardBlue10,
+                                                          strutStyle: StrutStyle(
+                                                              height: 1.2),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                ],
+                                              ),
+                                            ),
+                                            (childHHData[index].is_edited == 0 &&
+                                                    childHHData[index]
+                                                            .is_uploaded ==
+                                                        1)
+                                                ? Image.asset(
+                                                    "assets/sync.png",
+                                                    scale: 1.5,
+                                                  )
+                                                : Image.asset(
+                                                    "assets/sync_gray.png",
+                                                    scale: 1.5,
+                                                  )
+                                          ],
+                                        ),
+                                        SizedBox(height: 5),
+                                        // DynamicMultiCheckGrowthGridView(
+                                        //   titleText:'Illness',
+                                        //   items: inless,
+                                        //   readable:true,
+                                        //   selectedItem: callGetChildDataFromAnthro(
+                                        //       childHHData[index].responces!,
+                                        //       'illness_id'),
+                                        //   onChanged: (value) {
+                                        //   },
+                                        // ),
+                                        callGetChildDataFromAnthro(
+                                                    childHHData[index].responces!,
+                                                    'do_you_have_height_weight') ==
+                                                '1'
+                                            ? Text(
+                                                '${Global.returnTrLable(translats, 'Z - Score', lng).trim()}',
+                                                style: Styles.black104,
+                                              )
+                                            : SizedBox(),
+                                        callGetChildDataFromAnthro(
+                                                    childHHData[index].responces!,
+                                                    'do_you_have_height_weight') ==
+                                                '1'
+                                            ? SizedBox(height: 5)
+                                            : SizedBox(),
+                                        callGetChildDataFromAnthro(
+                                                    childHHData[index].responces!,
+                                                    'do_you_have_height_weight') ==
+                                                '1'
+                                            ? Container(
+                                                padding: EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  border: Border.all(
+                                                      color: Color(0xffE0E0E0)),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10.r),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Column(
+                                                        children: [
+                                                          Container(
+                                                            height: 25,
+                                                            width: 25,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: callColorId(
+                                                                  childHHData[
+                                                                          index]
+                                                                      .responces!,
+                                                                  'weight_for_age'),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5.r),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            Global.returnTrLable(
+                                                                translats,
+                                                                'Weight for age',
+                                                                lng),
+                                                            style: Styles.black85,
+                                                            strutStyle:
+                                                                StrutStyle(
+                                                                    height: 1.2),
+                                                          ),
+                                                          Text(
+                                                            callColorName(
+                                                                childHHData[index]
+                                                                    .responces!,
+                                                                'weight_for_age'),
+                                                            style: Styles.red85,
+                                                          ),
+                                                          Text(
+                                                            callColorNameAvg(childResponce(childHHData[index].responces!), 'weight_for_age',
+                                                                callGetChildDataFromAnthro(childHHData[index].responces!, 'measurement_taken_date')),
+                                                            style: Styles.red85,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                        child: Column(
                                                       children: [
                                                         Container(
                                                           height: 25,
@@ -484,10 +530,9 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                           decoration:
                                                               BoxDecoration(
                                                             color: callColorId(
-                                                                childHHData[
-                                                                        index]
+                                                                childHHData[index]
                                                                     .responces!,
-                                                                'weight_for_age'),
+                                                                'weight_for_height'),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
@@ -497,141 +542,99 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                         Text(
                                                           Global.returnTrLable(
                                                               translats,
-                                                              'Weight for age',
+                                                              'Weight for Height',
                                                               lng),
                                                           style: Styles.black85,
-                                                          strutStyle:
-                                                              StrutStyle(
-                                                                  height: 1.2),
+                                                          strutStyle: StrutStyle(
+                                                              height: 1.2),
                                                         ),
                                                         Text(
                                                           callColorName(
                                                               childHHData[index]
                                                                   .responces!,
-                                                              'weight_for_age'),
+                                                              'weight_for_height'),
                                                           style: Styles.red85,
                                                         ),
                                                         Text(
-                                                          callColorNameAvg(childResponce(childHHData[index].responces!), 'weight_for_age',
-                                                              callGetChildDataFromAnthro(childHHData[index].responces!, 'measurement_taken_date')),
+                                                          callColorNameAvg(
+                                                              childResponce(
+                                                                  childHHData[
+                                                                          index]
+                                                                      .responces!),
+                                                              'weight_for_height',callGetChildDataFromAnthro(childHHData[index].responces!, 'measurement_taken_date')),
                                                           style: Styles.red85,
                                                         ),
                                                       ],
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                      child: Column(
-                                                    children: [
-                                                      Container(
-                                                        height: 25,
-                                                        width: 25,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: callColorId(
-                                                              childHHData[index]
-                                                                  .responces!,
-                                                              'weight_for_height'),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      5.r),
+                                                    )),
+                                                    Expanded(
+                                                        child: Column(
+                                                      children: [
+                                                        Container(
+                                                          height: 25,
+                                                          width: 25,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: callColorId(
+                                                                childHHData[index]
+                                                                    .responces!,
+                                                                'height_for_age'),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5.r),
+                                                          ),
                                                         ),
-                                                      ),
-                                                      Text(
-                                                        Global.returnTrLable(
-                                                            translats,
-                                                            'Weight for Height',
-                                                            lng),
-                                                        style: Styles.black85,
-                                                        strutStyle: StrutStyle(
-                                                            height: 1.2),
-                                                      ),
-                                                      Text(
-                                                        callColorName(
-                                                            childHHData[index]
-                                                                .responces!,
-                                                            'weight_for_height'),
-                                                        style: Styles.red85,
-                                                      ),
-                                                      Text(
-                                                        callColorNameAvg(
-                                                            childResponce(
-                                                                childHHData[
-                                                                        index]
-                                                                    .responces!),
-                                                            'weight_for_height',callGetChildDataFromAnthro(childHHData[index].responces!, 'measurement_taken_date')),
-                                                        style: Styles.red85,
-                                                      ),
-                                                    ],
-                                                  )),
-                                                  Expanded(
-                                                      child: Column(
-                                                    children: [
-                                                      Container(
-                                                        height: 25,
-                                                        width: 25,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: callColorId(
+                                                        Text(
+                                                          Global.returnTrLable(
+                                                              translats,
+                                                              'Height for Age',
+                                                              lng),
+                                                          style: Styles.black85,
+                                                          strutStyle: StrutStyle(
+                                                              height: 1.2),
+                                                        ),
+                                                        Text(
+                                                          callColorName(
                                                               childHHData[index]
                                                                   .responces!,
                                                               'height_for_age'),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      5.r),
+                                                          style: Styles.red85,
                                                         ),
-                                                      ),
-                                                      Text(
-                                                        Global.returnTrLable(
-                                                            translats,
-                                                            'Height for Age',
-                                                            lng),
-                                                        style: Styles.black85,
-                                                        strutStyle: StrutStyle(
-                                                            height: 1.2),
-                                                      ),
-                                                      Text(
-                                                        callColorName(
-                                                            childHHData[index]
-                                                                .responces!,
-                                                            'height_for_age'),
-                                                        style: Styles.red85,
-                                                      ),
-                                                      Text(
-                                                        callColorNameAvg(
-                                                            childResponce(
-                                                                childHHData[
-                                                                        index]
-                                                                    .responces!),
-                                                            'height_for_age',callGetChildDataFromAnthro(childHHData[index].responces!, 'measurement_taken_date')),
-                                                        style: Styles.red85,
-                                                      ),
-                                                    ],
-                                                  ))
-                                                ],
-                                              ),
-                                            )
-                                          : SizedBox(),
-                                      SizedBox(height: 10),
-                                      Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: visibleOtherItem(
-                                              childHHData[index].responces!))
-                                    ]),
+                                                        Text(
+                                                          callColorNameAvg(
+                                                              childResponce(
+                                                                  childHHData[
+                                                                          index]
+                                                                      .responces!),
+                                                              'height_for_age',callGetChildDataFromAnthro(childHHData[index].responces!, 'measurement_taken_date')),
+                                                          style: Styles.red85,
+                                                        ),
+                                                      ],
+                                                    ))
+                                                  ],
+                                                ),
+                                              )
+                                            : SizedBox(),
+                                        SizedBox(height: 10),
+                                        Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: visibleOtherItem(
+                                                childHHData[index].responces!))
+                                      ]),
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng)),
-                    ),
-            ),
-          ],
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text(Global.returnTrLable(
+                            translats, CustomText.NorecordAvailable, lng)),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

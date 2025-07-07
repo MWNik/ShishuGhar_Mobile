@@ -86,6 +86,7 @@ class _MultiLineChartState extends State<MultiLineChart> {
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     return SafeArea(
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,

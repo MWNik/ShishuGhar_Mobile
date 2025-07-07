@@ -123,214 +123,217 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppbar(
-        text: Global.returnTrLable(
-            locationControlls, CustomText.ShishuGharDetails, lng!),
-        onTap: () => Navigator.pop(context),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            GestureDetector(
-              child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10.h),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Color(0xffE7F0FF)),
-                        borderRadius: BorderRadius.circular(10.r)),
-                    child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                  '${Global.returnTrLable(locationControlls, CustomText.Creche_Name, lng!)} :',
-                                  style: Styles.black104),
-                              Text(
-                                '${Global.returnTrLable(locationControlls, CustomText.Village, lng!)} :',
-                                style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.2),
-                              ),
-                              Text(
-                                '${Global.returnTrLable(locationControlls, CustomText.GramPanchayat, lng!)} :',
-                                style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.2),
-                              ),
-                              Text(
-                                '${Global.returnTrLable(locationControlls, CustomText.Block, lng!)} :',
-                                style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.2),
-                              ),
-                              Text(
-                                '${Global.returnTrLable(locationControlls, CustomText.District, lng!)} :',
-                                style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.2),
-                              ),
-                              Text(
-                                '${Global.returnTrLable(locationControlls, CustomText.State, lng!)} :',
-                                style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.2),
-                              ),
-                              Text(
-                                '${Global.returnTrLable(locationControlls, CustomText.Supervisor, lng!)} :',
-                                style: Styles.black104,
-                                strutStyle: StrutStyle(height: 1.2),
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 10),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.14,
-                            width: 2,
-                            child: VerticalDivider(
-                              color: Color(0xffE6E6E6),
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          responce != null
-                              ? Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        Global.getItemValues(
-                                            responce!.responces!,
-                                            'creche_name'),
-                                        style: Styles.cardBlue10,
-                                      ),
-                                      Text(
-                                        village != null ? '$village' : '',
-                                        style: Styles.cardBlue10,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        gp != null ? '$gp' : '',
-                                        style: Styles.cardBlue10,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        block != null ? '$block' : '',
-                                        style: Styles.cardBlue10,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        district != null ? '$district' : '',
-                                        style: Styles.cardBlue10,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        state != null ? '$state' : '',
-                                        style: Styles.cardBlue10,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        supName != null ? '$supName' : '',
-                                        style: Styles.cardBlue10,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : SizedBox(),
-                        ],
-                      ),
-                    ),
-                  )),
-            ),
-            SizedBox(height: 7.h),
-            Expanded(
-                child: GridView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                        mainAxisExtent: 90.h),
-                    itemCount: text.length,
-                    physics: BouncingScrollPhysics(),
-                    itemBuilder: (ctx, i) {
-                      return InkWell(
-                        onTap: () async {
-                          await onclick(i, image[i]);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xff5A5A5A).withOpacity(
-                                      0.1), // Shadow color with opacity
-                                  offset: Offset(
-                                      0, 1), // Horizontal and vertical offset
-                                  blurRadius: 5, // Blur radius
-                                  spreadRadius: 0, // Spread radius
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomAppbar(
+          text: Global.returnTrLable(
+              locationControlls, CustomText.ShishuGharDetails, lng!),
+          onTap: () => Navigator.pop(context),
+        ),
+        body: Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              GestureDetector(
+                child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Color(0xffE7F0FF)),
+                          borderRadius: BorderRadius.circular(10.r)),
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                    '${Global.returnTrLable(locationControlls, CustomText.Creche_Name, lng!)} :',
+                                    style: Styles.black104),
+                                Text(
+                                  '${Global.returnTrLable(locationControlls, CustomText.Village, lng!)} :',
+                                  style: Styles.black104,
+                                  strutStyle: StrutStyle(height: 1.2),
+                                ),
+                                Text(
+                                  '${Global.returnTrLable(locationControlls, CustomText.GramPanchayat, lng!)} :',
+                                  style: Styles.black104,
+                                  strutStyle: StrutStyle(height: 1.2),
+                                ),
+                                Text(
+                                  '${Global.returnTrLable(locationControlls, CustomText.Block, lng!)} :',
+                                  style: Styles.black104,
+                                  strutStyle: StrutStyle(height: 1.2),
+                                ),
+                                Text(
+                                  '${Global.returnTrLable(locationControlls, CustomText.District, lng!)} :',
+                                  style: Styles.black104,
+                                  strutStyle: StrutStyle(height: 1.2),
+                                ),
+                                Text(
+                                  '${Global.returnTrLable(locationControlls, CustomText.State, lng!)} :',
+                                  style: Styles.black104,
+                                  strutStyle: StrutStyle(height: 1.2),
+                                ),
+                                Text(
+                                  '${Global.returnTrLable(locationControlls, CustomText.Supervisor, lng!)} :',
+                                  style: Styles.black104,
+                                  strutStyle: StrutStyle(height: 1.2),
                                 ),
                               ],
-                              color: Color(0xffF2F7FF),
-                              borderRadius: BorderRadius.circular(5.r),
-                              border: Border.all(
-                                color: Color(0xffE7F0FF),
-                              )),
-                          height: 168.h,
-                          width: 146.w,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                  child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Visibility(
-                                      visible: true,
-                                      child: Stack(
-                                        children: [
-                                          SizedBox(
-                                            height: 40,
-                                            width: 40,
-                                            child: Image.asset(
-                                              image[i],
-                                              filterQuality: FilterQuality.high,
-                                              scale: 0.7,
-                                              color: Color(0xff5979AA),
-                                            ),
-                                          )
-                                        ],
-                                      )),
-                                  SizedBox(
-                                    height: i == 3 || i == 5 ? 12.h : 15.h,
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 7),
-                                    child: Text(
-                                      Global.returnTrLable(
-                                          locationControlls, text[i], lng!),
-                                      style: Styles.listlablefont,
-                                      textAlign: TextAlign.center,
-                                      // overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
+                            ),
+                            SizedBox(width: 10),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.14,
+                              width: 2,
+                              child: VerticalDivider(
+                                color: Color(0xffE6E6E6),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            responce != null
+                                ? Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          Global.getItemValues(
+                                              responce!.responces!,
+                                              'creche_name'),
+                                          style: Styles.cardBlue10,
+                                        ),
+                                        Text(
+                                          village != null ? '$village' : '',
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                        ),
+                                        Text(
+                                          gp != null ? '$gp' : '',
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                        ),
+                                        Text(
+                                          block != null ? '$block' : '',
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                        ),
+                                        Text(
+                                          district != null ? '$district' : '',
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                        ),
+                                        Text(
+                                          state != null ? '$state' : '',
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                        ),
+                                        Text(
+                                          supName != null ? '$supName' : '',
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                        ),
+                                      ],
                                     ),
                                   )
-                                ],
-                              ))
-                            ],
-                          ),
+                                : SizedBox(),
+                          ],
                         ),
-                      );
-                    }))
-          ],
+                      ),
+                    )),
+              ),
+              SizedBox(height: 7.h),
+              Expanded(
+                  child: GridView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                          mainAxisExtent: 90.h),
+                      itemCount: text.length,
+                      physics: BouncingScrollPhysics(),
+                      itemBuilder: (ctx, i) {
+                        return InkWell(
+                          onTap: () async {
+                            await onclick(i, image[i]);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xff5A5A5A).withOpacity(
+                                        0.1), // Shadow color with opacity
+                                    offset: Offset(
+                                        0, 1), // Horizontal and vertical offset
+                                    blurRadius: 5, // Blur radius
+                                    spreadRadius: 0, // Spread radius
+                                  ),
+                                ],
+                                color: Color(0xffF2F7FF),
+                                borderRadius: BorderRadius.circular(5.r),
+                                border: Border.all(
+                                  color: Color(0xffE7F0FF),
+                                )),
+                            height: 168.h,
+                            width: 146.w,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                    child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Visibility(
+                                        visible: true,
+                                        child: Stack(
+                                          children: [
+                                            SizedBox(
+                                              height: 40,
+                                              width: 40,
+                                              child: Image.asset(
+                                                image[i],
+                                                filterQuality: FilterQuality.high,
+                                                scale: 0.7,
+                                                color: Color(0xff5979AA),
+                                              ),
+                                            )
+                                          ],
+                                        )),
+                                    SizedBox(
+                                      height: i == 3 || i == 5 ? 12.h : 15.h,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 7),
+                                      child: Text(
+                                        Global.returnTrLable(
+                                            locationControlls, text[i], lng!),
+                                        style: Styles.listlablefont,
+                                        textAlign: TextAlign.center,
+                                        // overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                    )
+                                  ],
+                                ))
+                              ],
+                            ),
+                          ),
+                        );
+                      }))
+            ],
+          ),
         ),
       ),
     );

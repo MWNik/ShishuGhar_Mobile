@@ -175,483 +175,486 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     return isLoading
         ? Container(
             color: Colors.white,
             child: Center(child: CircularProgressIndicator()))
-        : Scaffold(
-            key: _scaffoldKey,
-            appBar: widget.isHomeScreen
-                ? CustomAppbar(
-                    text: Global.returnTrLable(
-                        translats, CustomText.fllowUp, lng),
-                    actions: [],
-                  )
-                : AppBar(
-                    toolbarHeight: 60,
-                    backgroundColor: Color.fromARGB(242, 89, 122, 170),
-                    actions: [SizedBox()],
-                    leading: Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context, CustomText.itemRefresh);
-                        },
-                        child: Icon(
-                          Icons.arrow_back_ios_sharp,
-                          size: 20,
-                          color: Colors.white,
+        : SafeArea(
+          child: Scaffold(
+              key: _scaffoldKey,
+              appBar: widget.isHomeScreen
+                  ? CustomAppbar(
+                      text: Global.returnTrLable(
+                          translats, CustomText.fllowUp, lng),
+                      actions: [],
+                    )
+                  : AppBar(
+                      toolbarHeight: 60,
+                      backgroundColor: Color.fromARGB(242, 89, 122, 170),
+                      actions: [SizedBox()],
+                      leading: Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context, CustomText.itemRefresh);
+                          },
+                          child: Icon(
+                            Icons.arrow_back_ios_sharp,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
-                    centerTitle: true,
-                    title: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                            Global.returnTrLable(
-                                translats, CustomText.fllowUp, lng),
-                            style: Styles.white145),
-                        RichText(
-                            textAlign: TextAlign.center,
-                            overflow: TextOverflow.clip,
-                            maxLines: 2,
-                            text: TextSpan(children: [
-                              TextSpan(
-                                  text: '$child_name ',
-                                  style: Styles.white126P),
-                              TextSpan(
-                                  text: ' - $child_id', style: Styles.white126P)
-                            ]))
-                      ],
-                    ),
-                  ),
-            endDrawer: SafeArea(
-                child: Drawer(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 30),
-                      child: Row(
+                      centerTitle: true,
+                      title: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Image.asset(
+                          Text(
+                              Global.returnTrLable(
+                                  translats, CustomText.fllowUp, lng),
+                              style: Styles.white145),
+                          RichText(
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.clip,
+                              maxLines: 2,
+                              text: TextSpan(children: [
+                                TextSpan(
+                                    text: '$child_name ',
+                                    style: Styles.white126P),
+                                TextSpan(
+                                    text: ' - $child_id', style: Styles.white126P)
+                              ]))
+                        ],
+                      ),
+                    ),
+              endDrawer: SafeArea(
+                  child: Drawer(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 30),
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              "assets/filter_icon.png",
+                              scale: 2.4,
+                            ),
+                            SizedBox(width: 10.w),
+                            Text(
+                              Global.returnTrLable(
+                                  translats, CustomText.Filter, lng),
+                              style: Styles.labelcontrollerfont,
+                            ),
+                            Spacer(),
+                            InkWell(
+                              onTap: () {
+                                _scaffoldKey.currentState!.closeEndDrawer();
+                              },
+                              child: Image.asset(
+                                'assets/cross.png',
+                                color: Colors.grey,
+                                scale: 4,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(),
+                      DynamicCustomDropdownForFilterField(
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.Creches, lng),
+                        items: creches,
+                        selectedItem: selectedCreche,
+                        onChanged: (value) {
+                          selectedCreche = value?.name;
+                        },
+                      ),
+                      SizedBox(height: 10.h),
+                      Padding(
+                        padding: EdgeInsets.all(3.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Expanded(
+                                child: CElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                cleaAllFilter();
+                              },
+                              text: Global.returnTrLable(
+                                  translats, CustomText.clear, lng),
+                              color: Color(0xffF26BA3),
+                            )),
+                            SizedBox(width: 4.w),
+                            Expanded(
+                              child: CElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  filteredGetData(context);
+                                },
+                                text: Global.returnTrLable(
+                                    translats, CustomText.Search, lng),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      // Padding(
+                      //   padding: EdgeInsets.only(top: 25),
+                      //   child: AnimatedRollingSwitch(
+                      //     isOnlyUnsynched: isOnlyUnsyched,
+                      //     onChange: (value) async {
+                      //       setState(() {
+                      //         isOnlyUnsyched = value;
+                      //       });
+                      //       await fetchFollowUpList();
+                      //     },
+                      //   ),
+                      // )
+                    ],
+                  ),
+                ),
+              )),
+              body: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomTextFieldRow(
+                            controller: Searchcontroller,
+                            onChanged: (value) {
+                              print(value);
+                              filterDataQu(value);
+                            },
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.Search, lng),
+                            prefixIcon: Image.asset(
+                              "assets/search.png",
+                              scale: 2.4,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10.w,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            _scaffoldKey.currentState!.openEndDrawer();
+                          },
+                          child: Image.asset(
                             "assets/filter_icon.png",
                             scale: 2.4,
                           ),
-                          SizedBox(width: 10.w),
-                          Text(
-                            Global.returnTrLable(
-                                translats, CustomText.Filter, lng),
-                            style: Styles.labelcontrollerfont,
-                          ),
-                          Spacer(),
-                          InkWell(
-                            onTap: () {
-                              _scaffoldKey.currentState!.closeEndDrawer();
-                            },
-                            child: Image.asset(
-                              'assets/cross.png',
-                              color: Colors.grey,
-                              scale: 4,
-                            ),
-                          )
-                        ],
-                      ),
+                        )
+                      ],
                     ),
-                    SizedBox(),
-                    DynamicCustomDropdownForFilterField(
-                      hintText: Global.returnTrLable(
-                          translats, CustomText.Creches, lng),
-                      items: creches,
-                      selectedItem: selectedCreche,
-                      onChanged: (value) {
-                        selectedCreche = value?.name;
-                      },
-                    ),
-                    SizedBox(height: 10.h),
-                    Padding(
-                      padding: EdgeInsets.all(3.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Expanded(
-                              child: CElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              cleaAllFilter();
-                            },
-                            text: Global.returnTrLable(
-                                translats, CustomText.clear, lng),
-                            color: Color(0xffF26BA3),
-                          )),
-                          SizedBox(width: 4.w),
-                          Expanded(
-                            child: CElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                filteredGetData(context);
-                              },
-                              text: Global.returnTrLable(
-                                  translats, CustomText.Search, lng),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    // Padding(
-                    //   padding: EdgeInsets.only(top: 25),
-                    //   child: AnimatedRollingSwitch(
-                    //     isOnlyUnsynched: isOnlyUnsyched,
-                    //     onChange: (value) async {
-                    //       setState(() {
-                    //         isOnlyUnsyched = value;
-                    //       });
-                    //       await fetchFollowUpList();
-                    //     },
-                    //   ),
-                    // )
-                  ],
-                ),
-              ),
-            )),
-            body: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomTextFieldRow(
-                          controller: Searchcontroller,
-                          onChanged: (value) {
-                            print(value);
-                            filterDataQu(value);
-                          },
-                          hintText: Global.returnTrLable(
-                              translats, CustomText.Search, lng),
-                          prefixIcon: Image.asset(
-                            "assets/search.png",
-                            scale: 2.4,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10.w,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _scaffoldKey.currentState!.openEndDrawer();
-                        },
-                        child: Image.asset(
-                          "assets/filter_icon.png",
-                          scale: 2.4,
-                        ),
-                      )
-                    ],
-                  ),
-                  Expanded(
-                    child: (filteredFollowUp.length > 0)
-                        ? ListView.builder(
-                            itemCount: filteredFollowUp.length,
-                            shrinkWrap: true,
-                            physics: BouncingScrollPhysics(),
-                            scrollDirection: Axis.vertical,
-                            itemBuilder: (BuildContext context, int index) {
-                              var selectedItem = filteredFollowUp[index];
-                              return GestureDetector(
-                                onTap: () async {
-                                  var child_followup_guid =
-                                      selectedItem['child_followup_guid'];
+                    Expanded(
+                      child: (filteredFollowUp.length > 0)
+                          ? ListView.builder(
+                              itemCount: filteredFollowUp.length,
+                              shrinkWrap: true,
+                              physics: BouncingScrollPhysics(),
+                              scrollDirection: Axis.vertical,
+                              itemBuilder: (BuildContext context, int index) {
+                                var selectedItem = filteredFollowUp[index];
+                                return GestureDetector(
+                                  onTap: () async {
+                                    var child_followup_guid =
+                                        selectedItem['child_followup_guid'];
 
-                                  bool isEdited=await Validate().checkEditable(filteredFollowUp[index]
-                                  ['created_at'], 7);
-                                  var dateString =
-                                      filteredFollowUp[index]['schedule_date']!;
-                                  var parts = dateString
-                                      .toString()
-                                      .split('-')
-                                      .map(int.parse)
-                                      .toList();
-                                  var date =
-                                      DateTime(parts[0], parts[1], parts[2]);
-                                  var backDate =
-                                      DateTime.parse(Validate().currentDate())
-                                          .subtract(Duration(days: 7));
-                                  var backDateSD =
-                                      date.subtract(Duration(days: 7));
-                                  if (Global.validString(child_followup_guid)) {
-                                    var refStatus = await Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                ChildFollowUpTabScreen(
-                                                  tabTitle:
-                                                      Global.returnTrLable(
-                                                          translats,
-                                                          CustomText.fllowUp,
-                                                          lng),
-                                                  child_referral_guid:
-                                                      filteredFollowUp[index][
-                                                          'child_referral_guid'],
-                                                  discharge_date:
-                                                      Global.getItemValues(
-                                                          filteredFollowUp[
-                                                                  index]
-                                                              ['responces'],
-                                                          'discharge_date'),
-                                                  followup_visit_date:
-                                                      filteredFollowUp[index][
-                                                          'followup_visit_date'],
-                                                  schedule_date:
-                                                      filteredFollowUp[index]
-                                                          ['schedule_date'],
-                                                  enrollChildGuid:
-                                                      Global.getItemValues(
-                                                          filteredFollowUp[
-                                                                  index]
-                                                              ['enrResponces'],
-                                                          'childenrollguid'),
-                                                  creche_id: Global.stringToInt(
-                                                      Global.getItemValues(
-                                                          filteredFollowUp[
-                                                                  index]
-                                                              ['enrResponces'],
-                                                          'creche_id')),
-                                                  child_id: Global.stringToInt(
-                                                      Global.getItemValues(
-                                                          filteredFollowUp[
-                                                                  index]
-                                                              ['enrResponces'],
-                                                          'name')),
-                                                  child_followup_guid:
-                                                      child_followup_guid!,
-                                                  childId: Global.getItemValues(
-                                                      filteredFollowUp[index]
-                                                          ['enrResponces'],
-                                                      'child_id'),
-                                                  childName:
-                                                      Global.getItemValues(
-                                                          filteredFollowUp[
-                                                                  index]
-                                                              ['enrResponces'],
-                                                          'child_name'),
-                                                  minDate: backDate
-                                                          .isBefore(backDateSD)
-                                                      ? backDateSD
-                                                      : backDate,
-                                                  isEditable: role ==
-                                                          CustomText
-                                                              .crecheSupervisor
-                                                              .trim()
-                                                      ? isEdited
-                                                      : false,
-                                                )));
+                                    bool isEdited=await Validate().checkEditable(filteredFollowUp[index]
+                                    ['created_at'], 7);
+                                    var dateString =
+                                        filteredFollowUp[index]['schedule_date']!;
+                                    var parts = dateString
+                                        .toString()
+                                        .split('-')
+                                        .map(int.parse)
+                                        .toList();
+                                    var date =
+                                        DateTime(parts[0], parts[1], parts[2]);
+                                    var backDate =
+                                        DateTime.parse(Validate().currentDate())
+                                            .subtract(Duration(days: 7));
+                                    var backDateSD =
+                                        date.subtract(Duration(days: 7));
+                                    if (Global.validString(child_followup_guid)) {
+                                      var refStatus = await Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  ChildFollowUpTabScreen(
+                                                    tabTitle:
+                                                        Global.returnTrLable(
+                                                            translats,
+                                                            CustomText.fllowUp,
+                                                            lng),
+                                                    child_referral_guid:
+                                                        filteredFollowUp[index][
+                                                            'child_referral_guid'],
+                                                    discharge_date:
+                                                        Global.getItemValues(
+                                                            filteredFollowUp[
+                                                                    index]
+                                                                ['responces'],
+                                                            'discharge_date'),
+                                                    followup_visit_date:
+                                                        filteredFollowUp[index][
+                                                            'followup_visit_date'],
+                                                    schedule_date:
+                                                        filteredFollowUp[index]
+                                                            ['schedule_date'],
+                                                    enrollChildGuid:
+                                                        Global.getItemValues(
+                                                            filteredFollowUp[
+                                                                    index]
+                                                                ['enrResponces'],
+                                                            'childenrollguid'),
+                                                    creche_id: Global.stringToInt(
+                                                        Global.getItemValues(
+                                                            filteredFollowUp[
+                                                                    index]
+                                                                ['enrResponces'],
+                                                            'creche_id')),
+                                                    child_id: Global.stringToInt(
+                                                        Global.getItemValues(
+                                                            filteredFollowUp[
+                                                                    index]
+                                                                ['enrResponces'],
+                                                            'name')),
+                                                    child_followup_guid:
+                                                        child_followup_guid!,
+                                                    childId: Global.getItemValues(
+                                                        filteredFollowUp[index]
+                                                            ['enrResponces'],
+                                                        'child_id'),
+                                                    childName:
+                                                        Global.getItemValues(
+                                                            filteredFollowUp[
+                                                                    index]
+                                                                ['enrResponces'],
+                                                            'child_name'),
+                                                    minDate: backDate
+                                                            .isBefore(backDateSD)
+                                                        ? backDateSD
+                                                        : backDate,
+                                                    isEditable: role ==
+                                                            CustomText
+                                                                .crecheSupervisor
+                                                                .trim()
+                                                        ? isEdited
+                                                        : false,
+                                                  )));
 
-                                    if (refStatus == 'itemRefresh') {
-                                      await fetchFollowUpList();
+                                      if (refStatus == 'itemRefresh') {
+                                        await fetchFollowUpList();
+                                      }
                                     }
-                                  }
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 5.h),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Color(0xff5A5A5A).withOpacity(
-                                                0.2), // Shadow color with opacity
-                                            offset: Offset(0,
-                                                3), // Horizontal and vertical offset
-                                            blurRadius: 6, // Blur radius
-                                            spreadRadius: 0, // Spread radius
-                                          ),
-                                        ],
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Color(0xffE7F0FF)),
-                                        borderRadius:
-                                            BorderRadius.circular(10.r)),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10.w, vertical: 8.h),
-                                      child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
-                                                  style: Styles.black104,
-                                                ),
-                                                Text(
-                                                  '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.2),
-                                                  style: Styles.black104,
-                                                ),
-                                                Text(
-                                                  '${Global.returnTrLable(translats, CustomText.Creches, lng).trim()} : ',
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.2),
-                                                  style: Styles.black104,
-                                                ),
-                                                Text(
-                                                  '${Global.returnTrLable(translats, CustomText.schduleDate, lng).trim()} : ',
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.2),
-                                                  style: Styles.black104,
-                                                ),
-                                                Text(
-                                                  '${Global.returnTrLable(translats, CustomText.followup_visit_date, lng).trim()} : ',
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.2),
-                                                  style: Styles.black104,
-                                                ),
-                                                Text(
-                                                  '${Global.returnTrLable(translats, CustomText.weight, lng).trim()} : ',
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.2),
-                                                  style: Styles.black104,
-                                                ),
-                                              ],
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 5.h),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Color(0xff5A5A5A).withOpacity(
+                                                  0.2), // Shadow color with opacity
+                                              offset: Offset(0,
+                                                  3), // Horizontal and vertical offset
+                                              blurRadius: 6, // Blur radius
+                                              spreadRadius: 0, // Spread radius
                                             ),
-                                            SizedBox(width: 10),
-                                            SizedBox(
-                                              height: 30.h,
-                                              width: 2,
-                                              child: VerticalDivider(
-                                                color: Color(0xffE6E6E6),
-                                              ),
-                                            ),
-                                            SizedBox(width: 10),
-                                            Expanded(
-                                              child: Column(
+                                          ],
+                                          color: Colors.white,
+                                          border: Border.all(
+                                              color: Color(0xffE7F0FF)),
+                                          borderRadius:
+                                              BorderRadius.circular(10.r)),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w, vertical: 8.h),
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    Global.getItemValues(
-                                                        filteredFollowUp[index]
-                                                            ['enrResponces'],
-                                                        'child_name'),
-                                                    style: Styles.cardBlue10,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
+                                                    style: Styles.black104,
                                                   ),
                                                   Text(
-                                                    Global.getItemValues(
-                                                        filteredFollowUp[index]
-                                                            ['enrResponces'],
-                                                        'child_id'),
+                                                    '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
                                                     strutStyle:
                                                         StrutStyle(height: 1.2),
-                                                    style: Styles.cardBlue10,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    style: Styles.black104,
                                                   ),
                                                   Text(
-                                                    callCrecheNameName(
-                                                        Global.getItemValues(
-                                                            filteredFollowUp[
-                                                                    index][
-                                                                'enrResponces'],
-                                                            'creche_id')),
+                                                    '${Global.returnTrLable(translats, CustomText.Creches, lng).trim()} : ',
                                                     strutStyle:
                                                         StrutStyle(height: 1.2),
-                                                    style: Styles.cardBlue10,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    style: Styles.black104,
                                                   ),
                                                   Text(
-                                                    Validate().displeDateFormate(
-                                                        filteredFollowUp[index]
-                                                            ['schedule_date']!),
+                                                    '${Global.returnTrLable(translats, CustomText.schduleDate, lng).trim()} : ',
                                                     strutStyle:
                                                         StrutStyle(height: 1.2),
-                                                    style: Styles.cardBlue10,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    style: Styles.black104,
                                                   ),
                                                   Text(
-                                                    Validate().displeDateFormate(
-                                                        Global.getItemValues(
-                                                            filteredFollowUp[
-                                                                    index]
-                                                                ['responces'],
-                                                            'followup_visit_date')),
+                                                    '${Global.returnTrLable(translats, CustomText.followup_visit_date, lng).trim()} : ',
                                                     strutStyle:
                                                         StrutStyle(height: 1.2),
-                                                    style: Styles.cardBlue10,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    style: Styles.black104,
                                                   ),
                                                   Text(
-                                                    Global.getItemValues(
-                                                        filteredFollowUp[index]
-                                                            ['responces'],
-                                                        'weight'),
+                                                    '${Global.returnTrLable(translats, CustomText.weight, lng).trim()} : ',
                                                     strutStyle:
                                                         StrutStyle(height: 1.2),
-                                                    style: Styles.cardBlue10,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                    style: Styles.black104,
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                            SizedBox(width: 5),
-                                            Column(
-                                              children: [
-                                                SizedBox(
-                                                  height: 30.h,
+                                              SizedBox(width: 10),
+                                              SizedBox(
+                                                height: 30.h,
+                                                width: 2,
+                                                child: VerticalDivider(
+                                                  color: Color(0xffE6E6E6),
                                                 ),
-                                              ],
-                                            ),
-                                            (followUpsList[index]
-                                                            ['is_edited'] ==
-                                                        0 &&
-                                                    followUpsList[index]
-                                                            ['is_uploaded'] ==
-                                                        1)
-                                                ? Image.asset(
-                                                    "assets/sync.png",
-                                                    scale: 1.5,
-                                                  )
-                                                : Image.asset(
-                                                    "assets/sync_gray.png",
-                                                    scale: 1.5,
-                                                  )
-                                          ]),
+                                              ),
+                                              SizedBox(width: 10),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      Global.getItemValues(
+                                                          filteredFollowUp[index]
+                                                              ['enrResponces'],
+                                                          'child_name'),
+                                                      style: Styles.cardBlue10,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    Text(
+                                                      Global.getItemValues(
+                                                          filteredFollowUp[index]
+                                                              ['enrResponces'],
+                                                          'child_id'),
+                                                      strutStyle:
+                                                          StrutStyle(height: 1.2),
+                                                      style: Styles.cardBlue10,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    Text(
+                                                      callCrecheNameName(
+                                                          Global.getItemValues(
+                                                              filteredFollowUp[
+                                                                      index][
+                                                                  'enrResponces'],
+                                                              'creche_id')),
+                                                      strutStyle:
+                                                          StrutStyle(height: 1.2),
+                                                      style: Styles.cardBlue10,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    Text(
+                                                      Validate().displeDateFormate(
+                                                          filteredFollowUp[index]
+                                                              ['schedule_date']!),
+                                                      strutStyle:
+                                                          StrutStyle(height: 1.2),
+                                                      style: Styles.cardBlue10,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    Text(
+                                                      Validate().displeDateFormate(
+                                                          Global.getItemValues(
+                                                              filteredFollowUp[
+                                                                      index]
+                                                                  ['responces'],
+                                                              'followup_visit_date')),
+                                                      strutStyle:
+                                                          StrutStyle(height: 1.2),
+                                                      style: Styles.cardBlue10,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    Text(
+                                                      Global.getItemValues(
+                                                          filteredFollowUp[index]
+                                                              ['responces'],
+                                                          'weight'),
+                                                      strutStyle:
+                                                          StrutStyle(height: 1.2),
+                                                      style: Styles.cardBlue10,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(width: 5),
+                                              Column(
+                                                children: [
+                                                  SizedBox(
+                                                    height: 30.h,
+                                                  ),
+                                                ],
+                                              ),
+                                              (followUpsList[index]
+                                                              ['is_edited'] ==
+                                                          0 &&
+                                                      followUpsList[index]
+                                                              ['is_uploaded'] ==
+                                                          1)
+                                                  ? Image.asset(
+                                                      "assets/sync.png",
+                                                      scale: 1.5,
+                                                    )
+                                                  : Image.asset(
+                                                      "assets/sync_gray.png",
+                                                      scale: 1.5,
+                                                    )
+                                            ]),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            })
-                        : Center(
-                            child: Text(Global.returnTrLable(
-                                translats, CustomText.NorecordAvailable, lng)),
-                          ),
-                  )
-                ],
+                                );
+                              })
+                          : Center(
+                              child: Text(Global.returnTrLable(
+                                  translats, CustomText.NorecordAvailable, lng)),
+                            ),
+                    )
+                  ],
+                ),
               ),
             ),
-          );
+        );
   }
 }

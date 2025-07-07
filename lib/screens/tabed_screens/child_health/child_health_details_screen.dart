@@ -21,7 +21,6 @@ import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
-import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/databasemodel/child_health_respose_model.dart';
@@ -81,6 +80,13 @@ class _ChildHealthDetailScreenState extends State<ChildHealthDetailScreen> {
     'creche_id',
     'child_id'
   ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Global.applyDisplayCutout(const Color(0xff5979AA));
+    });
+  }
 
   Future<void> initializeData() async {
     userName = (await Validate().readString(Validate.userName))!;
@@ -131,57 +137,59 @@ class _ChildHealthDetailScreenState extends State<ChildHealthDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: CustomChildAppbar(
-          text: Global.returnTrLable(
-              labelControlls, CustomText.ChildHealthDetail, lng!),
-          subTitle1: widget.childName!,
-          subTitle2: widget.childId!,
-          onTap: () => Navigator.pop(context, 'itemRefresh'),
-        ),
-        body: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Column(
-                children: [
-                  Divider(),
-                  Expanded(
-                      child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: SingleChildScrollView(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: cWidget(),
-                    )),
-                  )),
-                  Divider(),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: Row(children: [
-                      Expanded(
-                          child: CElevatedButton(
-                        color: Color(0xffF26BA3),
-                        onPressed: () {
-                          nextTab(0, context);
-                        },
-                        text: Global.returnTrLable(
-                            labelControlls, CustomText.back, lng!),
+    return SafeArea(
+      child: Scaffold(
+          appBar: CustomChildAppbar(
+            text: Global.returnTrLable(
+                labelControlls, CustomText.ChildHealthDetail, lng!),
+            subTitle1: widget.childName!,
+            subTitle2: widget.childId!,
+            onTap: () => Navigator.pop(context, 'itemRefresh'),
+          ),
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    Divider(),
+                    Expanded(
+                        child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      child: SingleChildScrollView(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: cWidget(),
                       )),
-                      SizedBox(width: 10),
-                      Expanded(
-                          child: CElevatedButton(
-                        color: Color(0xff369A8D),
-                        onPressed: () {
-                          nextTab(1, context);
-                        },
-                        text: Global.returnTrLable(
-                            labelControlls, CustomText.Submit, lng!),
-                      ))
-                    ]),
-                  )
-                ],
-              ));
+                    )),
+                    Divider(),
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      child: Row(children: [
+                        Expanded(
+                            child: CElevatedButton(
+                          color: Color(0xffF26BA3),
+                          onPressed: () {
+                            nextTab(0, context);
+                          },
+                          text: Global.returnTrLable(
+                              labelControlls, CustomText.back, lng!),
+                        )),
+                        SizedBox(width: 10),
+                        Expanded(
+                            child: CElevatedButton(
+                          color: Color(0xff369A8D),
+                          onPressed: () {
+                            nextTab(1, context);
+                          },
+                          text: Global.returnTrLable(
+                              labelControlls, CustomText.Submit, lng!),
+                        ))
+                      ]),
+                    )
+                  ],
+                )),
+    );
   }
 
   List<Widget> cWidget() {

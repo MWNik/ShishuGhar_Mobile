@@ -90,269 +90,272 @@ class _DashboardReportByApiState extends State<DashboardReportByApiScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: CustomAppbar(
-        text: Global.returnTrLable(translats, CustomText.DashBoardReport, lng),
-        onTap: () {
-          Navigator.pop(context);
-        },
-      ),
-      // endDrawer: SafeArea(
-      //   child: Drawer(
-      //       backgroundColor: Colors.white,
-      //       shape: RoundedRectangleBorder(
-      //         borderRadius: BorderRadius.only(),
-      //       ),
-      //       child: Padding(
-      //         padding: EdgeInsets.symmetric(horizontal: 15),
-      //         child: Column(
-      //             crossAxisAlignment: CrossAxisAlignment.start,
-      //             children: [
-      //               Padding(
-      //                 padding: const EdgeInsets.symmetric(
-      //                     horizontal: 15, vertical: 30),
-      //                 child: Row(
-      //                   children: [
-      //                     Image.asset(
-      //                       "assets/filter_icon.png",
-      //                       scale: 2.4,
-      //                     ),
-      //                     SizedBox(
-      //                       width: 10.w,
-      //                     ),
-      //                     Text(
-      //                       Global.returnTrLable(
-      //                           translats, CustomText.Filter, lng),
-      //                       style: Styles.labelcontrollerfont,
-      //                     ),
-      //                     Spacer(),
-      //                     InkWell(
-      //                         onTap: () async {
-      //                           _scaffoldKey.currentState!.closeEndDrawer();
-      //                           // cleaAllFilter();
-      //                         },
-      //                         child: Image.asset(
-      //                           'assets/cross.png',
-      //                           color: Colors.grey,
-      //                           scale: 4,
-      //                         )),
-      //                   ],
-      //                 ),
-      //               ),
-      //               // SizedBox(),
-      //
-      //               Row(
-      //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //                 children: [
-      //                   Expanded(
-      //                     child: DynamicCustomDropdownField(
-      //                       hintText: Global.returnTrLable(
-      //                           translats, CustomText.Year, lng),
-      //                       items: getYearList(2020),
-      //                       titleText:Global.returnTrLable(
-      //                           translats, CustomText.Year, lng),
-      //                       selectedItem: selectedYear,
-      //                       onChanged: (value) {
-      //                         setState(() {
-      //                           selectedYear = value!.name!;
-      //                           months=getMonthList(Global.stringToInt(selectedYear));
-      //                           selectedMonth=null;
-      //                         });
-      //
-      //                       },
-      //                     ),
-      //                   ),
-      //                   Expanded(
-      //                     child: DynamicCustomDropdownField(
-      //                       hintText: Global.returnTrLable(
-      //                           translats, CustomText.Month, lng),
-      //                       items: months,
-      //                       titleText:Global.returnTrLable(
-      //                           translats, CustomText.Month, lng),
-      //                       selectedItem: selectedMonth,
-      //                       onChanged: (value) {
-      //                         selectedMonth = value?.name;
-      //                       },
-      //                     ),
-      //                   )
-      //                 ],
-      //               ),
-      //
-      //               SizedBox(
-      //                 height: 10.h,
-      //               ),
-      //               Padding(
-      //                 padding: EdgeInsets.all(3.0),
-      //                 child: Row(
-      //                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-      //                   children: [
-      //                     Expanded(
-      //                       child: CElevatedButton(
-      //                         text: Global.returnTrLable(
-      //                             translats, CustomText.Cancel, lng),
-      //                         color: Color(0xffF26BA3),
-      //                         onPressed: () {
-      //                           Navigator.of(context).pop();
-      //                         },
-      //                       ),
-      //                     ),
-      //                     // Spacer(),
-      //                     SizedBox(width: 4.w),
-      //                     Expanded(
-      //                       child: CElevatedButton(
-      //                         text: Global.returnTrLable(
-      //                             translats, CustomText.Search, lng),
-      //                         onPressed: () {
-      //                           if(selectedMonth!=null){
-      //                             Navigator.of(context).pop();
-      //                             callApiForDashboardApi();
-      //                           }else{
-      //                             Validate().singleButtonPopup(
-      //                                 Global.returnTrLable(
-      //                                     translats, CustomText.pleaseSelectMonth, lng),
-      //                                 Global.returnTrLable(translats, CustomText.ok, lng),
-      //                                 false,
-      //                                 context);
-      //                           }
-      //
-      //                         },
-      //                       ),
-      //                     ),
-      //                   ],
-      //                 ),
-      //               ),
-      //             ]),
-      //       )),
-      // ),
-      body: Padding(
-          padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-          child:
-              // apiIsCall?
-              Column(children: [
-            // Row(
-            //   children: [
-            //     Expanded(
-            //         child: SizedBox())
-            //     ,
-            //     GestureDetector(
-            //       onTap: () {
-            //         _scaffoldKey.currentState!.openEndDrawer();
-            //       },
-            //       child: Image.asset(
-            //         "assets/filter_icon.png",
-            //         scale: 2.4,
-            //       ),
-            //     )
-            //   ],
-            // ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: DynamicCustomDropdownField(
-                    hintText:
-                        Global.returnTrLable(translats, CustomText.Year, lng),
-                    items: getYearList(2020),
-                    // titleText:
-                    //     Global.returnTrLable(translats, CustomText.Year, lng),
-                    selectedItem: selectedYear,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedYear = value!.name!;
-                        months = getMonthList(Global.stringToInt(selectedYear));
-                        selectedMonth = null;
-                      });
-                    },
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: CustomAppbar(
+          text: Global.returnTrLable(translats, CustomText.DashBoardReport, lng),
+          onTap: () {
+            Navigator.pop(context);
+          },
+        ),
+        // endDrawer: SafeArea(
+        //   child: Drawer(
+        //       backgroundColor: Colors.white,
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.only(),
+        //       ),
+        //       child: Padding(
+        //         padding: EdgeInsets.symmetric(horizontal: 15),
+        //         child: Column(
+        //             crossAxisAlignment: CrossAxisAlignment.start,
+        //             children: [
+        //               Padding(
+        //                 padding: const EdgeInsets.symmetric(
+        //                     horizontal: 15, vertical: 30),
+        //                 child: Row(
+        //                   children: [
+        //                     Image.asset(
+        //                       "assets/filter_icon.png",
+        //                       scale: 2.4,
+        //                     ),
+        //                     SizedBox(
+        //                       width: 10.w,
+        //                     ),
+        //                     Text(
+        //                       Global.returnTrLable(
+        //                           translats, CustomText.Filter, lng),
+        //                       style: Styles.labelcontrollerfont,
+        //                     ),
+        //                     Spacer(),
+        //                     InkWell(
+        //                         onTap: () async {
+        //                           _scaffoldKey.currentState!.closeEndDrawer();
+        //                           // cleaAllFilter();
+        //                         },
+        //                         child: Image.asset(
+        //                           'assets/cross.png',
+        //                           color: Colors.grey,
+        //                           scale: 4,
+        //                         )),
+        //                   ],
+        //                 ),
+        //               ),
+        //               // SizedBox(),
+        //
+        //               Row(
+        //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //                 children: [
+        //                   Expanded(
+        //                     child: DynamicCustomDropdownField(
+        //                       hintText: Global.returnTrLable(
+        //                           translats, CustomText.Year, lng),
+        //                       items: getYearList(2020),
+        //                       titleText:Global.returnTrLable(
+        //                           translats, CustomText.Year, lng),
+        //                       selectedItem: selectedYear,
+        //                       onChanged: (value) {
+        //                         setState(() {
+        //                           selectedYear = value!.name!;
+        //                           months=getMonthList(Global.stringToInt(selectedYear));
+        //                           selectedMonth=null;
+        //                         });
+        //
+        //                       },
+        //                     ),
+        //                   ),
+        //                   Expanded(
+        //                     child: DynamicCustomDropdownField(
+        //                       hintText: Global.returnTrLable(
+        //                           translats, CustomText.Month, lng),
+        //                       items: months,
+        //                       titleText:Global.returnTrLable(
+        //                           translats, CustomText.Month, lng),
+        //                       selectedItem: selectedMonth,
+        //                       onChanged: (value) {
+        //                         selectedMonth = value?.name;
+        //                       },
+        //                     ),
+        //                   )
+        //                 ],
+        //               ),
+        //
+        //               SizedBox(
+        //                 height: 10.h,
+        //               ),
+        //               Padding(
+        //                 padding: EdgeInsets.all(3.0),
+        //                 child: Row(
+        //                   mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //                   children: [
+        //                     Expanded(
+        //                       child: CElevatedButton(
+        //                         text: Global.returnTrLable(
+        //                             translats, CustomText.Cancel, lng),
+        //                         color: Color(0xffF26BA3),
+        //                         onPressed: () {
+        //                           Navigator.of(context).pop();
+        //                         },
+        //                       ),
+        //                     ),
+        //                     // Spacer(),
+        //                     SizedBox(width: 4.w),
+        //                     Expanded(
+        //                       child: CElevatedButton(
+        //                         text: Global.returnTrLable(
+        //                             translats, CustomText.Search, lng),
+        //                         onPressed: () {
+        //                           if(selectedMonth!=null){
+        //                             Navigator.of(context).pop();
+        //                             callApiForDashboardApi();
+        //                           }else{
+        //                             Validate().singleButtonPopup(
+        //                                 Global.returnTrLable(
+        //                                     translats, CustomText.pleaseSelectMonth, lng),
+        //                                 Global.returnTrLable(translats, CustomText.ok, lng),
+        //                                 false,
+        //                                 context);
+        //                           }
+        //
+        //                         },
+        //                       ),
+        //                     ),
+        //                   ],
+        //                 ),
+        //               ),
+        //             ]),
+        //       )),
+        // ),
+        body: Padding(
+            padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+            child:
+                // apiIsCall?
+                Column(children: [
+              // Row(
+              //   children: [
+              //     Expanded(
+              //         child: SizedBox())
+              //     ,
+              //     GestureDetector(
+              //       onTap: () {
+              //         _scaffoldKey.currentState!.openEndDrawer();
+              //       },
+              //       child: Image.asset(
+              //         "assets/filter_icon.png",
+              //         scale: 2.4,
+              //       ),
+              //     )
+              //   ],
+              // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: DynamicCustomDropdownField(
+                      hintText:
+                          Global.returnTrLable(translats, CustomText.Year, lng),
+                      items: getYearList(2020),
+                      // titleText:
+                      //     Global.returnTrLable(translats, CustomText.Year, lng),
+                      selectedItem: selectedYear,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedYear = value!.name!;
+                          months = getMonthList(Global.stringToInt(selectedYear));
+                          selectedMonth = null;
+                        });
+                      },
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: DynamicCustomDropdownField(
-                    hintText:
-                        Global.returnTrLable(translats, CustomText.Month, lng),
-                    items: months,
-                    // titleText:
-                    //     Global.returnTrLable(translats, CustomText.Month, lng),
-                    selectedItem: selectedMonth,
-                    onChanged: (value) {
-                      selectedMonth = value?.name;
-                      callApiForDashboardApi();
-                    },
+                  Expanded(
+                    child: DynamicCustomDropdownField(
+                      hintText:
+                          Global.returnTrLable(translats, CustomText.Month, lng),
+                      items: months,
+                      // titleText:
+                      //     Global.returnTrLable(translats, CustomText.Month, lng),
+                      selectedItem: selectedMonth,
+                      onChanged: (value) {
+                        selectedMonth = value?.name;
+                        callApiForDashboardApi();
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 10.h,
-            ),
-            Expanded(
-              child: (items.length > 0)
-                  ? GridView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: items.length,
-                      physics: BouncingScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 15,
-                        mainAxisSpacing: 15, // Vertical spacing (Add this line)
-                      ),
-                      itemBuilder: (BuildContext context, int index) {
-                        var selectedItem = items[index];
-                        return InkWell(
-                          onTap: () async {},
-                          child: Container(
-                            width: double
-                                .infinity, // Takes full width of grid cell
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xff5A5A5A).withOpacity(0.2),
-                                  offset: Offset(0, 3),
-                                  blurRadius: 6,
-                                  spreadRadius: 0,
-                                ),
-                              ],
-                              color: Color(0xffF2F7FF),
-                              borderRadius: BorderRadius.circular(5.r),
-                              border: Border.all(color: Color(0xffE7F0FF)),
-                            ),
-                            child: AspectRatio(
-                              aspectRatio:
-                                  1, // Keeps it square, change as needed
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    items[index]['value'].toString(),
-                                    style: Styles.blue148,
+                ],
+              ),
+              SizedBox(
+                height: 10.h,
+              ),
+              Expanded(
+                child: (items.length > 0)
+                    ? GridView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: items.length,
+                        physics: BouncingScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15, // Vertical spacing (Add this line)
+                        ),
+                        itemBuilder: (BuildContext context, int index) {
+                          var selectedItem = items[index];
+                          return InkWell(
+                            onTap: () async {},
+                            child: Container(
+                              width: double
+                                  .infinity, // Takes full width of grid cell
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xff5A5A5A).withOpacity(0.2),
+                                    offset: Offset(0, 3),
+                                    blurRadius: 6,
+                                    spreadRadius: 0,
                                   ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Text(items[index]['title'],
-                                          textAlign: TextAlign.center,
-                                          style: Styles.black124))
                                 ],
+                                color: Color(0xffF2F7FF),
+                                borderRadius: BorderRadius.circular(5.r),
+                                border: Border.all(color: Color(0xffE7F0FF)),
+                              ),
+                              child: AspectRatio(
+                                aspectRatio:
+                                    1, // Keeps it square, change as needed
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      items[index]['value'].toString(),
+                                      style: Styles.blue148,
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Text(items[index]['title'],
+                                            textAlign: TextAlign.center,
+                                            style: Styles.black124))
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng)),
-                    ),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text(Global.returnTrLable(
+                            translats, CustomText.NorecordAvailable, lng)),
+                      ),
+              ),
+            ])
+            //   :Center(
+            // child: Text(Global.returnTrLable(translats,
+            //     CustomText.NorecordAvailable, lng)))
             ),
-          ])
-          //   :Center(
-          // child: Text(Global.returnTrLable(translats,
-          //     CustomText.NorecordAvailable, lng)))
-          ),
+      ),
     );
   }
 

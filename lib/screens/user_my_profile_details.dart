@@ -31,101 +31,104 @@ class _UserDetailsScreenState extends State<UserDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppbar(
-        text: lng != null
-            ? Global.returnTrLable(translatsLabel, CustomText.MyProfile, lng!)
-            : CustomText.MyProfile,
-        onTap: () {
-          Navigator.pop(context, 'itemRefresh');
-        },
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: (lng != null && email != null)
-            ? Container(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        SizedBox(height: 3.h),
-                        DynamicCustomTextFieldNew(
-                          titleText: Global.returnTrLable(
-                              translatsLabel, CustomText.UserName, lng!),
-                          readable: true,
-                          initialvalue: userName,
-                          // isRequred: 1,
-                          onChanged: (value) {
-                            print('Entered text: $value');
-                          },
-                        ),
-                        DynamicCustomTextFieldNew(
-                          titleText: Global.returnTrLable(
-                              translatsLabel, CustomText.role, lng!),
-                          readable: true,
-                          hintText: CustomText.typehere,
-                          initialvalue: role,
-                          // isRequred: 1,
-                          onChanged: (value) {
-                            print('Entered text: $value');
-                          },
-                        ),
-                        DynamicCustomTextFieldNew(
-                          titleText: Global.returnTrLable(translatsLabel,
-                              CustomText.email, lng!),
-                          readable: true,
-                          hintText: CustomText.typehere,
-                          initialvalue: email,
-                          // isRequred: 1,
-                          onChanged: (value) {
-                            print('Entered text: $value');
-                          },
-                        ),
-                        DynamicCustomTextFieldNew(
-                          titleText: Global.returnTrLable(translatsLabel,
-                              CustomText.mobileNumber, lng!),
-                          readable: true,
-                          hintText: CustomText.role,
-                          initialvalue: mobile_no,
-                          // isRequred: 1,
-                          onChanged: (value) {
-                            print('Entered text: $value');
-                          },
-                        ),
-                        SizedBox(
-                          height: 20.h,
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CElevatedButton(
-                                color: Color(0xffF26BA3),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                text: Global.returnTrLable(
-                                        translatsLabel, CustomText.back, lng!)
-                                    .trim(),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10.h,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            : SizedBox(),
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomAppbar(
+          text: lng != null
+              ? Global.returnTrLable(translatsLabel, CustomText.MyProfile, lng!)
+              : CustomText.MyProfile,
+          onTap: () {
+            Navigator.pop(context, 'itemRefresh');
+          },
+        ),
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: (lng != null && email != null)
+              ? Container(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          SizedBox(height: 3.h),
+                          DynamicCustomTextFieldNew(
+                            titleText: Global.returnTrLable(
+                                translatsLabel, CustomText.UserName, lng!),
+                            readable: true,
+                            initialvalue: userName,
+                            // isRequred: 1,
+                            onChanged: (value) {
+                              print('Entered text: $value');
+                            },
+                          ),
+                          DynamicCustomTextFieldNew(
+                            titleText: Global.returnTrLable(
+                                translatsLabel, CustomText.role, lng!),
+                            readable: true,
+                            hintText: CustomText.typehere,
+                            initialvalue: role,
+                            // isRequred: 1,
+                            onChanged: (value) {
+                              print('Entered text: $value');
+                            },
+                          ),
+                          DynamicCustomTextFieldNew(
+                            titleText: Global.returnTrLable(translatsLabel,
+                                CustomText.email, lng!),
+                            readable: true,
+                            hintText: CustomText.typehere,
+                            initialvalue: email,
+                            // isRequred: 1,
+                            onChanged: (value) {
+                              print('Entered text: $value');
+                            },
+                          ),
+                          DynamicCustomTextFieldNew(
+                            titleText: Global.returnTrLable(translatsLabel,
+                                CustomText.mobileNumber, lng!),
+                            readable: true,
+                            hintText: CustomText.role,
+                            initialvalue: mobile_no,
+                            // isRequred: 1,
+                            onChanged: (value) {
+                              print('Entered text: $value');
+                            },
+                          ),
+                          SizedBox(
+                            height: 20.h,
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CElevatedButton(
+                                  color: Color(0xffF26BA3),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  text: Global.returnTrLable(
+                                          translatsLabel, CustomText.back, lng!)
+                                      .trim(),
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: 10.h,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              : SizedBox(),
+        ),
       ),
     );
   }

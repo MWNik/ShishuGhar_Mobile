@@ -109,237 +109,240 @@ class _ChildEventListingScreenState extends State<ChildEventListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: role == CustomText.crecheSupervisor.trim()
-          ? InkWell(
-              onTap: () async {
-                String chilevenGuid = '';
-                if (!(Global.validString(chilevenGuid))) {
-                  chilevenGuid = Validate().randomGuid();
-                  String? minDate;
-                  if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
-                    minDate=await Validate().callMinDate(widget.dateOfEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: role == CustomText.crecheSupervisor.trim()
+            ? InkWell(
+                onTap: () async {
+                  String chilevenGuid = '';
+                  if (!(Global.validString(chilevenGuid))) {
+                    chilevenGuid = Validate().randomGuid();
+                    String? minDate;
+                    if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                      minDate=await Validate().callMinDate(widget.dateOfEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                    }
+                    var refStatus = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                EnrolledChildDetailsSccreen(
+                                  childEventGuid: chilevenGuid,
+                                  enName: widget.enName!,
+                                  chilenrolledGUID: widget.chilenrolledGUID!,
+                                  creche_id: widget.creche_id,
+                                  lastDate: Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
+                                  childId: widget.childId,
+                                  childName: widget.childName,
+                                  existingDates: existingDates,
+                                )));
+                    if (refStatus == 'itemRefresh') {
+                      fetchChildevents();
+                    }
                   }
-                  var refStatus = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              EnrolledChildDetailsSccreen(
-                                childEventGuid: chilevenGuid,
-                                enName: widget.enName!,
-                                chilenrolledGUID: widget.chilenrolledGUID!,
-                                creche_id: widget.creche_id,
-                                lastDate: Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
-                                childId: widget.childId,
-                                childName: widget.childName,
-                                existingDates: existingDates,
-                              )));
-                  if (refStatus == 'itemRefresh') {
-                    fetchChildevents();
-                  }
-                }
-              },
-              child: Image.asset(
-                "assets/add_btn.png",
-                scale: 2.7,
-                color: Color(0xff5979AA),
-              ),
-            )
-          : SizedBox(),
-      appBar: CustomChildAppbar(
-        text: Global.returnTrLable(translats, CustomText.ChildEventDetail, lng),
-        subTitle1: widget.childName,
-        subTitle2: widget.childId,
-        onTap: () => Navigator.pop(context, 'itemRefresh'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-        child: Column(children: [
-          role == CustomText.crecheSupervisor
-              ? Align(
-                  alignment: Alignment.topRight,
-                  child: AnimatedRollingSwitch(
-                    title1:
-                        Global.returnTrLable(translats, CustomText.all, lng),
-                    title2: Global.returnTrLable(
-                        translats, CustomText.unsynched, lng),
-                    isOnlyUnsynched: isOnlyUnsyched,
-                    onChange: (value) async {
-                      setState(() {
-                        isOnlyUnsyched = value;
-                      });
-                      await fetchChildevents();
-                    },
-                  ),
-                )
-              : SizedBox(),
-          Expanded(
-            child: (filterEventData.length > 0)
-                ? ListView.builder(
-                    itemCount: filterEventData.length,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () async {
-                          bool isEdited=await Validate().checkEditable(filterEventData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
-                          String? minDate;
-                          if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
-                            minDate=await Validate().callMinDate(widget.dateOfEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
-                          }
-                          
-                          bool isUnEditable=true;
-                          if(isEdited&&role == CustomText.crecheSupervisor){
-                            isUnEditable=false;
-                          }
-                          if (existingDates.contains(Global.getItemValues(
-                              filterEventData[index].responces, 'date'))) {
-                            var currentRecordDate = Global.getItemValues(
-                                filterEventData[index].responces, 'date');
-                            existingDates.remove(currentRecordDate);
-                          }
+                },
+                child: Image.asset(
+                  "assets/add_btn.png",
+                  scale: 2.7,
+                  color: Color(0xff5979AA),
+                ),
+              )
+            : SizedBox(),
+        appBar: CustomChildAppbar(
+          text: Global.returnTrLable(translats, CustomText.ChildEventDetail, lng),
+          subTitle1: widget.childName,
+          subTitle2: widget.childId,
+          onTap: () => Navigator.pop(context, 'itemRefresh'),
+        ),
+        body: Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+          child: Column(children: [
+            role == CustomText.crecheSupervisor
+                ? Align(
+                    alignment: Alignment.topRight,
+                    child: AnimatedRollingSwitch(
+                      title1:
+                          Global.returnTrLable(translats, CustomText.all, lng),
+                      title2: Global.returnTrLable(
+                          translats, CustomText.unsynched, lng),
+                      isOnlyUnsynched: isOnlyUnsyched,
+                      onChange: (value) async {
+                        setState(() {
+                          isOnlyUnsyched = value;
+                        });
+                        await fetchChildevents();
+                      },
+                    ),
+                  )
+                : SizedBox(),
+            Expanded(
+              child: (filterEventData.length > 0)
+                  ? ListView.builder(
+                      itemCount: filterEventData.length,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () async {
+                            bool isEdited=await Validate().checkEditable(filterEventData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
+                            String? minDate;
+                            if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                              minDate=await Validate().callMinDate(widget.dateOfEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                            }
 
-                          // var lstDate=await callDatesAlredDateList(Global.getItemValues(filterEventData[index].responces!, 'date'));
-                          var refStatus = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      isUnEditable
-                                          ? ChildEventDetailsViewScreen(
-                                              type: 1,
-                                              childEventGuid:
-                                                  filterEventData[index]
-                                                      .child_event_guid,
-                                              enName: widget.enName!,
-                                              chilenrolledGUID:
-                                                  filterEventData[index]
-                                                      .childenrolledguid,
-                                              creche_id: widget.creche_id,
+                            bool isUnEditable=true;
+                            if(isEdited&&role == CustomText.crecheSupervisor){
+                              isUnEditable=false;
+                            }
+                            if (existingDates.contains(Global.getItemValues(
+                                filterEventData[index].responces, 'date'))) {
+                              var currentRecordDate = Global.getItemValues(
+                                  filterEventData[index].responces, 'date');
+                              existingDates.remove(currentRecordDate);
+                            }
 
-                                              // maxDate:maxDate,
-                                              childId: widget.childId,
-                                              childName: widget.childName,
-                                            )
-                                          : EnrolledChildDetailsSccreen(
-                                              childEventGuid:
-                                                  filterEventData[index]
-                                                      .child_event_guid,
-                                              enName: widget.enName!,
-                                              chilenrolledGUID:
-                                                  filterEventData[index]
-                                                      .childenrolledguid,
-                                              creche_id: widget.creche_id,
-                                              lastDate:Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
-                                              // maxDate:maxDate,
-                                              childId: widget.childId,
-                                              childName: widget.childName,
-                                              existingDates: existingDates,
-                                            )));
-                          if (refStatus == 'itemRefresh') {
-                            await fetchChildevents();
-                          }
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff5A5A5A).withOpacity(
-                                        0.2), // Shadow color with opacity
-                                    offset: Offset(
-                                        0, 3), // Horizontal and vertical offset
-                                    blurRadius: 6, // Blur radius
-                                    spreadRadius: 0, // Spread radius
-                                  ),
-                                ],
-                                color: Colors.white,
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 8.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} : ',
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.detail, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10),
-                                  SizedBox(
-                                    height: 10.h,
-                                    width: 2,
-                                    child: VerticalDivider(
-                                      color: Color(0xffE6E6E6),
+                            // var lstDate=await callDatesAlredDateList(Global.getItemValues(filterEventData[index].responces!, 'date'));
+                            var refStatus = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        isUnEditable
+                                            ? ChildEventDetailsViewScreen(
+                                                type: 1,
+                                                childEventGuid:
+                                                    filterEventData[index]
+                                                        .child_event_guid,
+                                                enName: widget.enName!,
+                                                chilenrolledGUID:
+                                                    filterEventData[index]
+                                                        .childenrolledguid,
+                                                creche_id: widget.creche_id,
+
+                                                // maxDate:maxDate,
+                                                childId: widget.childId,
+                                                childName: widget.childName,
+                                              )
+                                            : EnrolledChildDetailsSccreen(
+                                                childEventGuid:
+                                                    filterEventData[index]
+                                                        .child_event_guid,
+                                                enName: widget.enName!,
+                                                chilenrolledGUID:
+                                                    filterEventData[index]
+                                                        .childenrolledguid,
+                                                creche_id: widget.creche_id,
+                                                lastDate:Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
+                                                // maxDate:maxDate,
+                                                childId: widget.childId,
+                                                childName: widget.childName,
+                                                existingDates: existingDates,
+                                              )));
+                            if (refStatus == 'itemRefresh') {
+                              await fetchChildevents();
+                            }
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff5A5A5A).withOpacity(
+                                          0.2), // Shadow color with opacity
+                                      offset: Offset(
+                                          0, 3), // Horizontal and vertical offset
+                                      blurRadius: 6, // Blur radius
+                                      spreadRadius: 0, // Spread radius
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
+                                  ],
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xffE7F0FF)),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w, vertical: 8.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          Validate().displeDateFormate(
-                                              Global.getItemValues(
-                                                  filterEventData[index]
-                                                      .responces!,
-                                                  'date')),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
+                                          '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} : ',
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Global.getItemValues(
-                                              filterEventData[index].responces!,
-                                              'details'),
-                                          maxLines: 1,
-                                          style: Styles.cardBlue10,
+                                          '${Global.returnTrLable(translats, CustomText.detail, lng).trim()} : ',
+                                          style: Styles.black104,
                                           strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(width: 5),
-                                  (filterEventData[index].is_edited == 0 &&
-                                          filterEventData[index].is_uploaded ==
-                                              1)
-                                      ? Image.asset(
-                                          "assets/sync.png",
-                                          scale: 1.5,
-                                        )
-                                      : Image.asset(
-                                          "assets/sync_gray.png",
-                                          scale: 1.5,
-                                        )
-                                ],
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 10.h,
+                                      width: 2,
+                                      child: VerticalDivider(
+                                        color: Color(0xffE6E6E6),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            Validate().displeDateFormate(
+                                                Global.getItemValues(
+                                                    filterEventData[index]
+                                                        .responces!,
+                                                    'date')),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.getItemValues(
+                                                filterEventData[index].responces!,
+                                                'details'),
+                                            maxLines: 1,
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    (filterEventData[index].is_edited == 0 &&
+                                            filterEventData[index].is_uploaded ==
+                                                1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : Image.asset(
+                                            "assets/sync_gray.png",
+                                            scale: 1.5,
+                                          )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    })
-                : Center(
-                    child: Text(Global.returnTrLable(
-                        translats, CustomText.NorecordAvailable, lng)),
-                  ),
-          )
-        ]),
+                        );
+                      })
+                  : Center(
+                      child: Text(Global.returnTrLable(
+                          translats, CustomText.NorecordAvailable, lng)),
+                    ),
+            )
+          ]),
+        ),
       ),
     );
   }

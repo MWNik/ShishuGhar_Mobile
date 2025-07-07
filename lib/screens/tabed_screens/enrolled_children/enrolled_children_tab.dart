@@ -82,89 +82,92 @@ class _EnrolledChilrenTabState extends State<EnrolledChilrenTab>
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 60,
-          backgroundColor: Color(0xff5979AA),
-          leading: Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context, 'itemRefresh');
-              },
-              child: Icon(
-                Icons.arrow_back_ios_sharp,
-                size: 20,
-                color: Colors.white,
+      return SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 60,
+            backgroundColor: Color(0xff5979AA),
+            leading: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context, 'itemRefresh');
+                },
+                child: Icon(
+                  Icons.arrow_back_ios_sharp,
+                  size: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  Global.returnTrLable(
+                          translatsLabel, CustomText.ChildEnrollment, lng)
+                      .trim(),
+                  style: Styles.white145,
+                ),
+                // EnrolledChilrenTab.childName!=null?Text(
+                //   EnrolledChilrenTab.childName!,
+                //   style: Styles.white145,
+                // ):
+                Text(''),
+              ],
+            ),
+            // actions: [
+            //   (role == 'Cluster Coordinator')
+            //       ? GestureDetector(
+            //           onTap: () async {
+            //             await updateVerificationStatus(context);
+            //           },
+            //           child: Image.asset(
+            //             "assets/verify_icon.png",
+            //             scale: 1.5,
+            //           ),
+            //         )
+            //       : SizedBox(),
+            //   SizedBox(
+            //     width: 10,
+            //   )
+            // ],
+            centerTitle: true,
+            bottom: TabBar(
+              indicatorColor: Colors.white,
+              unselectedLabelColor: Colors.grey.shade300,
+              unselectedLabelStyle: Styles.white124P,
+              labelColor: Colors.white,
+              onTap: (index) {
+                if (_tabController.indexIsChanging) {
+                  _tabController.index = _tabController.previousIndex;
+                  print("object $index");
+                  handleTabChange(index);
+                } else {
+                  print("object 1 $index");
+                  return;
+                }
+              },
+              controller: _tabController,
+              isScrollable: true,
+              tabs: tabController(),
+            ),
           ),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                Global.returnTrLable(
-                        translatsLabel, CustomText.ChildEnrollment, lng)
-                    .trim(),
-                style: Styles.white145,
-              ),
-              // EnrolledChilrenTab.childName!=null?Text(
-              //   EnrolledChilrenTab.childName!,
-              //   style: Styles.white145,
-              // ):
-              Text(''),
-            ],
-          ),
-          // actions: [
-          //   (role == 'Cluster Coordinator')
-          //       ? GestureDetector(
-          //           onTap: () async {
-          //             await updateVerificationStatus(context);
-          //           },
-          //           child: Image.asset(
-          //             "assets/verify_icon.png",
-          //             scale: 1.5,
-          //           ),
-          //         )
-          //       : SizedBox(),
-          //   SizedBox(
-          //     width: 10,
-          //   )
-          // ],
-          centerTitle: true,
-          bottom: TabBar(
-            indicatorColor: Colors.white,
-            unselectedLabelColor: Colors.grey.shade300,
-            unselectedLabelStyle: Styles.white124P,
-            labelColor: Colors.white,
-            onTap: (index) {
-              if (_tabController.indexIsChanging) {
-                _tabController.index = _tabController.previousIndex;
-                print("object $index");
-                handleTabChange(index);
-              } else {
-                print("object 1 $index");
-                return;
-              }
-            },
-            controller: _tabController,
-            isScrollable: true,
-            tabs: tabController(),
-          ),
+          body: Column(children: [
+            Expanded(
+                child: TabBarView(
+              controller: _tabController,
+              physics: NeverScrollableScrollPhysics(),
+              children: tabControllerScreen(),
+            ))
+          ]),
         ),
-        body: Column(children: [
-          Expanded(
-              child: TabBarView(
-            controller: _tabController,
-            physics: NeverScrollableScrollPhysics(),
-            children: tabControllerScreen(),
-          ))
-        ]),
       );
     }
   }

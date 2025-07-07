@@ -179,92 +179,95 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () async {
-          Navigator.pop(context, 'itemRefresh');
-          return false; // Change this according to your logic
-        },
-        child: _isLoading
-            ? Container(
-                color: Colors.white,
-                child: Center(child: CircularProgressIndicator()))
-            : Scaffold(
-                body: Column(
-                  children: [
-                    Divider(),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 20.w, vertical: 10.h),
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: cWidget(widget.tabBreakItem.name!),
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context, 'itemRefresh');
+            return false; // Change this according to your logic
+          },
+          child: _isLoading
+              ? Container(
+                  color: Colors.white,
+                  child: Center(child: CircularProgressIndicator()))
+              : Scaffold(
+                  body: Column(
+                    children: [
+                      Divider(),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20.w, vertical: 10.h),
+                          child: SingleChildScrollView(
+                            controller: _scrollController,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: cWidget(widget.tabBreakItem.name!),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Divider(),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: CElevatedButton(
-                              color: Color(0xffF26BA3),
-                              onPressed: () {
-                                // ch(2);
-                                nextTab(0, context);
-                              },
-                              text: Global.returnTrLable(
-                                      translats, CustomText.back, lng)
-                                  .trim(),
+                      Divider(),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: CElevatedButton(
+                                color: Color(0xffF26BA3),
+                                onPressed: () {
+                                  // ch(2);
+                                  nextTab(0, context);
+                                },
+                                text: Global.returnTrLable(
+                                        translats, CustomText.back, lng)
+                                    .trim(),
+                              ),
                             ),
-                          ),
-                          // Row(children: [
-                          SizedBox(width: 10),
-                          widget.tabIndex == (widget.totalTab - 1)
-                              ? SizedBox()
-                              : Expanded(
-                                  child: CElevatedButton(
-                                    color: Color(0xff5979AA),
-                                    onPressed: () {
-                                      saveOnly(1, context);
-                                      // widget.changeTab(1);
-                                    },
-                                    text: Global.returnTrLable(
-                                            translats, CustomText.Save, lng)
-                                        .trim(),
+                            // Row(children: [
+                            SizedBox(width: 10),
+                            widget.tabIndex == (widget.totalTab - 1)
+                                ? SizedBox()
+                                : Expanded(
+                                    child: CElevatedButton(
+                                      color: Color(0xff5979AA),
+                                      onPressed: () {
+                                        saveOnly(1, context);
+                                        // widget.changeTab(1);
+                                      },
+                                      text: Global.returnTrLable(
+                                              translats, CustomText.Save, lng)
+                                          .trim(),
+                                    ),
                                   ),
-                                ),
-                          // ]
-                          // ),
-                          widget.tabIndex == (widget.totalTab - 1)
-                              ? SizedBox()
-                              : SizedBox(width: 10),
-                          Expanded(
-                            child: CElevatedButton(
-                              color: Color(0xff369A8D),
-                              onPressed: () {
-                                nextTab(1, context);
-                                // widget.changeTab(1);
-                              },
-                              text: Global.returnTrLable(
-                                  translats,
-                                  widget.tabIndex == (widget.totalTab - 1)
-                                      ? CustomText.Submit
-                                      : CustomText.Next,
-                                  lng),
+                            // ]
+                            // ),
+                            widget.tabIndex == (widget.totalTab - 1)
+                                ? SizedBox()
+                                : SizedBox(width: 10),
+                            Expanded(
+                              child: CElevatedButton(
+                                color: Color(0xff369A8D),
+                                onPressed: () {
+                                  nextTab(1, context);
+                                  // widget.changeTab(1);
+                                },
+                                text: Global.returnTrLable(
+                                    translats,
+                                    widget.tabIndex == (widget.totalTab - 1)
+                                        ? CustomText.Submit
+                                        : CustomText.Next,
+                                    lng),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ));
+                    ],
+                  ),
+                )),
+    );
   }
 
   List<Widget> cWidget(

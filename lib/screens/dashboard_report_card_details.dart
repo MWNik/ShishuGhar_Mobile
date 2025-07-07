@@ -86,6 +86,15 @@ class _DashboardReportCardDetailState
   OptionsModel? selectedCrecheStatus;
   OptionsModel? selectedPartner;
 
+  OptionsModel? tempSelectedState;
+  OptionsModel? tempSelectedDistrict;
+  OptionsModel? tempSelectedBlock;
+  OptionsModel? tempSelectedGramPanchayat;
+  OptionsModel? tempSelectedVillage;
+  OptionsModel? tempSelectedCreche;
+  OptionsModel? tempSelectedCrecheStatus;
+  OptionsModel? tempSelectedPartner;
+
   List<OptionsModel> mstStates = [];
   List<OptionsModel> mstDistrict = [];
   List<OptionsModel> mstBlock = [];
@@ -155,6 +164,7 @@ class _DashboardReportCardDetailState
       CustomText.crecheNotAvailable,
       CustomText.CrecheStatus,
       CustomText.Partner,
+      CustomText.totalCount,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -165,412 +175,461 @@ class _DashboardReportCardDetailState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: CustomAppbar(
-        text: Global.returnTrLable(translats, widget.title, lng),
-        onTap: () {
-          Navigator.pop(context);
-        },
-      ),
-      endDrawer: SafeArea(
-          child: Drawer(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 15,right: 15, top: 20,bottom: 10),
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              "assets/filter_icon.png",
-                              scale: 2.4,
-                            ),
-                            SizedBox(
-                              width: 10.w,
-                            ),
-                            Text(
-                              Global.returnTrLable(
-                                  translats, CustomText.Filter, lng),
-                              style: Styles.labelcontrollerfont,
-                            ),
-                            Spacer(),
-                            InkWell(
-                                onTap: () async {
-                                  _scaffoldKey.currentState!.closeEndDrawer();
-                                },
-                                child: Image.asset(
-                                  'assets/cross.png',
-                                  color: Colors.grey,
-                                  scale: 4,
-                                )),
-                          ],
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: CustomAppbar(
+          text: Global.returnTrLable(translats, widget.title, lng),
+          onTap: () {
+            Navigator.pop(context);
+          },
+        ),
+        endDrawer: SafeArea(
+            child: Drawer(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15, right: 15, top: 20, bottom: 10),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                "assets/filter_icon.png",
+                                scale: 2.4,
+                              ),
+                              SizedBox(
+                                width: 10.w,
+                              ),
+                              Text(
+                                Global.returnTrLable(
+                                    translats, CustomText.Filter, lng),
+                                style: Styles.labelcontrollerfont,
+                              ),
+                              Spacer(),
+                              InkWell(
+                                  onTap: () async {
+                                    _scaffoldKey.currentState!.closeEndDrawer();
+                                  },
+                                  child: Image.asset(
+                                    'assets/cross.png',
+                                    color: Colors.grey,
+                                    scale: 4,
+                                  )),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(),
-                      parterns.length > 0
-                          ? DynamicCustomDropdownField(
-                              hintText: Global.returnTrLable(
-                                  translats, CustomText.Selecthere, lng),
-                              titleText: Global.returnTrLable(
-                                  translats, CustomText.Partner, lng),
-                              isRequred: 0,
-                              items: parterns,
-                              selectedItem: selectedPartner != null
-                                  ? selectedPartner?.name
-                                  : null,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedPartner = value;
-                                });
-                              },
-                            )
-                          : SizedBox(),
-                      DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.select_here, lng),
-                        titleText: Global.returnTrLable(
-                            translats, CustomText.state, lng),
-                        items: mstStates,
-                        isRequred: 0,
-                        selectedItem:
-                            selectedState != null ? selectedState?.name : null,
-                        onChanged: (value) async {
-                          selectedState = value;
-                          selectedDistrict = null;
-                          selectedBlock = null;
-                          selectedGramPanchayat = null;
-                          selectedVillage = null;
-                          selectedCreche = null;
-                          mstDistrict =
-                              Global.callDistrict(district, lng, selectedState);
-                          if (mstDistrict.length == 1) {
-                            selectedDistrict = mstDistrict.first;
-                            mstBlock =
-                                Global.callBlocks(block, lng, selectedDistrict);
-                            if (mstBlock.length == 1) {
-                              selectedBlock = mstBlock.first;
+                        SizedBox(),
+                        Expanded(
+                            child: SingleChildScrollView(
+                                child: Column(children: [
+                          parterns.length > 0
+                              ? DynamicCustomDropdownField(
+                                  hintText: Global.returnTrLable(
+                                      translats, CustomText.Selecthere, lng),
+                                  titleText: Global.returnTrLable(
+                                      translats, CustomText.Partner, lng),
+                                  isRequred: 0,
+                                  items: parterns,
+                                  selectedItem: selectedPartner != null
+                                      ? selectedPartner?.name
+                                      : null,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedPartner = value;
+                                    });
+                                  },
+                                )
+                              : SizedBox(),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.select_here, lng),
+                            titleText: Global.returnTrLable(
+                                translats, CustomText.state, lng),
+                            items: mstStates,
+                            isRequred: 0,
+                            selectedItem: selectedState != null
+                                ? selectedState?.name
+                                : null,
+                            onChanged: (value) async {
+                              selectedState = value;
+                              selectedDistrict = null;
+                              selectedBlock = null;
+                              selectedGramPanchayat = null;
+                              selectedVillage = null;
+                              selectedCreche = null;
+                              mstDistrict = Global.callDistrict(
+                                  district, lng, selectedState);
+                              if (mstDistrict.length == 1) {
+                                selectedDistrict = mstDistrict.first;
+                                mstBlock = Global.callBlocks(
+                                    block, lng, selectedDistrict);
+                                if (mstBlock.length == 1) {
+                                  selectedBlock = mstBlock.first;
+                                  mstGP = Global.callGramPanchyats(
+                                      gramPanchayat, lng, selectedBlock);
+                                  if (mstGP.length == 1) {
+                                    selectedGramPanchayat = mstGP.first;
+                                    mstVillage = Global.callFiltersVillages(
+                                        villages, lng, selectedGramPanchayat);
+
+                                    if (mstVillage.length == 1) {
+                                      selectedVillage = mstVillage.first;
+                                      mstcreches = Global.callFiltersCreches(
+                                          creches, lng, selectedVillage);
+                                    }
+                                  }
+                                }
+                              } else {
+                                mstBlock = [];
+                                mstGP = [];
+                                mstVillage = [];
+                              }
+                              setState(() {
+                                // Update districtList based on selectedState
+                                // districtList = // data from database based on selectedState;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.select_here, lng),
+                            titleText: Global.returnTrLable(
+                                translats, CustomText.District, lng),
+                            items: mstDistrict,
+                            isRequred: 0,
+                            selectedItem: selectedDistrict != null
+                                ? selectedDistrict?.name
+                                : null,
+                            onChanged: (value) async {
+                              selectedDistrict = value;
+                              selectedBlock = null;
+                              selectedGramPanchayat = null;
+                              selectedVillage = null;
+                              selectedCreche = null;
+                              mstBlock = Global.callBlocks(
+                                  block, lng, selectedDistrict);
+                              if (mstBlock.length == 1) {
+                                selectedBlock = mstBlock.first;
+                                mstGP = Global.callGramPanchyats(
+                                    gramPanchayat, lng, selectedBlock);
+                                if (mstGP.length == 1) {
+                                  selectedGramPanchayat = mstGP.first;
+                                  mstVillage = Global.callFiltersVillages(
+                                      villages, lng, selectedGramPanchayat);
+
+                                  if (mstVillage.length == 1) {
+                                    selectedVillage = mstVillage.first;
+                                    mstcreches = Global.callFiltersCreches(
+                                        creches, lng, selectedVillage);
+                                  }
+                                }
+                              } else {
+                                mstGP = [];
+                                mstVillage = [];
+                              }
+                              setState(() {
+                                // Update blockList based on selectedDistrict
+                                // blockList = // data from database based on selectedDistrict;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.select_here, lng),
+                            titleText: Global.returnTrLable(
+                                translats, CustomText.Block, lng),
+                            items: mstBlock,
+                            isRequred: 0,
+                            selectedItem: selectedBlock != null
+                                ? selectedBlock?.name
+                                : null,
+                            onChanged: (value) async {
+                              selectedBlock = value;
+                              selectedGramPanchayat = null;
+                              selectedVillage = null;
+                              selectedCreche = null;
                               mstGP = Global.callGramPanchyats(
                                   gramPanchayat, lng, selectedBlock);
                               if (mstGP.length == 1) {
                                 selectedGramPanchayat = mstGP.first;
                                 mstVillage = Global.callFiltersVillages(
                                     villages, lng, selectedGramPanchayat);
-
+                                if (mstVillage.length == 1) {
+                                  selectedVillage = mstVillage.first;
+                                  mstcreches = Global.callFiltersCreches(
+                                      creches, lng, selectedVillage);
+                                }
+                              } else {
+                                mstVillage = [];
+                              }
+                              setState(() {});
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            isRequred: 0,
+                            titleText: Global.returnTrLable(
+                                translats, CustomText.GramPanchayat, lng),
+                            items: mstGP,
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.Selecthere, lng),
+                            selectedItem: selectedGramPanchayat != null
+                                ? selectedGramPanchayat?.name
+                                : null,
+                            onChanged: (value) async {
+                              selectedGramPanchayat = value;
+                              selectedVillage = null;
+                              selectedCreche = null;
+                              mstVillage = Global.callFiltersVillages(
+                                  villages, lng, selectedGramPanchayat);
+                              if (mstVillage.length == 1) {
+                                selectedVillage = mstVillage.first;
                                 if (mstVillage.length == 1) {
                                   selectedVillage = mstVillage.first;
                                   mstcreches = Global.callFiltersCreches(
                                       creches, lng, selectedVillage);
                                 }
                               }
-                            }
-                          }
-                          setState(() {
-                            // Update districtList based on selectedState
-                            // districtList = // data from database based on selectedState;
-                          });
-                        },
-                      ),
-                      DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.select_here, lng),
-                        titleText: Global.returnTrLable(
-                            translats, CustomText.District, lng),
-                        items: mstDistrict,
-                        isRequred: 0,
-                        selectedItem: selectedDistrict != null
-                            ? selectedDistrict?.name
-                            : null,
-                        onChanged: (value) async {
-                          selectedDistrict = value;
-                          selectedBlock = null;
-                          selectedGramPanchayat = null;
-                          selectedVillage = null;
-                          selectedCreche = null;
-                          mstBlock =
-                              Global.callBlocks(block, lng, selectedDistrict);
-                          if (mstBlock.length == 1) {
-                            selectedBlock = mstBlock.first;
-                            mstGP = Global.callGramPanchyats(
-                                gramPanchayat, lng, selectedBlock);
-                            if (mstGP.length == 1) {
-                              selectedGramPanchayat = mstGP.first;
-                              mstVillage = Global.callFiltersVillages(
-                                  villages, lng, selectedGramPanchayat);
-
-                              if (mstVillage.length == 1) {
-                                selectedVillage = mstVillage.first;
+                              setState(() {});
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.Selecthere, lng),
+                            titleText: Global.returnTrLable(
+                                translats, CustomText.Village, lng),
+                            isRequred: 0,
+                            items: mstVillage,
+                            selectedItem: selectedVillage != null
+                                ? selectedVillage?.name
+                                : null,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedVillage = value;
+                                selectedCreche = null;
                                 mstcreches = Global.callFiltersCreches(
                                     creches, lng, selectedVillage);
-                              }
-                            }
-                          }
-                          setState(() {
-                            // Update blockList based on selectedDistrict
-                            // blockList = // data from database based on selectedDistrict;
-                          });
-                        },
-                      ),
-                      DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.select_here, lng),
-                        titleText: Global.returnTrLable(
-                            translats, CustomText.Block, lng),
-                        items: mstBlock,
-                        isRequred: 0,
-                        selectedItem:
-                            selectedBlock != null ? selectedBlock?.name : null,
-                        onChanged: (value) async {
-                          selectedBlock = value;
-                          selectedGramPanchayat = null;
-                          selectedVillage = null;
-                          selectedCreche = null;
-                          mstGP = Global.callGramPanchyats(
-                              gramPanchayat, lng, selectedBlock);
-                          if (mstGP.length == 1) {
-                            selectedGramPanchayat = mstGP.first;
-                            mstVillage = Global.callFiltersVillages(
-                                villages, lng, selectedGramPanchayat);
-                            if (mstVillage.length == 1) {
-                              selectedVillage = mstVillage.first;
-                              mstcreches = Global.callFiltersCreches(
-                                  creches, lng, selectedVillage);
-                            }
-                          }
-                          setState(() {});
-                        },
-                      ),
-                      DynamicCustomDropdownField(
-                        isRequred: 0,
-                        titleText: Global.returnTrLable(
-                            translats, CustomText.GramPanchayat, lng),
-                        items: mstGP,
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.Selecthere, lng),
-                        selectedItem: selectedGramPanchayat != null
-                            ? selectedGramPanchayat?.name
-                            : null,
-                        onChanged: (value) async {
-                          selectedGramPanchayat = value;
-                          selectedVillage = null;
-                          selectedCreche = null;
-                          mstVillage = Global.callFiltersVillages(
-                              villages, lng, selectedGramPanchayat);
-                          if (mstVillage.length == 1) {
-                            selectedVillage = mstVillage.first;
-                            if (mstVillage.length == 1) {
-                              selectedVillage = mstVillage.first;
-                              mstcreches = Global.callFiltersCreches(
-                                  creches, lng, selectedVillage);
-                            }
-                          }
-                          setState(() {});
-                        },
-                      ),
-                      DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.Selecthere, lng),
-                        titleText: Global.returnTrLable(
-                            translats, CustomText.Village, lng),
-                        isRequred: 0,
-                        items: mstVillage,
-                        selectedItem: selectedVillage != null
-                            ? selectedVillage?.name
-                            : null,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedVillage = value;
-                            selectedCreche = null;
-                            mstcreches = Global.callFiltersCreches(
-                                creches, lng, selectedVillage);
-                            if (mstcreches.length == 1) {
-                              selectedCreche = mstcreches.first;
-                            }
-                          });
-                        },
-                      ),
-                      DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.Selecthere, lng),
-                        titleText: Global.returnTrLable(
-                            translats, CustomText.Creches, lng),
-                        isRequred: 0,
-                        items: mstcreches,
-                        selectedItem: selectedCreche != null
-                            ? selectedCreche?.name
-                            : null,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedCreche = value;
-                          });
-                        },
-                      ),
-                      DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(
-                            translats, CustomText.Selecthere, lng),
-                        titleText: Global.returnTrLable(
-                            translats, CustomText.CrecheStatus, lng),
-                        isRequred: 0,
-                        items: crecheStatus,
-                        selectedItem: selectedCrecheStatus != null
-                            ? selectedCrecheStatus?.name
-                            : null,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedCrecheStatus = value;
-                          });
-                        },
-                      ),
-                      SizedBox(
-                        height: 5.h,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(3.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    translats, 'Clear', lng),
-                                color: Color(0xffF26BA3),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  cleaAllFilter();
-                                },
-                              ),
-                            ),
-                            SizedBox(width: 4.w),
-                            Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    translats, 'Search', lng),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  callApiForDashboardApi();
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ]),
-              ))),
-      body: Padding(
-          padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-          child:
-              // apiIsCall?
-              Column(children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: DynamicCustomDropdownField(
-                    hintText:
-                        Global.returnTrLable(translats, CustomText.Year, lng),
-                    items: getYearList(2020),
-                    // titleText:
-                    //     Global.returnTrLable(translats, CustomText.Year, lng),
-                    selectedItem: selectedYear,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedYear = value!.name!;
-                        months = getMonthList(Global.stringToInt(selectedYear));
-                        selectedMonth = null;
-                      });
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: DynamicCustomDropdownField(
-                    hintText:
-                        Global.returnTrLable(translats, CustomText.Month, lng),
-                    items: months,
-                    // titleText:
-                    //     Global.returnTrLable(translats, CustomText.Month, lng),
-                    selectedItem: selectedMonth,
-                    onChanged: (value) {
-                      selectedMonth = value?.name;
-                      callApiForDashboardApi();
-                    },
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    _scaffoldKey.currentState!.openEndDrawer();
-                  },
-                  child: Image.asset(
-                    "assets/filter_icon.png",
-                    scale: 2.4,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 10.h,
-            ),
-            Expanded(
-              child: (items.length > 0)
-                  ? ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: items.length,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (BuildContext context, int index) {
-                        return InkWell(
-                          onTap: () async {},
-                          child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: Container(
-                                width: double
-                                    .infinity, // Takes full width of grid cell
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(0.2),
-                                      offset: Offset(0, 3),
-                                      blurRadius: 6,
-                                      spreadRadius: 0,
-                                    ),
-                                  ],
-                                  color: Color(0xffF2F7FF),
-                                  borderRadius: BorderRadius.circular(5.r),
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                ),
-                                child: callCardItem(items[index])),
+                                if (mstcreches.length == 1) {
+                                  selectedCreche = mstcreches.first;
+                                }
+                              });
+                            },
                           ),
-                        );
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.Selecthere, lng),
+                            titleText: Global.returnTrLable(
+                                translats, CustomText.Creches, lng),
+                            isRequred: 0,
+                            items: mstcreches,
+                            selectedItem: selectedCreche != null
+                                ? selectedCreche?.name
+                                : null,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedCreche = value;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.Selecthere, lng),
+                            titleText: Global.returnTrLable(
+                                translats, CustomText.CrecheStatus, lng),
+                            isRequred: 0,
+                            items: crecheStatus,
+                            selectedItem: selectedCrecheStatus != null
+                                ? selectedCrecheStatus?.name
+                                : null,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedCrecheStatus = value;
+                              });
+                            },
+                          ),
+                        ]))),
+                        SizedBox(
+                          height: 5.h,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(3.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      translats, 'Clear', lng),
+                                  color: Color(0xffF26BA3),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    cleaAllFilter();
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: 4.w),
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      translats, 'Search', lng),
+                                  onPressed: () {
+                                    // widget.selectedState=null;
+                                    // widget.selectedDistrict=null;
+                                    // widget.selectedBlock=null;
+                                    // widget.selectedGramPanchayat=null;
+                                    // widget.selectedVillage=null;
+                                    // widget.selectedCreche=null;
+                                    // widget.selectedCrecheStatus=null;
+                                    // widget.selectedPartner=null;
+
+                                    tempSelectedState = selectedState;
+                                    tempSelectedDistrict = selectedDistrict;
+                                    tempSelectedBlock = selectedBlock;
+                                    tempSelectedGramPanchayat =
+                                        selectedGramPanchayat;
+                                    tempSelectedVillage = selectedVillage;
+                                    tempSelectedCreche = selectedCreche;
+                                    tempSelectedCrecheStatus =
+                                        selectedCrecheStatus;
+                                    tempSelectedPartner = selectedPartner;
+                                    Navigator.of(context).pop();
+                                    callApiForDashboardApi();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ]),
+                ))),
+        body: Padding(
+            padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+            child:
+                // apiIsCall?
+                Column(children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: DynamicCustomDropdownField(
+                      hintText:
+                          Global.returnTrLable(translats, CustomText.Year, lng),
+                      items: getYearList(2020),
+                      // titleText:
+                      //     Global.returnTrLable(translats, CustomText.Year, lng),
+                      selectedItem: selectedYear,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedYear = value!.name!;
+                          months =
+                              getMonthList(Global.stringToInt(selectedYear));
+                          selectedMonth = null;
+                        });
                       },
-                    )
-                  : Center(
-                      child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng)),
                     ),
+                  ),
+                  Expanded(
+                    child: DynamicCustomDropdownField(
+                      hintText: Global.returnTrLable(
+                          translats, CustomText.Month, lng),
+                      items: months,
+                      // titleText:
+                      //     Global.returnTrLable(translats, CustomText.Month, lng),
+                      selectedItem: selectedMonth,
+                      onChanged: (value) {
+                        selectedMonth = value?.name;
+                        callApiForDashboardApi();
+                      },
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    },
+                    child: Image.asset(
+                      "assets/filter_icon.png",
+                      scale: 2.4,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    '${Global.returnTrLable(translats, CustomText.totalCount, lng)}: ${items.length}',
+                    style: Styles.black12700,
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 10.h,
+              ),
+              Expanded(
+                child: (items.length > 0)
+                    ? ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: items.length,
+                        physics: BouncingScrollPhysics(),
+                        itemBuilder: (BuildContext context, int index) {
+                          return InkWell(
+                            onTap: () async {},
+                            child: Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Container(
+                                  width: double
+                                      .infinity, // Takes full width of grid cell
+                                  decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            Color(0xff5A5A5A).withOpacity(0.2),
+                                        offset: Offset(0, 3),
+                                        blurRadius: 6,
+                                        spreadRadius: 0,
+                                      ),
+                                    ],
+                                    color: Color(0xffF2F7FF),
+                                    borderRadius: BorderRadius.circular(5.r),
+                                    border:
+                                        Border.all(color: Color(0xffE7F0FF)),
+                                  ),
+                                  child: callCardItem(items[index])),
+                            ),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text(Global.returnTrLable(
+                            translats, CustomText.NorecordAvailable, lng)),
+                      ),
+              ),
+            ])
+            //   :Center(
+            // child: Text(Global.returnTrLable(translats,
+            //     CustomText.NorecordAvailable, lng)))
             ),
-          ])
-          //   :Center(
-          // child: Text(Global.returnTrLable(translats,
-          //     CustomText.NorecordAvailable, lng)))
-          ),
+      ),
     );
   }
 
   Future callApiForDashboardApi() async {
     var token = await Validate().readString(Validate.appToken);
     var network = await Validate().checkNetworkConnection();
-    String? userName=null;
-    String? usr=await Validate().readString(Validate.userName);
-    String? pswd=await Validate().readString(Validate.Password);
+    String? userName = null;
+    String? usr = await Validate().readString(Validate.userName);
+    String? pswd = await Validate().readString(Validate.Password);
     if (role == CustomText.crecheSupervisor) {
       userName = usr;
-      usr=null;
-      pswd=null;
+      usr = null;
+      pswd = null;
     }
     if (network) {
       showLoaderDialog(context);
@@ -579,15 +638,17 @@ class _DashboardReportCardDetailState
           widget.query_type,
           selectedYear,
           selectedMonth!,
-          selectedState,
-          selectedDistrict,
-          selectedBlock,
-          selectedGramPanchayat,
-          selectedVillage,
-          selectedCreche,
-          selectedCrecheStatus,
-          selectedPartner,
-          token!,usr,pswd);
+          tempSelectedState,
+          tempSelectedDistrict,
+          tempSelectedBlock,
+          tempSelectedGramPanchayat,
+          tempSelectedVillage,
+          tempSelectedCreche,
+          tempSelectedCrecheStatus,
+          tempSelectedPartner,
+          token!,
+          usr,
+          pswd);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data['data'] != null) {
@@ -716,6 +777,15 @@ class _DashboardReportCardDetailState
   }
 
   Future<void> fetchStateList() async {
+    tempSelectedState = widget.selectedState;
+    tempSelectedDistrict = widget.selectedDistrict;
+    tempSelectedBlock = widget.selectedBlock;
+    tempSelectedGramPanchayat = widget.selectedGramPanchayat;
+    tempSelectedVillage = widget.selectedVillage;
+    tempSelectedCreche = widget.selectedCreche;
+    tempSelectedPartner = widget.selectedPartner;
+    tempSelectedCrecheStatus = widget.selectedCrecheStatus;
+
     states = await StateDataHelper().getTabStateList();
     district = await DistrictDataHelper().getTabDistrictList();
     block = await BlockDataHelper().getTabBlockList();
@@ -732,15 +802,18 @@ class _DashboardReportCardDetailState
     }
     if (mstStates.length == 1) {
       selectedState = mstStates.first;
+      tempSelectedState = mstStates.first;
       mstDistrict = Global.callDistrict(district, lng, selectedState);
     }
     if (mstStates.length > 0 && widget.selectedState != null) {
       selectedState = widget.selectedState;
+      tempSelectedState = widget.selectedState;
       mstDistrict = Global.callDistrict(district, lng, selectedState);
     }
 
     if (mstDistrict.length == 1) {
       selectedDistrict = mstDistrict.first;
+      tempSelectedDistrict = mstDistrict.first;
       mstBlock = Global.callBlocks(block, lng, selectedDistrict);
     }
 
@@ -751,15 +824,18 @@ class _DashboardReportCardDetailState
 
     if (mstBlock.length == 1) {
       selectedBlock = mstBlock.first;
+      tempSelectedBlock = mstBlock.first;
       mstGP = Global.callGramPanchyats(gramPanchayat, lng, selectedBlock);
     }
     if (mstBlock.length > 0 && widget.selectedBlock != null) {
       selectedBlock = widget.selectedBlock;
+      tempSelectedBlock = widget.selectedBlock;
       mstGP = Global.callGramPanchyats(gramPanchayat, lng, selectedBlock);
     }
 
     if (mstGP.length == 1) {
       selectedGramPanchayat = mstGP.first;
+      tempSelectedGramPanchayat = mstGP.first;
       mstVillage =
           Global.callFiltersVillages(villages, lng, selectedGramPanchayat);
     }
@@ -771,6 +847,7 @@ class _DashboardReportCardDetailState
 
     if (mstVillage.length == 1) {
       selectedVillage = mstVillage.first;
+      tempSelectedVillage = mstVillage.first;
       mstcreches = Global.callFiltersCreches(creches, lng, selectedVillage);
     }
     if (mstVillage.length > 0 && widget.selectedVillage != null) {
@@ -780,22 +857,28 @@ class _DashboardReportCardDetailState
 
     if (mstcreches.length > 0 && widget.selectedCreche != null) {
       selectedCreche = widget.selectedCreche;
+    } else if (mstcreches.length == 1) {
+      selectedCreche = mstcreches.first;
+      tempSelectedCreche = mstcreches.first;
     }
 
     if (parterns.length > 0 && widget.selectedPartner != null) {
       selectedPartner = widget.selectedPartner;
     } else if (parterns.length == 1) {
       selectedPartner = parterns.first;
+      tempSelectedPartner = parterns.first;
     }
     if (crecheStatus.length > 0 && widget.selectedCrecheStatus != null) {
       selectedCrecheStatus = widget.selectedCrecheStatus;
     } else if (crecheStatus.length == 1) {
       selectedCrecheStatus = crecheStatus.first;
+      tempSelectedCrecheStatus = crecheStatus.first;
     } else if (crecheStatus.length > 1) {
       var items = crecheStatus
           .where((element) => element.name == 3.toString())
           .toList();
       if (items.isNotEmpty) {
+        tempSelectedCrecheStatus = items.first;
         selectedCrecheStatus = items.first;
       }
     }
@@ -812,6 +895,15 @@ class _DashboardReportCardDetailState
     selectedCreche = null;
     selectedPartner = null;
     selectedCrecheStatus = null;
+
+    tempSelectedState = null;
+    tempSelectedDistrict = null;
+    tempSelectedBlock = null;
+    tempSelectedGramPanchayat = null;
+    tempSelectedVillage = null;
+    tempSelectedCreche = null;
+    tempSelectedPartner = null;
+    tempSelectedCrecheStatus = null;
 
     widget.selectedState = null;
     widget.selectedDistrict = null;

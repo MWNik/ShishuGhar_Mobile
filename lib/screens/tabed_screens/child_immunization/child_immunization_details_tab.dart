@@ -157,156 +157,159 @@ class _ChildImmunizationExpendedScreenSatet
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: tabCount,
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 60,
-          backgroundColor: Color(0xff5979AA),
-          leading: Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context, 'itemRefresh');
-              },
-              child: Icon(
-                Icons.arrow_back_ios_sharp,
-                size: 20,
-                color: Colors.white,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: DefaultTabController(
+        length: tabCount,
+        child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 60,
+            backgroundColor: Color(0xff5979AA),
+            leading: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context, 'itemRefresh');
+                },
+                child: Icon(
+                  Icons.arrow_back_ios_sharp,
+                  size: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-          title: RichText(
-            text: TextSpan(
-              children: [
-                WidgetSpan(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      RichText(
-                        maxLines: 2,
-                        textAlign: TextAlign.center,
-                        text: TextSpan(children: [
-                          WidgetSpan(
-                            child: Text(
-                              '${widget.childName} ',
-                              style: Styles.white145,
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
+            title: RichText(
+              text: TextSpan(
+                children: [
+                  WidgetSpan(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        RichText(
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                          text: TextSpan(children: [
+                            WidgetSpan(
+                              child: Text(
+                                '${widget.childName} ',
+                                style: Styles.white145,
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                          WidgetSpan(
-                            child: Text(
-                              '-${widget.childHHID}',
-                              style: Styles.white145,
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              // overflow: TextOverflow.ellipsis,
-                            ),
-                          )
-                        ]),
-                      ),
+                            WidgetSpan(
+                              child: Text(
+                                '-${widget.childHHID}',
+                                style: Styles.white145,
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                                // overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                          ]),
+                        ),
 
-                      Text(
-                        Global.returnTrLable(labelControlls,
-                            CustomText.ChildImmunizationDetails, lng!),
-                        style: Styles.white126P,
-                      ),
-                      // Add additional TextSpans here if needed
-                    ],
+                        Text(
+                          Global.returnTrLable(labelControlls,
+                              CustomText.ChildImmunizationDetails, lng!),
+                          style: Styles.white126P,
+                        ),
+                        // Add additional TextSpans here if needed
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            centerTitle: true,
+            bottom: TabBar(
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelPadding: EdgeInsets.zero,
+
+              // indicatorWeight: 4.5,
+              indicatorColor: Colors.white,
+              indicator: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.yellow.shade600, // Divider color
+                    width: 4.5,
+                    // Divider thickness
                   ),
-                )
-              ],
-            ),
-          ),
-          centerTitle: true,
-          bottom: TabBar(
-            indicatorSize: TabBarIndicatorSize.tab,
-            labelPadding: EdgeInsets.zero,
-
-            // indicatorWeight: 4.5,
-            indicatorColor: Colors.white,
-            indicator: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.yellow.shade600, // Divider color
-                  width: 4.5,
-                  // Divider thickness
                 ),
               ),
-            ),
 
-            unselectedLabelColor: Colors.transparent,
-            tabs: (tabCount == 2)
-                ? [
-                    Container(
-                      color: getBorderColorByType('overdue'),
-                      width: double.infinity,
-                      child: Tab(
-                          child: Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.overdue, lng!),
-                              style: TextStyle(color: Colors.white))),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      color: getBorderColorByType('completed'),
-                      child: Tab(
-                          child: Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.complted, lng!),
-                              style: TextStyle(color: Colors.white))),
-                    ),
-                  ]
-                : [
-                    Container(
-                      color: getBorderColorByType('overdue'),
-                      width: double.infinity,
-                      child: Tab(
-                          child: Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.overdue, lng!),
-                              style: TextStyle(color: Colors.white))),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      color: getBorderColorByType('completed'),
-                      child: Tab(
-                          child: Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.complted, lng!),
-                              style: TextStyle(color: Colors.white))),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      color: getBorderColorByType('upcoming'),
-                      child: Tab(
-                          child: Text(
-                              Global.returnTrLable(
-                                  labelControlls, CustomText.upcomming, lng!),
-                              style: TextStyle(color: Colors.white))),
-                    ),
-                  ],
+              unselectedLabelColor: Colors.transparent,
+              tabs: (tabCount == 2)
+                  ? [
+                      Container(
+                        color: getBorderColorByType('overdue'),
+                        width: double.infinity,
+                        child: Tab(
+                            child: Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.overdue, lng!),
+                                style: TextStyle(color: Colors.white))),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        color: getBorderColorByType('completed'),
+                        child: Tab(
+                            child: Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.complted, lng!),
+                                style: TextStyle(color: Colors.white))),
+                      ),
+                    ]
+                  : [
+                      Container(
+                        color: getBorderColorByType('overdue'),
+                        width: double.infinity,
+                        child: Tab(
+                            child: Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.overdue, lng!),
+                                style: TextStyle(color: Colors.white))),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        color: getBorderColorByType('completed'),
+                        child: Tab(
+                            child: Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.complted, lng!),
+                                style: TextStyle(color: Colors.white))),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        color: getBorderColorByType('upcoming'),
+                        child: Tab(
+                            child: Text(
+                                Global.returnTrLable(
+                                    labelControlls, CustomText.upcomming, lng!),
+                                style: TextStyle(color: Colors.white))),
+                      ),
+                    ],
+            ),
           ),
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: TabBarView(
+                    children: (tabCount == 2)
+                        ? [
+                            buildVaccineList(vaccinesOverdue, 'overdue'),
+                            buildVaccineList(vaccinesCompleted, 'completed'),
+                          ]
+                        : [
+                            buildVaccineList(vaccinesOverdue, 'overdue'),
+                            buildVaccineList(vaccinesCompleted, 'completed'),
+                            buildVaccineList(vaccinesUpComming, 'upcoming'),
+                          ],
+                  ),
+                ),
         ),
-        body: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                child: TabBarView(
-                  children: (tabCount == 2)
-                      ? [
-                          buildVaccineList(vaccinesOverdue, 'overdue'),
-                          buildVaccineList(vaccinesCompleted, 'completed'),
-                        ]
-                      : [
-                          buildVaccineList(vaccinesOverdue, 'overdue'),
-                          buildVaccineList(vaccinesCompleted, 'completed'),
-                          buildVaccineList(vaccinesUpComming, 'upcoming'),
-                        ],
-                ),
-              ),
       ),
     );
   }

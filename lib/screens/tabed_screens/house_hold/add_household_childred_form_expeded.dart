@@ -72,183 +72,186 @@ class _HouseholdScreenState
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return WillPopScope(
-        onWillPop: () async {
-          Navigator.pop(context, 'itemRefresh');
-          return false;
-        },
-        child: Scaffold(
-            appBar: AppBar(
-              toolbarHeight: 60,
-              backgroundColor: Color(0xff5979AA),
-              leading: Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context, 'itemRefresh');
-                  },
-                  child: Icon(
-                    Icons.arrow_back_ios_sharp,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              // title: Text(
-              //   CustomText.hh_detail,
-              //   style: Styles.white145,
-              // ),
-              title: RichText(
-                text: TextSpan(
-                  // text: CustomText.hh_detail,
-                  // style:Styles.white145,
-                  children: (Global.validString(houseHoldHeadName))
-                      ? [
-                          WidgetSpan(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  Global.returnTrLable(
-                                      translats, 'Children Detail', lng),
-                                  style: Styles.white145,
-                                ),
-                                Text(
-                                  '${Global.returnTrLable(translats, hhNameTitle, lng)} : ${Global.validToString(houseHoldHeadName)}',
-                                  style: Styles.white126P,
-                                ),
-                                // Add additional TextSpans here if needed
-                              ],
-                            ),
-                          ),
-                        ]
-                      : [
-                          WidgetSpan(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  Global.returnTrLable(
-                                      translats, 'Children Detail', lng),
-                                  style: Styles.white145,
-                                ),
-                                // Add additional TextSpans here if needed
-                              ],
-                            ),
-                          ),
-                        ],
-                ),
-              ),
-              centerTitle: true,
-            ),
-            // appBar: CustomAppbar(text: CustomText.AddHouseholdListingChild,
-            //     onTap: () {
-            //   Navigator.pop(context,'itemRefresh');
-            // }),
-            body: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
-              child: Column(
-                children: [
-                  Divider(),
-                  Expanded(
-                    child: ListView.builder(
-                      // physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: tabBreakItems.length,
-                      itemBuilder: (BuildContext context, int i) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    Global.returnTrLable(
-                                        translats,
-                                        Global.validToString(
-                                            tabBreakItems[i].label),
-                                        lng),
-                                    style: expandableList == i
-                                        ? Styles.blue148
-                                        : Styles.gray124,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    // if (expandableList == i) {
-                                    //   expandableList = -1;
-                                    // } else {
-                                    //   expandableList = i;
-                                    // }
-                                    // setState(() {});
-                                  },
-                                  child: Icon(
-                                    expandableList == i
-                                        ? Icons.expand_less
-                                        : Icons.expand_more,
-                                    color: Color(0xffB2B2B2),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 5.h),
-                            expandableList == i
-                                ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: cWidget(tabBreakItems[i].name!),
-                                  )
-                                : SizedBox.shrink(),
-                            if (i != tabBreakItems.length - 1) Divider(),
-                            // Add a Divider after each item except the last one
-                          ],
-                        );
-                      },
+      return SafeArea(
+        child: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context, 'itemRefresh');
+            return false;
+          },
+          child: Scaffold(
+              appBar: AppBar(
+                toolbarHeight: 60,
+                backgroundColor: Color(0xff5979AA),
+                leading: Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context, 'itemRefresh');
+                    },
+                    child: Icon(
+                      Icons.arrow_back_ios_sharp,
+                      size: 20,
+                      color: Colors.white,
                     ),
                   ),
-                  Divider(),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CElevatedButton(
-                          color: Color(0xffF26BA3),
-                          onPressed: () {
-                            // Navigator.pop(context);
-                            nextTab(0);
-                          },
-                          text: Global.returnTrLable(translats, 'Back', lng),
-                        ),
-                      ),
-                      role == CustomText.crecheSupervisor
-                          ? SizedBox(width: 10)
-                          : SizedBox(),
-                      role == CustomText.crecheSupervisor
-                          ? Expanded(
-                              child: CElevatedButton(
-                                color: Color(0xff369A8D),
-                                onPressed: () {
-                                  print(myMap);
-                                  nextTab(1);
-                                  // Navigator.of(context).push(MaterialPageRoute(
-                                  //   builder: (BuildContext context) => AddHouseholdScreenChildFrom(),
-                                  // ));
-                                },
-                                text: Global.returnTrLable(
-                                    translats, saveNext, lng),
+                ),
+                // title: Text(
+                //   CustomText.hh_detail,
+                //   style: Styles.white145,
+                // ),
+                title: RichText(
+                  text: TextSpan(
+                    // text: CustomText.hh_detail,
+                    // style:Styles.white145,
+                    children: (Global.validString(houseHoldHeadName))
+                        ? [
+                            WidgetSpan(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    Global.returnTrLable(
+                                        translats, 'Children Detail', lng),
+                                    style: Styles.white145,
+                                  ),
+                                  Text(
+                                    '${Global.returnTrLable(translats, hhNameTitle, lng)} : ${Global.validToString(houseHoldHeadName)}',
+                                    style: Styles.white126P,
+                                  ),
+                                  // Add additional TextSpans here if needed
+                                ],
                               ),
-                            )
-                          : SizedBox(),
-                    ],
+                            ),
+                          ]
+                        : [
+                            WidgetSpan(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    Global.returnTrLable(
+                                        translats, 'Children Detail', lng),
+                                    style: Styles.white145,
+                                  ),
+                                  // Add additional TextSpans here if needed
+                                ],
+                              ),
+                            ),
+                          ],
                   ),
-                ],
+                ),
+                centerTitle: true,
               ),
-            )),
+              // appBar: CustomAppbar(text: CustomText.AddHouseholdListingChild,
+              //     onTap: () {
+              //   Navigator.pop(context,'itemRefresh');
+              // }),
+              body: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+                child: Column(
+                  children: [
+                    Divider(),
+                    Expanded(
+                      child: ListView.builder(
+                        // physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: tabBreakItems.length,
+                        itemBuilder: (BuildContext context, int i) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      Global.returnTrLable(
+                                          translats,
+                                          Global.validToString(
+                                              tabBreakItems[i].label),
+                                          lng),
+                                      style: expandableList == i
+                                          ? Styles.blue148
+                                          : Styles.gray124,
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      // if (expandableList == i) {
+                                      //   expandableList = -1;
+                                      // } else {
+                                      //   expandableList = i;
+                                      // }
+                                      // setState(() {});
+                                    },
+                                    child: Icon(
+                                      expandableList == i
+                                          ? Icons.expand_less
+                                          : Icons.expand_more,
+                                      color: Color(0xffB2B2B2),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 5.h),
+                              expandableList == i
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: cWidget(tabBreakItems[i].name!),
+                                    )
+                                  : SizedBox.shrink(),
+                              if (i != tabBreakItems.length - 1) Divider(),
+                              // Add a Divider after each item except the last one
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    Divider(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CElevatedButton(
+                            color: Color(0xffF26BA3),
+                            onPressed: () {
+                              // Navigator.pop(context);
+                              nextTab(0);
+                            },
+                            text: Global.returnTrLable(translats, 'Back', lng),
+                          ),
+                        ),
+                        role == CustomText.crecheSupervisor
+                            ? SizedBox(width: 10)
+                            : SizedBox(),
+                        role == CustomText.crecheSupervisor
+                            ? Expanded(
+                                child: CElevatedButton(
+                                  color: Color(0xff369A8D),
+                                  onPressed: () {
+                                    print(myMap);
+                                    nextTab(1);
+                                    // Navigator.of(context).push(MaterialPageRoute(
+                                    //   builder: (BuildContext context) => AddHouseholdScreenChildFrom(),
+                                    // ));
+                                  },
+                                  text: Global.returnTrLable(
+                                      translats, saveNext, lng),
+                                ),
+                              )
+                            : SizedBox(),
+                      ],
+                    ),
+                  ],
+                ),
+              )),
+        ),
       );
     }
   }

@@ -209,6 +209,9 @@ class DashboardReportApi {
     if (selectedPartner != null) {
       body['partner_id'] = '${selectedPartner.name}';
     }
+    if (userName != null) {
+      body['supervisor_id'] = '${userName}';
+    }
     if (usr != null) {
       body['usr'] = usr;
     }

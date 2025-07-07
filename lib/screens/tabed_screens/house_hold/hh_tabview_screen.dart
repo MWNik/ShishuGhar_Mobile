@@ -72,125 +72,128 @@ class _HHTabScreenState extends State<HHTabScreen>
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return WillPopScope(
-        onWillPop: () async {
-          Validate().showExitDialog(context, labelControlls, lng!);
-          return false;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 60,
-            backgroundColor: Color(0xff5979AA),
-            leading: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: GestureDetector(
-                onTap: () {
-                  Validate().showExitDialog(context, labelControlls, lng!);
-                },
-                child: Icon(
-                  Icons.arrow_back_ios_sharp,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            title: RichText(
-              text: TextSpan(
-                children: (Global.validString(hhName))
-                    ? [
-                        WidgetSpan(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                Global.returnTrLable(
-                                    labelControlls, CustomText.hh_detail, lng!),
-                                style: Styles.white145,
-                              ),
-                              Text(
-                                '${Global.returnTrLable(labelControlls, hhNameTitle, lng!)} : ${Global.validToString(hhName)}',
-                                style: Styles.white126P,
-                              ),
-                              // Add additional TextSpans here if needed
-                            ],
-                          ),
-                        ),
-                      ]
-                    : [
-                        WidgetSpan(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                Global.returnTrLable(
-                                    labelControlls, CustomText.hh_detail, lng!),
-                                style: Styles.white145,
-                              ),
-                              // Add additional TextSpans here if needed
-                            ],
-                          ),
-                        ),
-                      ],
-              ),
-            ),
-            centerTitle: true,
-            // actions: [
-            //   (role == 'Cluster Coordinator')
-            //       ? GestureDetector(
-            //           onTap: () async {
-            //              await updateVerificationStatusRadio(context);
-            //           },
-            //           child: Image.asset(
-            //             "assets/verify_icon.png",
-            //             scale: 1.5,
-            //           ),
-            //         )
-            //       : SizedBox(),
-            //   SizedBox(
-            //     width: 10,
-            //   )
-            // ],
-            bottom: _isLoading
-                ? null
-                : TabBar(
-                    indicatorColor: Color(0xffF26BA3),
-                    unselectedLabelColor: Colors.grey.shade300,
-                    unselectedLabelStyle: Styles.white124P,
-                    labelColor: Colors.white,
-                    controller: _tabController,
-                    isScrollable: tabIsScrollable,
-                    labelPadding: EdgeInsets.zero,
-                    // tabAlignment: TabAlignment.start,
-                    tabAlignment: tabIsScrollable ? TabAlignment.start : null,
-
-                    tabs: tabTitleItem,
-                    onTap: (index) {
-                      if (_tabController.indexIsChanging) {
-                        _tabController.index = _tabController.previousIndex;
-
-                        handleTabChange(index, _tabController.previousIndex);
-                      } else {
-                        print("object 1 $index");
-                        return;
-                      }
-                    },
+      return SafeArea(
+        child: WillPopScope(
+          onWillPop: () async {
+            Validate().showExitDialog(context, labelControlls, lng!);
+            return false;
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 60,
+              backgroundColor: Color(0xff5979AA),
+              leading: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    Validate().showExitDialog(context, labelControlls, lng!);
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios_sharp,
+                    size: 20,
+                    color: Colors.white,
                   ),
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: tabControllerScreen(),
                 ),
               ),
-            ],
+              title: RichText(
+                text: TextSpan(
+                  children: (Global.validString(hhName))
+                      ? [
+                          WidgetSpan(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  Global.returnTrLable(
+                                      labelControlls, CustomText.hh_detail, lng!),
+                                  style: Styles.white145,
+                                ),
+                                Text(
+                                  '${Global.returnTrLable(labelControlls, hhNameTitle, lng!)} : ${Global.validToString(hhName)}',
+                                  style: Styles.white126P,
+                                ),
+                                // Add additional TextSpans here if needed
+                              ],
+                            ),
+                          ),
+                        ]
+                      : [
+                          WidgetSpan(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  Global.returnTrLable(
+                                      labelControlls, CustomText.hh_detail, lng!),
+                                  style: Styles.white145,
+                                ),
+                                // Add additional TextSpans here if needed
+                              ],
+                            ),
+                          ),
+                        ],
+                ),
+              ),
+              centerTitle: true,
+              // actions: [
+              //   (role == 'Cluster Coordinator')
+              //       ? GestureDetector(
+              //           onTap: () async {
+              //              await updateVerificationStatusRadio(context);
+              //           },
+              //           child: Image.asset(
+              //             "assets/verify_icon.png",
+              //             scale: 1.5,
+              //           ),
+              //         )
+              //       : SizedBox(),
+              //   SizedBox(
+              //     width: 10,
+              //   )
+              // ],
+              bottom: _isLoading
+                  ? null
+                  : TabBar(
+                      indicatorColor: Color(0xffF26BA3),
+                      unselectedLabelColor: Colors.grey.shade300,
+                      unselectedLabelStyle: Styles.white124P,
+                      labelColor: Colors.white,
+                      controller: _tabController,
+                      isScrollable: tabIsScrollable,
+                      labelPadding: EdgeInsets.zero,
+                      // tabAlignment: TabAlignment.start,
+                      tabAlignment: tabIsScrollable ? TabAlignment.start : null,
+
+                      tabs: tabTitleItem,
+                      onTap: (index) {
+                        if (_tabController.indexIsChanging) {
+                          _tabController.index = _tabController.previousIndex;
+
+                          handleTabChange(index, _tabController.previousIndex);
+                        } else {
+                          print("object 1 $index");
+                          return;
+                        }
+                      },
+                    ),
+            ),
+            body: Column(
+              children: [
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: tabControllerScreen(),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );

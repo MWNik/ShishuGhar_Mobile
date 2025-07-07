@@ -95,341 +95,386 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (selectedState != null &&
-            selectedDistrict != null &&
-            selectedBlock != null &&
-            selectedGramPanchayat != null &&
-            selectedVillage != null) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DashboardScreen(
-                      index: 0,
-                    )),
-          );
-        } else {
-          if (userrole == "CRP") {
-            if (selectedGramPanchayat != null) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => DashboardScreen(
-                          index: 0,
-                        )),
-              );
-            }
-          }
-        }
-        return true;
-      },
-      child: Scaffold(
-        appBar: CustomAppbar(
-          text: (lng != null)
-              ? Global.returnTrLable(
-                  locationControlls, CustomText.checkIN, lng!)
-              : '',
-          onTap: () {
-            if (selectedState != null &&
-                selectedDistrict != null &&
-                selectedBlock != null &&
-                selectedGramPanchayat != null &&
-                selectedVillage != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => DashboardScreen(
-                          index: 0,
-                        )),
-              );
-            } else {
-              if (userrole == "CRP") {
-                if (selectedGramPanchayat != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DashboardScreen(
-                              index: 0,
-                            )),
-                  );
-                }
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          if (selectedState != null &&
+              selectedDistrict != null &&
+              selectedBlock != null &&
+              selectedGramPanchayat != null &&
+              selectedVillage != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DashboardScreen(
+                        index: 0,
+                      )),
+            );
+          } else {
+            if (userrole == "CRP") {
+              if (selectedGramPanchayat != null) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DashboardScreen(
+                            index: 0,
+                          )),
+                );
               }
             }
-          },
-        ),
-        body: (lng != null)
-            ? SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 10.h),
-                      Text(
-                        (lng != null)
-                            ? Global.returnTrLable(
-                                locationControlls, CustomText.checkIN, lng!)
-                            : '',
-                        style: Styles.red145,
-                      ),
-                      SizedBox(height: 10.h),
-                      CustomDropdownFieldString(
-                        titleText: Global.returnTrLable(
-                            locationControlls, CustomText.state, lng!),
-                        items: stateList,
-                        isRequred: 1,
-                        selectedItem: selectedState,
-                        onChanged: (value) async {
-                          selectedState = value;
-                          selectedDistrict = null;
-                          selectedBlock = null;
-                          selectedGramPanchayat = null;
-                          selectedVillage = null;
-                          selectedStateID = states
-                              .firstWhere(
-                                  (element) => element.value == selectedState)
-                              .name;
-                          DistrictDataHelper districtdata =
-                              DistrictDataHelper();
-                          List<TabDistrict> tempdistrict =
-                              await districtdata.getTabDistrictList();
-                          district = tempdistrict
-                              .where((element) =>
-                                  element.stateId == selectedStateID.toString())
-                              .toList();
-                          districtList.clear();
-                          district.forEach((element) {
-                            districtList.add(element.value!);
-                          });
-                          setState(() {
-                            // Update districtList based on selectedState
-                            // districtList = // data from database based on selectedState;
-                          });
-                        },
-                      ),
-                      CustomDropdownFieldString(
-                        titleText: Global.returnTrLable(
-                            locationControlls, CustomText.District, lng!),
-                        items: districtList,
-                        isRequred: 1,
-                        selectedItem: selectedDistrict,
-                        onChanged: (value) async {
-                          selectedDistrict = value;
-                          selectedBlock = null;
-                          selectedGramPanchayat = null;
-                          selectedVillage = null;
-                          selectedDistrictID = district
-                              .firstWhere((element) =>
-                                  element.value == selectedDistrict)
-                              .name;
-                          BlockDataHelper blockdata = BlockDataHelper();
-                          block = await blockdata.getTabBlockList();
-                          block = block
-                              .where((element) =>
-                                  element.districtId ==
-                                  selectedDistrictID.toString())
-                              .toList();
-                          blockList.clear();
-                          block.forEach((element) {
-                            blockList.add(element.value!);
-                          });
-                          setState(() {
-                            // Update blockList based on selectedDistrict
-                            // blockList = // data from database based on selectedDistrict;
-                          });
-                        },
-                      ),
-                      CustomDropdownFieldString(
-                        titleText: Global.returnTrLable(
-                            locationControlls, CustomText.Block, lng!),
-                        items: blockList,
-                        isRequred: 1,
-                        selectedItem: selectedBlock,
-                        onChanged: (value) async {
-                          selectedBlock = value;
-                          selectedGramPanchayat = null;
-                          selectedVillage = null;
-                          selectedBlockID = block
-                              .firstWhere(
-                                  (element) => element.value == selectedBlock)
-                              .name;
-                          GramPanchayatDataHelper gramPanchayatdata =
-                              GramPanchayatDataHelper();
-                          gramPanchayat =
-                              await gramPanchayatdata.getTabGramPanchayatList();
-                          gramPanchayat = gramPanchayat
-                              .where((element) =>
-                                  element.blockId == selectedBlockID.toString())
-                              .toList();
-                          gramPanchayatList.clear();
-                          gramPanchayat.forEach((element) {
-                            gramPanchayatList.add(element.value!);
-                          });
-                          setState(() {
-                            // Update gramPanchayatList based on selectedBlock
-                            // gramPanchayatList = // data from database based on selectedBlock;
-                          });
-                        },
-                      ),
-                      CustomDropdownFieldString(
-                        isRequred: 1,
-                        titleText: Global.returnTrLable(
-                            locationControlls, CustomText.GramPanchayat, lng!),
-                        items: gramPanchayatList,
-                        selectedItem: selectedGramPanchayat,
-                        onChanged: (value) async {
-                          selectedGramPanchayat = value;
-                          selectedVillage = null;
-                          selectedGramPanchayatID = gramPanchayat
-                              .firstWhere((element) =>
-                                  element.value == selectedGramPanchayat)
-                              .name;
-                          VillageDataHelper villagetdata = VillageDataHelper();
-                          village = await villagetdata.getTabVillageList();
-                          village = village
-                              .where((element) =>
-                                  element.gpId ==
-                                  selectedGramPanchayatID.toString())
-                              .toList();
-                          villageList.clear();
-                          village.forEach((element) {
-                            villageList.add(element.value!);
-                          });
-                          setState(() {
-                            // Update villageList based on selectedGramPanchayat
-                            // villageList = // data from database based on selectedGramPanchayat;
-                          });
-                        },
-                      ),
-                      userrole == "CRP"
-                          ? SizedBox()
-                          : Column(
-                              children: [
-                                CustomDropdownFieldString(
-                                  titleText: Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.Village,
-                                      lng!),
-                                  isRequred: 1,
-                                  items: villageList,
-                                  selectedItem: selectedVillage,
-                                  onChanged: (value) async {
-                                    selectedVillage = value;
-                                    selectedCrche=null;
-                                    selectedCrcheID=null;
-                                    selectedVillageID = village
-                                        .firstWhere((element) =>
-                                            (element.value == selectedVillage &&
-                                                element.gpId ==
-                                                    selectedGramPanchayatID
-                                                        .toString()))
-                                        .name;
-                                    crecheLocationWise = await CrecheDataHelper().getCrecheResponce();
-                                    crecheLocationWise= crecheLocationWise.where((element) =>
-                                    Global.getItemValues(element.responces!,'village_id')==selectedVillageID.toString()).toList();
-                                    crecheLocationWiseString.clear();
-                                    crecheLocationWise.forEach((element) {
-                                      crecheLocationWiseString
-                                          .add(Global.getItemValues(element.responces!, 'creche_name'));
-                                      if(selectedCrcheID!=null){
-                                        if(Global.getItemValues(element.responces!, 'creche_id')==selectedCrcheID){
-                                          selectedCrche=Global.getItemValues(element.responces!, 'creche_name');
+          }
+          return true;
+        },
+        child: Scaffold(
+          appBar: CustomAppbar(
+            text: (lng != null)
+                ? Global.returnTrLable(
+                    locationControlls, CustomText.checkIN, lng!)
+                : '',
+            onTap: () {
+              if (selectedState != null &&
+                  selectedDistrict != null &&
+                  selectedBlock != null &&
+                  selectedGramPanchayat != null &&
+                  selectedVillage != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DashboardScreen(
+                            index: 0,
+                          )),
+                );
+              } else {
+                if (userrole == "CRP") {
+                  if (selectedGramPanchayat != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DashboardScreen(
+                                index: 0,
+                              )),
+                    );
+                  }
+                }
+              }
+            },
+          ),
+          body: (lng != null)
+              ? SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 10.h),
+                        Text(
+                          (lng != null)
+                              ? Global.returnTrLable(
+                                  locationControlls, CustomText.checkIN, lng!)
+                              : '',
+                          style: Styles.red145,
+                        ),
+                        SizedBox(height: 10.h),
+                        CustomDropdownFieldString(
+                          titleText: Global.returnTrLable(
+                              locationControlls, CustomText.state, lng!),
+                          items: stateList,
+                          isRequred: 1,
+                          selectedItem: selectedState,
+                          onChanged: (value) async {
+                            selectedState = value;
+                            selectedDistrict = null;
+                            selectedBlock = null;
+                            selectedGramPanchayat = null;
+                            selectedVillage = null;
+                            selectedStateID = states
+                                .firstWhere(
+                                    (element) => element.value == selectedState)
+                                .name;
+                            DistrictDataHelper districtdata =
+                                DistrictDataHelper();
+                            List<TabDistrict> tempdistrict =
+                                await districtdata.getTabDistrictList();
+                            district = tempdistrict
+                                .where((element) =>
+                                    element.stateId == selectedStateID.toString())
+                                .toList();
+                            districtList.clear();
+                            district.forEach((element) {
+                              districtList.add(element.value!);
+                            });
+                            setState(() {
+                              // Update districtList based on selectedState
+                              // districtList = // data from database based on selectedState;
+                            });
+                          },
+                        ),
+                        CustomDropdownFieldString(
+                          titleText: Global.returnTrLable(
+                              locationControlls, CustomText.District, lng!),
+                          items: districtList,
+                          isRequred: 1,
+                          selectedItem: selectedDistrict,
+                          onChanged: (value) async {
+                            selectedDistrict = value;
+                            selectedBlock = null;
+                            selectedGramPanchayat = null;
+                            selectedVillage = null;
+                            selectedDistrictID = district
+                                .firstWhere((element) =>
+                                    element.value == selectedDistrict)
+                                .name;
+                            BlockDataHelper blockdata = BlockDataHelper();
+                            block = await blockdata.getTabBlockList();
+                            block = block
+                                .where((element) =>
+                                    element.districtId ==
+                                    selectedDistrictID.toString())
+                                .toList();
+                            blockList.clear();
+                            block.forEach((element) {
+                              blockList.add(element.value!);
+                            });
+                            setState(() {
+                              // Update blockList based on selectedDistrict
+                              // blockList = // data from database based on selectedDistrict;
+                            });
+                          },
+                        ),
+                        CustomDropdownFieldString(
+                          titleText: Global.returnTrLable(
+                              locationControlls, CustomText.Block, lng!),
+                          items: blockList,
+                          isRequred: 1,
+                          selectedItem: selectedBlock,
+                          onChanged: (value) async {
+                            selectedBlock = value;
+                            selectedGramPanchayat = null;
+                            selectedVillage = null;
+                            selectedBlockID = block
+                                .firstWhere(
+                                    (element) => element.value == selectedBlock)
+                                .name;
+                            GramPanchayatDataHelper gramPanchayatdata =
+                                GramPanchayatDataHelper();
+                            gramPanchayat =
+                                await gramPanchayatdata.getTabGramPanchayatList();
+                            gramPanchayat = gramPanchayat
+                                .where((element) =>
+                                    element.blockId == selectedBlockID.toString())
+                                .toList();
+                            gramPanchayatList.clear();
+                            gramPanchayat.forEach((element) {
+                              gramPanchayatList.add(element.value!);
+                            });
+                            setState(() {
+                              // Update gramPanchayatList based on selectedBlock
+                              // gramPanchayatList = // data from database based on selectedBlock;
+                            });
+                          },
+                        ),
+                        CustomDropdownFieldString(
+                          isRequred: 1,
+                          titleText: Global.returnTrLable(
+                              locationControlls, CustomText.GramPanchayat, lng!),
+                          items: gramPanchayatList,
+                          selectedItem: selectedGramPanchayat,
+                          onChanged: (value) async {
+                            selectedGramPanchayat = value;
+                            selectedVillage = null;
+                            selectedGramPanchayatID = gramPanchayat
+                                .firstWhere((element) =>
+                                    element.value == selectedGramPanchayat)
+                                .name;
+                            VillageDataHelper villagetdata = VillageDataHelper();
+                            village = await villagetdata.getTabVillageList();
+                            village = village
+                                .where((element) =>
+                                    element.gpId ==
+                                    selectedGramPanchayatID.toString())
+                                .toList();
+                            villageList.clear();
+                            village.forEach((element) {
+                              villageList.add(element.value!);
+                            });
+                            setState(() {
+                              // Update villageList based on selectedGramPanchayat
+                              // villageList = // data from database based on selectedGramPanchayat;
+                            });
+                          },
+                        ),
+                        userrole == "CRP"
+                            ? SizedBox()
+                            : Column(
+                                children: [
+                                  CustomDropdownFieldString(
+                                    titleText: Global.returnTrLable(
+                                        locationControlls,
+                                        CustomText.Village,
+                                        lng!),
+                                    isRequred: 1,
+                                    items: villageList,
+                                    selectedItem: selectedVillage,
+                                    onChanged: (value) async {
+                                      selectedVillage = value;
+                                      selectedCrche=null;
+                                      selectedCrcheID=null;
+                                      selectedVillageID = village
+                                          .firstWhere((element) =>
+                                              (element.value == selectedVillage &&
+                                                  element.gpId ==
+                                                      selectedGramPanchayatID
+                                                          .toString()))
+                                          .name;
+                                      crecheLocationWise = await CrecheDataHelper().getCrecheResponce();
+                                      crecheLocationWise= crecheLocationWise.where((element) =>
+                                      Global.getItemValues(element.responces!,'village_id')==selectedVillageID.toString()).toList();
+                                      crecheLocationWiseString.clear();
+                                      crecheLocationWise.forEach((element) {
+                                        crecheLocationWiseString
+                                            .add(Global.getItemValues(element.responces!, 'creche_name'));
+                                        if(selectedCrcheID!=null){
+                                          if(Global.getItemValues(element.responces!, 'creche_id')==selectedCrcheID){
+                                            selectedCrche=Global.getItemValues(element.responces!, 'creche_name');
+                                          }
                                         }
-                                      }
-                                    });
-                                    setState(() {});
-                                  },
-                                ),
-                                CustomDropdownFieldString(
-                                  titleText: Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.Creches,
-                                      lng!),
-                                  isRequred: checkMendotoryCreche(),
-                                  items: crecheLocationWiseString,
-                                  selectedItem: selectedCrche,
-                                  onChanged: (value) {
-                                    selectedCrche = value;
-                                 var selecteCrecheItem=    crecheLocationWise
-                                        .firstWhere((element) =>
-                                     (Global.getItemValues(element.responces!, 'creche_name') == selectedCrche));
-                                    selectedCrcheID=Global.getItemValues(selecteCrecheItem.responces!, 'creche_id');
-                                    CrecheIdName=selecteCrecheItem.name;
-                                    setState(() {});
-                                  },
-                                )
-                              ],
-                            ),
-                      SizedBox(height: 30.h),
-                      CElevatedButton(
-                        onPressed: () async {
-                          if (selectedState == null) {
-                            Validate().singleButtonPopup(
-                                Global.returnTrLable(locationControlls, CustomText.plSelect_state, lng!),
-                                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                                false,
-                                context);
-                          } else if (selectedDistrict == null) {
-                            Validate().singleButtonPopup(
-                                Global.returnTrLable(locationControlls, CustomText.plSelect_district, lng!),
-                                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                                false,
-                                context);
-                          } else if (selectedBlock == null) {
-                            Validate().singleButtonPopup(
-                                Global.returnTrLable(locationControlls, CustomText.plSelect_block, lng!),
-                                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                                false,
-                                context);
-                          } else if (selectedGramPanchayat == null) {
-                            Validate().singleButtonPopup(
-                                Global.returnTrLable(locationControlls, CustomText.plSelect_geamPanchayat, lng!),
-                                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                                false,
-                                context);
-                          } else if (selectedVillage == null) {
-                            if (userrole == 'CRP') {
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
-                              prefs.setString(Validate.state, selectedState!);
-                              prefs.setString(
-                                  Validate.district, selectedDistrict!);
-                              prefs.setString(Validate.block, selectedBlock!);
-                              prefs.setString(Validate.gramPanchayat,
-                                  selectedGramPanchayat!);
-
-                              prefs.setInt(Validate.stateID, selectedStateID!);
-                              prefs.setInt(
-                                  Validate.districtID, selectedDistrictID!);
-                              prefs.setInt(Validate.blockID, selectedBlockID!);
-
-                              gramPanchayat.forEach((element) {
-                                if (element.value == selectedGramPanchayat) {
-                                  prefs.setInt(
-                                      Validate.panchayatId, element.name!);
-                                }
-                              });
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DashboardScreen(
-                                      index: 0,
-                                    ),
-                                  ));
-                            }
-                            else {
+                                      });
+                                      setState(() {});
+                                    },
+                                  ),
+                                  CustomDropdownFieldString(
+                                    titleText: Global.returnTrLable(
+                                        locationControlls,
+                                        CustomText.Creches,
+                                        lng!),
+                                    isRequred: checkMendotoryCreche(),
+                                    items: crecheLocationWiseString,
+                                    selectedItem: selectedCrche,
+                                    onChanged: (value) {
+                                      selectedCrche = value;
+                                   var selecteCrecheItem=    crecheLocationWise
+                                          .firstWhere((element) =>
+                                       (Global.getItemValues(element.responces!, 'creche_name') == selectedCrche));
+                                      selectedCrcheID=Global.getItemValues(selecteCrecheItem.responces!, 'creche_id');
+                                      CrecheIdName=selecteCrecheItem.name;
+                                      setState(() {});
+                                    },
+                                  )
+                                ],
+                              ),
+                        SizedBox(height: 30.h),
+                        CElevatedButton(
+                          onPressed: () async {
+                            if (selectedState == null) {
                               Validate().singleButtonPopup(
-                                  Global.returnTrLable(locationControlls, CustomText.plSelect_village, lng!),
+                                  Global.returnTrLable(locationControlls, CustomText.plSelect_state, lng!),
                                   Global.returnTrLable(locationControlls, CustomText.ok, lng!),
                                   false,
                                   context);
+                            } else if (selectedDistrict == null) {
+                              Validate().singleButtonPopup(
+                                  Global.returnTrLable(locationControlls, CustomText.plSelect_district, lng!),
+                                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                                  false,
+                                  context);
+                            } else if (selectedBlock == null) {
+                              Validate().singleButtonPopup(
+                                  Global.returnTrLable(locationControlls, CustomText.plSelect_block, lng!),
+                                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                                  false,
+                                  context);
+                            } else if (selectedGramPanchayat == null) {
+                              Validate().singleButtonPopup(
+                                  Global.returnTrLable(locationControlls, CustomText.plSelect_geamPanchayat, lng!),
+                                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                                  false,
+                                  context);
+                            } else if (selectedVillage == null) {
+                              if (userrole == 'CRP') {
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                prefs.setString(Validate.state, selectedState!);
+                                prefs.setString(
+                                    Validate.district, selectedDistrict!);
+                                prefs.setString(Validate.block, selectedBlock!);
+                                prefs.setString(Validate.gramPanchayat,
+                                    selectedGramPanchayat!);
+
+                                prefs.setInt(Validate.stateID, selectedStateID!);
+                                prefs.setInt(
+                                    Validate.districtID, selectedDistrictID!);
+                                prefs.setInt(Validate.blockID, selectedBlockID!);
+
+                                gramPanchayat.forEach((element) {
+                                  if (element.value == selectedGramPanchayat) {
+                                    prefs.setInt(
+                                        Validate.panchayatId, element.name!);
+                                  }
+                                });
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DashboardScreen(
+                                        index: 0,
+                                      ),
+                                    ));
+                              }
+                              else {
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(locationControlls, CustomText.plSelect_village, lng!),
+                                    Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                                    false,
+                                    context);
+                              }
                             }
-                          }
-                           else if (selectedCrche == null) {
-                            if (checkMendotoryCreche()==0) {
+                             else if (selectedCrche == null) {
+                              if (checkMendotoryCreche()==0) {
+                                SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                                prefs.setString(Validate.state, selectedState!);
+                                prefs.setString(
+                                    Validate.district, selectedDistrict!);
+                                prefs.setString(Validate.block, selectedBlock!);
+                                prefs.setString(
+                                    Validate.gramPanchayat, selectedGramPanchayat!);
+                                prefs.setString(Validate.village, selectedVillage!);
+
+                                prefs.setInt(Validate.stateID, selectedStateID!);
+                                prefs.setInt(
+                                    Validate.districtID, selectedDistrictID!);
+                                prefs.setInt(Validate.blockID, selectedBlockID!);
+                                prefs.setInt(Validate.gramPanchayatID,
+                                    selectedGramPanchayatID!);
+                                await prefs.remove(Validate.CrcheID);
+                                await prefs.remove(Validate.CrecheIdName);
+                                await prefs.remove(Validate.CrecheSName);
+                                village.forEach((element) {
+                                  if (element.value == selectedVillage &&
+                                      element.gpId ==
+                                          selectedGramPanchayatID.toString()) {
+                                    prefs.setInt(Validate.villageId, element.name!);
+                                  }
+                                });
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DashboardScreen(
+                                        index: 0,
+                                      ),
+                                    ));
+                              }
+                              else {
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(locationControlls, CustomText.plSelect_creche, lng!),
+                                    Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                                    false,
+                                    context);
+                              }
+                            }
+                            else {
                               SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
+                                  await SharedPreferences.getInstance();
                               prefs.setString(Validate.state, selectedState!);
                               prefs.setString(
                                   Validate.district, selectedDistrict!);
@@ -444,9 +489,10 @@ class _LocationScreenState extends State<LocationScreen> {
                               prefs.setInt(Validate.blockID, selectedBlockID!);
                               prefs.setInt(Validate.gramPanchayatID,
                                   selectedGramPanchayatID!);
-                              await prefs.remove(Validate.CrcheID);
-                              await prefs.remove(Validate.CrecheIdName);
-                              await prefs.remove(Validate.CrecheSName);
+                              prefs.setString(Validate.CrcheID, selectedCrcheID!);
+                              prefs.setInt(Validate.CrecheIdName, CrecheIdName!);
+                              prefs.setString(Validate.CrecheSName, selectedCrche!);
+
                               village.forEach((element) {
                                 if (element.value == selectedVillage &&
                                     element.gpId ==
@@ -454,6 +500,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                   prefs.setInt(Validate.villageId, element.name!);
                                 }
                               });
+
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
@@ -462,60 +509,16 @@ class _LocationScreenState extends State<LocationScreen> {
                                     ),
                                   ));
                             }
-                            else {
-                              Validate().singleButtonPopup(
-                                  Global.returnTrLable(locationControlls, CustomText.plSelect_creche, lng!),
-                                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
-                                  false,
-                                  context);
-                            }
-                          }
-                          else {
-                            SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            prefs.setString(Validate.state, selectedState!);
-                            prefs.setString(
-                                Validate.district, selectedDistrict!);
-                            prefs.setString(Validate.block, selectedBlock!);
-                            prefs.setString(
-                                Validate.gramPanchayat, selectedGramPanchayat!);
-                            prefs.setString(Validate.village, selectedVillage!);
-
-                            prefs.setInt(Validate.stateID, selectedStateID!);
-                            prefs.setInt(
-                                Validate.districtID, selectedDistrictID!);
-                            prefs.setInt(Validate.blockID, selectedBlockID!);
-                            prefs.setInt(Validate.gramPanchayatID,
-                                selectedGramPanchayatID!);
-                            prefs.setString(Validate.CrcheID, selectedCrcheID!);
-                            prefs.setInt(Validate.CrecheIdName, CrecheIdName!);
-                            prefs.setString(Validate.CrecheSName, selectedCrche!);
-
-                            village.forEach((element) {
-                              if (element.value == selectedVillage &&
-                                  element.gpId ==
-                                      selectedGramPanchayatID.toString()) {
-                                prefs.setInt(Validate.villageId, element.name!);
-                              }
-                            });
-
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DashboardScreen(
-                                    index: 0,
-                                  ),
-                                ));
-                          }
-                        },
-                        text: Global.returnTrLable(
-                            locationControlls, CustomText.checkIN, lng!),
-                      )
-                    ],
+                          },
+                          text: Global.returnTrLable(
+                              locationControlls, CustomText.checkIN, lng!),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              )
-            : SizedBox(),
+                )
+              : SizedBox(),
+        ),
       ),
     );
   }

@@ -62,102 +62,105 @@ class _CresheTabScreenState extends State<CresheTabScreen>
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return WillPopScope(
-        onWillPop: () async {
-          Navigator.pop(context, 'itemRefresh');
-          return false;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 40,
-            backgroundColor: Color(0xff5979AA),
-            leading: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context, 'itemRefresh');
-                },
-                child: Icon(
-                  Icons.arrow_back_ios_sharp,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: InkWell(
-                  onTap: () async {
-                    if (lat != null && long != null) {
-                      await IntentUtils.launchGoogleMaps(lat!, long!);
-                    } else {
-                      Validate().singleButtonPopup(
-                          Global.returnTrLable(labelControlls,
-                              CustomText.locationNotAvailable, lng!),
-                          Global.returnTrLable(
-                              labelControlls, CustomText.ok, lng!),
-                          false,
-                          context);
-                    }
+      return SafeArea(
+        child: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context, 'itemRefresh');
+            return false;
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 40,
+              backgroundColor: Color(0xff5979AA),
+              leading: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context, 'itemRefresh');
                   },
                   child: Icon(
-                    lat != null && long != null
-                        ? Icons.place
-                        : Icons.place_outlined,
+                    Icons.arrow_back_ios_sharp,
+                    size: 20,
                     color: Colors.white,
                   ),
                 ),
-              )
-            ],
-            title: Text(
-              lng != null
-                  ? Global.returnTrLable(
-                      labelControlls, CustomText.CrecheProfileView, lng!)
-                  : "",
-              style: Styles.white145,
-            ),
-            centerTitle: true,
-            bottom: _isLoading
-                ? null
-                : TabBar(
-                    indicatorColor: Color(0xffF26BA3),
-                    unselectedLabelColor: Colors.grey.shade300,
-                    unselectedLabelStyle: Styles.white124P,
-                    labelColor: Colors.white,
-                    controller: _tabController,
-                    isScrollable: tabIsScrollable,
-                    labelPadding: EdgeInsets.zero,
-                    // tabAlignment: TabAlignment.start,
-                    tabAlignment: tabIsScrollable ? TabAlignment.start : null,
-                    tabs: tabTitleItem,
-                    onTap: (index) {
-                      if (_tabController.indexIsChanging) {
-                        _tabController.index = _tabController.previousIndex;
-
-                        handleTabChange(index, _tabController.previousIndex);
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 15),
+                  child: InkWell(
+                    onTap: () async {
+                      if (lat != null && long != null) {
+                        await IntentUtils.launchGoogleMaps(lat!, long!);
                       } else {
-                        print("object 1 $index");
-                        return;
+                        Validate().singleButtonPopup(
+                            Global.returnTrLable(labelControlls,
+                                CustomText.locationNotAvailable, lng!),
+                            Global.returnTrLable(
+                                labelControlls, CustomText.ok, lng!),
+                            false,
+                            context);
                       }
                     },
+                    child: Icon(
+                      lat != null && long != null
+                          ? Icons.place
+                          : Icons.place_outlined,
+                      color: Colors.white,
+                    ),
                   ),
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: tabControllerScreen(),
-                ),
+                )
+              ],
+              title: Text(
+                lng != null
+                    ? Global.returnTrLable(
+                        labelControlls, CustomText.CrecheProfileView, lng!)
+                    : "",
+                style: Styles.white145,
               ),
-            ],
+              centerTitle: true,
+              bottom: _isLoading
+                  ? null
+                  : TabBar(
+                      indicatorColor: Color(0xffF26BA3),
+                      unselectedLabelColor: Colors.grey.shade300,
+                      unselectedLabelStyle: Styles.white124P,
+                      labelColor: Colors.white,
+                      controller: _tabController,
+                      isScrollable: tabIsScrollable,
+                      labelPadding: EdgeInsets.zero,
+                      // tabAlignment: TabAlignment.start,
+                      tabAlignment: tabIsScrollable ? TabAlignment.start : null,
+                      tabs: tabTitleItem,
+                      onTap: (index) {
+                        if (_tabController.indexIsChanging) {
+                          _tabController.index = _tabController.previousIndex;
+
+                          handleTabChange(index, _tabController.previousIndex);
+                        } else {
+                          print("object 1 $index");
+                          return;
+                        }
+                      },
+                    ),
+            ),
+            body: Column(
+              children: [
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: tabControllerScreen(),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );

@@ -133,7 +133,7 @@ void main() async {
 
   String? initialPayload = notificationAppLaunchDetails?.notificationResponse?.payload;
   var anthroItems = await ChildGrowthResponseHelper().excuteIsNotSubmitedDate();
-  print("checkWorondition $anthroItems");
+
   if (Platform.isAndroid) {
     final androidInfo = await DeviceInfoPlugin().androidInfo;
     if (androidInfo.version.sdkInt >= 33) {

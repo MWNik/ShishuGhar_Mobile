@@ -96,73 +96,76 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return Scaffold(
-        body: Column(
-          children: [
-            Divider(),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: cWidget(widget.tabBreakItem.name!),
+      return SafeArea(
+        child: Scaffold(
+          body: Column(
+            children: [
+              Divider(),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: cWidget(widget.tabBreakItem.name!),
+                    ),
                   ),
                 ),
               ),
-            ),
-            Divider(),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CElevatedButton(
-                      color: Color(0xffF26BA3),
-                      onPressed: () {
-                        nextTab(0);
-                      },
-                      text:
-                          Global.returnTrLable(translats, CustomText.back, lng),
+              Divider(),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CElevatedButton(
+                        color: Color(0xffF26BA3),
+                        onPressed: () {
+                          nextTab(0);
+                        },
+                        text:
+                            Global.returnTrLable(translats, CustomText.back, lng),
+                      ),
                     ),
-                  ),
-                  role == 'Creche Supervisor'
-                      ? SizedBox(width: 10)
-                      : SizedBox(),
-                  role == 'Creche Supervisor'
-                      ? Expanded(
-                          child: CElevatedButton(
-                            color: Color(0xff5979AA),
-                            onPressed: () {
-                              nextTabSave(1);
-                              // widget.changeTab(1);
-                            },
-                            text: Global.returnTrLable(
-                                translats, CustomText.Save, lng),
-                          ),
-                        )
-                      : SizedBox(),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: CElevatedButton(
-                      color: Color(0xff369A8D),
-                      onPressed: () {
-                        nextTab(1);
-                        // widget.changeTab(1);
-                      },
-                      text:
-                          Global.returnTrLable(translats, CustomText.Next, lng),
+                    role == 'Creche Supervisor'
+                        ? SizedBox(width: 10)
+                        : SizedBox(),
+                    role == 'Creche Supervisor'
+                        ? Expanded(
+                            child: CElevatedButton(
+                              color: Color(0xff5979AA),
+                              onPressed: () {
+                                nextTabSave(1);
+                                // widget.changeTab(1);
+                              },
+                              text: Global.returnTrLable(
+                                  translats, CustomText.Save, lng),
+                            ),
+                          )
+                        : SizedBox(),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: CElevatedButton(
+                        color: Color(0xff369A8D),
+                        onPressed: () {
+                          nextTab(1);
+                          // widget.changeTab(1);
+                        },
+                        text:
+                            Global.returnTrLable(translats, CustomText.Next, lng),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }

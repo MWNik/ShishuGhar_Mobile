@@ -49,116 +49,119 @@ class _CrecheEnrolledListingTabState extends State<CrecheEnrolledListingTab>
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return WillPopScope(
-        onWillPop: () async {
-          Navigator.pop(context, 'itemRefresh');
-          return false;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 60,
-            backgroundColor: Color(0xff5979AA),
-            leading: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context, 'itemRefresh');
-                },
-                child: Icon(
-                  Icons.arrow_back_ios_sharp,
-                  size: 20,
-                  color: Colors.white,
+      return SafeArea(
+        child: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context, 'itemRefresh');
+            return false;
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 60,
+              backgroundColor: Color(0xff5979AA),
+              leading: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context, 'itemRefresh');
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios_sharp,
+                    size: 20,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-            title: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  Global.returnTrLable(
-                      labelControlls, CustomText.creche_enrollement, lng),
-                  style: Styles.white145,
-                ),
-                RichText(
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  text: TextSpan(children: [
-                    WidgetSpan(
-                      child: Text(
-                        '${widget.Childname} ',
-                        style: Styles.white126P,
-                        textAlign: TextAlign.center,
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    WidgetSpan(
-                      child: Text(
-                        '-${widget.childID}',
-                        style: Styles.white126P,
-                        textAlign: TextAlign.center,
-                        softWrap: true,
-                        // overflow: TextOverflow.ellipsis,
-                      ),
-                    )
-                  ]),
-                )
-              ],
-            ),
-            centerTitle: true,
-            bottom: _isLoading
-                ? null
-                : TabBar(
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    labelPadding: EdgeInsets.zero,
-                    indicator: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Color(0xffF26BA3),
-                          width: 3.0,
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    Global.returnTrLable(
+                        labelControlls, CustomText.creche_enrollement, lng),
+                    style: Styles.white145,
+                  ),
+                  RichText(
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    text: TextSpan(children: [
+                      WidgetSpan(
+                        child: Text(
+                          '${widget.Childname} ',
+                          style: Styles.white126P,
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                    controller: _tabController,
-                    unselectedLabelColor: Color(0xff369A8D),
-                    tabs: [
-                      Container(
-                        color: Color(0xff369A8D),
-                        width: double.infinity,
-                        child: Tab(
-                          child: Text(
-                            CustomText.Enrolled,
-                            style: TextStyle(color: Colors.white),
+                      WidgetSpan(
+                        child: Text(
+                          '-${widget.childID}',
+                          style: Styles.white126P,
+                          textAlign: TextAlign.center,
+                          softWrap: true,
+                          // overflow: TextOverflow.ellipsis,
+                        ),
+                      )
+                    ]),
+                  )
+                ],
+              ),
+              centerTitle: true,
+              bottom: _isLoading
+                  ? null
+                  : TabBar(
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      labelPadding: EdgeInsets.zero,
+                      indicator: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Color(0xffF26BA3),
+                            width: 3.0,
                           ),
                         ),
                       ),
-                      Container(
-                        color: Color(0xff369A8D),
-                        width: double.infinity,
-                        child: Tab(
+                      controller: _tabController,
+                      unselectedLabelColor: Color(0xff369A8D),
+                      tabs: [
+                        Container(
+                          color: Color(0xff369A8D),
+                          width: double.infinity,
+                          child: Tab(
                             child: Text(
-                          CustomText.child_exited,
-                          style: TextStyle(color: Colors.white),
-                        )),
-                      ),
-                    ],
+                              CustomText.Enrolled,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          color: Color(0xff369A8D),
+                          width: double.infinity,
+                          child: Tab(
+                              child: Text(
+                            CustomText.child_exited,
+                            style: TextStyle(color: Colors.white),
+                          )),
+                        ),
+                      ],
+                    ),
+            ),
+            body: Column(
+              children: [
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: tabControllerScreen(),
                   ),
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: tabControllerScreen(),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );

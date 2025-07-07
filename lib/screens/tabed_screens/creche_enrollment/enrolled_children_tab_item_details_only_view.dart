@@ -129,41 +129,44 @@ class _EnrolledChilrenTabItemViewState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomChildAppbar(
-        subTitle1: widget.childName ?? '',
-        subTitle2: widget.childId ?? '',
-        text: Global.returnTrLable(translats, CustomText.ChildProfile, lng),
-        onTap: () => Navigator.pop(context, 'itemRefresh'),
-      ),
-      body: WillPopScope(
-        onWillPop: () async {
-          Navigator.pop(context, 'itemRefresh');
-          return false; // Change this according to your logic
-        },
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Scaffold(
-                body: Column(
-                  children: [
-                    Divider(),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 20.w, vertical: 10.h),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            // children: [Text("hello")],
-                            children: cWidget(itemsList!),
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomChildAppbar(
+          subTitle1: widget.childName ?? '',
+          subTitle2: widget.childId ?? '',
+          text: Global.returnTrLable(translats, CustomText.ChildProfile, lng),
+          onTap: () => Navigator.pop(context, 'itemRefresh'),
+        ),
+        body: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context, 'itemRefresh');
+            return false; // Change this according to your logic
+          },
+          child: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Scaffold(
+                  body: Column(
+                    children: [
+                      Divider(),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20.w, vertical: 10.h),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              // children: [Text("hello")],
+                              children: cWidget(itemsList!),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Divider(),
-                  ],
+                      Divider(),
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }

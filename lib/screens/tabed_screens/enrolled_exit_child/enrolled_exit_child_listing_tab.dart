@@ -46,121 +46,124 @@ class _EnrolledChildrenListingTabState
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return WillPopScope(
-        onWillPop: () async {
-          Navigator.pop(context, 'itemRefresh');
-          return false;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 60,
-            backgroundColor: Color(0xff5979AA),
-            leading: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context, 'itemRefresh');
-                },
-                child: Icon(
-                  Icons.arrow_back_ios_sharp,
-                  size: 20,
-                  color: Colors.white,
+      return SafeArea(
+        child: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context, 'itemRefresh');
+            return false;
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 60,
+              backgroundColor: Color(0xff5979AA),
+              leading: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context, 'itemRefresh');
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios_sharp,
+                    size: 20,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-            title: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  Global.returnTrLable(
-                      labelControlls, CustomText.Enrolledchildren, lng),
-                  style: Styles.white145,
-                ),
-                // Text(
-                //  widget.creCheName,
-                //   style: Styles.white145,
-                // ),
-              ],
-            ),
-            centerTitle: true,
-            bottom: _isLoading
-                ? null
-                : TabBar(
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    labelPadding: EdgeInsets.zero,
-                    indicator: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Color(0xffF26BA3),
-                          width: 3.0,
-                        ),
-                      ),
-                    ),
-                    controller: _tabController,
-                    unselectedLabelColor: Color(0xff369A8D),
-                    tabs: [
-                      Container(
-                        // color: Color(0xff369A8D),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                            color: Color(0xff369A8D),
-                            border: Border(
-                                right: BorderSide(
-                                    color: Colors.white,
-                                    width: 1,
-                                    style: BorderStyle.solid))),
-                        child: Tab(
-                          child: Text(
-                            Global.returnTrLable(
-                                labelControlls, CustomText.Enrolled, lng),
-                            style: TextStyle(color: Colors.white),
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    Global.returnTrLable(
+                        labelControlls, CustomText.Enrolledchildren, lng),
+                    style: Styles.white145,
+                  ),
+                  // Text(
+                  //  widget.creCheName,
+                  //   style: Styles.white145,
+                  // ),
+                ],
+              ),
+              centerTitle: true,
+              bottom: _isLoading
+                  ? null
+                  : TabBar(
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      labelPadding: EdgeInsets.zero,
+                      indicator: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Color(0xffF26BA3),
+                            width: 3.0,
                           ),
                         ),
                       ),
-                      Container(
-                        // color: Color(0xff369A8D),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                            color: Color(0xff369A8D),
-                            border: Border(
-                                right: BorderSide(
-                                    color: Colors.white,
-                                    width: 1,
-                                    style: BorderStyle.solid))),
-                        child: Tab(
+                      controller: _tabController,
+                      unselectedLabelColor: Color(0xff369A8D),
+                      tabs: [
+                        Container(
+                          // color: Color(0xff369A8D),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              color: Color(0xff369A8D),
+                              border: Border(
+                                  right: BorderSide(
+                                      color: Colors.white,
+                                      width: 1,
+                                      style: BorderStyle.solid))),
+                          child: Tab(
                             child: Text(
-                          Global.returnTrLable(
-                              labelControlls, CustomText.NotEnroll, lng),
-                          style: TextStyle(color: Colors.white),
-                        )),
-                      ),
-                    ],
-                  ),
-            /* TabBar(
-                    indicatorColor: Colors.white,
-                    unselectedLabelColor: Colors.grey.shade300,
-                    unselectedLabelStyle: Styles.white124P,
-                    labelColor: Colors.white,
+                              Global.returnTrLable(
+                                  labelControlls, CustomText.Enrolled, lng),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          // color: Color(0xff369A8D),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              color: Color(0xff369A8D),
+                              border: Border(
+                                  right: BorderSide(
+                                      color: Colors.white,
+                                      width: 1,
+                                      style: BorderStyle.solid))),
+                          child: Tab(
+                              child: Text(
+                            Global.returnTrLable(
+                                labelControlls, CustomText.NotEnroll, lng),
+                            style: TextStyle(color: Colors.white),
+                          )),
+                        ),
+                      ],
+                    ),
+              /* TabBar(
+                      indicatorColor: Colors.white,
+                      unselectedLabelColor: Colors.grey.shade300,
+                      unselectedLabelStyle: Styles.white124P,
+                      labelColor: Colors.white,
+                      controller: _tabController,
+                      // isScrollable: true,
+                      tabs: tabTitleItem,
+                    ),*/
+            ),
+            body: Column(
+              children: [
+                Expanded(
+                  child: TabBarView(
                     controller: _tabController,
-                    // isScrollable: true,
-                    tabs: tabTitleItem,
-                  ),*/
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: tabControllerScreen(),
+                    physics: NeverScrollableScrollPhysics(),
+                    children: tabControllerScreen(),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );

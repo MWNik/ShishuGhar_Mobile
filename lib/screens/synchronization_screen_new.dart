@@ -142,426 +142,428 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context, 'itemRefresh');
-        return false;
-      },
-      child: Scaffold(
-        appBar: CustomAppbar(
-          actions: [
-            InkWell(
-              onTap: () {
-                Navigator.pop(context, 'itemRefresh');
-              },
-              child: Image.asset(
-                "assets/home.png",
-                color: Colors.white,
-                scale: 2,
-              ),
-            ),
-            SizedBox(width: 25)
-          ],
-          text: (lngtr != null)
-              ? Global.returnTrLable(locationControlls, CustomText.sync, lngtr!)
-              : "",
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DashboardScreen(
-                        index: 0,
-                      )),
-            );
-          },
-        ),
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 10.h,
-              ),
-              Expanded(
-                child: GridView.builder(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemCount: text.length,
-                  physics: BouncingScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 15,
-                      mainAxisExtent: 160.h),
-                  itemBuilder: (ctx, i) {
-                    return InkWell(
-                      onTap: () async {
-                        if (i == 0) {
-                          if (role == 'Creche Supervisor') {
-                            if (pendindTaskCount == 0) {
-                              var hhItems = await HouseHoldTabResponceHelper()
-                                  .getHouseHoldItems();
-                              // var childProfile = await EnrolledChilrenResponceHelper().callChildrenForUpload();
-                              var childEnrollExitData =
-                                  await EnrolledExitChilrenResponceHelper()
-                                      .callChildrenForUploadDarftEdited();
-                              var villageProfile =
-                                  await await CrecheMonitorResponseHelper()
-                                      .getVillageProfileforUploadDarftEdit();
-                              var creCheMonitoring =
-                                  await CrecheMonitorResponseHelper()
-                                      .getVillageProfileforUploadDarftEdit();
-                              var chilAttendence =
-                                  await ChildAttendanceResponceHelper()
-                                      .callChildAttendencesAllForUpoadEditDarft();
-
-                              var daftCount = hhItems.length +
-                                  childEnrollExitData.length +
-                                  villageProfile.length +
-                                  chilAttendence.length +
-                                  // childProfile.length +
-                                  creCheMonitoring.length;
-                              if (daftCount == 0) {
-                                totalApiCount = 19;
-                                callVillageFilterData(context);
-                              } else {
-                                Validate().singleButtonPopup(
-                                    Global.returnTrLable(
-                                        locationControlls,
-                                        CustomText.darftDataForComplete,
-                                        lngtr!),
-                                    Global.returnTrLable(locationControlls,
-                                        CustomText.ok, lngtr!),
-                                    false,
-                                    context);
-                              }
-                            } else
-                              Validate().singleButtonPopup(
-                                  Global.returnTrLable(locationControlls,
-                                      CustomText.pleaseUploadDataFirst, lngtr!),
-                                  Global.returnTrLable(
-                                      locationControlls, CustomText.ok, lngtr!),
-                                  false,
-                                  context);
-                          } else {
-                            if (pendindTaskCount == 0) {
-                              List<dynamic> visitNotes = [];
-                              if (role == CustomText.clusterCoordinator)
-                                visitNotes = await CmcCCTabResponseHelper()
-                                    .getCcForUploadEditDarft();
-                              else if (role == CustomText.alm)
-                                visitNotes = await CmcALMTabResponseHelper()
-                                    .getAlmForUploadDarftEdited();
-                              else if (role == CustomText.cbm)
-                                visitNotes = await CmcCBMTabResponseHelper()
-                                    .getCBMForUploadDarft();
-                              var crecheCheckIn = await CheckInResponseHelper()
-                                  .callCrecheCheckInResponses();
-
-                              var grievanceData =
-                                  await ChildGrievancesTabResponceHelper()
-                                      .getChildGrievanceForUpload();
-
-                              var ImageFileData = await ImageFileTabHelper()
-                                  .getImageForUpload();
-                              var usynchedData = visitNotes.length +
-                                  crecheCheckIn.length +
-                                  grievanceData.length +
-                                  ImageFileData.length;
-                              if (usynchedData == 0) {
-                                // totalApiCount = 19;
-                                // callVillageFilterDataCC(context);
-                                var syncItem = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          CoordinatorLocationScreen(
-                                            role: role,
-                                          )),
-                                );
-                                if (syncItem == 'itemRefresh') {
-                                  await initializeData();
-                                }
-                              } else {
-                                Validate().singleButtonPopup(
-                                    Global.returnTrLable(
-                                        locationControlls,
-                                        CustomText.darftDataForComplete,
-                                        lngtr!),
-                                    Global.returnTrLable(locationControlls,
-                                        CustomText.ok, lngtr!),
-                                    false,
-                                    context);
-                              }
-                            } else
-                              Validate().singleButtonPopup(
-                                  Global.returnTrLable(locationControlls,
-                                      CustomText.pleaseUploadDataFirst, lngtr!),
-                                  Global.returnTrLable(
-                                      locationControlls, CustomText.ok, lngtr!),
-                                  false,
-                                  context);
-                          }
-                        } else if (i == 1) {
-                          String refStatus = '';
-                          if (role == CustomText.crecheSupervisor) {
-                            if (pendindTaskCount > 0) {
-                              refStatus = await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PendingSyncScreen()),
-                                  ) ??
-                                  '';
-                            } else
-                              Validate().singleButtonPopup(
-                                  Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.nothing_for_upload_msg,
-                                      lngtr!),
-                                  Global.returnTrLable(
-                                      locationControlls, CustomText.ok, lngtr!),
-                                  false,
-                                  context);
-                          } else if (role == CustomText.clusterCoordinator) {
-                            if (pendindTaskCount > 0) {
-                              refStatus = await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PendingSyncScreen()),
-                                  ) ??
-                                  '';
-                            } else
-                              Validate().singleButtonPopup(
-                                  Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.nothing_for_upload_msg,
-                                      lngtr!),
-                                  Global.returnTrLable(
-                                      locationControlls, CustomText.ok, lngtr!),
-                                  false,
-                                  context);
-                          } else if (role == 'Accounts and Logistics Manager') {
-                            var visitNots = await CmcALMTabResponseHelper()
-                                .getAlmForUpload();
-                            if (pendindTaskCount > 0) {
-                              refStatus = await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PendingSyncScreen()),
-                                  ) ??
-                                  '';
-                            } else
-                              Validate().singleButtonPopup(
-                                  Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.nothing_for_upload_msg,
-                                      lngtr!),
-                                  Global.returnTrLable(
-                                      locationControlls, CustomText.ok, lngtr!),
-                                  false,
-                                  context);
-                          } else if (role == 'Capacity and Building Manager') {
-                            var visitNots = await CmcCBMTabResponseHelper()
-                                .getCBMForUpload();
-                            if (pendindTaskCount > 0) {
-                              refStatus = await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PendingSyncScreen()),
-                                  ) ??
-                                  '';
-                            } else
-                              Validate().singleButtonPopup(
-                                  Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.nothing_for_upload_msg,
-                                      lngtr!),
-                                  Global.returnTrLable(
-                                      locationControlls, CustomText.ok, lngtr!),
-                                  false,
-                                  context);
-                          } else {
-                            if (pendindTaskCount > 0) {
-                              refStatus = await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PendingSyncScreen()),
-                                  ) ??
-                                  '';
-                            } else
-                              Validate().singleButtonPopup(
-                                  Global.returnTrLable(
-                                      locationControlls,
-                                      CustomText.nothing_for_upload_msg,
-                                      lngtr!),
-                                  Global.returnTrLable(
-                                      locationControlls, CustomText.ok, lngtr!),
-                                  false,
-                                  context);
-                          }
-                          if (refStatus == 'itemRefresh') {
-                            await initializeData();
-                          }
-                        } else if (i == 2) {
-                          var network =
-                              await Validate().checkNetworkConnection();
-                          if (network) {
-                            var crecheProfile =
-                                await CrecheDataHelper().callCrecheForUpload();
-                            if (crecheProfile.isNotEmpty) {
-                              uploadCreCheProfile(context);
-                            } else {
-                              totalApiCount = 27;
-                              callMasterData(context);
-                            }
-                          } else {
-                            Validate().singleButtonPopup(
-                                Global.returnTrLable(
-                                    locationControlls,
-                                    CustomText.nointernetconnectionavailable,
-                                    lngtr!),
-                                Global.returnTrLable(
-                                    locationControlls, CustomText.ok, lngtr!),
-                                false,
-                                context);
-                          }
-                        }
-                        // else if (i == 3) {
-                        //   try {
-                        //     bool shouldProceed = await DoctypeUpdate(
-                        //             locationControlls: locationControlls,
-                        //             lng: lngtr!,
-                        //             role: role,
-                        //             mt: mounted)
-                        //         .callFieldData(context);
-                        //     if (shouldProceed) await initializeData();
-                        //   } catch (e) {
-                        //     print("Error Updating doctype - $e");
-                        //   }
-                        // }
-                      },
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 136.h,
-                            width: 170.w,
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff5A5A5A).withOpacity(
-                                        0.2), // Shadow color with opacity
-                                    offset: Offset(
-                                        0, 3), // Horizontal and vertical offset
-                                    blurRadius: 6, // Blur radius
-                                    spreadRadius: 0, // Spread radius
-                                  ),
-                                ],
-                                color: Color(0xffF2F7FF),
-                                borderRadius: BorderRadius.circular(5.r),
-                                border: Border.all(
-                                  color: Color(0xffE7F0FF),
-                                )),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      (i == 1)
-                                          ? Stack(
-                                              children: [
-                                                SizedBox(
-                                                  height: 40,
-                                                  width: 40,
-                                                  child: Image.asset(image[i],
-                                                      filterQuality:
-                                                          FilterQuality.high,
-                                                      scale: 4.2),
-                                                ),
-                                                pendindTaskCount > 0
-                                                    ? Positioned(
-                                                        top: 0,
-                                                        bottom: 24,
-                                                        left: 27,
-                                                        right: 0,
-                                                        child: Container(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          height: 80,
-                                                          width: 80,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            shape:
-                                                                BoxShape.circle,
-                                                            color: Color(
-                                                                0xffF26BA3),
-                                                          ),
-                                                          // padding: EdgeInsets.all(4),
-                                                          child: Text(
-                                                            pendindTaskCount > 9
-                                                                ? '9+'
-                                                                : '$pendindTaskCount',
-                                                            style:
-                                                                Styles.white74P,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : SizedBox(),
-                                              ],
-                                            )
-                                          : Image.asset(
-                                              image[i],
-                                              filterQuality: FilterQuality.high,
-                                              scale: 4,
-                                              // color: Color(0xff5979AA),
-                                            ),
-                                      SizedBox(
-                                        height: 15.h,
-                                      ),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(horizontal: 7),
-                                        child: Text(
-                                          (lngtr != null)
-                                              ? Global.returnTrLable(
-                                                  locationControlls,
-                                                  text[i],
-                                                  lngtr!)
-                                              : '',
-                                          style: Styles.black123,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(horizontal: 7),
-                                        child: Text(
-                                          (i == 0)
-                                              ? dataDownloadDateTime
-                                              : (i == 1)
-                                                  ? dataUploadDateTime
-                                                  : (i == 2)
-                                                      ? msterDownloadDateTime
-                                                      : doctypeUpdateDateTime,
-                                          style: Styles.black123,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, 'itemRefresh');
+          return false;
+        },
+        child: Scaffold(
+          appBar: CustomAppbar(
+            actions: [
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context, 'itemRefresh');
+                },
+                child: Image.asset(
+                  "assets/home.png",
+                  color: Colors.white,
+                  scale: 2,
                 ),
               ),
+              SizedBox(width: 25)
             ],
+            text: (lngtr != null)
+                ? Global.returnTrLable(locationControlls, CustomText.sync, lngtr!)
+                : "",
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DashboardScreen(
+                          index: 0,
+                        )),
+              );
+            },
+          ),
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 10.h,
+                ),
+                Expanded(
+                  child: GridView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: text.length,
+                    physics: BouncingScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 15,
+                        mainAxisExtent: 160.h),
+                    itemBuilder: (ctx, i) {
+                      return InkWell(
+                        onTap: () async {
+                          if (i == 0) {
+                            if (role == 'Creche Supervisor') {
+                              if (pendindTaskCount == 0) {
+                                var hhItems = await HouseHoldTabResponceHelper()
+                                    .getHouseHoldItems();
+                                // var childProfile = await EnrolledChilrenResponceHelper().callChildrenForUpload();
+                                var childEnrollExitData =
+                                    await EnrolledExitChilrenResponceHelper()
+                                        .callChildrenForUploadDarftEdited();
+                                var villageProfile =
+                                    await await CrecheMonitorResponseHelper()
+                                        .getVillageProfileforUploadDarftEdit();
+                                var creCheMonitoring =
+                                    await CrecheMonitorResponseHelper()
+                                        .getVillageProfileforUploadDarftEdit();
+                                var chilAttendence =
+                                    await ChildAttendanceResponceHelper()
+                                        .callChildAttendencesAllForUpoadEditDarft();
+
+                                var daftCount = hhItems.length +
+                                    childEnrollExitData.length +
+                                    villageProfile.length +
+                                    chilAttendence.length +
+                                    // childProfile.length +
+                                    creCheMonitoring.length;
+                                if (daftCount == 0) {
+                                  totalApiCount = 19;
+                                  callVillageFilterData(context);
+                                } else {
+                                  Validate().singleButtonPopup(
+                                      Global.returnTrLable(
+                                          locationControlls,
+                                          CustomText.darftDataForComplete,
+                                          lngtr!),
+                                      Global.returnTrLable(locationControlls,
+                                          CustomText.ok, lngtr!),
+                                      false,
+                                      context);
+                                }
+                              } else
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(locationControlls,
+                                        CustomText.pleaseUploadDataFirst, lngtr!),
+                                    Global.returnTrLable(
+                                        locationControlls, CustomText.ok, lngtr!),
+                                    false,
+                                    context);
+                            } else {
+                              if (pendindTaskCount == 0) {
+                                List<dynamic> visitNotes = [];
+                                if (role == CustomText.clusterCoordinator)
+                                  visitNotes = await CmcCCTabResponseHelper()
+                                      .getCcForUploadEditDarft();
+                                else if (role == CustomText.alm)
+                                  visitNotes = await CmcALMTabResponseHelper()
+                                      .getAlmForUploadDarftEdited();
+                                else if (role == CustomText.cbm)
+                                  visitNotes = await CmcCBMTabResponseHelper()
+                                      .getCBMForUploadDarft();
+                                var crecheCheckIn = await CheckInResponseHelper()
+                                    .callCrecheCheckInResponses();
+
+                                var grievanceData =
+                                    await ChildGrievancesTabResponceHelper()
+                                        .getChildGrievanceForUpload();
+
+                                var ImageFileData = await ImageFileTabHelper()
+                                    .getImageForUpload();
+                                var usynchedData = visitNotes.length +
+                                    crecheCheckIn.length +
+                                    grievanceData.length +
+                                    ImageFileData.length;
+                                if (usynchedData == 0) {
+                                  // totalApiCount = 19;
+                                  // callVillageFilterDataCC(context);
+                                  var syncItem = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            CoordinatorLocationScreen(
+                                              role: role,
+                                            )),
+                                  );
+                                  if (syncItem == 'itemRefresh') {
+                                    await initializeData();
+                                  }
+                                } else {
+                                  Validate().singleButtonPopup(
+                                      Global.returnTrLable(
+                                          locationControlls,
+                                          CustomText.darftDataForComplete,
+                                          lngtr!),
+                                      Global.returnTrLable(locationControlls,
+                                          CustomText.ok, lngtr!),
+                                      false,
+                                      context);
+                                }
+                              } else
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(locationControlls,
+                                        CustomText.pleaseUploadDataFirst, lngtr!),
+                                    Global.returnTrLable(
+                                        locationControlls, CustomText.ok, lngtr!),
+                                    false,
+                                    context);
+                            }
+                          } else if (i == 1) {
+                            String refStatus = '';
+                            if (role == CustomText.crecheSupervisor) {
+                              if (pendindTaskCount > 0) {
+                                refStatus = await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PendingSyncScreen()),
+                                    ) ??
+                                    '';
+                              } else
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(
+                                        locationControlls,
+                                        CustomText.nothing_for_upload_msg,
+                                        lngtr!),
+                                    Global.returnTrLable(
+                                        locationControlls, CustomText.ok, lngtr!),
+                                    false,
+                                    context);
+                            } else if (role == CustomText.clusterCoordinator) {
+                              if (pendindTaskCount > 0) {
+                                refStatus = await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PendingSyncScreen()),
+                                    ) ??
+                                    '';
+                              } else
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(
+                                        locationControlls,
+                                        CustomText.nothing_for_upload_msg,
+                                        lngtr!),
+                                    Global.returnTrLable(
+                                        locationControlls, CustomText.ok, lngtr!),
+                                    false,
+                                    context);
+                            } else if (role == 'Accounts and Logistics Manager') {
+                              var visitNots = await CmcALMTabResponseHelper()
+                                  .getAlmForUpload();
+                              if (pendindTaskCount > 0) {
+                                refStatus = await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PendingSyncScreen()),
+                                    ) ??
+                                    '';
+                              } else
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(
+                                        locationControlls,
+                                        CustomText.nothing_for_upload_msg,
+                                        lngtr!),
+                                    Global.returnTrLable(
+                                        locationControlls, CustomText.ok, lngtr!),
+                                    false,
+                                    context);
+                            } else if (role == 'Capacity and Building Manager') {
+                              var visitNots = await CmcCBMTabResponseHelper()
+                                  .getCBMForUpload();
+                              if (pendindTaskCount > 0) {
+                                refStatus = await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PendingSyncScreen()),
+                                    ) ??
+                                    '';
+                              } else
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(
+                                        locationControlls,
+                                        CustomText.nothing_for_upload_msg,
+                                        lngtr!),
+                                    Global.returnTrLable(
+                                        locationControlls, CustomText.ok, lngtr!),
+                                    false,
+                                    context);
+                            } else {
+                              if (pendindTaskCount > 0) {
+                                refStatus = await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PendingSyncScreen()),
+                                    ) ??
+                                    '';
+                              } else
+                                Validate().singleButtonPopup(
+                                    Global.returnTrLable(
+                                        locationControlls,
+                                        CustomText.nothing_for_upload_msg,
+                                        lngtr!),
+                                    Global.returnTrLable(
+                                        locationControlls, CustomText.ok, lngtr!),
+                                    false,
+                                    context);
+                            }
+                            if (refStatus == 'itemRefresh') {
+                              await initializeData();
+                            }
+                          } else if (i == 2) {
+                            var network =
+                                await Validate().checkNetworkConnection();
+                            if (network) {
+                              var crecheProfile =
+                                  await CrecheDataHelper().callCrecheForUpload();
+                              if (crecheProfile.isNotEmpty) {
+                                uploadCreCheProfile(context);
+                              } else {
+                                totalApiCount = 27;
+                                callMasterData(context);
+                              }
+                            } else {
+                              Validate().singleButtonPopup(
+                                  Global.returnTrLable(
+                                      locationControlls,
+                                      CustomText.nointernetconnectionavailable,
+                                      lngtr!),
+                                  Global.returnTrLable(
+                                      locationControlls, CustomText.ok, lngtr!),
+                                  false,
+                                  context);
+                            }
+                          }
+                          // else if (i == 3) {
+                          //   try {
+                          //     bool shouldProceed = await DoctypeUpdate(
+                          //             locationControlls: locationControlls,
+                          //             lng: lngtr!,
+                          //             role: role,
+                          //             mt: mounted)
+                          //         .callFieldData(context);
+                          //     if (shouldProceed) await initializeData();
+                          //   } catch (e) {
+                          //     print("Error Updating doctype - $e");
+                          //   }
+                          // }
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 136.h,
+                              width: 170.w,
+                              decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff5A5A5A).withOpacity(
+                                          0.2), // Shadow color with opacity
+                                      offset: Offset(
+                                          0, 3), // Horizontal and vertical offset
+                                      blurRadius: 6, // Blur radius
+                                      spreadRadius: 0, // Spread radius
+                                    ),
+                                  ],
+                                  color: Color(0xffF2F7FF),
+                                  borderRadius: BorderRadius.circular(5.r),
+                                  border: Border.all(
+                                    color: Color(0xffE7F0FF),
+                                  )),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        (i == 1)
+                                            ? Stack(
+                                                children: [
+                                                  SizedBox(
+                                                    height: 40,
+                                                    width: 40,
+                                                    child: Image.asset(image[i],
+                                                        filterQuality:
+                                                            FilterQuality.high,
+                                                        scale: 4.2),
+                                                  ),
+                                                  pendindTaskCount > 0
+                                                      ? Positioned(
+                                                          top: 0,
+                                                          bottom: 24,
+                                                          left: 27,
+                                                          right: 0,
+                                                          child: Container(
+                                                            alignment:
+                                                                Alignment.center,
+                                                            height: 80,
+                                                            width: 80,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              shape:
+                                                                  BoxShape.circle,
+                                                              color: Color(
+                                                                  0xffF26BA3),
+                                                            ),
+                                                            // padding: EdgeInsets.all(4),
+                                                            child: Text(
+                                                              pendindTaskCount > 9
+                                                                  ? '9+'
+                                                                  : '$pendindTaskCount',
+                                                              style:
+                                                                  Styles.white74P,
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : SizedBox(),
+                                                ],
+                                              )
+                                            : Image.asset(
+                                                image[i],
+                                                filterQuality: FilterQuality.high,
+                                                scale: 4,
+                                                // color: Color(0xff5979AA),
+                                              ),
+                                        SizedBox(
+                                          height: 15.h,
+                                        ),
+                                        Padding(
+                                          padding:
+                                              EdgeInsets.symmetric(horizontal: 7),
+                                          child: Text(
+                                            (lngtr != null)
+                                                ? Global.returnTrLable(
+                                                    locationControlls,
+                                                    text[i],
+                                                    lngtr!)
+                                                : '',
+                                            style: Styles.black123,
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              EdgeInsets.symmetric(horizontal: 7),
+                                          child: Text(
+                                            (i == 0)
+                                                ? dataDownloadDateTime
+                                                : (i == 1)
+                                                    ? dataUploadDateTime
+                                                    : (i == 2)
+                                                        ? msterDownloadDateTime
+                                                        : doctypeUpdateDateTime,
+                                            style: Styles.black123,
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -967,6 +969,9 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Global.applyDisplayCutout(const Color(0xff5979AA));
+    });
     initializeData();
   }
 

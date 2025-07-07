@@ -267,924 +267,927 @@ class _VerficationForPendingState extends State<VerficationForPending> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context, 'itemRefresh');
-        return false;
-      },
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: CustomAppbar(
-          actions: [
-            (role == 'Creche Supervisor')
-                ? InkWell(
-              onTap: () {
-              },
-              child: SizedBox(
-                height: 40,
-                width: 40,
-                child: Image.asset(
-                  "assets/reset.png",
-                  scale: 3,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, 'itemRefresh');
+          return false;
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: CustomAppbar(
+            actions: [
+              (role == 'Creche Supervisor')
+                  ? InkWell(
+                onTap: () {
+                },
+                child: SizedBox(
+                  height: 40,
+                  width: 40,
+                  child: Image.asset(
+                    "assets/reset.png",
+                    scale: 3,
+                  ),
                 ),
-              ),
-            )
-                : SizedBox(),
-          ],
-          text: (lng != null)
-              ? (village != null)
-              ? Global.returnTrLable(hhlistingControlls, CustomText.Pendingforverify, lng!) +
-              '-' +
-              village.toString()
-              : Global.returnTrLable(hhlistingControlls, CustomText.Pendingforverify, lng!)
-              : '',
-          onTap: () {
-            Navigator.pop(context, 'itemRefresh');
-          },
-        ),
-        endDrawer: SafeArea(
-          child: Drawer(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: (lng != null)
-                    ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 30.h,
-                      ),
-                      Row(
-                        children: [
-                          Image.asset(
-                            "assets/filter_icon.png",
-                            scale: 2.4,
-                          ),
-                          SizedBox(
-                            width: 10.w,
-                          ),
-                          Text(
-                            CustomText.Filter,
-                            style: Styles.labelcontrollerfont,
-                          ),
-                          Spacer(),
-                          InkWell(
-                              onTap: () async {
-                                _scaffoldKey.currentState!.closeEndDrawer();
-                                // cleaAllFilter();
-                              },
-                              child: Image.asset(
-                                'assets/cross.png',
-                                color: Colors.grey,
-                                scale: 4,
-                              )),
-                        ],
-                      ),
-                      (role == 'Cluster Coordinator' ||
-                          role == 'CRP' ||
-                          role == 'Creche Supervisor')
-                          ? Row(
-                        children: [
-                          Expanded(
-                            child: CustomRadioButton(
-                              value: "General Filter",
-                              groupValue: GeneralFilter,
-                              onChanged: (value) {
-                                setState(() {
-                                  GeneralFilter = value!;
-                                });
-                              },
-                              label: Global.returnTrLable(
-                                  hhlistingControlls,
-                                  CustomText.Generalfilter,
-                                  lng!),
+              )
+                  : SizedBox(),
+            ],
+            text: (lng != null)
+                ? (village != null)
+                ? Global.returnTrLable(hhlistingControlls, CustomText.Pendingforverify, lng!) +
+                '-' +
+                village.toString()
+                : Global.returnTrLable(hhlistingControlls, CustomText.Pendingforverify, lng!)
+                : '',
+            onTap: () {
+              Navigator.pop(context, 'itemRefresh');
+            },
+          ),
+          endDrawer: SafeArea(
+            child: Drawer(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: (lng != null)
+                      ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 30.h,
+                        ),
+                        Row(
+                          children: [
+                            Image.asset(
+                              "assets/filter_icon.png",
+                              scale: 2.4,
                             ),
-                          ),
-                          Expanded(
-                            child: CustomRadioButton(
-                              value: "Location Filter",
-                              groupValue: GeneralFilter,
-                              onChanged: (value) {
-                                setState(() {
-                                  GeneralFilter = value!;
-                                });
-                              },
-                              label: Global.returnTrLable(
-                                  hhlistingControlls,
-                                  CustomText.Locationfilter,
-                                  lng!),
+                            SizedBox(
+                              width: 10.w,
                             ),
-                          ),
-                        ],
-                      )
-                          : SizedBox(),
-                      if (GeneralFilter == "General Filter") ...[
-                        // DynamicCustomDropdownField(
-                        //   titleText: Global.returnTrLable(
-                        //       hhlistingControlls, 'Status', lng!),
-                        //   items: statusListItem,
-                        //   selectedItem: _selectedItem,
-                        //   hintText: CustomText.Selecthere,
-                        //   onChanged: (value) {
-                        //     if (value != null)
-                        //       String selectedId = value.name!;
-                        //     setState(() {
-                        //       _selectedItem = value?.name!;
-                        //     });
-                        //
-                        //     //    filterDataByCriteria();
-                        //   },
-                        // ),
-                        CustomDatepickerDynamic(
-                          initialvalue: calStartDate,
-                          isRequred: 0,
-                          calenderValidate:[],
-                          titleText: Global.returnTrLable(
-                              hhlistingControlls, 'Start Date', lng!),
-                          onChanged: (value) {
-                            calStartDate = value;
-                            validateDates();
-                          },
+                            Text(
+                              CustomText.Filter,
+                              style: Styles.labelcontrollerfont,
+                            ),
+                            Spacer(),
+                            InkWell(
+                                onTap: () async {
+                                  _scaffoldKey.currentState!.closeEndDrawer();
+                                  // cleaAllFilter();
+                                },
+                                child: Image.asset(
+                                  'assets/cross.png',
+                                  color: Colors.grey,
+                                  scale: 4,
+                                )),
+                          ],
                         ),
-                        CustomDatepickerDynamic(
-                          fieldName: 'date_of_visit',
-                          initialvalue: calEndDate,
-                          calenderValidate:[],
-                          titleText: Global.returnTrLable(
-                              hhlistingControlls, 'End Date', lng!),
-                          onChanged: (value) {
-                            calEndDate = value;
-                            // setState(() {});
-
-                            validateDates();
-                          },
-                        ),
-                      ] else ...[
-                        DynamicCustomDropdownField(
-                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
-                          titleText: Global.returnTrLable(
-                              hhlistingControlls, CustomText.state, lng!),
-                          items: mstStates,
-                          isRequred: 0,
-                          selectedItem: selectedState!=null?selectedState?.name:null,
-                          onChanged: (value) async {
-                            selectedState = value;
-                            selectedDistrict = null;
-                            selectedBlock = null;
-                            selectedGramPanchayat = null;
-                            selectedVillage = null;
-                            mstDistrict=Global.callDistrict(district, lng!, selectedState);
-                            if(mstDistrict.length==1){
-                              selectedDistrict=mstDistrict.first;
-                            }
-                            setState(() {
-                              // Update districtList based on selectedState
-                              // districtList = // data from database based on selectedState;
-                            });
-                          },
-                        ),
-                        DynamicCustomDropdownField(
-                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
-                          titleText: Global.returnTrLable(
-                              hhlistingControlls,
-                              CustomText.District,
-                              lng!),
-                          items: mstDistrict,
-                          isRequred: 0,
-                          selectedItem: selectedDistrict!=null?selectedDistrict?.name:null,
-                          onChanged: (value) async {
-                            selectedDistrict = value;
-                            selectedBlock = null;
-                            selectedGramPanchayat = null;
-                            selectedVillage = null;
-                            mstBlock=Global.callBlocks(block, lng!, selectedDistrict);
-                            if(mstBlock.length==1){
-                              selectedBlock=mstBlock.first;
-                            }
-                            setState(() {
-                              // Update blockList based on selectedDistrict
-                              // blockList = // data from database based on selectedDistrict;
-                            });
-                          },
-                        ),
-                        DynamicCustomDropdownField(
-                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
-                          titleText: Global.returnTrLable(
-                              hhlistingControlls, CustomText.Block, lng!),
-                          items: mstBlock,
-                          isRequred: 0,
-                          selectedItem: selectedBlock!=null?selectedBlock?.name:null,
-                          onChanged: (value) async {
-                            selectedBlock = value;
-                            selectedGramPanchayat = null;
-                            selectedVillage = null;
-                            mstGP=Global.callGramPanchyats(gramPanchayat, lng!, selectedBlock);
-                            if(mstGP.length==1){
-                              selectedGramPanchayat=mstGP.first;
-                            }
-                            setState(() {
-                              // Update gramPanchayatList based on selectedBlock
-                              // gramPanchayatList = // data from database based on selectedBlock;
-                            });
-                          },
-                        ),
-                        DynamicCustomDropdownField(
-                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
-                          isRequred: 0,
-                          titleText: Global.returnTrLable(
-                              hhlistingControlls,
-                              CustomText.GramPanchayat,
-                              lng!),
-                          items: mstGP,
-                          selectedItem: selectedGramPanchayat!=null?selectedGramPanchayat?.name:null,
-                          onChanged: (value) async {
-                            selectedGramPanchayat = value;
-                            selectedVillage = null;
-                            mstVillage=Global.callFiltersVillages(villages, lng!, selectedGramPanchayat);
-
-                            if(mstVillage.length==1){
-                              selectedVillage=mstVillage.first;
-                            }
-                            setState(() {
-                              // Update villageList based on selectedGramPanchayat
-                              // villageList = // data from database based on selectedGramPanchayat;
-                            });
-                          },
-                        ),
-                        DynamicCustomDropdownField(
-                          hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
-                          titleText: Global.returnTrLable(
-                              hhlistingControlls, CustomText.Village, lng!),
-                          isRequred: 0,
-                          items: mstVillage,
-                          selectedItem: selectedVillage!=null?selectedVillage?.name:null,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedVillage = value;
-                            });
-                          },
-                        ),
-                      ],
-                      SizedBox(
-                        height: 10.h,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(3),
-                        child: Row(
+                        (role == 'Cluster Coordinator' ||
+                            role == 'CRP' ||
+                            role == 'Creche Supervisor')
+                            ? Row(
                           children: [
                             Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    hhlistingControlls, 'Clear', lng!),
-                                color: Color(0xffDB4B73),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  cleaAllFilter();
+                              child: CustomRadioButton(
+                                value: "General Filter",
+                                groupValue: GeneralFilter,
+                                onChanged: (value) {
+                                  setState(() {
+                                    GeneralFilter = value!;
+                                  });
                                 },
+                                label: Global.returnTrLable(
+                                    hhlistingControlls,
+                                    CustomText.Generalfilter,
+                                    lng!),
                               ),
                             ),
-                            SizedBox(width: 4.w),
                             Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    hhlistingControlls, 'Search', lng!),
-                                color: Color(0xff369A8D),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  filteredgetData(context);
+                              child: CustomRadioButton(
+                                value: "Location Filter",
+                                groupValue: GeneralFilter,
+                                onChanged: (value) {
+                                  setState(() {
+                                    GeneralFilter = value!;
+                                  });
                                 },
+                                label: Global.returnTrLable(
+                                    hhlistingControlls,
+                                    CustomText.Locationfilter,
+                                    lng!),
                               ),
                             ),
                           ],
+                        )
+                            : SizedBox(),
+                        if (GeneralFilter == "General Filter") ...[
+                          // DynamicCustomDropdownField(
+                          //   titleText: Global.returnTrLable(
+                          //       hhlistingControlls, 'Status', lng!),
+                          //   items: statusListItem,
+                          //   selectedItem: _selectedItem,
+                          //   hintText: CustomText.Selecthere,
+                          //   onChanged: (value) {
+                          //     if (value != null)
+                          //       String selectedId = value.name!;
+                          //     setState(() {
+                          //       _selectedItem = value?.name!;
+                          //     });
+                          //
+                          //     //    filterDataByCriteria();
+                          //   },
+                          // ),
+                          CustomDatepickerDynamic(
+                            initialvalue: calStartDate,
+                            isRequred: 0,
+                            calenderValidate:[],
+                            titleText: Global.returnTrLable(
+                                hhlistingControlls, 'Start Date', lng!),
+                            onChanged: (value) {
+                              calStartDate = value;
+                              validateDates();
+                            },
+                          ),
+                          CustomDatepickerDynamic(
+                            fieldName: 'date_of_visit',
+                            initialvalue: calEndDate,
+                            calenderValidate:[],
+                            titleText: Global.returnTrLable(
+                                hhlistingControlls, 'End Date', lng!),
+                            onChanged: (value) {
+                              calEndDate = value;
+                              // setState(() {});
+
+                              validateDates();
+                            },
+                          ),
+                        ] else ...[
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
+                            titleText: Global.returnTrLable(
+                                hhlistingControlls, CustomText.state, lng!),
+                            items: mstStates,
+                            isRequred: 0,
+                            selectedItem: selectedState!=null?selectedState?.name:null,
+                            onChanged: (value) async {
+                              selectedState = value;
+                              selectedDistrict = null;
+                              selectedBlock = null;
+                              selectedGramPanchayat = null;
+                              selectedVillage = null;
+                              mstDistrict=Global.callDistrict(district, lng!, selectedState);
+                              if(mstDistrict.length==1){
+                                selectedDistrict=mstDistrict.first;
+                              }
+                              setState(() {
+                                // Update districtList based on selectedState
+                                // districtList = // data from database based on selectedState;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
+                            titleText: Global.returnTrLable(
+                                hhlistingControlls,
+                                CustomText.District,
+                                lng!),
+                            items: mstDistrict,
+                            isRequred: 0,
+                            selectedItem: selectedDistrict!=null?selectedDistrict?.name:null,
+                            onChanged: (value) async {
+                              selectedDistrict = value;
+                              selectedBlock = null;
+                              selectedGramPanchayat = null;
+                              selectedVillage = null;
+                              mstBlock=Global.callBlocks(block, lng!, selectedDistrict);
+                              if(mstBlock.length==1){
+                                selectedBlock=mstBlock.first;
+                              }
+                              setState(() {
+                                // Update blockList based on selectedDistrict
+                                // blockList = // data from database based on selectedDistrict;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
+                            titleText: Global.returnTrLable(
+                                hhlistingControlls, CustomText.Block, lng!),
+                            items: mstBlock,
+                            isRequred: 0,
+                            selectedItem: selectedBlock!=null?selectedBlock?.name:null,
+                            onChanged: (value) async {
+                              selectedBlock = value;
+                              selectedGramPanchayat = null;
+                              selectedVillage = null;
+                              mstGP=Global.callGramPanchyats(gramPanchayat, lng!, selectedBlock);
+                              if(mstGP.length==1){
+                                selectedGramPanchayat=mstGP.first;
+                              }
+                              setState(() {
+                                // Update gramPanchayatList based on selectedBlock
+                                // gramPanchayatList = // data from database based on selectedBlock;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
+                            isRequred: 0,
+                            titleText: Global.returnTrLable(
+                                hhlistingControlls,
+                                CustomText.GramPanchayat,
+                                lng!),
+                            items: mstGP,
+                            selectedItem: selectedGramPanchayat!=null?selectedGramPanchayat?.name:null,
+                            onChanged: (value) async {
+                              selectedGramPanchayat = value;
+                              selectedVillage = null;
+                              mstVillage=Global.callFiltersVillages(villages, lng!, selectedGramPanchayat);
+
+                              if(mstVillage.length==1){
+                                selectedVillage=mstVillage.first;
+                              }
+                              setState(() {
+                                // Update villageList based on selectedGramPanchayat
+                                // villageList = // data from database based on selectedGramPanchayat;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(hhlistingControlls, CustomText.select_here, lng!),
+                            titleText: Global.returnTrLable(
+                                hhlistingControlls, CustomText.Village, lng!),
+                            isRequred: 0,
+                            items: mstVillage,
+                            selectedItem: selectedVillage!=null?selectedVillage?.name:null,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedVillage = value;
+                              });
+                            },
+                          ),
+                        ],
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(3),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      hhlistingControlls, 'Clear', lng!),
+                                  color: Color(0xffDB4B73),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    cleaAllFilter();
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: 4.w),
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      hhlistingControlls, 'Search', lng!),
+                                  color: Color(0xff369A8D),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    filteredgetData(context);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ])
+                      : SizedBox(),
+                )),
+          ),
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextFieldRow(
+                        controller: Searchcontroller,
+                        onChanged: (value) {
+                          print(value);
+                          filterDataQu(value);
+                        },
+                        hintText: (lng != null)
+                            ? Global.returnTrLable(
+                            hhlistingControlls, 'Search', lng!)
+                            : '',
+                        prefixIcon: Image.asset(
+                          "assets/search.png",
+                          scale: 2.4,
                         ),
                       ),
-                    ])
-                    : SizedBox(),
-              )),
-        ),
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomTextFieldRow(
-                      controller: Searchcontroller,
-                      onChanged: (value) {
-                        print(value);
-                        filterDataQu(value);
+                    ),
+                    SizedBox(
+                      width: 10.w,
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        // showDialog(
+                        //   context: context,
+                        //   builder: (BuildContext context) {
+                        //     return StatefulBuilder(builder:
+                        //         (BuildContext context, StateSetter setState) {
+                        //       return AlertDialog(
+                        //         shape: RoundedRectangleBorder(
+                        //           borderRadius: BorderRadius.circular(10.0),
+                        //         ),
+                        //         contentPadding: EdgeInsets.zero,
+                        //         content: Container(
+                        //             width: MediaQuery.of(context).size.width * 5.00,
+                        //             height: GeneralFilter == "General Filter"
+                        //                 ? MediaQuery.of(context).size.height * .5
+                        //                 : MediaQuery.of(context).size.height * .7,
+                        //             child: Column(
+                        //                 mainAxisAlignment:
+                        //                 MainAxisAlignment.spaceBetween,
+                        //                 children: <Widget>[
+                        //                   Container(
+                        //                     height: 40.h,
+                        //                     padding: EdgeInsets.all(5),
+                        //                     decoration: BoxDecoration(
+                        //                       color: Color(0xff112A74),
+                        //                       borderRadius: BorderRadius.only(
+                        //                         topLeft: Radius.circular(5.0),
+                        //                         topRight: Radius.circular(5.0),
+                        //                       ),
+                        //                     ),
+                        //                     child: Center(
+                        //                         child: Text(CustomText.SHISHUGHAR,
+                        //                             style: Styles.white126P)),
+                        //                   ),
+                        //                   Padding(
+                        //                     padding: EdgeInsets.symmetric(
+                        //                       horizontal: 10.w,
+                        //                     ),
+                        //                     child: Column(
+                        //                       children: [
+                        //                         (role == 'Cluster Coordinator' || role == 'CRP')?Row(
+                        //                           children: [
+                        //                             Expanded(
+                        //                               child: CustomRadioButton(
+                        //                                 value: "General Filter",
+                        //                                 groupValue: GeneralFilter,
+                        //                                 onChanged: (value) {
+                        //                                   setState(() {
+                        //                                     GeneralFilter = value!;
+                        //                                   });
+                        //                                 },
+                        //                                 label: Global.returnTrLable(hhlistingControlls, CustomText.Generalfilter, lng!),
+                        //                               ),
+                        //                             ),
+                        //                             Expanded(
+                        //                               child: CustomRadioButton(
+                        //                                 value: "Location Filter",
+                        //                                 groupValue: GeneralFilter,
+                        //                                 onChanged: (value) {
+                        //                                   setState(() {
+                        //                                     GeneralFilter = value!;
+                        //                                   });
+                        //                                 },
+                        //                                 label: Global.returnTrLable(hhlistingControlls, CustomText.Locationfilter, lng!),
+                        //                               ),
+                        //                             ),
+                        //                           ],
+                        //                         ):SizedBox(),
+                        //                         if (GeneralFilter ==
+                        //                             "General Filter") ...[
+                        //                           DynamicCustomDropdownField(
+                        //                             titleText: Global.returnTrLable(
+                        //                                 hhlistingControlls,
+                        //                                 'Status',
+                        //                                 lng!),
+                        //                             items: statusListItem,
+                        //                             selectedItem: _selectedItem,
+                        //                             hintText: CustomText.Selecthere,
+                        //                             onChanged: (value) {
+                        //                               if (value != null)
+                        //                                 String selectedId =
+                        //                                 value.name!;
+                        //                               setState(() {
+                        //                                 _selectedItem =
+                        //                                 value?.name!;
+                        //                               });
+
+                        //                               //    filterDataByCriteria();
+                        //                             },
+                        //                           ),
+                        //                           CustomDatepickerDynamic(
+                        //                             initialvalue:calStartDate,
+                        //                             isRequred:0,
+                        //                             titleText: Global.returnTrLable(
+                        //                                 hhlistingControlls,
+                        //                                 'Start Date',
+                        //                                 lng!),
+                        //                             onChanged: (value) {
+                        //                               calStartDate=value;
+                        //                               validateDates();
+                        //                             },
+                        //                           ),
+                        //                           CustomDatepickerDynamic(
+                        //                             fieldName: 'date_of_visit',
+                        //                             initialvalue:calEndDate,
+                        //                             titleText: Global.returnTrLable(
+                        //                                 hhlistingControlls,
+                        //                                 'End Date',
+                        //                                 lng!),
+                        //                             onChanged: (value) {
+                        //                               calEndDate=value;
+                        //                               // setState(() {});
+
+                        //                               validateDates();
+                        //                             },
+                        //                           ),
+                        //                         ]else ...[
+                        //                           CustomDropdownFieldString(
+                        //                             titleText: Global.returnTrLable(
+                        //                                 hhlistingControlls,
+                        //                                 CustomText.state,
+                        //                                 lng!),
+                        //                             items: stateList,
+                        //                             isRequred: 0,
+                        //                             selectedItem: selectedState,
+                        //                             onChanged: (value) async {
+                        //                               selectedState = value;
+                        //                               selectedDistrict = null;
+                        //                               selectedBlock = null;
+                        //                               selectedGramPanchayat = null;
+                        //                               selectedVillage = null;
+                        //                               var stateId = states
+                        //                                   .firstWhere((element) =>
+                        //                               element.value ==
+                        //                                   selectedState)
+                        //                                   .name;
+                        //                               DistrictDataHelper
+                        //                               districtdata =
+                        //                               DistrictDataHelper();
+                        //                               List<TabDistrict> tempdistrict = [];
+                        //                               if(districtIdList.isNotEmpty && districtIdList.length>0){
+                        //                                 tempdistrict = await districtdata.getDistrictListByDistrictId(districtIdList);
+                        //                               }else {
+                        //                                 tempdistrict = await districtdata.getTabDistrictList();
+                        //                               }
+                        //                               district = tempdistrict
+                        //                                   .where((element) =>
+                        //                               element.stateId ==
+                        //                                   stateId.toString())
+                        //                                   .toList();
+                        //                               districtList.clear();
+                        //                               district.forEach((element) {
+                        //                                 districtList
+                        //                                     .add(element.value!);
+                        //                               });
+                        //                               setState(() {
+                        //                                 // Update districtList based on selectedState
+                        //                                 // districtList = // data from database based on selectedState;
+                        //                               });
+                        //                             },
+                        //                           ),
+                        //                           CustomDropdownFieldString(
+                        //                             titleText: Global.returnTrLable(
+                        //                                 hhlistingControlls,
+                        //                                 CustomText.District,
+                        //                                 lng!),
+                        //                             items: districtList,
+                        //                             isRequred: 0,
+                        //                             selectedItem: selectedDistrict,
+                        //                             onChanged: (value) async {
+                        //                               selectedDistrict = value;
+                        //                               selectedBlock = null;
+                        //                               selectedGramPanchayat = null;
+                        //                               selectedVillage = null;
+                        //                               var districtId = district
+                        //                                   .firstWhere((element) =>
+                        //                               element.value ==
+                        //                                   selectedDistrict)
+                        //                                   .name;
+                        //                               BlockDataHelper blockdata =
+                        //                               BlockDataHelper();
+                        //                               if(blockIdList.isNotEmpty && blockIdList.length>0){
+                        //                                 block = await blockdata.getBlockListByBlockId(blockIdList);
+                        //                               }else {
+                        //                                 block = await blockdata
+                        //                                     .getTabBlockList();
+                        //                               }
+                        //                               block = block
+                        //                                   .where((element) =>
+                        //                               element.districtId ==
+                        //                                   districtId.toString())
+                        //                                   .toList();
+                        //                               blockList.clear();
+                        //                               block.forEach((element) {
+                        //                                 blockList
+                        //                                     .add(element.value!);
+                        //                               });
+                        //                               setState(() {
+                        //                                 // Update blockList based on selectedDistrict
+                        //                                 // blockList = // data from database based on selectedDistrict;
+                        //                               });
+                        //                             },
+                        //                           ),
+                        //                           CustomDropdownFieldString(
+                        //                             titleText: Global.returnTrLable(
+                        //                                 hhlistingControlls,
+                        //                                 CustomText.Block,
+                        //                                 lng!),
+                        //                             items: blockList,
+                        //                             isRequred: 0,
+                        //                             selectedItem: selectedBlock,
+                        //                             onChanged: (value) async {
+                        //                               selectedBlock = value;
+                        //                               selectedGramPanchayat = null;
+                        //                               selectedVillage = null;
+                        //                               var blockId = block
+                        //                                   .firstWhere((element) =>
+                        //                               element.value ==
+                        //                                   selectedBlock)
+                        //                                   .name;
+                        //                               GramPanchayatDataHelper
+                        //                               gramPanchayatdata =
+                        //                               GramPanchayatDataHelper();
+                        //                               if(panchayatIdList.isNotEmpty && panchayatIdList.length>0){
+                        //                                 gramPanchayat = await gramPanchayatdata
+                        //                                     .getGramPanchayatListByPanchayatId(panchayatIdList);
+                        //                               }else {
+                        //                                 gramPanchayat = await gramPanchayatdata
+                        //                                     .getTabGramPanchayatList();
+                        //                               }
+
+                        //                               gramPanchayat = gramPanchayat
+                        //                                   .where((element) =>
+                        //                               element.blockId ==
+                        //                                   blockId.toString())
+                        //                                   .toList();
+                        //                               gramPanchayatList.clear();
+                        //                               gramPanchayat
+                        //                                   .forEach((element) {
+                        //                                 gramPanchayatList
+                        //                                     .add(element.value!);
+                        //                               });
+                        //                               setState(() {
+                        //                                 // Update gramPanchayatList based on selectedBlock
+                        //                                 // gramPanchayatList = // data from database based on selectedBlock;
+                        //                               });
+                        //                             },
+                        //                           ),
+                        //                           CustomDropdownFieldString(
+                        //                             isRequred: 0,
+                        //                             titleText: Global.returnTrLable(
+                        //                                 hhlistingControlls,
+                        //                                 CustomText.GramPanchayat,
+                        //                                 lng!),
+                        //                             items: gramPanchayatList,
+                        //                             selectedItem:
+                        //                             selectedGramPanchayat,
+                        //                             onChanged: (value) async {
+                        //                               selectedGramPanchayat = value;
+                        //                               selectedVillage = null;
+                        //                               var gramPanchyatId = gramPanchayat
+                        //                                   .firstWhere((element) =>
+                        //                               element.value ==
+                        //                                   selectedGramPanchayat)
+                        //                                   .name;
+                        //                               VillageDataHelper
+                        //                               villagetdata =
+                        //                               VillageDataHelper();
+                        //                               if(villageIdList.isNotEmpty && villageIdList.length>0){
+                        //                                 villages = await villagetdata
+                        //                                     .getVillageListByVillageId(villageIdList);
+                        //                               }else {
+                        //                                 villages = await villagetdata
+                        //                                     .getTabVillageList();
+                        //                               }
+                        //                               villages = villages
+                        //                                   .where((element) =>
+                        //                               element.gpId ==
+                        //                                   gramPanchyatId
+                        //                                       .toString())
+                        //                                   .toList();
+                        //                               villageList.clear();
+                        //                               villages.forEach((element) {
+                        //                                 villageList
+                        //                                     .add(element.value!);
+                        //                               });
+                        //                               setState(() {
+                        //                                 // Update villageList based on selectedGramPanchayat
+                        //                                 // villageList = // data from database based on selectedGramPanchayat;
+                        //                               });
+                        //                             },
+                        //                           ),
+                        //                           CustomDropdownFieldString(
+                        //                             titleText: Global.returnTrLable(
+                        //                                 hhlistingControlls,
+                        //                                 CustomText.Village,
+                        //                                 lng!),
+                        //                             isRequred: 0,
+                        //                             items: villageList,
+                        //                             selectedItem: selectedVillage,
+                        //                             onChanged: (value) {
+                        //                               setState(() {
+                        //                                 selectedVillage = value;
+                        //                               });
+                        //                             },
+                        //                           ),
+                        //                         ]
+
+                        //                       ],
+                        //                     ),
+                        //                   ),
+                        //                   Padding(
+                        //                     padding: EdgeInsets.symmetric(
+                        //                       horizontal: 20,
+                        //                     ),
+                        //                     child: Row(
+                        //                       children: [
+                        //                         Expanded(
+                        //                           child: CElevatedButton(
+                        //                             text: Global.returnTrLable(hhlistingControlls, 'Search', lng!),
+                        //                             color: Color(0xffDB4B73),
+                        //                             onPressed: () {
+                        //                               Navigator.of(context).pop();
+                        //                               filteredgetData(context);
+                        //                             },
+                        //                           ),
+                        //                         ),
+                        //                         SizedBox(width: 10),
+                        //                         Expanded(
+                        //                           child: CElevatedButton(
+                        //                             text: Global.returnTrLable(hhlistingControlls,'Cancel', lng!),
+                        //                             color: Color(0xFF42A5F5),
+                        //                             onPressed: () {
+                        //                               cleaAllFilter();
+                        //                               Navigator.of(context).pop();
+                        //                             },
+                        //                           ),
+                        //                         )
+                        //                       ],
+                        //                     ),
+                        //                   ),
+                        //                   SizedBox(height: 10),
+                        //                 ])),
+                        //       );
+                        //     }
+                        //     );
+                        //   },
+                        // );
+                        // _scaffoldKey.currentState!.closeEndDrawer();
+                        _scaffoldKey.currentState!.openEndDrawer();
                       },
-                      hintText: (lng != null)
-                          ? Global.returnTrLable(
-                          hhlistingControlls, 'Search', lng!)
-                          : '',
-                      prefixIcon: Image.asset(
-                        "assets/search.png",
+                      child: Image.asset(
+                        "assets/filter_icon.png",
                         scale: 2.4,
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 10.w,
-                  ),
-                  InkWell(
-                    onTap: () async {
-                      // showDialog(
-                      //   context: context,
-                      //   builder: (BuildContext context) {
-                      //     return StatefulBuilder(builder:
-                      //         (BuildContext context, StateSetter setState) {
-                      //       return AlertDialog(
-                      //         shape: RoundedRectangleBorder(
-                      //           borderRadius: BorderRadius.circular(10.0),
-                      //         ),
-                      //         contentPadding: EdgeInsets.zero,
-                      //         content: Container(
-                      //             width: MediaQuery.of(context).size.width * 5.00,
-                      //             height: GeneralFilter == "General Filter"
-                      //                 ? MediaQuery.of(context).size.height * .5
-                      //                 : MediaQuery.of(context).size.height * .7,
-                      //             child: Column(
-                      //                 mainAxisAlignment:
-                      //                 MainAxisAlignment.spaceBetween,
-                      //                 children: <Widget>[
-                      //                   Container(
-                      //                     height: 40.h,
-                      //                     padding: EdgeInsets.all(5),
-                      //                     decoration: BoxDecoration(
-                      //                       color: Color(0xff112A74),
-                      //                       borderRadius: BorderRadius.only(
-                      //                         topLeft: Radius.circular(5.0),
-                      //                         topRight: Radius.circular(5.0),
-                      //                       ),
-                      //                     ),
-                      //                     child: Center(
-                      //                         child: Text(CustomText.SHISHUGHAR,
-                      //                             style: Styles.white126P)),
-                      //                   ),
-                      //                   Padding(
-                      //                     padding: EdgeInsets.symmetric(
-                      //                       horizontal: 10.w,
-                      //                     ),
-                      //                     child: Column(
-                      //                       children: [
-                      //                         (role == 'Cluster Coordinator' || role == 'CRP')?Row(
-                      //                           children: [
-                      //                             Expanded(
-                      //                               child: CustomRadioButton(
-                      //                                 value: "General Filter",
-                      //                                 groupValue: GeneralFilter,
-                      //                                 onChanged: (value) {
-                      //                                   setState(() {
-                      //                                     GeneralFilter = value!;
-                      //                                   });
-                      //                                 },
-                      //                                 label: Global.returnTrLable(hhlistingControlls, CustomText.Generalfilter, lng!),
-                      //                               ),
-                      //                             ),
-                      //                             Expanded(
-                      //                               child: CustomRadioButton(
-                      //                                 value: "Location Filter",
-                      //                                 groupValue: GeneralFilter,
-                      //                                 onChanged: (value) {
-                      //                                   setState(() {
-                      //                                     GeneralFilter = value!;
-                      //                                   });
-                      //                                 },
-                      //                                 label: Global.returnTrLable(hhlistingControlls, CustomText.Locationfilter, lng!),
-                      //                               ),
-                      //                             ),
-                      //                           ],
-                      //                         ):SizedBox(),
-                      //                         if (GeneralFilter ==
-                      //                             "General Filter") ...[
-                      //                           DynamicCustomDropdownField(
-                      //                             titleText: Global.returnTrLable(
-                      //                                 hhlistingControlls,
-                      //                                 'Status',
-                      //                                 lng!),
-                      //                             items: statusListItem,
-                      //                             selectedItem: _selectedItem,
-                      //                             hintText: CustomText.Selecthere,
-                      //                             onChanged: (value) {
-                      //                               if (value != null)
-                      //                                 String selectedId =
-                      //                                 value.name!;
-                      //                               setState(() {
-                      //                                 _selectedItem =
-                      //                                 value?.name!;
-                      //                               });
-
-                      //                               //    filterDataByCriteria();
-                      //                             },
-                      //                           ),
-                      //                           CustomDatepickerDynamic(
-                      //                             initialvalue:calStartDate,
-                      //                             isRequred:0,
-                      //                             titleText: Global.returnTrLable(
-                      //                                 hhlistingControlls,
-                      //                                 'Start Date',
-                      //                                 lng!),
-                      //                             onChanged: (value) {
-                      //                               calStartDate=value;
-                      //                               validateDates();
-                      //                             },
-                      //                           ),
-                      //                           CustomDatepickerDynamic(
-                      //                             fieldName: 'date_of_visit',
-                      //                             initialvalue:calEndDate,
-                      //                             titleText: Global.returnTrLable(
-                      //                                 hhlistingControlls,
-                      //                                 'End Date',
-                      //                                 lng!),
-                      //                             onChanged: (value) {
-                      //                               calEndDate=value;
-                      //                               // setState(() {});
-
-                      //                               validateDates();
-                      //                             },
-                      //                           ),
-                      //                         ]else ...[
-                      //                           CustomDropdownFieldString(
-                      //                             titleText: Global.returnTrLable(
-                      //                                 hhlistingControlls,
-                      //                                 CustomText.state,
-                      //                                 lng!),
-                      //                             items: stateList,
-                      //                             isRequred: 0,
-                      //                             selectedItem: selectedState,
-                      //                             onChanged: (value) async {
-                      //                               selectedState = value;
-                      //                               selectedDistrict = null;
-                      //                               selectedBlock = null;
-                      //                               selectedGramPanchayat = null;
-                      //                               selectedVillage = null;
-                      //                               var stateId = states
-                      //                                   .firstWhere((element) =>
-                      //                               element.value ==
-                      //                                   selectedState)
-                      //                                   .name;
-                      //                               DistrictDataHelper
-                      //                               districtdata =
-                      //                               DistrictDataHelper();
-                      //                               List<TabDistrict> tempdistrict = [];
-                      //                               if(districtIdList.isNotEmpty && districtIdList.length>0){
-                      //                                 tempdistrict = await districtdata.getDistrictListByDistrictId(districtIdList);
-                      //                               }else {
-                      //                                 tempdistrict = await districtdata.getTabDistrictList();
-                      //                               }
-                      //                               district = tempdistrict
-                      //                                   .where((element) =>
-                      //                               element.stateId ==
-                      //                                   stateId.toString())
-                      //                                   .toList();
-                      //                               districtList.clear();
-                      //                               district.forEach((element) {
-                      //                                 districtList
-                      //                                     .add(element.value!);
-                      //                               });
-                      //                               setState(() {
-                      //                                 // Update districtList based on selectedState
-                      //                                 // districtList = // data from database based on selectedState;
-                      //                               });
-                      //                             },
-                      //                           ),
-                      //                           CustomDropdownFieldString(
-                      //                             titleText: Global.returnTrLable(
-                      //                                 hhlistingControlls,
-                      //                                 CustomText.District,
-                      //                                 lng!),
-                      //                             items: districtList,
-                      //                             isRequred: 0,
-                      //                             selectedItem: selectedDistrict,
-                      //                             onChanged: (value) async {
-                      //                               selectedDistrict = value;
-                      //                               selectedBlock = null;
-                      //                               selectedGramPanchayat = null;
-                      //                               selectedVillage = null;
-                      //                               var districtId = district
-                      //                                   .firstWhere((element) =>
-                      //                               element.value ==
-                      //                                   selectedDistrict)
-                      //                                   .name;
-                      //                               BlockDataHelper blockdata =
-                      //                               BlockDataHelper();
-                      //                               if(blockIdList.isNotEmpty && blockIdList.length>0){
-                      //                                 block = await blockdata.getBlockListByBlockId(blockIdList);
-                      //                               }else {
-                      //                                 block = await blockdata
-                      //                                     .getTabBlockList();
-                      //                               }
-                      //                               block = block
-                      //                                   .where((element) =>
-                      //                               element.districtId ==
-                      //                                   districtId.toString())
-                      //                                   .toList();
-                      //                               blockList.clear();
-                      //                               block.forEach((element) {
-                      //                                 blockList
-                      //                                     .add(element.value!);
-                      //                               });
-                      //                               setState(() {
-                      //                                 // Update blockList based on selectedDistrict
-                      //                                 // blockList = // data from database based on selectedDistrict;
-                      //                               });
-                      //                             },
-                      //                           ),
-                      //                           CustomDropdownFieldString(
-                      //                             titleText: Global.returnTrLable(
-                      //                                 hhlistingControlls,
-                      //                                 CustomText.Block,
-                      //                                 lng!),
-                      //                             items: blockList,
-                      //                             isRequred: 0,
-                      //                             selectedItem: selectedBlock,
-                      //                             onChanged: (value) async {
-                      //                               selectedBlock = value;
-                      //                               selectedGramPanchayat = null;
-                      //                               selectedVillage = null;
-                      //                               var blockId = block
-                      //                                   .firstWhere((element) =>
-                      //                               element.value ==
-                      //                                   selectedBlock)
-                      //                                   .name;
-                      //                               GramPanchayatDataHelper
-                      //                               gramPanchayatdata =
-                      //                               GramPanchayatDataHelper();
-                      //                               if(panchayatIdList.isNotEmpty && panchayatIdList.length>0){
-                      //                                 gramPanchayat = await gramPanchayatdata
-                      //                                     .getGramPanchayatListByPanchayatId(panchayatIdList);
-                      //                               }else {
-                      //                                 gramPanchayat = await gramPanchayatdata
-                      //                                     .getTabGramPanchayatList();
-                      //                               }
-
-                      //                               gramPanchayat = gramPanchayat
-                      //                                   .where((element) =>
-                      //                               element.blockId ==
-                      //                                   blockId.toString())
-                      //                                   .toList();
-                      //                               gramPanchayatList.clear();
-                      //                               gramPanchayat
-                      //                                   .forEach((element) {
-                      //                                 gramPanchayatList
-                      //                                     .add(element.value!);
-                      //                               });
-                      //                               setState(() {
-                      //                                 // Update gramPanchayatList based on selectedBlock
-                      //                                 // gramPanchayatList = // data from database based on selectedBlock;
-                      //                               });
-                      //                             },
-                      //                           ),
-                      //                           CustomDropdownFieldString(
-                      //                             isRequred: 0,
-                      //                             titleText: Global.returnTrLable(
-                      //                                 hhlistingControlls,
-                      //                                 CustomText.GramPanchayat,
-                      //                                 lng!),
-                      //                             items: gramPanchayatList,
-                      //                             selectedItem:
-                      //                             selectedGramPanchayat,
-                      //                             onChanged: (value) async {
-                      //                               selectedGramPanchayat = value;
-                      //                               selectedVillage = null;
-                      //                               var gramPanchyatId = gramPanchayat
-                      //                                   .firstWhere((element) =>
-                      //                               element.value ==
-                      //                                   selectedGramPanchayat)
-                      //                                   .name;
-                      //                               VillageDataHelper
-                      //                               villagetdata =
-                      //                               VillageDataHelper();
-                      //                               if(villageIdList.isNotEmpty && villageIdList.length>0){
-                      //                                 villages = await villagetdata
-                      //                                     .getVillageListByVillageId(villageIdList);
-                      //                               }else {
-                      //                                 villages = await villagetdata
-                      //                                     .getTabVillageList();
-                      //                               }
-                      //                               villages = villages
-                      //                                   .where((element) =>
-                      //                               element.gpId ==
-                      //                                   gramPanchyatId
-                      //                                       .toString())
-                      //                                   .toList();
-                      //                               villageList.clear();
-                      //                               villages.forEach((element) {
-                      //                                 villageList
-                      //                                     .add(element.value!);
-                      //                               });
-                      //                               setState(() {
-                      //                                 // Update villageList based on selectedGramPanchayat
-                      //                                 // villageList = // data from database based on selectedGramPanchayat;
-                      //                               });
-                      //                             },
-                      //                           ),
-                      //                           CustomDropdownFieldString(
-                      //                             titleText: Global.returnTrLable(
-                      //                                 hhlistingControlls,
-                      //                                 CustomText.Village,
-                      //                                 lng!),
-                      //                             isRequred: 0,
-                      //                             items: villageList,
-                      //                             selectedItem: selectedVillage,
-                      //                             onChanged: (value) {
-                      //                               setState(() {
-                      //                                 selectedVillage = value;
-                      //                               });
-                      //                             },
-                      //                           ),
-                      //                         ]
-
-                      //                       ],
-                      //                     ),
-                      //                   ),
-                      //                   Padding(
-                      //                     padding: EdgeInsets.symmetric(
-                      //                       horizontal: 20,
-                      //                     ),
-                      //                     child: Row(
-                      //                       children: [
-                      //                         Expanded(
-                      //                           child: CElevatedButton(
-                      //                             text: Global.returnTrLable(hhlistingControlls, 'Search', lng!),
-                      //                             color: Color(0xffDB4B73),
-                      //                             onPressed: () {
-                      //                               Navigator.of(context).pop();
-                      //                               filteredgetData(context);
-                      //                             },
-                      //                           ),
-                      //                         ),
-                      //                         SizedBox(width: 10),
-                      //                         Expanded(
-                      //                           child: CElevatedButton(
-                      //                             text: Global.returnTrLable(hhlistingControlls,'Cancel', lng!),
-                      //                             color: Color(0xFF42A5F5),
-                      //                             onPressed: () {
-                      //                               cleaAllFilter();
-                      //                               Navigator.of(context).pop();
-                      //                             },
-                      //                           ),
-                      //                         )
-                      //                       ],
-                      //                     ),
-                      //                   ),
-                      //                   SizedBox(height: 10),
-                      //                 ])),
-                      //       );
-                      //     }
-                      //     );
-                      //   },
-                      // );
-                      // _scaffoldKey.currentState!.closeEndDrawer();
-                      _scaffoldKey.currentState!.openEndDrawer();
-                    },
-                    child: Image.asset(
-                      "assets/filter_icon.png",
-                      scale: 2.4,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 10.h,
-              ),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:[
-                    SizedBox(),
-                    Text(
-                        lng!=null?
-                        Global.returnTrLable(
-                            hhlistingControlls,
-                            CustomText.totalHH,
-                            lng!) +
-                            " : ${filterData.length}":CustomText.totalHH+ " : ${filterData.length}",
-                        style: Styles.black127P,
-                        strutStyle: StrutStyle(height: 1.2),textAlign: TextAlign.left
-                    ),
-                  ]
-              ),
-              (filterData.length > 0)
-                  ? Expanded(
-                child: ListView.builder(
-                  itemCount: filterData.length,
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  scrollDirection: Axis.vertical,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () async {
-                        // Handle item tap here
-                        print('Item $index tapped');
-                        var refStatus = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => HHTabScreen(
-                                hhGuid: filterData[index].HHGUID!,
-                                crecheId:Global.stringToInt(Global.getItemValues(filterData[index].responces, 'creche_id'))),
-                          ),
-                        );
-                        if (refStatus == 'itemRefresh') {
-                          await fetchHhDataList();
-                        }
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5.h),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff5A5A5A).withOpacity(
-                                    0.2), // Shadow color with opacity
-                                offset: Offset(0,
-                                    3), // Horizontal and vertical offset
-                                blurRadius: 6, // Blur radius
-                                spreadRadius: 0, // Spread radius
-                              ),
-                            ],
-                            color: Colors.white,
-                            border: Border.all(color: Color(0xffE7F0FF)),
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10.w,
-                              vertical: 8.h,
+                  ],
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children:[
+                      SizedBox(),
+                      Text(
+                          lng!=null?
+                          Global.returnTrLable(
+                              hhlistingControlls,
+                              CustomText.totalHH,
+                              lng!) +
+                              " : ${filterData.length}":CustomText.totalHH+ " : ${filterData.length}",
+                          style: Styles.black127P,
+                          strutStyle: StrutStyle(height: 1.2),textAlign: TextAlign.left
+                      ),
+                    ]
+                ),
+                (filterData.length > 0)
+                    ? Expanded(
+                  child: ListView.builder(
+                    itemCount: filterData.length,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          // Handle item tap here
+                          print('Item $index tapped');
+                          var refStatus = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => HHTabScreen(
+                                  hhGuid: filterData[index].HHGUID!,
+                                  crecheId:Global.stringToInt(Global.getItemValues(filterData[index].responces, 'creche_id'))),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      Global.returnTrLable(
-                                          hhlistingControlls,
-                                          'Respondent Name',
-                                          lng!) +
-                                          " : ",
-                                      style: Styles.black104,
-                                    ),
-                                    Text(
-                                      Global.returnTrLable(
-                                          hhlistingControlls,
-                                          'HH Name',
-                                          lng!) +
-                                          " : ",
-                                      style: Styles.black104,
-                                      strutStyle: StrutStyle(height: 1),
-                                    ),
-                                    Text(
-                                      Global.returnTrLable(
-                                          hhlistingControlls,
-                                          'Date of Visit',
-                                          lng!) +
-                                          " : ",
-                                      style: Styles.black104,
-                                      strutStyle: StrutStyle(height: 1),
-                                    ),
-                                    Text(
-                                      Global.returnTrLable(
-                                          hhlistingControlls,
-                                          'Village',
-                                          lng!) +
-                                          " : ",
-                                      style: Styles.black104,
-                                      strutStyle: StrutStyle(height: 1),
-                                    ),
-                                    Text(
-                                      Global.returnTrLable(
-                                          hhlistingControlls,
-                                          'Status',
-                                          lng!) +
-                                          " : ",
-                                      style: Styles.black104,
-                                      strutStyle: StrutStyle(height: 1),
-                                    ),
-                                  ],
+                          );
+                          if (refStatus == 'itemRefresh') {
+                            await fetchHhDataList();
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.h),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xff5A5A5A).withOpacity(
+                                      0.2), // Shadow color with opacity
+                                  offset: Offset(0,
+                                      3), // Horizontal and vertical offset
+                                  blurRadius: 6, // Blur radius
+                                  spreadRadius: 0, // Spread radius
                                 ),
-                                SizedBox(width: 10),
-                                SizedBox(
-                                  height: 40.h,
-                                  width: 2,
-                                  child: VerticalDivider(
-                                    color: Color(0xffE6E6E6),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
+                              ],
+                              color: Colors.white,
+                              border: Border.all(color: Color(0xffE7F0FF)),
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10.w,
+                                vertical: 8.h,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
                                     crossAxisAlignment:
                                     CrossAxisAlignment.start,
                                     mainAxisAlignment:
                                     MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                          getItemValues(
-                                              filterData[index].responces!,
-                                              'respondent_name'),
-                                          style: Styles.blue125,
-                                          overflow: TextOverflow.ellipsis),
+                                        Global.returnTrLable(
+                                            hhlistingControlls,
+                                            'Respondent Name',
+                                            lng!) +
+                                            " : ",
+                                        style: Styles.black104,
+                                      ),
                                       Text(
-                                          getItemValues(
-                                              filterData[index].responces!,
-                                              'hosuehold_head_name'),
-                                          style: Styles.blue125,
-                                          overflow: TextOverflow.ellipsis),
+                                        Global.returnTrLable(
+                                            hhlistingControlls,
+                                            'HH Name',
+                                            lng!) +
+                                            " : ",
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
                                       Text(
-                                          Validate().displeDateFormate(
-                                              getItemValues(
-                                                  filterData[index]
-                                                      .responces!,
-                                                  'date_of_visit')),
-                                          style: Styles.blue125,
-                                          strutStyle:
-                                          StrutStyle(height: .5),
-                                          overflow: TextOverflow.ellipsis),
+                                        Global.returnTrLable(
+                                            hhlistingControlls,
+                                            'Date of Visit',
+                                            lng!) +
+                                            " : ",
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
                                       Text(
-                                          callVillageName(
-                                              filterData[index].responces!),
-                                          style: Styles.blue125,
-                                          strutStyle:
-                                          StrutStyle(height: .5),
-                                          overflow: TextOverflow.ellipsis),
+                                        Global.returnTrLable(
+                                            hhlistingControlls,
+                                            'Village',
+                                            lng!) +
+                                            " : ",
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
                                       Text(
-                                          getfindStatusValues(getItemValues(
-                                              filterData[index].responces!,
-                                              'verification_status')),
-                                          style: Styles.blue125,
-                                          strutStyle:
-                                          StrutStyle(height: .5),
-                                          overflow: TextOverflow.ellipsis),
+                                        Global.returnTrLable(
+                                            hhlistingControlls,
+                                            'Status',
+                                            lng!) +
+                                            " : ",
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1),
+                                      ),
                                     ],
                                   ),
-                                ),
-                                SizedBox(width: 5),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Global.stringToInt(getItemValues(
-                                        filterData[index]
-                                            .responces!,
-                                        'verification_status')) ==
-                                        3|| Global.stringToInt(getItemValues(
-                                        filterData[index]
-                                            .responces!,
-                                        'verification_status')) ==
-                                        4
-                                        ? Image.asset(
-                                      "assets/sync.png",
-                                      scale: 1.5,
-                                    )
-                                        : Image.asset(
-                                      "assets/sync_gray.png",
-                                      scale: 1.5,
+                                  SizedBox(width: 10),
+                                  SizedBox(
+                                    height: 40.h,
+                                    width: 2,
+                                    child: VerticalDivider(
+                                      color: Color(0xffE6E6E6),
                                     ),
-                                    SizedBox(height: 5.h),
-                                    Global.stringToInt(getItemValues(
-                                        filterData[index]
-                                            .responces!,
-                                        'verification_status')) ==
-                                        4
-                                        ? Image.asset(
-                                      "assets/verify.png",
-                                      scale: 1.5,
-                                    )
-                                        : Image.asset(
-                                      "assets/verify_gray.png",
-                                      scale: 1.5,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            getItemValues(
+                                                filterData[index].responces!,
+                                                'respondent_name'),
+                                            style: Styles.blue125,
+                                            overflow: TextOverflow.ellipsis),
+                                        Text(
+                                            getItemValues(
+                                                filterData[index].responces!,
+                                                'hosuehold_head_name'),
+                                            style: Styles.blue125,
+                                            overflow: TextOverflow.ellipsis),
+                                        Text(
+                                            Validate().displeDateFormate(
+                                                getItemValues(
+                                                    filterData[index]
+                                                        .responces!,
+                                                    'date_of_visit')),
+                                            style: Styles.blue125,
+                                            strutStyle:
+                                            StrutStyle(height: .5),
+                                            overflow: TextOverflow.ellipsis),
+                                        Text(
+                                            callVillageName(
+                                                filterData[index].responces!),
+                                            style: Styles.blue125,
+                                            strutStyle:
+                                            StrutStyle(height: .5),
+                                            overflow: TextOverflow.ellipsis),
+                                        Text(
+                                            getfindStatusValues(getItemValues(
+                                                filterData[index].responces!,
+                                                'verification_status')),
+                                            style: Styles.blue125,
+                                            strutStyle:
+                                            StrutStyle(height: .5),
+                                            overflow: TextOverflow.ellipsis),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                  SizedBox(width: 5),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Global.stringToInt(getItemValues(
+                                          filterData[index]
+                                              .responces!,
+                                          'verification_status')) ==
+                                          3|| Global.stringToInt(getItemValues(
+                                          filterData[index]
+                                              .responces!,
+                                          'verification_status')) ==
+                                          4
+                                          ? Image.asset(
+                                        "assets/sync.png",
+                                        scale: 1.5,
+                                      )
+                                          : Image.asset(
+                                        "assets/sync_gray.png",
+                                        scale: 1.5,
+                                      ),
+                                      SizedBox(height: 5.h),
+                                      Global.stringToInt(getItemValues(
+                                          filterData[index]
+                                              .responces!,
+                                          'verification_status')) ==
+                                          4
+                                          ? Image.asset(
+                                        "assets/verify.png",
+                                        scale: 1.5,
+                                      )
+                                          : Image.asset(
+                                        "assets/verify_gray.png",
+                                        scale: 1.5,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
+                )
+                    :
+                /*(lng!=null)?(village!=null)?Global.returnTrLable(hhlistingControlls,'HH List', lng!)*/
+                Expanded(
+                    child: Center(
+                        child: Text((lng != null)
+                            ? Global.returnTrLable(hhlistingControlls,
+                            CustomText.NorecordAvailable, lng!)
+                            : ''))),
+                SizedBox(
+                  height: 10.h,
                 ),
-              )
-                  :
-              /*(lng!=null)?(village!=null)?Global.returnTrLable(hhlistingControlls,'HH List', lng!)*/
-              Expanded(
-                  child: Center(
-                      child: Text((lng != null)
-                          ? Global.returnTrLable(hhlistingControlls,
-                          CustomText.NorecordAvailable, lng!)
-                          : ''))),
-              SizedBox(
-                height: 10.h,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

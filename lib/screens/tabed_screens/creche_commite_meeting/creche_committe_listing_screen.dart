@@ -114,212 +114,215 @@ class _CrecheCommitteListingScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: role == CustomText.crecheSupervisor.trim()
-          ? InkWell(
-              onTap: () async {
-                String ccGuid = '';
-                if (!Global.validString(ccGuid)) {
-                  ccGuid = Validate().randomGuid();
-                  String? minDate;
-                  if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
-                    minDate=await Validate().requredOnlyMinimum(null, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: role == CustomText.crecheSupervisor.trim()
+            ? InkWell(
+                onTap: () async {
+                  String ccGuid = '';
+                  if (!Global.validString(ccGuid)) {
+                    ccGuid = Validate().randomGuid();
+                    String? minDate;
+                    if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                      minDate=await Validate().requredOnlyMinimum(null, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                    }
+                    var refStatus = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                CrecheCommitteDetailsScreen(
+                                    creche_id: widget.creche_id,
+                                    ccGuid: ccGuid,
+                                    isImageUpdate: false,
+                                    minDate: minDate!=null?Validate().stringToDate(minDate):null,
+                                    existingList: existingDate)));
+                    if (refStatus == 'itemRefresh') {
+                      await fetchCommittieMeetingrecords();
+                    }
                   }
-                  var refStatus = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              CrecheCommitteDetailsScreen(
-                                  creche_id: widget.creche_id,
-                                  ccGuid: ccGuid,
-                                  isImageUpdate: false,
-                                  minDate: minDate!=null?Validate().stringToDate(minDate):null,
-                                  existingList: existingDate)));
-                  if (refStatus == 'itemRefresh') {
-                    await fetchCommittieMeetingrecords();
-                  }
-                }
-              },
-              child: Image.asset(
-                "assets/add_btn.png",
-                scale: 2.7,
-                color: Color(0xff5979AA),
-              ),
-            )
-          : SizedBox(),
-      appBar: CustomAppbar(
-        text: Global.returnTrLable(translats, CustomText.ccListing, lng),
-        subTitle: widget.crecheName,
-        onTap: () => Navigator.pop(context, 'itemRefresh'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-        child: Column(children: [
-          role == CustomText.crecheSupervisor
-              ? Container(
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: AnimatedRollingSwitch(
-                      title1:
-                          Global.returnTrLable(translats, CustomText.all, lng),
-                      title2: Global.returnTrLable(
-                          translats, CustomText.unsynched, lng),
-                      isOnlyUnsynched: isOnlyUnsynched ?? false,
-                      onChange: (value) async {
-                        setState(() {
-                          isOnlyUnsynched = value;
-                        });
-                        await fetchCommittieMeetingrecords();
-                      },
-                    ),
-                  ),
-                )
-              : SizedBox(),
-          Expanded(
-            child: (filterData.length > 0)
-                ? ListView.builder(
-                    itemCount: filterData.length,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () async {
-                          bool isEdited=await Validate().checkEditable(filterData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
-                          String? minDate;
-                          if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
-                            minDate=await Validate().requredOnlyMinimum(null, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
-                          }
-                          bool isUnEditable=true;
-                          if(isEdited&&role == CustomText.crecheSupervisor){
-                            isUnEditable=false;
-                          }
-                          if (existingDate.contains(Global.getItemValues(
-                              filterData[index].responces, 'meeting_date'))) {
-                            var currentRecordDate = Global.getItemValues(
-                                filterData[index].responces, 'meeting_date');
-                            existingDate.remove(currentRecordDate);
-                          }
-
-
-                          var ccGuid = filterData[index].ccguid;
-                          if (Global.validString(ccGuid)) {
-                            var refStatus = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                    isUnEditable
-                                            ? CrecheCommitteDetailsViewScreen(
-                                                creche_id: widget.creche_id,
-                                                ccGuid: ccGuid,
-                                              )
-                                            : CrecheCommitteDetailsScreen(
-                                                creche_id: widget.creche_id,
-                                                ccGuid: ccGuid,
-                                                minDate:minDate!=null?Validate().stringToDate(minDate):null,
-                                                existingList: existingDate,
-                                                isImageUpdate:
-                                                    Global.validString(
-                                                        Global.getItemValues(
-                                                            filterData[index]
-                                                                .responces!,
-                                                            'image')))));
-
-                            if (refStatus == 'itemRefresh') {
-                              await fetchCommittieMeetingrecords();
-                            }
-                          }
+                },
+                child: Image.asset(
+                  "assets/add_btn.png",
+                  scale: 2.7,
+                  color: Color(0xff5979AA),
+                ),
+              )
+            : SizedBox(),
+        appBar: CustomAppbar(
+          text: Global.returnTrLable(translats, CustomText.ccListing, lng),
+          subTitle: widget.crecheName,
+          onTap: () => Navigator.pop(context, 'itemRefresh'),
+        ),
+        body: Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+          child: Column(children: [
+            role == CustomText.crecheSupervisor
+                ? Container(
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: AnimatedRollingSwitch(
+                        title1:
+                            Global.returnTrLable(translats, CustomText.all, lng),
+                        title2: Global.returnTrLable(
+                            translats, CustomText.unsynched, lng),
+                        isOnlyUnsynched: isOnlyUnsynched ?? false,
+                        onChange: (value) async {
+                          setState(() {
+                            isOnlyUnsynched = value;
+                          });
+                          await fetchCommittieMeetingrecords();
                         },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 8.h),
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} : ',
-                                          style: Styles.black104,
-                                        ),
-                                        Text(
-                                          '${Global.returnTrLable(translats, CustomText.MajorTopic, lng).trim()} : ',
-                                          style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1.2),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(width: 10),
-                                    SizedBox(
-                                      height: 10.h,
-                                      width: 2,
-                                      child: VerticalDivider(
-                                        color: Color(0xffE6E6E6),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
+                      ),
+                    ),
+                  )
+                : SizedBox(),
+            Expanded(
+              child: (filterData.length > 0)
+                  ? ListView.builder(
+                      itemCount: filterData.length,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () async {
+                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
+                            String? minDate;
+                            if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                              minDate=await Validate().requredOnlyMinimum(null, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                            }
+                            bool isUnEditable=true;
+                            if(isEdited&&role == CustomText.crecheSupervisor){
+                              isUnEditable=false;
+                            }
+                            if (existingDate.contains(Global.getItemValues(
+                                filterData[index].responces, 'meeting_date'))) {
+                              var currentRecordDate = Global.getItemValues(
+                                  filterData[index].responces, 'meeting_date');
+                              existingDate.remove(currentRecordDate);
+                            }
+
+
+                            var ccGuid = filterData[index].ccguid;
+                            if (Global.validString(ccGuid)) {
+                              var refStatus = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                      isUnEditable
+                                              ? CrecheCommitteDetailsViewScreen(
+                                                  creche_id: widget.creche_id,
+                                                  ccGuid: ccGuid,
+                                                )
+                                              : CrecheCommitteDetailsScreen(
+                                                  creche_id: widget.creche_id,
+                                                  ccGuid: ccGuid,
+                                                  minDate:minDate!=null?Validate().stringToDate(minDate):null,
+                                                  existingList: existingDate,
+                                                  isImageUpdate:
+                                                      Global.validString(
+                                                          Global.getItemValues(
+                                                              filterData[index]
+                                                                  .responces!,
+                                                              'image')))));
+
+                              if (refStatus == 'itemRefresh') {
+                                await fetchCommittieMeetingrecords();
+                              }
+                            }
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xffE7F0FF)),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w, vertical: 8.h),
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            Validate().displeDateFormate(
-                                                Global.getItemValues(
-                                                    filterData[index]
-                                                        .responces!,
-                                                    'meeting_date')),
-                                            style: Styles.cardBlue10,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
+                                            '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} : ',
+                                            style: Styles.black104,
                                           ),
                                           Text(
-                                            Global.getItemValues(
-                                                filterData[index].responces!,
-                                                'major_topic'),
-                                            style: Styles.cardBlue10,
-                                            maxLines: 1,
+                                            '${Global.returnTrLable(translats, CustomText.MajorTopic, lng).trim()} : ',
+                                            style: Styles.black104,
                                             strutStyle: StrutStyle(height: 1.2),
-                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    SizedBox(width: 5),
-                                    (filterData[index].is_edited == 0 &&
-                                            filterData[index].is_uploaded == 1)
-                                        ? Image.asset(
-                                            "assets/sync.png",
-                                            scale: 1.5,
-                                          )
-                                        : Image.asset(
-                                            "assets/sync_gray.png",
-                                            scale: 1.5,
-                                          )
-                                  ]),
+                                      SizedBox(width: 10),
+                                      SizedBox(
+                                        height: 10.h,
+                                        width: 2,
+                                        child: VerticalDivider(
+                                          color: Color(0xffE6E6E6),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              Validate().displeDateFormate(
+                                                  Global.getItemValues(
+                                                      filterData[index]
+                                                          .responces!,
+                                                      'meeting_date')),
+                                              style: Styles.cardBlue10,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(
+                                              Global.getItemValues(
+                                                  filterData[index].responces!,
+                                                  'major_topic'),
+                                              style: Styles.cardBlue10,
+                                              maxLines: 1,
+                                              strutStyle: StrutStyle(height: 1.2),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 5),
+                                      (filterData[index].is_edited == 0 &&
+                                              filterData[index].is_uploaded == 1)
+                                          ? Image.asset(
+                                              "assets/sync.png",
+                                              scale: 1.5,
+                                            )
+                                          : Image.asset(
+                                              "assets/sync_gray.png",
+                                              scale: 1.5,
+                                            )
+                                    ]),
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    })
-                : Center(
-                    child: Text(Global.returnTrLable(
-                        translats, CustomText.NorecordAvailable, lng)),
-                  ),
-          )
-        ]),
+                        );
+                      })
+                  : Center(
+                      child: Text(Global.returnTrLable(
+                          translats, CustomText.NorecordAvailable, lng)),
+                    ),
+            )
+          ]),
+        ),
       ),
     );
   }

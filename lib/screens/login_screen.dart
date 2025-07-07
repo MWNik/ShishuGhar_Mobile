@@ -118,311 +118,314 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     ToastContext().init(context);
-    return WillPopScope(
-      onWillPop: () async {
-        final timegap = DateTime.now().difference(pre_backpress);
-        final cantExit = timegap >= Duration(seconds: 2);
-        pre_backpress = DateTime.now();
-        if (cantExit) {
-          final message = 'Press back button again to exit';
-          Toast.show(message, duration: 3, backgroundColor: Colors.black);
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          final timegap = DateTime.now().difference(pre_backpress);
+          final cantExit = timegap >= Duration(seconds: 2);
+          pre_backpress = DateTime.now();
+          if (cantExit) {
+            final message = 'Press back button again to exit';
+            Toast.show(message, duration: 3, backgroundColor: Colors.black);
 
-          return false;
-        } else {
-          // Fluttertoast.cancel();
-          return true;
-        }
-      },
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          automaticallyImplyLeading: true,
-          toolbarHeight: 0,
-          systemOverlayStyle:
-              SystemUiOverlayStyle(statusBarColor: Color(0xffDFDFDF)),
-        ),
-        resizeToAvoidBottomInset: false,
-        body: SingleChildScrollView(
-          reverse: true,
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    "assets/toploginImage.png",
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w),
-                      child: Container(
-                        child: Column(
-                          children: [
-                            (_keyboardVisible)
-                                ? Flexible(
-                                    child: SizedBox(
-                                        height: 181.h,
-                                        width: 280.w,
-                                        child: Image.asset(
-                                            "assets/loginlogo.png")),
-                                  )
-                                : SizedBox(
-                                    height: 181.h,
-                                    width: 280.w,
-                                    child: Image.asset("assets/loginlogo.png")),
-                            Flexible(
-                              child: Text(
-                                CustomText.SHISHUGHAR,
-                                style: Styles.blue207P,
-                              ),
-                            ),
-                            Flexible(
-                              child: Divider(
-                                thickness: 1.5,
-                                indent: 70.w,
-                                endIndent: 70.w,
-                                color: Color(0xffDFDFDF),
-                              ),
-                            ),
-                            Flexible(
-                              child: Text(
-                                CustomText.hindiSHISHUGHAR,
-                                style: Styles.blue207P,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10.h,
-                            ),
-                            Flexible(
-                              child: Text(
-                                CustomText.SishuGharManagementSystem,
-                                style: Styles.black127P,
-                              ),
-                            ),
-                            Flexible(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 50.w, vertical: 10.h),
-                                child: Row(
-                                  children: [
-                                    CustomRadioButton(
-                                      value: 'English',
-                                      groupValue: selectedlanguages,
-                                      onChanged: (value) {
-                                        Validate().saveString(
-                                            Validate.sLanguage, 'en');
-                                        setState(() {
-                                          selectedlanguages = value!;
-                                        });
-                                      },
-                                      label: CustomText.English,
-                                    ),
-                                    Spacer(),
-                                    CustomRadioButton(
-                                      value: 'Hindi',
-                                      groupValue: selectedlanguages,
-                                      onChanged: (value) {
-                                        Validate().saveString(
-                                            Validate.sLanguage, 'hi');
-                                        setState(() {
-                                          selectedlanguages = value!;
-                                        });
-                                      },
-                                      label: CustomText.Hindi,
-                                    ),
-                                    Spacer(),
-                                    CustomRadioButton(
-                                      value: 'Odiya',
-                                      groupValue: selectedlanguages,
-                                      onChanged: (value) {
-                                        Validate().saveString(
-                                            Validate.sLanguage, 'od');
-                                        setState(() {
-                                          selectedlanguages = value!;
-                                        });
-                                      },
-                                      label: CustomText.Odiya,
-                                    ),
-                                  ],
+            return false;
+          } else {
+            // Fluttertoast.cancel();
+            return true;
+          }
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            automaticallyImplyLeading: true,
+            toolbarHeight: 0,
+            systemOverlayStyle:
+                SystemUiOverlayStyle(statusBarColor: Color(0xffDFDFDF)),
+          ),
+          resizeToAvoidBottomInset: false,
+          body: SingleChildScrollView(
+            reverse: true,
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/toploginImage.png",
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10.w),
+                        child: Container(
+                          child: Column(
+                            children: [
+                              (_keyboardVisible)
+                                  ? Flexible(
+                                      child: SizedBox(
+                                          height: 181.h,
+                                          width: 280.w,
+                                          child: Image.asset(
+                                              "assets/loginlogo.png")),
+                                    )
+                                  : SizedBox(
+                                      height: 181.h,
+                                      width: 280.w,
+                                      child: Image.asset("assets/loginlogo.png")),
+                              Flexible(
+                                child: Text(
+                                  CustomText.SHISHUGHAR,
+                                  style: Styles.blue207P,
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: (_keyboardVisible) ? 15.w : 7.w),
-                              child: CustomTextFieldRow(
-                                focusNode: _focusNode,
-                                controller: mobileController,
-                                keyboardtype: TextInputType.text,
-                                enabled: savedUsername == null ? true : false,
-                                // maxlength: 20,
-                                hintText: CustomText.Email,
-                                prefixIcon: Image.asset(
-                                  "assets/mobile.png",
-                                  scale: 3.2,
+                              Flexible(
+                                child: Divider(
+                                  thickness: 1.5,
+                                  indent: 70.w,
+                                  endIndent: 70.w,
+                                  color: Color(0xffDFDFDF),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 15.h,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: (_keyboardVisible) ? 15.w : 7.w),
-                              child: CustomTextFieldRow(
-                                maxlength: 20,
-                                focusNode: _focusNode2,
-                                controller: passwordcontroller,
-                                hintText: CustomText.Password,
-                                prefixIcon: Image.asset(
-                                  "assets/key.png",
-                                  scale: 3.2,
+                              Flexible(
+                                child: Text(
+                                  CustomText.hindiSHISHUGHAR,
+                                  style: Styles.blue207P,
                                 ),
-                                suffixIcon: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      _isPasswordVisible = !_isPasswordVisible;
-                                    });
-                                  },
-                                  child: Icon(
-                                    _isPasswordVisible == true
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                    color: Colors.grey,
-                                    size: 20.sp,
-                                  ),
-                                ),
-                                obscureText: _isPasswordVisible,
                               ),
-                            ),
-                            SizedBox(
-                              height: 5.h,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20.w),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  InkWell(
-                                    onTap: () {},
-                                    child: Visibility(
-                                      visible: false,
-                                      // Set this to false to hide the Text widget
-                                      child: Text(
-                                        CustomText.LoginwithOTP,
-                                        style: Styles.black105P,
+                              SizedBox(
+                                height: 10.h,
+                              ),
+                              Flexible(
+                                child: Text(
+                                  CustomText.SishuGharManagementSystem,
+                                  style: Styles.black127P,
+                                ),
+                              ),
+                              Flexible(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 50.w, vertical: 10.h),
+                                  child: Row(
+                                    children: [
+                                      CustomRadioButton(
+                                        value: 'English',
+                                        groupValue: selectedlanguages,
+                                        onChanged: (value) {
+                                          Validate().saveString(
+                                              Validate.sLanguage, 'en');
+                                          setState(() {
+                                            selectedlanguages = value!;
+                                          });
+                                        },
+                                        label: CustomText.English,
                                       ),
-                                    ),
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                ResetPaswordScreen(),
-                                          ));
-                                    },
-                                    child: Text(
-                                      CustomText.ForgotPassword,
-                                      style: Styles.blue105P,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: (_keyboardVisible) ? 10.h : 30.h,
-                            ),
-                            CElevatedButton(
-                              onPressed: () async {
-                                var network =
-                                    await Validate().checkNetworkConnection();
-                                if (network) {
-                                  if (mobileController.text.isEmpty) {
-                                    Validate().singleButtonPopup(
-                                        'User name required',
-                                        'ok',
-                                        false,
-                                        context);
-                                  } else if (passwordcontroller.text.isEmpty) {
-                                    Validate().singleButtonPopup(
-                                        'Password required',
-                                        'ok',
-                                        false,
-                                        context);
-                                  } else {
-                                    if (_focusNode.hasFocus) {
-                                      _focusNode.unfocus();
-                                    }
-                                    if (_focusNode2.hasFocus) {
-                                      _focusNode2.unfocus();
-                                    }
-                                    await newLoginFlow(mobileController.text,
-                                        passwordcontroller.text, context);
-                                  }
-                                } else {
-                                  Validate().singleButtonPopup(
-                                      CustomText.nointernetconnectionavailable,
-                                      CustomText.ok,
-                                      false,
-                                      context);
-                                }
-                              },
-                              text: CustomText.LogIn,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Center(
-                              child: GestureDetector(
-                                onTap: () async {
-                                  await Validate().createDbBackup();
-                                },
-                                child: RichText(
-                                  text: TextSpan(
-                                    text: CustomText.Version,
-                                    style: Styles.black124,
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                          text: " $appVersionName",
-                                          style: Styles.black126P),
-                                      Constants.baseUrl ==
-                                              'https://uat.shishughar.in/api/'
-                                          ? TextSpan(
-                                              text: "  (UAT)",
-                                              style: Styles.red125)
-                                          : Constants.baseUrl ==
-                                                  'https://shishughar.in/api/'
-                                              ? TextSpan(
-                                                  text: "",
-                                                  style: Styles.red125)
-                                              : TextSpan(
-                                                  text: "  (DEV)",
-                                                  style: Styles.red125),
+                                      Spacer(),
+                                      CustomRadioButton(
+                                        value: 'Hindi',
+                                        groupValue: selectedlanguages,
+                                        onChanged: (value) {
+                                          Validate().saveString(
+                                              Validate.sLanguage, 'hi');
+                                          setState(() {
+                                            selectedlanguages = value!;
+                                          });
+                                        },
+                                        label: CustomText.Hindi,
+                                      ),
+                                      Spacer(),
+                                      CustomRadioButton(
+                                        value: 'Odiya',
+                                        groupValue: selectedlanguages,
+                                        onChanged: (value) {
+                                          Validate().saveString(
+                                              Validate.sLanguage, 'od');
+                                          setState(() {
+                                            selectedlanguages = value!;
+                                          });
+                                        },
+                                        label: CustomText.Odiya,
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
-                            ),
-                            Padding(
-                                padding: EdgeInsets.only(
-                                    bottom: (_keyboardVisible) ? 15.h : 7.h)),
-                          ],
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: (_keyboardVisible) ? 15.w : 7.w),
+                                child: CustomTextFieldRow(
+                                  focusNode: _focusNode,
+                                  controller: mobileController,
+                                  keyboardtype: TextInputType.text,
+                                  enabled: savedUsername == null ? true : false,
+                                  // maxlength: 20,
+                                  hintText: CustomText.Email,
+                                  prefixIcon: Image.asset(
+                                    "assets/mobile.png",
+                                    scale: 3.2,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 15.h,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: (_keyboardVisible) ? 15.w : 7.w),
+                                child: CustomTextFieldRow(
+                                  maxlength: 20,
+                                  focusNode: _focusNode2,
+                                  controller: passwordcontroller,
+                                  hintText: CustomText.Password,
+                                  prefixIcon: Image.asset(
+                                    "assets/key.png",
+                                    scale: 3.2,
+                                  ),
+                                  suffixIcon: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _isPasswordVisible = !_isPasswordVisible;
+                                      });
+                                    },
+                                    child: Icon(
+                                      _isPasswordVisible == true
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      color: Colors.grey,
+                                      size: 20.sp,
+                                    ),
+                                  ),
+                                  obscureText: _isPasswordVisible,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5.h,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {},
+                                      child: Visibility(
+                                        visible: false,
+                                        // Set this to false to hide the Text widget
+                                        child: Text(
+                                          CustomText.LoginwithOTP,
+                                          style: Styles.black105P,
+                                        ),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ResetPaswordScreen(),
+                                            ));
+                                      },
+                                      child: Text(
+                                        CustomText.ForgotPassword,
+                                        style: Styles.blue105P,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: (_keyboardVisible) ? 10.h : 30.h,
+                              ),
+                              CElevatedButton(
+                                onPressed: () async {
+                                  var network =
+                                      await Validate().checkNetworkConnection();
+                                  if (network) {
+                                    if (mobileController.text.isEmpty) {
+                                      Validate().singleButtonPopup(
+                                          'User name required',
+                                          'ok',
+                                          false,
+                                          context);
+                                    } else if (passwordcontroller.text.isEmpty) {
+                                      Validate().singleButtonPopup(
+                                          'Password required',
+                                          'ok',
+                                          false,
+                                          context);
+                                    } else {
+                                      if (_focusNode.hasFocus) {
+                                        _focusNode.unfocus();
+                                      }
+                                      if (_focusNode2.hasFocus) {
+                                        _focusNode2.unfocus();
+                                      }
+                                      await newLoginFlow(mobileController.text,
+                                          passwordcontroller.text, context);
+                                    }
+                                  } else {
+                                    Validate().singleButtonPopup(
+                                        CustomText.nointernetconnectionavailable,
+                                        CustomText.ok,
+                                        false,
+                                        context);
+                                  }
+                                },
+                                text: CustomText.LogIn,
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Center(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    await Validate().createDbBackup();
+                                  },
+                                  child: RichText(
+                                    text: TextSpan(
+                                      text: CustomText.Version,
+                                      style: Styles.black124,
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                            text: " $appVersionName",
+                                            style: Styles.black126P),
+                                        Constants.baseUrl ==
+                                                'https://uat.shishughar.in/api/'
+                                            ? TextSpan(
+                                                text: "  (UAT)",
+                                                style: Styles.red125)
+                                            : Constants.baseUrl ==
+                                                    'https://shishughar.in/api/'
+                                                ? TextSpan(
+                                                    text: "",
+                                                    style: Styles.red125)
+                                                : TextSpan(
+                                                    text: "  (DEV)",
+                                                    style: Styles.red125),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom: (_keyboardVisible) ? 15.h : 7.h)),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  // Padding(
-                  //   padding: EdgeInsets.only(
-                  //       bottom: MediaQuery.of(context).viewInsets.bottom),
-                  // ),
-                  Image.asset("assets/bottomloginImage.png"),
-                ],
+                    // Padding(
+                    //   padding: EdgeInsets.only(
+                    //       bottom: MediaQuery.of(context).viewInsets.bottom),
+                    // ),
+                    Image.asset("assets/bottomloginImage.png"),
+                  ],
+                ),
               ),
             ),
           ),

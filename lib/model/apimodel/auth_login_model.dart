@@ -1,4 +1,4 @@
-import 'package:shishughar/model/apimodel/mapping_login_model.dart';
+ import 'package:shishughar/model/apimodel/mapping_login_model.dart';
 
 class Auth {
   String? apiKey;

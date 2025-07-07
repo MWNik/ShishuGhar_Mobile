@@ -108,87 +108,91 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
+
     if (_isLoading) {
       return Container(
           color: Colors.white,
           child: Center(child: CircularProgressIndicator()));
     } else {
-      return WillPopScope(
-          onWillPop: () async {
-            isEditable
-                ? Validate().showExitDialog(context, translatsLabel, lng)
-                : Navigator.pop(context, 'itemRefresh');
-            return false;
-          },
-          child: Scaffold(
-            appBar: AppBar(
-              toolbarHeight: 60,
-              backgroundColor: Color(0xff5979AA),
-              leading: Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: GestureDetector(
-                  onTap: () {
-                    isEditable
-                        ? Validate()
-                            .showExitDialog(context, translatsLabel, lng)
-                        : Navigator.pop(context, 'itemRefresh');
-                  },
-                  child: Icon(
-                    Icons.arrow_back_ios_sharp,
-                    size: 20,
-                    color: Colors.white,
+      return SafeArea(
+        child: WillPopScope(
+            onWillPop: () async {
+              isEditable
+                  ? Validate().showExitDialog(context, translatsLabel, lng)
+                  : Navigator.pop(context, 'itemRefresh');
+              return false;
+            },
+            child: Scaffold(
+              appBar: AppBar(
+                toolbarHeight: 60,
+                backgroundColor: Color(0xff5979AA),
+                leading: Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: GestureDetector(
+                    onTap: () {
+                      isEditable
+                          ? Validate()
+                              .showExitDialog(context, translatsLabel, lng)
+                          : Navigator.pop(context, 'itemRefresh');
+                    },
+                    child: Icon(
+                      Icons.arrow_back_ios_sharp,
+                      size: 20,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
+                title: Column(
+                  children: [
+                    Text(
+                      Global.returnTrLable(
+                          translatsLabel, CustomText.Add_Attendance, lng!),
+                      style: Styles.white145,
+                    ),
+                    Text(
+                      widget.crexhe_name!,
+                      style: Styles.white145,
+                    )
+                  ],
+                ),
+                centerTitle: true,
+                bottom: _isLoading
+                    ? null
+                    : TabBar(
+                        indicatorColor: Color(0xffF26BA3),
+                        unselectedLabelColor: Colors.grey.shade300,
+                        unselectedLabelStyle: Styles.white124P,
+                        labelColor: Colors.white,
+                        controller: _tabController,
+                        isScrollable: tabIsScrollable,
+                        labelPadding: EdgeInsets.zero,
+                        tabAlignment: tabIsScrollable ? TabAlignment.start : null,
+                        tabs: tabController(),
+                        onTap: (index) {
+                          if (_tabController.indexIsChanging) {
+                            _tabController.index = _tabController.previousIndex;
+
+                            handleTabChange(index, _tabController.previousIndex);
+                          } else {
+                            print("object 1 $index");
+                            return;
+                          }
+                        },
+                      ),
               ),
-              title: Column(
+              body: Column(
                 children: [
-                  Text(
-                    Global.returnTrLable(
-                        translatsLabel, CustomText.Add_Attendance, lng!),
-                    style: Styles.white145,
-                  ),
-                  Text(
-                    widget.crexhe_name!,
-                    style: Styles.white145,
-                  )
+                  Expanded(
+                      child: TabBarView(
+                    controller: _tabController,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: tabControllerScreen(),
+                  ))
                 ],
               ),
-              centerTitle: true,
-              bottom: _isLoading
-                  ? null
-                  : TabBar(
-                      indicatorColor: Color(0xffF26BA3),
-                      unselectedLabelColor: Colors.grey.shade300,
-                      unselectedLabelStyle: Styles.white124P,
-                      labelColor: Colors.white,
-                      controller: _tabController,
-                      isScrollable: tabIsScrollable,
-                      labelPadding: EdgeInsets.zero,
-                      tabAlignment: tabIsScrollable ? TabAlignment.start : null,
-                      tabs: tabController(),
-                      onTap: (index) {
-                        if (_tabController.indexIsChanging) {
-                          _tabController.index = _tabController.previousIndex;
-
-                          handleTabChange(index, _tabController.previousIndex);
-                        } else {
-                          print("object 1 $index");
-                          return;
-                        }
-                      },
-                    ),
-            ),
-            body: Column(
-              children: [
-                Expanded(
-                    child: TabBarView(
-                  controller: _tabController,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: tabControllerScreen(),
-                ))
-              ],
-            ),
-          ));
+            )),
+      );
     }
   }
 

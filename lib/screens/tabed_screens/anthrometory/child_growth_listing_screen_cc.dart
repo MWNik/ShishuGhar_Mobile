@@ -90,146 +90,123 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenCC> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppbar(
-        text: Global.returnTrLable(translats, CustomText.GrowthMonitoring, lng),
-        subTitle: widget.creche_name,
-        onTap: () => Navigator.pop(context),
-        actions: [
-          IconButton(onPressed: () async {
-            isCalenderView=isCalenderView?false:true;
-            setState(() {
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomAppbar(
+          text: Global.returnTrLable(translats, CustomText.GrowthMonitoring, lng),
+          subTitle: widget.creche_name,
+          onTap: () => Navigator.pop(context),
+          actions: [
+            IconButton(onPressed: () async {
+              isCalenderView=isCalenderView?false:true;
+              setState(() {
 
-            });
-          }, icon: Icon(isCalenderView?Icons.list_alt:Icons.calendar_month,color:Colors.white))
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.only(left: 20.w,right: 20.w, bottom: 10.h),
-        child: isCalenderView?YearMonthCalendar(
-            initialDate: DateTime.now(),
-            mesures: anthropometryData,
-            onTap: (data) async {
-              var selectedItems=childHHData.where((element) => element.cgmguid == Global.validToString(data)).toList();
-              if(selectedItems.isNotEmpty) {
-                var lstDate = await minMaxDate(selectedItems.first.created_at);
-                // if (callMeasurementEditableDate(
-                //     selectedItems.first.created_at!)) {
-                var refStatus = await Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            ChildGrowthExpendedFormScreen(
-                              creche_nameId: widget.creche_nameId,
-                              creche_name: widget.creche_name,
-                              cgmguid:
-                              selectedItems.first.cgmguid!,
-                              lastGrowthDate: lstDate,
-                              minGrowthDate: maxGrowthDate,
-                              createdAt:
-                              selectedItems.first.created_at,
-                              isNew:
-                              selectedItems.first.responces !=
-                                  null ? true : false,
-                            )));
+              });
+            }, icon: Icon(isCalenderView?Icons.list_alt:Icons.calendar_month,color:Colors.white))
+          ],
+        ),
+        body: Padding(
+          padding: EdgeInsets.only(left: 20.w,right: 20.w, bottom: 10.h),
+          child: isCalenderView?YearMonthCalendar(
+              initialDate: DateTime.now(),
+              mesures: anthropometryData,
+              onTap: (data) async {
+                var selectedItems=childHHData.where((element) => element.cgmguid == Global.validToString(data)).toList();
+                if(selectedItems.isNotEmpty) {
+                  var lstDate = await minMaxDate(selectedItems.first.created_at);
+                  // if (callMeasurementEditableDate(
+                  //     selectedItems.first.created_at!)) {
+                  var refStatus = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              ChildGrowthExpendedFormScreen(
+                                creche_nameId: widget.creche_nameId,
+                                creche_name: widget.creche_name,
+                                cgmguid:
+                                selectedItems.first.cgmguid!,
+                                lastGrowthDate: lstDate,
+                                minGrowthDate: maxGrowthDate,
+                                createdAt:
+                                selectedItems.first.created_at,
+                                isNew:
+                                selectedItems.first.responces !=
+                                    null ? true : false,
+                              )));
 
-                if (refStatus == 'itemRefresh') {
-                  await fetchEnrolleChild();
+                  if (refStatus == 'itemRefresh') {
+                    await fetchEnrolleChild();
+                  }
                 }
+                //   } else
+                //     Validate().singleButtonPopup(
+                //         Global.returnTrLable(translats, CustomText.growthMonitoring, lng),
+                //         Global.returnTrLable(translats, CustomText.ok, lng),
+                //         false,
+                //         context);
+                // }
+
               }
-              //   } else
-              //     Validate().singleButtonPopup(
-              //         Global.returnTrLable(translats, CustomText.growthMonitoring, lng),
-              //         Global.returnTrLable(translats, CustomText.ok, lng),
-              //         false,
-              //         context);
-              // }
+          ):Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(
+                child: (childHHData.length > 0)
+                    ? ListView.builder(
+                        itemCount: childHHData.length,
+                        shrinkWrap: true,
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: () async {
+                              var lstDate = await minMaxDate(childHHData[index].created_at);
 
-            }
-        ):Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Expanded(
-              child: (childHHData.length > 0)
-                  ? ListView.builder(
-                      itemCount: childHHData.length,
-                      shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () async {
-                            var lstDate = await minMaxDate(childHHData[index].created_at);
+                              // if(callMeasurementEditableDate(childHHData[index].created_at!)){
+                                var refStatus = await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            ChildGrowthExpendedFormScreen(
+                                              creche_nameId: widget.creche_nameId,
+                                              creche_name: widget.creche_name,
+                                              cgmguid: childHHData[index].cgmguid!,
+                                              lastGrowthDate: lstDate,
+                                              minGrowthDate: maxGrowthDate,
+                                              createdAt: childHHData[index].created_at,
+                                              isNew: childHHData[index].responces != null?true:false,
+                                            )));
 
-                            // if(callMeasurementEditableDate(childHHData[index].created_at!)){
-                              var refStatus = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          ChildGrowthExpendedFormScreen(
-                                            creche_nameId: widget.creche_nameId,
-                                            creche_name: widget.creche_name,
-                                            cgmguid: childHHData[index].cgmguid!,
-                                            lastGrowthDate: lstDate,
-                                            minGrowthDate: maxGrowthDate,
-                                            createdAt: childHHData[index].created_at,
-                                            isNew: childHHData[index].responces != null?true:false,
-                                          )));
+                                if (refStatus == 'itemRefresh') {
+                                  await fetchEnrolleChild();
+                                }
+                              // }else Validate().singleButtonPopup(CustomText.growthMonitoring, CustomText.ok, false, context);
 
-                              if (refStatus == 'itemRefresh') {
-                                await fetchEnrolleChild();
-                              }
-                            // }else Validate().singleButtonPopup(CustomText.growthMonitoring, CustomText.ok, false, context);
-
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5.h),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(
-                                          0.2), // Shadow color with opacity
-                                      offset: Offset(0,
-                                          3), // Horizontal and vertical offset
-                                      blurRadius: 6, // Blur radius
-                                      spreadRadius: 0, // Spread radius
-                                    ),
-                                  ],
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w, vertical: 8.h),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          Global.validString(
-                                                  childHHData[index].responces)
-                                              ? '${Global.returnTrLable(translats, CustomText.measurementDate, lng).trim()} : '
-                                              : '${Global.returnTrLable(translats, CustomText.schduleed, lng).trim()} : ',
-                                          style: Styles.black104,
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(width: 10),
-                                    SizedBox(
-                                      height: 10.h,
-                                      width: 2,
-                                      child: VerticalDivider(
-                                        color: Color(0xffE6E6E6),
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 5.h),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0xff5A5A5A).withOpacity(
+                                            0.2), // Shadow color with opacity
+                                        offset: Offset(0,
+                                            3), // Horizontal and vertical offset
+                                        blurRadius: 6, // Blur radius
+                                        spreadRadius: 0, // Spread radius
                                       ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
+                                    ],
+                                    color: Colors.white,
+                                    border: Border.all(color: Color(0xffE7F0FF)),
+                                    borderRadius: BorderRadius.circular(10.r)),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w, vertical: 8.h),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         mainAxisAlignment:
@@ -237,47 +214,73 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenCC> {
                                         children: [
                                           Text(
                                             Global.validString(
-                                                    childHHData[index]
-                                                        .responces)
-                                                ? Validate().displeDateFormate(
-                                                    Global.getItemValues(
-                                                        childHHData[index]
-                                                            .responces!,
-                                                        'measurement_date'))
-                                                : showStringDayMonth(
-                                                    childHHData[index]
-                                                        .created_at!),
-                                            style: Styles.cardBlue10,
-                                            overflow: TextOverflow.ellipsis,
+                                                    childHHData[index].responces)
+                                                ? '${Global.returnTrLable(translats, CustomText.measurementDate, lng).trim()} : '
+                                                : '${Global.returnTrLable(translats, CustomText.schduleed, lng).trim()} : ',
+                                            style: Styles.black104,
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    SizedBox(width: 5),
-                                    (childHHData[index].is_edited == 0 &&
-                                            childHHData[index].is_uploaded == 1)
-                                        ? Image.asset(
-                                            "assets/sync.png",
-                                            scale: 1.5,
-                                          )
-                                        : Image.asset(
-                                            "assets/sync_gray.png",
-                                            scale: 1.5,
-                                          )
-                                  ],
+                                      SizedBox(width: 10),
+                                      SizedBox(
+                                        height: 10.h,
+                                        width: 2,
+                                        child: VerticalDivider(
+                                          color: Color(0xffE6E6E6),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              Global.validString(
+                                                      childHHData[index]
+                                                          .responces)
+                                                  ? Validate().displeDateFormate(
+                                                      Global.getItemValues(
+                                                          childHHData[index]
+                                                              .responces!,
+                                                          'measurement_date'))
+                                                  : showStringDayMonth(
+                                                      childHHData[index]
+                                                          .created_at!),
+                                              style: Styles.cardBlue10,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 5),
+                                      (childHHData[index].is_edited == 0 &&
+                                              childHHData[index].is_uploaded == 1)
+                                          ? Image.asset(
+                                              "assets/sync.png",
+                                              scale: 1.5,
+                                            )
+                                          : Image.asset(
+                                              "assets/sync_gray.png",
+                                              scale: 1.5,
+                                            )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng)),
-                    ),
-            ),
-          ],
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text(Global.returnTrLable(
+                            translats, CustomText.NorecordAvailable, lng)),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

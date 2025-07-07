@@ -110,210 +110,213 @@ class _CrecheMonitorListingScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: InkWell(
-        onTap: () async {
-          String cmgUid = '';
-          if (!(Global.validString(cmgUid))) {
-            cmgUid = Validate().randomGuid();
-            _navigateToFormPage(cmgUid, null, false, true);
-          }
-        },
-        child: Image.asset(
-          "assets/add_btn.png",
-          scale: 2.7,
-          color: Color(0xff5979AA),
-        ),
-      ),
-
-      // appBar
-      appBar: CustomAppbar(
-        text: Global.returnTrLable(translats, CustomText.VisitNotes, lng),
-        subTitle: widget.crecheName,
-        onTap: () => Navigator.pop(context),
-      ),
-
-      // body
-      body: Padding(
-        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-        child: Column(children: [
-          Align(
-            alignment: Alignment.topLeft,
-            child: AnimatedRollingSwitch(
-              title1: Global.returnTrLable(translats, CustomText.all, lng),
-              title2: Global.returnTrLable(
-                  translats, CustomText.usynchedAndDraft, lng),
-              isOnlyUnsynched: isOnlyUnsynched ?? false,
-              onChange: (value) async {
-                setState(() {
-                  isOnlyUnsynched = value;
-                });
-                await fetchCmcData();
-              },
-            ),
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: InkWell(
+          onTap: () async {
+            String cmgUid = '';
+            if (!(Global.validString(cmgUid))) {
+              cmgUid = Validate().randomGuid();
+              _navigateToFormPage(cmgUid, null, false, true);
+            }
+          },
+          child: Image.asset(
+            "assets/add_btn.png",
+            scale: 2.7,
+            color: Color(0xff5979AA),
           ),
-          Expanded(
-            child: filterData.length > 0
-                ? ListView.builder(
-                    itemCount: filterData.length,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      final responce = filterData[index].responces;
-                      var selectedItem = filterData[index];
-                      return GestureDetector(
-                        onTap: () async {
-                          final cmgUid = selectedItem.cmguid;
-                          bool isEdited=await Validate().checkEditable(selectedItem.created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
-                          await _navigateToFormPage(
-                              cmgUid,
-                              Global.getItemValues(responce!, 'date_of_visit'),
-                              true,
-                              isEdited);
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 8.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      // Text(
-                                      //   '${CustomText.Creches} : ',
-                                      //   style: Styles.black104,
-                                      //   strutStyle: StrutStyle(height: 1),
-                                      // ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.datevisit, lng)} : ',
-                                        style: Styles.black104,
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10),
-                                  SizedBox(
-                                    height: 20.h,
-                                    width: 2,
-                                    child: VerticalDivider(
-                                      color: Color(0xffE6E6E6),
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
+        ),
+
+        // appBar
+        appBar: CustomAppbar(
+          text: Global.returnTrLable(translats, CustomText.VisitNotes, lng),
+          subTitle: widget.crecheName,
+          onTap: () => Navigator.pop(context),
+        ),
+
+        // body
+        body: Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+          child: Column(children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: AnimatedRollingSwitch(
+                title1: Global.returnTrLable(translats, CustomText.all, lng),
+                title2: Global.returnTrLable(
+                    translats, CustomText.usynchedAndDraft, lng),
+                isOnlyUnsynched: isOnlyUnsynched ?? false,
+                onChange: (value) async {
+                  setState(() {
+                    isOnlyUnsynched = value;
+                  });
+                  await fetchCmcData();
+                },
+              ),
+            ),
+            Expanded(
+              child: filterData.length > 0
+                  ? ListView.builder(
+                      itemCount: filterData.length,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        final responce = filterData[index].responces;
+                        var selectedItem = filterData[index];
+                        return GestureDetector(
+                          onTap: () async {
+                            final cmgUid = selectedItem.cmguid;
+                            bool isEdited=await Validate().checkEditable(selectedItem.created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
+                            await _navigateToFormPage(
+                                cmgUid,
+                                Global.getItemValues(responce!, 'date_of_visit'),
+                                true,
+                                isEdited);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xffE7F0FF)),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w, vertical: 8.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         // Text(
-                                        //   widget.crecheName,
-                                        //   style: Styles.blue125,
-                                        //   overflow: TextOverflow.ellipsis,
+                                        //   '${CustomText.Creches} : ',
+                                        //   style: Styles.black104,
+                                        //   strutStyle: StrutStyle(height: 1),
                                         // ),
                                         Text(
-                                          Global.validString(
-                                                  Global.getItemValues(
-                                                      responce!,
-                                                      'date_of_visit'))
-                                              ? Validate().displeDateFormate(
-                                                  Global.getItemValues(
-                                                      responce!,
-                                                      'date_of_visit'))
-                                              : '',
-                                          style: Styles.cardBlue10,
-                                          strutStyle: StrutStyle(height: .5),
-                                          overflow: TextOverflow.ellipsis,
+                                          '${Global.returnTrLable(translats, CustomText.datevisit, lng)} : ',
+                                          style: Styles.black104,
                                         ),
-                                        // Text(
-                                        //   Global.getItemValues(responce, 'exit_time'),
-                                        //   style: Styles.blue125,
-                                        //   strutStyle:
-                                        //   StrutStyle(height: .5),
-                                        //   overflow: TextOverflow.ellipsis,
-                                        // ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(width: 5),
-                                  (selectedItem.is_edited == 0 &&
-                                          selectedItem.is_uploaded == 1)
-                                      ? Image.asset(
-                                          "assets/sync.png",
-                                          scale: 1.5,
-                                        )
-                                      : (selectedItem.is_edited == 1 &&
-                                              selectedItem.is_uploaded == 0)
-                                          ? Image.asset(
-                                              "assets/sync_gray.png",
-                                              scale: 1.5,
-                                            )
-                                          : Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.error_outline_outlined,
-                                                  color: Colors.red,
-                                                  shadows: [
-                                                    BoxShadow(
-                                                        spreadRadius: 2,
-                                                        blurRadius: 4,
-                                                        color:
-                                                            Colors.red.shade200)
-                                                  ],
-                                                ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDeleteDialog(
-                                                        selectedItem);
-                                                  },
-                                                  child: Container(
-                                                    margin: EdgeInsets.only(
-                                                        left: 8
-                                                            .w), // Optional spacing from content
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50),
-                                                      color: Colors.red,
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 2.w,
-                                                              vertical: 2.h),
-                                                      child: Icon(
-                                                        Icons.delete_rounded,
-                                                        color: Colors.white,
-                                                        size: 16,
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 20.h,
+                                      width: 2,
+                                      child: VerticalDivider(
+                                        color: Color(0xffE6E6E6),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          // Text(
+                                          //   widget.crecheName,
+                                          //   style: Styles.blue125,
+                                          //   overflow: TextOverflow.ellipsis,
+                                          // ),
+                                          Text(
+                                            Global.validString(
+                                                    Global.getItemValues(
+                                                        responce!,
+                                                        'date_of_visit'))
+                                                ? Validate().displeDateFormate(
+                                                    Global.getItemValues(
+                                                        responce!,
+                                                        'date_of_visit'))
+                                                : '',
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: .5),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          // Text(
+                                          //   Global.getItemValues(responce, 'exit_time'),
+                                          //   style: Styles.blue125,
+                                          //   strutStyle:
+                                          //   StrutStyle(height: .5),
+                                          //   overflow: TextOverflow.ellipsis,
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    (selectedItem.is_edited == 0 &&
+                                            selectedItem.is_uploaded == 1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : (selectedItem.is_edited == 1 &&
+                                                selectedItem.is_uploaded == 0)
+                                            ? Image.asset(
+                                                "assets/sync_gray.png",
+                                                scale: 1.5,
+                                              )
+                                            : Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.error_outline_outlined,
+                                                    color: Colors.red,
+                                                    shadows: [
+                                                      BoxShadow(
+                                                          spreadRadius: 2,
+                                                          blurRadius: 4,
+                                                          color:
+                                                              Colors.red.shade200)
+                                                    ],
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      showDeleteDialog(
+                                                          selectedItem);
+                                                    },
+                                                    child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 8
+                                                              .w), // Optional spacing from content
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                50),
+                                                        color: Colors.red,
+                                                      ),
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                                horizontal: 2.w,
+                                                                vertical: 2.h),
+                                                        child: Icon(
+                                                          Icons.delete_rounded,
+                                                          color: Colors.white,
+                                                          size: 16,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                )
-                                              ],
-                                            )
-                                ],
+                                                  )
+                                                ],
+                                              )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  )
-                : Center(child: Text(Global.returnTrLable(translats, CustomText.NorecordAvailable, lng))),
-          ),
-        ]),
+                        );
+                      },
+                    )
+                  : Center(child: Text(Global.returnTrLable(translats, CustomText.NorecordAvailable, lng))),
+            ),
+          ]),
+        ),
       ),
     );
   }

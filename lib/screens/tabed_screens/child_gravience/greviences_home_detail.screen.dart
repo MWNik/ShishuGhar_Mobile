@@ -114,63 +114,66 @@ class _ChildGrievancesDetailsState extends State<GrieviencesHomeDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading)
       return Center(
         child: CircularProgressIndicator(),
       );
     else {
-      return Scaffold(
-          appBar: CustomAppbar(
-            text: Global.returnTrLable(
-                labelControlls, CustomText.ChildGrievances, lng!),
-            onTap: () => Navigator.pop(context, 'itemRefresh'),
-          ),
-          body: _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Column(
-                  children: [
-                    Expanded(
-                        child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 20.w, vertical: 10.h),
-                      child: SingleChildScrollView(
-                          controller: _scrollController,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: cWidget(),
-                          )),
-                    )),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 20.w, vertical: 10.h),
-                      child: Row(
-                        children: [
-                          Expanded(
-                              child: CElevatedButton(
-                            onPressed: () {
-                              nextTab(0, context);
-                            },
-                            color: Color(0xffF26BA3),
-                            text: Global.returnTrLable(
-                                labelControlls, CustomText.back, lng!),
-                          )),
-                          widget.isNew ? SizedBox(width: 10) : SizedBox(),
-                          widget.isNew
-                              ? Expanded(
-                                  child: CElevatedButton(
-                                  onPressed: () {
-                                    nextTab(1, context);
-                                  },
-                                  color: Color(0xff369A8D),
-                                  text: Global.returnTrLable(
-                                      labelControlls, CustomText.Submit, lng!),
-                                ))
-                              : SizedBox(),
-                        ],
+      return SafeArea(
+        child: Scaffold(
+            appBar: CustomAppbar(
+              text: Global.returnTrLable(
+                  labelControlls, CustomText.ChildGrievances, lng!),
+              onTap: () => Navigator.pop(context, 'itemRefresh'),
+            ),
+            body: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+                    children: [
+                      Expanded(
+                          child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.w, vertical: 10.h),
+                        child: SingleChildScrollView(
+                            controller: _scrollController,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: cWidget(),
+                            )),
+                      )),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.w, vertical: 10.h),
+                        child: Row(
+                          children: [
+                            Expanded(
+                                child: CElevatedButton(
+                              onPressed: () {
+                                nextTab(0, context);
+                              },
+                              color: Color(0xffF26BA3),
+                              text: Global.returnTrLable(
+                                  labelControlls, CustomText.back, lng!),
+                            )),
+                            widget.isNew ? SizedBox(width: 10) : SizedBox(),
+                            widget.isNew
+                                ? Expanded(
+                                    child: CElevatedButton(
+                                    onPressed: () {
+                                      nextTab(1, context);
+                                    },
+                                    color: Color(0xff369A8D),
+                                    text: Global.returnTrLable(
+                                        labelControlls, CustomText.Submit, lng!),
+                                  ))
+                                : SizedBox(),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ));
+                    ],
+                  )),
+      );
     }
   }
 

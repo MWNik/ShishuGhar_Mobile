@@ -51,6 +51,11 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false  // Force new alignment
+        }
+    }
 }
 
 flutter {

@@ -276,158 +276,161 @@ class _ChildGrowthExpendedFormState
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Validate().showExitDialog(context, translatsLabel, lng);
-        return false;
-      },
-      child: _isLoading
-          ? Container(
-          color: Colors.white,
-          child: Center(child: CircularProgressIndicator()))
-          : Scaffold(
-          appBar: CustomAppbar(
-              text: Global.returnTrLable(
-                  translatsLabel, CustomText.GrowthMonitoring, lng),
-              subTitle: widget.creche_name,
-              onTap: () =>
-                  Validate().showExitDialog(context, translatsLabel, lng)),
-          body: Column(
-            children: [
-              SizedBox(height: 10),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Row(
-                  // mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Spacer(),
-                    RichText(
-                      text: TextSpan(
-                        text: Global.returnTrLable(translatsLabel,
-                            CustomText.MeasuredChildren, lng),
-                        style: Styles.black124,
-                        children: [
-                          TextSpan(
-                            text:
-                            ' : ${countMesuredChildren()}/${enrolledChild.length}',
-                            style: Styles.red145,
-                          ),
-                        ],
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          Validate().showExitDialog(context, translatsLabel, lng);
+          return false;
+        },
+        child: _isLoading
+            ? Container(
+            color: Colors.white,
+            child: Center(child: CircularProgressIndicator()))
+            : Scaffold(
+            appBar: CustomAppbar(
+                text: Global.returnTrLable(
+                    translatsLabel, CustomText.GrowthMonitoring, lng),
+                subTitle: widget.creche_name,
+                onTap: () =>
+                    Validate().showExitDialog(context, translatsLabel, lng)),
+            body: Column(
+              children: [
+                SizedBox(height: 10),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Row(
+                    // mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        width: 10,
                       ),
-                    )
-                  ],
-                ),
-              ),
-              // SizedBox(height: 10),
-              measurement_date != null
-                  ? Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 20.w, vertical: 2.h),
-                child: CustomDatepickerDynamic(
-                  calenderValidate: [],
-                  initialvalue: myMap[measurement_date!.fieldname!],
-                  fieldName: measurement_date!.fieldname,
-                  isRequred: measurement_date!.reqd,
-                  minDate: caMinDate,
-                  maxDate: widget.minGrowthDate,
-                  readable: widget.isNew,
-                  onChanged: (value) {
-                    myMap[measurement_date!.fieldname!] = value;
-                    var logData = logic!.callDateDiffrenceLogic(
-                        myMap, measurement_date!);
-                    if (logData.isNotEmpty) {
-                      if (logData.keys.length > 0) {
-                        myMap.addEntries([
-                          MapEntry(logData.keys.first,
-                              logData.values.first)
-                        ]);
-                      }
-                    }
-                    callEnrollementChildList(value);
-                  },
-                ),
-              )
-                  : SizedBox(),
-              // Padding(
-              //     padding: EdgeInsets.symmetric(horizontal: 20.w),
-              //     child: Divider()),
-              Padding(
-                padding: EdgeInsets.only(left: 20, right: 20),
-                child: CustomTextFieldRow(
-                  controller: Searchcontroller,
-                  onChanged: (value) {
-                    // print(value);
-                    filterDataQu(value);
-                  },
-                  hintText: (lng != null)
-                      ? Global.returnTrLable(translatsLabel, 'Search', lng)
-                      : '',
-                  prefixIcon: Image.asset(
-                    "assets/search.png",
-                    scale: 2.4,
+                      Spacer(),
+                      RichText(
+                        text: TextSpan(
+                          text: Global.returnTrLable(translatsLabel,
+                              CustomText.MeasuredChildren, lng),
+                          style: Styles.black124,
+                          children: [
+                            TextSpan(
+                              text:
+                              ' : ${countMesuredChildren()}/${enrolledChild.length}',
+                              style: Styles.red145,
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                 ),
-              ),
-              Expanded(
-                  child: Padding(
-                    padding:
-                    EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-                    child: SingleChildScrollView(
-                      // controller: _scrollScontroller,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        // children: cWidget(),
-                        children: cParentWidget(),
-                      ),
+                // SizedBox(height: 10),
+                measurement_date != null
+                    ? Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 20.w, vertical: 2.h),
+                  child: CustomDatepickerDynamic(
+                    calenderValidate: [],
+                    initialvalue: myMap[measurement_date!.fieldname!],
+                    fieldName: measurement_date!.fieldname,
+                    isRequred: measurement_date!.reqd,
+                    minDate: caMinDate,
+                    maxDate: widget.minGrowthDate,
+                    readable: widget.isNew,
+                    onChanged: (value) {
+                      myMap[measurement_date!.fieldname!] = value;
+                      var logData = logic!.callDateDiffrenceLogic(
+                          myMap, measurement_date!);
+                      if (logData.isNotEmpty) {
+                        if (logData.keys.length > 0) {
+                          myMap.addEntries([
+                            MapEntry(logData.keys.first,
+                                logData.values.first)
+                          ]);
+                        }
+                      }
+                      callEnrollementChildList(value);
+                    },
+                  ),
+                )
+                    : SizedBox(),
+                // Padding(
+                //     padding: EdgeInsets.symmetric(horizontal: 20.w),
+                //     child: Divider()),
+                Padding(
+                  padding: EdgeInsets.only(left: 20, right: 20),
+                  child: CustomTextFieldRow(
+                    controller: Searchcontroller,
+                    onChanged: (value) {
+                      // print(value);
+                      filterDataQu(value);
+                    },
+                    hintText: (lng != null)
+                        ? Global.returnTrLable(translatsLabel, 'Search', lng)
+                        : '',
+                    prefixIcon: Image.asset(
+                      "assets/search.png",
+                      scale: 2.4,
                     ),
-                  )),
-              // Spacer(),
-              Divider(),
-              Padding(
-                padding:
-                EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: CElevatedButton(
-                        color: Color(0xffF26BA3),
-                        onPressed: () {
-                          // ch(2);
-                          Navigator.pop(context);
-                        },
-                        text: Global.returnTrLable(
-                            translatsLabel, CustomText.back, lng)
-                            .trim(),
-                      ),
-                    ),
-                    // Row(children: [
-                    role == CustomText.crecheSupervisor
-                        ? SizedBox(width: 10)
-                        : SizedBox(),
-                    role == CustomText.crecheSupervisor
-                        ? Expanded(
-                      child: CElevatedButton(
-                        color: Color(0xff369A8D),
-                        onPressed: () {
-                          // print('$attepmtChild');
-                          saveMeta(1, context);
-                        },
-                        text: Global.returnTrLable(translatsLabel,
-                            CustomText.Submit, lng)
-                            .trim(),
-                      ),
-                    )
-                        : SizedBox(),
-                    // ]
-                    // ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          )),
+                Expanded(
+                    child: Padding(
+                      padding:
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+                      child: SingleChildScrollView(
+                        // controller: _scrollScontroller,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          // children: cWidget(),
+                          children: cParentWidget(),
+                        ),
+                      ),
+                    )),
+                // Spacer(),
+                Divider(),
+                Padding(
+                  padding:
+                  EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: CElevatedButton(
+                          color: Color(0xffF26BA3),
+                          onPressed: () {
+                            // ch(2);
+                            Navigator.pop(context);
+                          },
+                          text: Global.returnTrLable(
+                              translatsLabel, CustomText.back, lng)
+                              .trim(),
+                        ),
+                      ),
+                      // Row(children: [
+                      role == CustomText.crecheSupervisor
+                          ? SizedBox(width: 10)
+                          : SizedBox(),
+                      role == CustomText.crecheSupervisor
+                          ? Expanded(
+                        child: CElevatedButton(
+                          color: Color(0xff369A8D),
+                          onPressed: () {
+                            // print('$attepmtChild');
+                            saveMeta(1, context);
+                          },
+                          text: Global.returnTrLable(translatsLabel,
+                              CustomText.Submit, lng)
+                              .trim(),
+                        ),
+                      )
+                          : SizedBox(),
+                      // ]
+                      // ),
+                    ],
+                  ),
+                ),
+              ],
+            )),
+      ),
     );
   }
 

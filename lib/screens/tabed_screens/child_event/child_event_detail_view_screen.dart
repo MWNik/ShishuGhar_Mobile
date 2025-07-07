@@ -127,57 +127,60 @@ class _EnrolledChildDetailsState extends State<ChildEventDetailsViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: CustomChildAppbar(
-          text: Global.returnTrLable(
-              labelControlls, CustomText.ChildEvents, lng!),
-          subTitle1: widget.childName,
-          subTitle2: widget.childId,
-          onTap: () => Navigator.pop(context, 'itemRefresh'),
-        ),
-        body: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Column(
-                children: [
-                  Divider(),
-                  Expanded(
-                      child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: SingleChildScrollView(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: cWidget(),
-                    )),
-                  )),
-                  Divider(),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: Row(children: [
-                      Expanded(
-                          child: CElevatedButton(
-                        color: Color(0xffF26BA3),
-                        onPressed: () {
-                          nextTab(0, context);
-                        },
-                        text: Global.returnTrLable(
-                            labelControlls, CustomText.back, lng!),
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+          appBar: CustomChildAppbar(
+            text: Global.returnTrLable(
+                labelControlls, CustomText.ChildEvents, lng!),
+            subTitle1: widget.childName,
+            subTitle2: widget.childId,
+            onTap: () => Navigator.pop(context, 'itemRefresh'),
+          ),
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    Divider(),
+                    Expanded(
+                        child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      child: SingleChildScrollView(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: cWidget(),
                       )),
-                      // SizedBox(width: 10),
-                      // Expanded(
-                      //     child: CElevatedButton(
-                      //   color: Color(0xff369A8D),
-                      //   onPressed: () {
-                      //     nextTab(1, context);
-                      //   },
-                      //   text: Global.returnTrLable(
-                      //       labelControlls,  CustomText.Submit, lng!),
-                      // ))
-                    ]),
-                  )
-                ],
-              ));
+                    )),
+                    Divider(),
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      child: Row(children: [
+                        Expanded(
+                            child: CElevatedButton(
+                          color: Color(0xffF26BA3),
+                          onPressed: () {
+                            nextTab(0, context);
+                          },
+                          text: Global.returnTrLable(
+                              labelControlls, CustomText.back, lng!),
+                        )),
+                        // SizedBox(width: 10),
+                        // Expanded(
+                        //     child: CElevatedButton(
+                        //   color: Color(0xff369A8D),
+                        //   onPressed: () {
+                        //     nextTab(1, context);
+                        //   },
+                        //   text: Global.returnTrLable(
+                        //       labelControlls,  CustomText.Submit, lng!),
+                        // ))
+                      ]),
+                    )
+                  ],
+                )),
+    );
   }
 
   List<Widget> cWidget() {

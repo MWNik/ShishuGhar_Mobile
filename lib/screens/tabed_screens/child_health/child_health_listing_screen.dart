@@ -53,6 +53,9 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
 
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Global.applyDisplayCutout(const Color(0xff5979AA));
+    });
     initializeData();
   }
 
@@ -106,261 +109,263 @@ class _ChildHealthListingState extends State<ChildHealthListing> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: role == CustomText.crecheSupervisor.trim()
-          ? InkWell(
-              onTap: () async {
-                String child_health_guid = '';
-                if (!(Global.validString(child_health_guid))) {
-                  child_health_guid = Validate().randomGuid();
-                  String? minDate;
-                  if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
-                    minDate=await Validate().callMinDate(widget.dateofEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: role == CustomText.crecheSupervisor.trim()
+            ? InkWell(
+                onTap: () async {
+                  String child_health_guid = '';
+                  if (!(Global.validString(child_health_guid))) {
+                    child_health_guid = Validate().randomGuid();
+                    String? minDate;
+                    if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                      minDate=await Validate().callMinDate(widget.dateofEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                    }
+                    var refStatus = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                ChildHealthDetailScreen(
+                                    child_health_guid: child_health_guid,
+                                    enName: widget.enName!,
+                                    creche_id: widget.creche_id,
+                                    chilenrolledGUID: widget.chilenrolledGUID,
+                                    lastDate: Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
+                                    childName: widget.childName,
+                                    childId: widget.childId,
+                                    existingDates: existingDates)));
+                    if (refStatus == 'itemRefresh') {
+                      fetchChildevents();
+                    }
                   }
-                  var refStatus = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              ChildHealthDetailScreen(
-                                  child_health_guid: child_health_guid,
-                                  enName: widget.enName!,
-                                  creche_id: widget.creche_id,
-                                  chilenrolledGUID: widget.chilenrolledGUID,
-                                  lastDate: Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
-                                  childName: widget.childName,
-                                  childId: widget.childId,
-                                  existingDates: existingDates)));
-                  if (refStatus == 'itemRefresh') {
-                    fetchChildevents();
-                  }
-                }
-              },
-              child: Image.asset(
-                "assets/add_btn.png",
-                scale: 2.7,
-                color: Color(0xff5979AA),
-              ),
-            )
-          : SizedBox(),
-      appBar: CustomChildAppbar(
-        text:
-            Global.returnTrLable(translats, CustomText.ChildHealthDetail, lng),
-        subTitle1: widget.childName,
-        subTitle2: widget.childId,
-        onTap: () => Navigator.pop(context, 'itemRefresh'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-        child: Column(children: [
-          role == CustomText.crecheSupervisor
-              ? Align(
-                  alignment: Alignment.topRight,
-                  child: AnimatedRollingSwitch(
-                    title1:
-                        Global.returnTrLable(translats, CustomText.all, lng),
-                    title2: Global.returnTrLable(
-                        translats, CustomText.unsynched, lng),
-                    isOnlyUnsynched: isOnlyUnsyched,
-                    onChange: (value) async {
-                      setState(() {
-                        isOnlyUnsyched = value;
-                      });
-                      await fetchChildevents();
-                    },
-                  ),
-                )
-              : SizedBox(),
-          Expanded(
-            child: (filterhealthData.length > 0)
-                ? ListView.builder(
-                    itemCount: filterhealthData.length,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () async {
+                },
+                child: Image.asset(
+                  "assets/add_btn.png",
+                  scale: 2.7,
+                  color: Color(0xff5979AA),
+                ),
+              )
+            : SizedBox(),
+        appBar: CustomChildAppbar(
+          text:
+              Global.returnTrLable(translats, CustomText.ChildHealthDetail, lng),
+          subTitle1: widget.childName,
+          subTitle2: widget.childId,
+          onTap: () => Navigator.pop(context, 'itemRefresh'),
+        ),
+        body: Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+          child: Column(children: [
+            role == CustomText.crecheSupervisor
+                ? Align(
+                    alignment: Alignment.topRight,
+                    child: AnimatedRollingSwitch(
+                      title1:
+                          Global.returnTrLable(translats, CustomText.all, lng),
+                      title2: Global.returnTrLable(
+                          translats, CustomText.unsynched, lng),
+                      isOnlyUnsynched: isOnlyUnsyched,
+                      onChange: (value) async {
+                        setState(() {
+                          isOnlyUnsyched = value;
+                        });
+                        await fetchChildevents();
+                      },
+                    ),
+                  )
+                : SizedBox(),
+            Expanded(
+              child: (filterhealthData.length > 0)
+                  ? ListView.builder(
+                      itemCount: filterhealthData.length,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () async {
 
-                          bool isEdited=await Validate().checkEditable(filterhealthData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
-                          String? minDate;
-                          if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
-                            minDate=await Validate().callMinDate(widget.dateofEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
-                          }
-                          
-                          bool isUnEditable=true;
-                          if(isEdited && role == CustomText.crecheSupervisor){
-                            isUnEditable=false;
-                          }
+                            bool isEdited=await Validate().checkEditable(filterhealthData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
+                            String? minDate;
+                            if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
+                              minDate=await Validate().callMinDate(widget.dateofEnrollment, backdatedConfigirationModel!.back_dated_data_entry_allowed!);
+                            }
+
+                            bool isUnEditable=true;
+                            if(isEdited && role == CustomText.crecheSupervisor){
+                              isUnEditable=false;
+                            }
 
 
-                          if (existingDates.contains(Global.getItemValues(
-                              filterhealthData[index].responces, 'date'))) {
-                            var currentRecordDate = Global.getItemValues(
-                                filterhealthData[index].responces, 'date');
-                            existingDates.remove(currentRecordDate);
-                          }
-                          var refStatus = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      isUnEditable
-                                          ? ChildHealthDetailViewScreen(
-                                              child_health_guid:
-                                                  filterhealthData[index]
-                                                      .child_health_guid,
-                                              enName: widget.enName!,
-                                              creche_id: widget.creche_id,
-                                              chilenrolledGUID:
-                                                  widget.chilenrolledGUID,
-                                              childId: widget.childId,
-                                              childName: widget.childName,
-                                              type: 1,
-                                            )
-                                          : ChildHealthDetailScreen(
-                                              child_health_guid:
-                                                  filterhealthData[index]
-                                                      .child_health_guid,
-                                              enName: widget.enName!,
-                                              creche_id: widget.creche_id,
-                                              chilenrolledGUID:
-                                                  widget.chilenrolledGUID,
-                                              lastDate:Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
-                                              childId: widget.childId,
-                                              childName: widget.childName,
-                                              existingDates: existingDates)));
-                          if (refStatus == 'itemRefresh') {
-                            await fetchChildevents();
-                          }
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff5A5A5A).withOpacity(
-                                        0.2), // Shadow color with opacity
-                                    offset: Offset(
-                                        0, 3), // Horizontal and vertical offset
-                                    blurRadius: 6, // Blur radius
-                                    spreadRadius: 0, // Spread radius
-                                  ),
-                                ],
-                                color: Colors.white,
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 8.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} : ',
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.symptoms, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.actionTaken, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      // Text(
-                                      //   '${Global.returnTrLable(translats, 'Child Age (In Months)', lng).trim()} : ',
-                                      //   style: Styles.black104,
-                                      //   strutStyle: StrutStyle(height: 1),
-                                      // ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10),
-                                  SizedBox(
-                                    height: 10.h,
-                                    width: 2,
-                                    child: VerticalDivider(
-                                      color: Color(0xffE6E6E6),
+                            if (existingDates.contains(Global.getItemValues(
+                                filterhealthData[index].responces, 'date'))) {
+                              var currentRecordDate = Global.getItemValues(
+                                  filterhealthData[index].responces, 'date');
+                              existingDates.remove(currentRecordDate);
+                            }
+                            var refStatus = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        isUnEditable
+                                            ? ChildHealthDetailViewScreen(
+                                                child_health_guid:
+                                                    filterhealthData[index]
+                                                        .child_health_guid,
+                                                enName: widget.enName!,
+                                                creche_id: widget.creche_id,
+                                                chilenrolledGUID:
+                                                    widget.chilenrolledGUID,
+                                                childId: widget.childId,
+                                                childName: widget.childName,
+                                                type: 1,
+                                              )
+                                            : ChildHealthDetailScreen(
+                                                child_health_guid:
+                                                    filterhealthData[index]
+                                                        .child_health_guid,
+                                                enName: widget.enName!,
+                                                creche_id: widget.creche_id,
+                                                chilenrolledGUID:
+                                                    widget.chilenrolledGUID,
+                                                lastDate:Global.validString(minDate)?Validate().stringToDate(minDate!).subtract(Duration(days: 1)):null,
+                                                childId: widget.childId,
+                                                childName: widget.childName,
+                                                existingDates: existingDates)));
+                            if (refStatus == 'itemRefresh') {
+                              await fetchChildevents();
+                            }
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff5A5A5A).withOpacity(
+                                          0.2), // Shadow color with opacity
+                                      offset: Offset(
+                                          0, 3), // Horizontal and vertical offset
+                                      blurRadius: 6, // Blur radius
+                                      spreadRadius: 0, // Spread radius
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
+                                  ],
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xffE7F0FF)),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w, vertical: 8.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          Validate().displeDateFormate(
-                                              Global.getItemValues(
-                                                  filterhealthData[index]
-                                                      .responces!,
-                                                  'date')),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
+                                          '${Global.returnTrLable(translats, CustomText.DateS, lng).trim()} : ',
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Global.getItemValues(
-                                              filterhealthData[index]
-                                                  .responces!,
-                                              'symptoms'),
-                                          maxLines: 1,
-                                          style: Styles.cardBlue10,
+                                          '${Global.returnTrLable(translats, CustomText.symptoms, lng).trim()} : ',
+                                          style: Styles.black104,
                                           strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          Global.getItemValues(
-                                              filterhealthData[index]
-                                                  .responces!,
-                                              'action_taken'),
-                                          style: Styles.cardBlue10,
-                                          maxLines: 1,
+                                          '${Global.returnTrLable(translats, CustomText.actionTaken, lng).trim()} : ',
+                                          style: Styles.black104,
                                           strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         // Text(
-                                        //   Global.getItemValues(
-                                        //       childHHData[index].responces!,
-                                        //       'age_months'),
-                                        //   style: Styles.cardBlue10,
-                                        //   strutStyle: StrutStyle(height: .5),
-                                        //   overflow: TextOverflow.ellipsis,
+                                        //   '${Global.returnTrLable(translats, 'Child Age (In Months)', lng).trim()} : ',
+                                        //   style: Styles.black104,
+                                        //   strutStyle: StrutStyle(height: 1),
                                         // ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(width: 5),
-                                  (filterhealthData[index].is_edited == 0 &&
-                                          filterhealthData[index].is_uploaded ==
-                                              1)
-                                      ? Image.asset(
-                                          "assets/sync.png",
-                                          scale: 1.5,
-                                        )
-                                      : Image.asset(
-                                          "assets/sync_gray.png",
-                                          scale: 1.5,
-                                        )
-                                ],
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 10.h,
+                                      width: 2,
+                                      child: VerticalDivider(
+                                        color: Color(0xffE6E6E6),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            Validate().displeDateFormate(
+                                                Global.getItemValues(
+                                                    filterhealthData[index]
+                                                        .responces!,
+                                                    'date')),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.getItemValues(
+                                                filterhealthData[index]
+                                                    .responces!,
+                                                'symptoms'),
+                                            maxLines: 1,
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.getItemValues(
+                                                filterhealthData[index]
+                                                    .responces!,
+                                                'action_taken'),
+                                            style: Styles.cardBlue10,
+                                            maxLines: 1,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          // Text(
+                                          //   Global.getItemValues(
+                                          //       childHHData[index].responces!,
+                                          //       'age_months'),
+                                          //   style: Styles.cardBlue10,
+                                          //   strutStyle: StrutStyle(height: .5),
+                                          //   overflow: TextOverflow.ellipsis,
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    (filterhealthData[index].is_edited == 0 &&
+                                            filterhealthData[index].is_uploaded ==
+                                                1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : Image.asset(
+                                            "assets/sync_gray.png",
+                                            scale: 1.5,
+                                          )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    })
-                : Center(
-                    child: Text(Global.returnTrLable(
-                        translats, CustomText.NorecordAvailable, lng)),
-                  ),
-          ),
-        ]),
+                        );
+                      })
+                  : Center(
+                      child: Text(Global.returnTrLable(
+                          translats, CustomText.NorecordAvailable, lng)),
+                    ),
+            ),
+          ]),
+        ),
       ),
     );
   }

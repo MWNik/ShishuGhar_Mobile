@@ -634,6 +634,7 @@ class CustomText {
   static String plsSelectreason = "Please select Reason!";
   static String reEnter = "Re Enter";
   static String updateMeasurement = "Child measurement";
+  static String totalCount = "Total";
   static String ChildIsNotAppilcableForExitToday = "Child is not applicable for exit today";
   static String January ="January";
   static String February = "February";

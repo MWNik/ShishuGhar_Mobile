@@ -111,158 +111,161 @@ class _StockCalenderListingScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        child: Column(children: [
-          (calenderList.length > 0)
-              ? Expanded(
-                  child: ListView.builder(
-                      itemCount: calenderList.length,
-                      shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () async {
-                            var record = await StockResponseHelper()
-                                .getStockByYearnMonth(
-                                    Global.stringToInt(widget.creche_id),
-                                    calenderList[index].month!,
-                                    calenderList[index].Year!);
-                            String? guid = record.isNotEmpty
-                                ? record.first.sguid
-                                : await Validate().randomGuid();
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          child: Column(children: [
+            (calenderList.length > 0)
+                ? Expanded(
+                    child: ListView.builder(
+                        itemCount: calenderList.length,
+                        shrinkWrap: true,
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: () async {
+                              var record = await StockResponseHelper()
+                                  .getStockByYearnMonth(
+                                      Global.stringToInt(widget.creche_id),
+                                      calenderList[index].month!,
+                                      calenderList[index].Year!);
+                              String? guid = record.isNotEmpty
+                                  ? record.first.sguid
+                                  : await Validate().randomGuid();
 
-                            var refStatus = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        StockExpendableDetailScreen(
-                                          sguid: guid!,
-                                          month: calenderList[index].month!,
-                                          year: calenderList[index].Year!,
-                                          creche_id: widget.creche_id,
-                                        )));
+                              var refStatus = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          StockExpendableDetailScreen(
+                                            sguid: guid!,
+                                            month: calenderList[index].month!,
+                                            year: calenderList[index].Year!,
+                                            creche_id: widget.creche_id,
+                                          )));
 
-                            if (refStatus == 'itemRefresh') {
-                              fetchStockData();
-                            }
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5.h),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(0.2),
-                                      offset: Offset(0, 3),
-                                      blurRadius: 6,
-                                      spreadRadius: 0,
-                                    ),
-                                  ],
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w, vertical: 8.h),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${Global.returnTrLable(translats, 'Month', lng!).trim()}',
-                                          style: Styles.black104,
-                                        ),
-                                        Text(
-                                          '${Global.returnTrLable(translats, 'Year', lng!).trim()}',
-                                          style: Styles.black104,
-                                          strutStyle: StrutStyle(height: 1),
-                                        ),
-                                        // Text(
-                                        //   '${Global.returnTrLable(translats, 'Status', lng!).trim()}',
-                                        //   style: Styles.black104,
-                                        //   strutStyle: StrutStyle(height: 1),
-                                        // ),
-                                      ],
-                                    ),
-                                    SizedBox(width: 10),
-                                    SizedBox(
-                                      height: 10.h,
-                                      width: 2,
-                                      child: VerticalDivider(
-                                        color: Color(0xffE6E6E6),
+                              if (refStatus == 'itemRefresh') {
+                                fetchStockData();
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 5.h),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0xff5A5A5A).withOpacity(0.2),
+                                        offset: Offset(0, 3),
+                                        blurRadius: 6,
+                                        spreadRadius: 0,
                                       ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
+                                    ],
+                                    color: Colors.white,
+                                    border: Border.all(color: Color(0xffE7F0FF)),
+                                    borderRadius: BorderRadius.circular(10.r)),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w, vertical: 8.h),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            getOptionsFromName(
-                                                calenderList[index].month!,
-                                                'Months'),
-                                            style: Styles.blue125,
-                                            strutStyle: StrutStyle(height: .5),
-                                            overflow: TextOverflow.ellipsis,
+                                            '${Global.returnTrLable(translats, 'Month', lng!).trim()}',
+                                            style: Styles.black104,
                                           ),
                                           Text(
-                                            getOptionsFromName(
-                                                calenderList[index].Year!,
-                                                'Year'),
-                                            style: Styles.blue125,
-                                            strutStyle: StrutStyle(height: .5),
-                                            overflow: TextOverflow.ellipsis,
+                                            '${Global.returnTrLable(translats, 'Year', lng!).trim()}',
+                                            style: Styles.black104,
+                                            strutStyle: StrutStyle(height: 1),
                                           ),
                                           // Text(
-                                          //   getStatusValue(Global.getItemValues(
-                                          //       requisitionData[index].responces!,
-                                          //       'status')),
-                                          //   style: Styles.blue125,
-                                          //   strutStyle: StrutStyle(height: .5),
-                                          //   overflow: TextOverflow.ellipsis,
+                                          //   '${Global.returnTrLable(translats, 'Status', lng!).trim()}',
+                                          //   style: Styles.black104,
+                                          //   strutStyle: StrutStyle(height: 1),
                                           // ),
                                         ],
                                       ),
-                                    ),
-                                    // Column(children: [
-                                    //   SizedBox(height: 5),
-                                    //   (stockData[index].is_edited == 0 &&
-                                    //           stockData[index].is_uploaded == 1)
-                                    //       ? Image.asset(
-                                    //           "assets/sync.png",
-                                    //           scale: 1.5,
-                                    //         )
-                                    //       : Image.asset(
-                                    //           "assets/sync_gray.png",
-                                    //           scale: 1.5,
-                                    //         )
-                                    // ])
-                                  ],
+                                      SizedBox(width: 10),
+                                      SizedBox(
+                                        height: 10.h,
+                                        width: 2,
+                                        child: VerticalDivider(
+                                          color: Color(0xffE6E6E6),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              getOptionsFromName(
+                                                  calenderList[index].month!,
+                                                  'Months'),
+                                              style: Styles.blue125,
+                                              strutStyle: StrutStyle(height: .5),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(
+                                              getOptionsFromName(
+                                                  calenderList[index].Year!,
+                                                  'Year'),
+                                              style: Styles.blue125,
+                                              strutStyle: StrutStyle(height: .5),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            // Text(
+                                            //   getStatusValue(Global.getItemValues(
+                                            //       requisitionData[index].responces!,
+                                            //       'status')),
+                                            //   style: Styles.blue125,
+                                            //   strutStyle: StrutStyle(height: .5),
+                                            //   overflow: TextOverflow.ellipsis,
+                                            // ),
+                                          ],
+                                        ),
+                                      ),
+                                      // Column(children: [
+                                      //   SizedBox(height: 5),
+                                      //   (stockData[index].is_edited == 0 &&
+                                      //           stockData[index].is_uploaded == 1)
+                                      //       ? Image.asset(
+                                      //           "assets/sync.png",
+                                      //           scale: 1.5,
+                                      //         )
+                                      //       : Image.asset(
+                                      //           "assets/sync_gray.png",
+                                      //           scale: 1.5,
+                                      //         )
+                                      // ])
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      }),
-                )
-              : Expanded(
-                  child: Center(
-                    child: Text(Global.returnTrLable(
-                        translats, CustomText.NorecordAvailable, lng!)),
+                          );
+                        }),
+                  )
+                : Expanded(
+                    child: Center(
+                      child: Text(Global.returnTrLable(
+                          translats, CustomText.NorecordAvailable, lng!)),
+                    ),
                   ),
-                ),
-        ]),
+          ]),
+        ),
       ),
     );
   }

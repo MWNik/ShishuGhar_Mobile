@@ -50,30 +50,33 @@ class _ShishuGharDetailsBottomBarState
 
   @override
   Widget build(BuildContext context) {
+    Global.applyDisplayCutout(Color(0xff5979AA));
     return (locationControlls.length > 0)
-        ? Scaffold(
-            body: pages[widget.index],
-            bottomNavigationBar: BottomNavigationBar(
-              useLegacyColorScheme: true,
-              showUnselectedLabels: true,
-              showSelectedLabels: true,
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Color(0xffAAAAAA),
-              selectedLabelStyle: Styles.Selectedbottambar,
-              unselectedLabelStyle: Styles.unSelectedbottambar,
-              unselectedIconTheme: IconThemeData(color: Colors.red),
-              currentIndex: widget.index,
-              onTap: (index) async {
-                if (index != 2) {
-                  onclick(index);
-                  setState(() {
-                    widget.index = index;
-                  });
-                }
-              },
-              items: initBottomTab(),
+        ? SafeArea(
+          child: Scaffold(
+              body: pages[widget.index],
+              bottomNavigationBar: BottomNavigationBar(
+                useLegacyColorScheme: true,
+                showUnselectedLabels: true,
+                showSelectedLabels: true,
+                selectedItemColor: Colors.black,
+                unselectedItemColor: Color(0xffAAAAAA),
+                selectedLabelStyle: Styles.Selectedbottambar,
+                unselectedLabelStyle: Styles.unSelectedbottambar,
+                unselectedIconTheme: IconThemeData(color: Colors.red),
+                currentIndex: widget.index,
+                onTap: (index) async {
+                  if (index != 2) {
+                    onclick(index);
+                    setState(() {
+                      widget.index = index;
+                    });
+                  }
+                },
+                items: initBottomTab(),
+              ),
             ),
-          )
+        )
         : SizedBox();
   }
 

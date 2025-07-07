@@ -3,13 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
-import 'package:shishughar/screens/Adddaily_attendance.dart';
-import 'package:shishughar/screens/childProfileScreen.dart';
-import 'package:shishughar/screens/child_Attendance.dart';
-import 'package:shishughar/screens/child_Enrolled.dart';
-import 'package:shishughar/screens/children_enrollment_profile.dart';
 import 'package:shishughar/screens/home_replica_screen.dart';
-import 'package:shishughar/screens/synchronization_screen.dart';
 import 'package:shishughar/screens/synchronization_screen_new.dart';
 import 'package:shishughar/screens/tabed_screens/anthrometory/child_growth_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/attendence/attendance_listed_screen.dart';
@@ -17,7 +11,6 @@ import 'package:shishughar/screens/tabed_screens/child_follow_up/follow_up_tab_s
 import 'package:shishughar/screens/tabed_screens/child_reffrel/reffral_tab_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creshe/cereche_listed_screen.dart';
 import 'package:shishughar/screens/tabed_screens/enrolled_children/children_enrolled_for_cc_listed.dart';
-import 'package:shishughar/screens/visit_notes.dart';
 
 import '../database/helper/translation_language_helper.dart';
 import '../model/apimodel/translation_language_api_model.dart';
@@ -40,14 +33,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
   List pages = [
     HomeReplicaScreen(),
-    ChildEnrolledScreen(),
-    ChildEnrolledScreen(),
-    VisitNotesScreen(),
-    ChildAttendanceScreen(),
-    ChildrenEnrollmentProfileScreen(),
-    ChildAttendanceScreen(),
-    AddDailyAttendanceScreen(),
-    ChildProfileScreen(),
     SynchronizationScreenNew(),
     CrecheListedScreen()
   ];
@@ -57,29 +42,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // return (dashboardControlls.length > 0)
-    //     ?
-      return Scaffold(
-            body: pages[widget.index!],
-            bottomNavigationBar: BottomNavigationBar(
-              useLegacyColorScheme: true,
-              showUnselectedLabels: true,
-              showSelectedLabels: true,
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Color(0xffAAAAAA),
-              selectedLabelStyle: Styles.Selectedbottambar,
-              unselectedLabelStyle: Styles.unSelectedbottambar,
-              unselectedIconTheme: IconThemeData(color: Colors.red),
-              currentIndex: _currentIndex,
-              onTap: (index) async {
-                setState(() {
-                  _currentIndex = index;
-                });
-                await setOnClick(_currentIndex);
-              },
-              items: initBottomBar(),
+    Global.applyDisplayCutout(Color(0xff5979AA));
+      return SafeArea(
+        child: Scaffold(
+              body: pages[widget.index!],
+              bottomNavigationBar: BottomNavigationBar(
+                useLegacyColorScheme: true,
+                showUnselectedLabels: true,
+                showSelectedLabels: true,
+                selectedItemColor: Colors.black,
+                unselectedItemColor: Color(0xffAAAAAA),
+                selectedLabelStyle: Styles.Selectedbottambar,
+                unselectedLabelStyle: Styles.unSelectedbottambar,
+                unselectedIconTheme: IconThemeData(color: Colors.red),
+                currentIndex: _currentIndex,
+                onTap: (index) async {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  await setOnClick(_currentIndex);
+                },
+                items: initBottomBar(),
+              ),
             ),
-          );
+      );
         // : Scaffold(
         // body:Center(
         // child: Text('please wait')));

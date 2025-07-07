@@ -145,390 +145,393 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      endDrawer: SafeArea(
-          child: Drawer(
-        backgroundColor: Colors.white,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 30),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      'assets/filter_icon.png',
-                      scale: 2.4,
-                    ),
-                    SizedBox(width: 10.w),
-                    Text(
-                      Global.returnTrLable(translats, CustomText.Filter, lng),
-                      style: Styles.labelcontrollerfont,
-                    ),
-                    Spacer(),
-                    InkWell(
-                      onTap: () async {
-                        _scaffoldKey.currentState!.closeEndDrawer();
-                      },
-                      child: Image.asset(
-                        'assets/cross.png',
-                        color: Colors.grey,
-                        scale: 4,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        key: _scaffoldKey,
+        endDrawer: SafeArea(
+            child: Drawer(
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 30),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        'assets/filter_icon.png',
+                        scale: 2.4,
                       ),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                    child: DynamicCustomTextFieldInt(
-                      initialvalue: minAgeLimit,
-                      hintText: Global.returnTrLable(
-                          translats, CustomText.minAgeInMonthEn, lng),
-                      onChanged: (value) {
-                        minAgeLimit = value;
-                      },
-                    ),
+                      SizedBox(width: 10.w),
+                      Text(
+                        Global.returnTrLable(translats, CustomText.Filter, lng),
+                        style: Styles.labelcontrollerfont,
+                      ),
+                      Spacer(),
+                      InkWell(
+                        onTap: () async {
+                          _scaffoldKey.currentState!.closeEndDrawer();
+                        },
+                        child: Image.asset(
+                          'assets/cross.png',
+                          color: Colors.grey,
+                          scale: 4,
+                        ),
+                      )
+                    ],
                   ),
-                  Expanded(
-                    child: DynamicCustomTextFieldInt(
-                      initialvalue: maxAgeLimit,
-                      hintText: Global.returnTrLable(
-                          translats, CustomText.maxAgeInMonthEn, lng),
-                      onChanged: (value) {
-                        maxAgeLimit = value;
-                      },
-                    ),
-                  )
-                ],
-              ),
-              DynamicCustomDropdownField(
-                hintText:
-                    Global.returnTrLable(translats, CustomText.Gender, lng),
-                items: genderList,
-                selectedItem: selectedItemDrop,
-                onChanged: (value) {
-                  selectedItemDrop = value?.name;
-                },
-              ),
-              DynamicCustomDropdownField(
-                hintText: Global.returnTrLable(
-                    translats, CustomText.ReasForExit, lng),
-                items: reasonOfExit,
-                selectedItem: selectedReason,
-                onChanged: (value) {
-                  selectedReason = value?.name;
-                },
-              ),
-              SizedBox(height: 10.h),
-              Padding(
-                padding: EdgeInsets.all(3.0),
-                child: Row(
+                ),
+                SizedBox(),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Expanded(
-                        child: CElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        cleaAllFilter();
-                      },
-                      text: Global.returnTrLable(
-                          translats, CustomText.clear, lng),
-                      color: Color(0xffF26BA3),
-                    )),
-                    SizedBox(width: 4.w),
-                    Expanded(
-                      child: CElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          filteredGetData(context);
+                      child: DynamicCustomTextFieldInt(
+                        initialvalue: minAgeLimit,
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.minAgeInMonthEn, lng),
+                        onChanged: (value) {
+                          minAgeLimit = value;
                         },
-                        text: Global.returnTrLable(
-                            translats, CustomText.Search, lng),
+                      ),
+                    ),
+                    Expanded(
+                      child: DynamicCustomTextFieldInt(
+                        initialvalue: maxAgeLimit,
+                        hintText: Global.returnTrLable(
+                            translats, CustomText.maxAgeInMonthEn, lng),
+                        onChanged: (value) {
+                          maxAgeLimit = value;
+                        },
                       ),
                     )
                   ],
                 ),
-              ),
-              role == CustomText.crecheSupervisor
-                  ? Padding(
-                      padding: EdgeInsets.only(top: 25),
-                      child: AnimatedRollingSwitch(
-                        title1: Global.returnTrLable(
-                            translats, CustomText.all, lng),
-                        title2: Global.returnTrLable(
-                            translats, CustomText.unsynched, lng),
-                        isOnlyUnsynched: isOnlyUnsynched,
-                        onChange: (value) async {
-                          setState(() {
-                            isOnlyUnsynched = value;
-                          });
-                          await fetchChildevents();
+                DynamicCustomDropdownField(
+                  hintText:
+                      Global.returnTrLable(translats, CustomText.Gender, lng),
+                  items: genderList,
+                  selectedItem: selectedItemDrop,
+                  onChanged: (value) {
+                    selectedItemDrop = value?.name;
+                  },
+                ),
+                DynamicCustomDropdownField(
+                  hintText: Global.returnTrLable(
+                      translats, CustomText.ReasForExit, lng),
+                  items: reasonOfExit,
+                  selectedItem: selectedReason,
+                  onChanged: (value) {
+                    selectedReason = value?.name;
+                  },
+                ),
+                SizedBox(height: 10.h),
+                Padding(
+                  padding: EdgeInsets.all(3.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Expanded(
+                          child: CElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          cleaAllFilter();
                         },
-                      ),
-                    )
-                  : SizedBox()
-            ],
-          ),
-        ),
-      )),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        child: Column(children: [
-          Row(
-            children: [
-              Expanded(
-                  child: CustomTextFieldRow(
-                controller: Searchcontroller,
-                onChanged: (value) {
-                  print(value);
-                  filterDataQu(value);
-                },
-                hintText:
-                    Global.returnTrLable(translats, CustomText.Search, lng),
-                prefixIcon: Image.asset(
-                  "assets/search.png",
-                  scale: 2.4,
+                        text: Global.returnTrLable(
+                            translats, CustomText.clear, lng),
+                        color: Color(0xffF26BA3),
+                      )),
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        child: CElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            filteredGetData(context);
+                          },
+                          text: Global.returnTrLable(
+                              translats, CustomText.Search, lng),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              )),
-              SizedBox(
-                width: 10.w,
-              ),
-              GestureDetector(
-                onTap: () {
-                  _scaffoldKey.currentState!.openEndDrawer();
-                },
-                child: Image.asset(
-                  'assets/filter_icon.png',
-                  scale: 2.4,
-                ),
-              )
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  '${Global.returnTrLable(translats, CustomText.childCount, lng)}: ${filterExitData.length}',
-                  style: Styles.black12700,
-                )
+                role == CustomText.crecheSupervisor
+                    ? Padding(
+                        padding: EdgeInsets.only(top: 25),
+                        child: AnimatedRollingSwitch(
+                          title1: Global.returnTrLable(
+                              translats, CustomText.all, lng),
+                          title2: Global.returnTrLable(
+                              translats, CustomText.unsynched, lng),
+                          isOnlyUnsynched: isOnlyUnsynched,
+                          onChange: (value) async {
+                            setState(() {
+                              isOnlyUnsynched = value;
+                            });
+                            await fetchChildevents();
+                          },
+                        ),
+                      )
+                    : SizedBox()
               ],
             ),
           ),
-          Expanded(
-            child: (filterExitData.length > 0)
-                ? ListView.builder(
-                    itemCount: filterExitData.length,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      var selectedItem = filterExitData[index];
-                      return GestureDetector(
-                        onTap: () async {
-                          /*  var detailMap = await fetchChildtDetailbyGuid(
-                              childExitData[index]['ChildEnrollGUID']!);*/
-                          //  var childId = detailMap.keys.first;
-                          // var date_of_enrollment = Global.getItemValues(
-                          //     selectedItem['responces'], 'date_of_enrollment');
-                          String? minDate=await callMinDate(Global.getItemValues(
-                              selectedItem['responces'], 'date_of_enrollment'));
-                          bool isEdit = await  Validate().checkEditable(selectedItem['created_at'],Validate().callEditfromCnfig(backdatedConfigirationModel));
-                          // var created_at = DateTime.parse(
-                          //     selectedItem['created_at'].toString());
-                          // var date = DateTime(created_at.year, created_at.month,
-                          //     created_at.day);
-                          var childName = Global.getItemValues(
-                              selectedItem['responces'], 'child_name');
-                          // bool isEditable = date
-                          //     .add(Duration(days: 16))
-                          //     .isAfter(
-                          //         DateTime.parse(Validate().currentDate()));
-                          // var applicableDate =
-                          //     Validate().stringToDate(Validate.date);
-                          // var now = DateTime.parse(Validate().currentDate());
+        )),
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          child: Column(children: [
+            Row(
+              children: [
+                Expanded(
+                    child: CustomTextFieldRow(
+                  controller: Searchcontroller,
+                  onChanged: (value) {
+                    print(value);
+                    filterDataQu(value);
+                  },
+                  hintText:
+                      Global.returnTrLable(translats, CustomText.Search, lng),
+                  prefixIcon: Image.asset(
+                    "assets/search.png",
+                    scale: 2.4,
+                  ),
+                )),
+                SizedBox(
+                  width: 10.w,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _scaffoldKey.currentState!.openEndDrawer();
+                  },
+                  child: Image.asset(
+                    'assets/filter_icon.png',
+                    scale: 2.4,
+                  ),
+                )
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    '${Global.returnTrLable(translats, CustomText.childCount, lng)}: ${filterExitData.length}',
+                    style: Styles.black12700,
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: (filterExitData.length > 0)
+                  ? ListView.builder(
+                      itemCount: filterExitData.length,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        var selectedItem = filterExitData[index];
+                        return GestureDetector(
+                          onTap: () async {
+                            /*  var detailMap = await fetchChildtDetailbyGuid(
+                                childExitData[index]['ChildEnrollGUID']!);*/
+                            //  var childId = detailMap.keys.first;
+                            // var date_of_enrollment = Global.getItemValues(
+                            //     selectedItem['responces'], 'date_of_enrollment');
+                            String? minDate=await callMinDate(Global.getItemValues(
+                                selectedItem['responces'], 'date_of_enrollment'));
+                            bool isEdit = await  Validate().checkEditable(selectedItem['created_at'],Validate().callEditfromCnfig(backdatedConfigirationModel));
+                            // var created_at = DateTime.parse(
+                            //     selectedItem['created_at'].toString());
+                            // var date = DateTime(created_at.year, created_at.month,
+                            //     created_at.day);
+                            var childName = Global.getItemValues(
+                                selectedItem['responces'], 'child_name');
+                            // bool isEditable = date
+                            //     .add(Duration(days: 16))
+                            //     .isAfter(
+                            //         DateTime.parse(Validate().currentDate()));
+                            // var applicableDate =
+                            //     Validate().stringToDate(Validate.date);
+                            // var now = DateTime.parse(Validate().currentDate());
 
-                          // var childName = detailMap.values.first;
-                          var refStatus = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      ExitEnrolledChilrenTab(
-                                          isForExitList: false,
-                                          // isForExit: true,
-                                          CHHGUID: selectedItem['CHHGUID'],
-                                          isForCrecheEnrollment: false,
-                                          EnrolledChilGUID:
-                                              selectedItem['ChildEnrollGUID'],
-                                          HHname: selectedItem['HHname'],
-                                          crecheId: Global.stringToInt(
-                                              widget.creche_id),
-                                          HHGUID: Global.getItemValues(
-                                              selectedItem['responces'],
-                                              'hhguid'),
-                                          isNew: 0,
-                                          childName: childName,
-                                          isImageUpdate: false,
-                                          isEditable: role ==
-                                                  CustomText.crecheSupervisor
-                                                      .trim()
-                                              ? isEdit
-                                              : false,
-                                          minDate: minDate)));
-                          if (refStatus == 'itemRefresh') {
-                            await fetchChildevents();
-                          }
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff5A5A5A).withOpacity(
-                                        0.2), // Shadow color with opacity
-                                    offset: Offset(
-                                        0, 3), // Horizontal and vertical offset
-                                    blurRadius: 6, // Blur radius
-                                    spreadRadius: 0, // Spread radius
-                                  ),
-                                ],
-                                color: Colors.white,
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 8.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
-                                        strutStyle: StrutStyle(height: 1.2),
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.DateOfExit, lng).trim()} : ',
-                                        strutStyle: StrutStyle(height: 1.2),
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.AgeOnDayOfExit, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.ReasForExit, lng).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      // Text(
-                                      //   '${Global.returnTrLable(translats, 'Child Age (In Months)', lng).trim()} : ',
-                                      //   style: Styles.black104,
-                                      //   strutStyle: StrutStyle(height: 1),
-                                      // ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10),
-                                  SizedBox(
-                                    height: 40.h,
-                                    width: 2,
-                                    child: VerticalDivider(
-                                      color: Color(0xffE6E6E6),
+                            // var childName = detailMap.values.first;
+                            var refStatus = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        ExitEnrolledChilrenTab(
+                                            isForExitList: false,
+                                            // isForExit: true,
+                                            CHHGUID: selectedItem['CHHGUID'],
+                                            isForCrecheEnrollment: false,
+                                            EnrolledChilGUID:
+                                                selectedItem['ChildEnrollGUID'],
+                                            HHname: selectedItem['HHname'],
+                                            crecheId: Global.stringToInt(
+                                                widget.creche_id),
+                                            HHGUID: Global.getItemValues(
+                                                selectedItem['responces'],
+                                                'hhguid'),
+                                            isNew: 0,
+                                            childName: childName,
+                                            isImageUpdate: false,
+                                            isEditable: role ==
+                                                    CustomText.crecheSupervisor
+                                                        .trim()
+                                                ? isEdit
+                                                : false,
+                                            minDate: minDate)));
+                            if (refStatus == 'itemRefresh') {
+                              await fetchChildevents();
+                            }
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff5A5A5A).withOpacity(
+                                          0.2), // Shadow color with opacity
+                                      offset: Offset(
+                                          0, 3), // Horizontal and vertical offset
+                                      blurRadius: 6, // Blur radius
+                                      spreadRadius: 0, // Spread radius
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
+                                  ],
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xffE7F0FF)),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w, vertical: 8.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          Global.getItemValues(
-                                              selectedItem['responces'],
-                                              'child_name'),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
+                                          '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Global.getItemValues(
-                                              selectedItem['responces'],
-                                              'child_id'),
-                                          style: Styles.cardBlue10,
+                                          '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
                                           strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Validate().displeDateFormate(
-                                              Global.getItemValues(
-                                                  selectedItem['responces'],
-                                                  'date_of_exit')),
-                                          style: Styles.cardBlue10,
+                                          '${Global.returnTrLable(translats, CustomText.DateOfExit, lng).trim()} : ',
                                           strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Global.getItemValues(
-                                              selectedItem['responces'],
-                                              'age_of_exit'),
-                                          style: Styles.cardBlue10,
+                                          '${Global.returnTrLable(translats, CustomText.AgeOnDayOfExit, lng).trim()} : ',
+                                          style: Styles.black104,
                                           strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          getReasonOfExit(Global.getItemValues(
-                                              selectedItem['responces'],
-                                              'reason_for_exit')),
-                                          style: Styles.cardBlue10,
+                                          '${Global.returnTrLable(translats, CustomText.ReasForExit, lng).trim()} : ',
+                                          style: Styles.black104,
                                           strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
+                                        // Text(
+                                        //   '${Global.returnTrLable(translats, 'Child Age (In Months)', lng).trim()} : ',
+                                        //   style: Styles.black104,
+                                        //   strutStyle: StrutStyle(height: 1),
+                                        // ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(width: 5),
-                                  (selectedItem['is_edited'] == 0 &&
-                                          selectedItem['is_uploaded'] == 1)
-                                      ? Image.asset(
-                                          "assets/sync.png",
-                                          scale: 1.5,
-                                        )
-                                      : Image.asset(
-                                          "assets/sync_gray.png",
-                                          scale: 1.5,
-                                        )
-                                ],
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 40.h,
+                                      width: 2,
+                                      child: VerticalDivider(
+                                        color: Color(0xffE6E6E6),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            Global.getItemValues(
+                                                selectedItem['responces'],
+                                                'child_name'),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.getItemValues(
+                                                selectedItem['responces'],
+                                                'child_id'),
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Validate().displeDateFormate(
+                                                Global.getItemValues(
+                                                    selectedItem['responces'],
+                                                    'date_of_exit')),
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.getItemValues(
+                                                selectedItem['responces'],
+                                                'age_of_exit'),
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            getReasonOfExit(Global.getItemValues(
+                                                selectedItem['responces'],
+                                                'reason_for_exit')),
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    (selectedItem['is_edited'] == 0 &&
+                                            selectedItem['is_uploaded'] == 1)
+                                        ? Image.asset(
+                                            "assets/sync.png",
+                                            scale: 1.5,
+                                          )
+                                        : Image.asset(
+                                            "assets/sync_gray.png",
+                                            scale: 1.5,
+                                          )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    })
-                : Center(
-                    child: Text(Global.returnTrLable(
-                        translats, CustomText.NorecordAvailable, lng)),
-                  ),
-          )
-        ]),
+                        );
+                      })
+                  : Center(
+                      child: Text(Global.returnTrLable(
+                          translats, CustomText.NorecordAvailable, lng)),
+                    ),
+            )
+          ]),
+        ),
       ),
     );
   }

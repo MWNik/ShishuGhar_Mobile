@@ -151,273 +151,276 @@ class _AddAttendanceState extends State<AddAttendance> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        child: Column(children: [
-          CustomDatepickerDynamic(
-            initialvalue: attendeceDate,
-            calenderValidate: [],
-            isRequred: 0,
-            readable: true,
-            onChanged: (value) {},
-            titleText: lng != null
-                ? Global.returnTrLable(
-                    translats, CustomText.DateofAttendance, lng!)
-                : '',
-          ),
-          CustomTextFieldRow(
-            controller: Searchcontroller,
-            onChanged: (value) {
-              print(value);
-              filterDataQu(value);
-            },
-            hintText: (lng != null)
-                ? Global.returnTrLable(translats, 'Search', lng!)
-                : '',
-            prefixIcon: Image.asset(
-              "assets/search.png",
-              scale: 2.4,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          child: Column(children: [
+            CustomDatepickerDynamic(
+              initialvalue: attendeceDate,
+              calenderValidate: [],
+              isRequred: 0,
+              readable: true,
+              onChanged: (value) {},
+              titleText: lng != null
+                  ? Global.returnTrLable(
+                      translats, CustomText.DateofAttendance, lng!)
+                  : '',
             ),
-          ),
-          lng != null
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Checkbox(
-                        value: _selectAll == true,
-                        onChanged: (value) {
-                          filterdData.forEach((element) =>
-                              checkedItem[element.ChildEnrollGUID!] = value!);
-                          setState(() {
-                            _selectAll = !_selectAll;
-                          });
-                        }),
-                    SizedBox(width: 5.w),
-                    Text(lng != null
-                        ? Global.returnTrLable(
-                            translats, CustomText.markAllPresent, lng!)
-                        : CustomText.markAllPresent),
-                    const Spacer(),
-                    RichText(
-                        text: TextSpan(children: [
-                      TextSpan(
-                          text:
-                              '${Global.returnTrLable(translats, CustomText.childCount, lng!)}: ${filterdData.length}',
-                          style: Styles.black12700),
-                      TextSpan(text: '\n'),
-                      TextSpan(
-                          text:
-                              '${Global.returnTrLable(translats, CustomText.childPresent, lng!)}: ${callPresentChild()}',
-                          style: Styles.black12700)
-                    ]))
-                  ],
-                )
-              : SizedBox(),
-          Expanded(
-            child: (filterdData.length > 0)
-                ? ListView.builder(
-                    itemCount: filterdData.length,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () async {
-                          // String refStatus = '';
-                          //   var selectedItem = childHHData[index];
-                          //   refStatus = await Navigator.of(context).push(
-                          //       MaterialPageRoute(
-                          //           builder: (BuildContext context) =>
-                          //               EnrolledChilrenTab(
-                          //                   CHHGUID: selectedItem['CHHGUID'],
-                          //                   HHname: Global.stringToInt(
-                          //                       selectedItem['HHname']
-                          //                           .toString()),
-                          //                   EnrolledChilGUID: selectedItem[
-                          //                   'ChildEnrollGUID'])));
-                          // if (refStatus == 'itemRefresh') {
-                          //   await fetchChildHHDataList();
-                          // }
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color(0xff5A5A5A).withOpacity(
-                                        0.2), // Shadow color with opacity
-                                    offset: Offset(
-                                        0, 3), // Horizontal and vertical offset
-                                    blurRadius: 6, // Blur radius
-                                    spreadRadius: 0, // Spread radius
-                                  ),
-                                ],
-                                color: Colors.white,
-                                border: Border.all(color: Color(0xffE7F0FF)),
-                                borderRadius: BorderRadius.circular(10.r)),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 8.h),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.ChildName, lng!).trim()} : ',
-                                        style: Styles.black104,
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.careGiverName, lng!).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                      Text(
-                                        '${Global.returnTrLable(translats, CustomText.ageInMonth, lng!).trim()} : ',
-                                        style: Styles.black104,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10),
-                                  SizedBox(
-                                    height: 40.h,
-                                    width: 2,
-                                    child: VerticalDivider(
-                                      color: Color(0xffE6E6E6),
+            CustomTextFieldRow(
+              controller: Searchcontroller,
+              onChanged: (value) {
+                print(value);
+                filterDataQu(value);
+              },
+              hintText: (lng != null)
+                  ? Global.returnTrLable(translats, 'Search', lng!)
+                  : '',
+              prefixIcon: Image.asset(
+                "assets/search.png",
+                scale: 2.4,
+              ),
+            ),
+            lng != null
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Checkbox(
+                          value: _selectAll == true,
+                          onChanged: (value) {
+                            filterdData.forEach((element) =>
+                                checkedItem[element.ChildEnrollGUID!] = value!);
+                            setState(() {
+                              _selectAll = !_selectAll;
+                            });
+                          }),
+                      SizedBox(width: 5.w),
+                      Text(lng != null
+                          ? Global.returnTrLable(
+                              translats, CustomText.markAllPresent, lng!)
+                          : CustomText.markAllPresent),
+                      const Spacer(),
+                      RichText(
+                          text: TextSpan(children: [
+                        TextSpan(
+                            text:
+                                '${Global.returnTrLable(translats, CustomText.childCount, lng!)}: ${filterdData.length}',
+                            style: Styles.black12700),
+                        TextSpan(text: '\n'),
+                        TextSpan(
+                            text:
+                                '${Global.returnTrLable(translats, CustomText.childPresent, lng!)}: ${callPresentChild()}',
+                            style: Styles.black12700)
+                      ]))
+                    ],
+                  )
+                : SizedBox(),
+            Expanded(
+              child: (filterdData.length > 0)
+                  ? ListView.builder(
+                      itemCount: filterdData.length,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () async {
+                            // String refStatus = '';
+                            //   var selectedItem = childHHData[index];
+                            //   refStatus = await Navigator.of(context).push(
+                            //       MaterialPageRoute(
+                            //           builder: (BuildContext context) =>
+                            //               EnrolledChilrenTab(
+                            //                   CHHGUID: selectedItem['CHHGUID'],
+                            //                   HHname: Global.stringToInt(
+                            //                       selectedItem['HHname']
+                            //                           .toString()),
+                            //                   EnrolledChilGUID: selectedItem[
+                            //                   'ChildEnrollGUID'])));
+                            // if (refStatus == 'itemRefresh') {
+                            //   await fetchChildHHDataList();
+                            // }
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5.h),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff5A5A5A).withOpacity(
+                                          0.2), // Shadow color with opacity
+                                      offset: Offset(
+                                          0, 3), // Horizontal and vertical offset
+                                      blurRadius: 6, // Blur radius
+                                      spreadRadius: 0, // Spread radius
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
+                                  ],
+                                  color: Colors.white,
+                                  border: Border.all(color: Color(0xffE7F0FF)),
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w, vertical: 8.h),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          Global.getItemValues(
-                                              filterdData[index].responces!,
-                                              'child_name'),
-                                          style: Styles.cardBlue10,
-                                          overflow: TextOverflow.ellipsis,
+                                          '${Global.returnTrLable(translats, CustomText.ChildName, lng!).trim()} : ',
+                                          style: Styles.black104,
                                         ),
                                         Text(
-                                          Global.getItemValues(
-                                              filterdData[index].responces!,
-                                              'name_of_primary_caregiver'),
-                                          style: Styles.cardBlue10,
+                                          '${Global.returnTrLable(translats, CustomText.careGiverName, lng!).trim()} : ',
+                                          style: Styles.black104,
                                           strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          // Global.getItemValues(
-                                          //     childHHData[index].responces!,
-                                          //     'age_at_enrollment_in_months'),
-                                          Global.validString(
-                                                  Global.getItemValues(
-                                                      filterdData[index]
-                                                          .responces,
-                                                      'child_dob'))
-                                              ? Validate()
-                                                  .calculateAgeInMonths(
-                                                      Validate().stringToDate(
-                                                          Global.getItemValues(
-                                                              filterdData[index]
-                                                                  .responces,
-                                                              'child_dob')))
-                                                  .toString()
-                                              : Global.getItemValues(
-                                                  filterdData[index].responces,
-                                                  'age_at_enrollment_in_months'),
-                                          style: Styles.cardBlue10,
+                                          '${Global.returnTrLable(translats, CustomText.ageInMonth, lng!).trim()} : ',
+                                          style: Styles.black104,
                                           strutStyle: StrutStyle(height: 1.2),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  Checkbox(
-                                      value: checkedItem[filterdData[index]
-                                                  .ChildEnrollGUID] !=
-                                              null
-                                          ? checkedItem[filterdData[index]
-                                              .ChildEnrollGUID]
-                                          : false,
-                                      onChanged: (newValue) {
-                                        setState(() {
-                                          _selectAll = false;
-                                          checkedItem[filterdData[index]
-                                              .ChildEnrollGUID!] = newValue!;
-                                        });
-                                      })
-                                ],
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 40.h,
+                                      width: 2,
+                                      child: VerticalDivider(
+                                        color: Color(0xffE6E6E6),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            Global.getItemValues(
+                                                filterdData[index].responces!,
+                                                'child_name'),
+                                            style: Styles.cardBlue10,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            Global.getItemValues(
+                                                filterdData[index].responces!,
+                                                'name_of_primary_caregiver'),
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            // Global.getItemValues(
+                                            //     childHHData[index].responces!,
+                                            //     'age_at_enrollment_in_months'),
+                                            Global.validString(
+                                                    Global.getItemValues(
+                                                        filterdData[index]
+                                                            .responces,
+                                                        'child_dob'))
+                                                ? Validate()
+                                                    .calculateAgeInMonths(
+                                                        Validate().stringToDate(
+                                                            Global.getItemValues(
+                                                                filterdData[index]
+                                                                    .responces,
+                                                                'child_dob')))
+                                                    .toString()
+                                                : Global.getItemValues(
+                                                    filterdData[index].responces,
+                                                    'age_at_enrollment_in_months'),
+                                            style: Styles.cardBlue10,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Checkbox(
+                                        value: checkedItem[filterdData[index]
+                                                    .ChildEnrollGUID] !=
+                                                null
+                                            ? checkedItem[filterdData[index]
+                                                .ChildEnrollGUID]
+                                            : false,
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            _selectAll = false;
+                                            checkedItem[filterdData[index]
+                                                .ChildEnrollGUID!] = newValue!;
+                                          });
+                                        })
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
+                        );
+                      },
+                    )
+                  : Center(
+                      child: Text(lng != null
+                          ? Global.returnTrLable(
+                              translats, CustomText.NorecordAvailable, lng!)
+                          : ''),
+                    ),
+            ),
+            Divider(),
+            Row(
+              children: [
+                Expanded(
+                  child: CElevatedButton(
+                    color: Color(0xffF26BA3),
+                    onPressed: () {
+                      nextTab(0, context);
                     },
-                  )
-                : Center(
-                    child: Text(lng != null
-                        ? Global.returnTrLable(
-                            translats, CustomText.NorecordAvailable, lng!)
-                        : ''),
+                    text: lng != null
+                        ? Global.returnTrLable(translats, CustomText.back, lng!)
+                        : ''.trim(),
                   ),
-          ),
-          Divider(),
-          Row(
-            children: [
-              Expanded(
-                child: CElevatedButton(
-                  color: Color(0xffF26BA3),
-                  onPressed: () {
-                    nextTab(0, context);
-                  },
-                  text: lng != null
-                      ? Global.returnTrLable(translats, CustomText.back, lng!)
-                      : ''.trim(),
                 ),
-              ),
-              // Row(children: [
-              SizedBox(width: 10),
-              Expanded(
-                child: CElevatedButton(
-                  color: Color(0xff5979AA),
-                  onPressed: () {
-                    saveOnly(1, context);
-                    // widget.changeTab(1);
-                  },
-                  text: lng != null
-                      ? Global.returnTrLable(translats, 'Save', lng!).trim()
-                      : '',
+                // Row(children: [
+                SizedBox(width: 10),
+                Expanded(
+                  child: CElevatedButton(
+                    color: Color(0xff5979AA),
+                    onPressed: () {
+                      saveOnly(1, context);
+                      // widget.changeTab(1);
+                    },
+                    text: lng != null
+                        ? Global.returnTrLable(translats, 'Save', lng!).trim()
+                        : '',
+                  ),
                 ),
-              ),
-              // ]
-              // ),
-              SizedBox(width: 10),
-              Expanded(
-                child: CElevatedButton(
-                  color: Color(0xff369A8D),
-                  onPressed: () {
-                    nextTab(1, context);
-                    // widget.changeTab(1);
-                  },
-                  text: lng != null
-                      ? Global.returnTrLable(translats, CustomText.Next, lng!)
-                      : '',
+                // ]
+                // ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: CElevatedButton(
+                    color: Color(0xff369A8D),
+                    onPressed: () {
+                      nextTab(1, context);
+                      // widget.changeTab(1);
+                    },
+                    text: lng != null
+                        ? Global.returnTrLable(translats, CustomText.Next, lng!)
+                        : '',
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ]),
+              ],
+            ),
+          ]),
+        ),
       ),
     );
   }

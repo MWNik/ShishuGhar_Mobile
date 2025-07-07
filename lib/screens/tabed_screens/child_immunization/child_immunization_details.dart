@@ -104,298 +104,301 @@ class _ChildImmunizationExpendedScreenSatet
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // floatingActionButton: InkWell(
-      //   onTap: () async {
-      //     // var refStatus = await Navigator.of(context).push(
-      //     //   MaterialPageRoute(
-      //     //     builder: (BuildContext context) => HHTabScreen(hhGuid: hhGuid),
-      //     //   ),
-      //     // );
-      //     // if (refStatus == 'itemRefresh') {
-      //     //   await fetchHhDataList();
-      //     // }
-      //   },
-      //   child: Image.asset(
-      //     "assets/add_btn.png",
-      //     scale: 2.7,
-      //     color: Color(0xff5979AA),
-      //   ),
-      // ),
-      appBar: AppBar(
-        toolbarHeight: 60,
-        backgroundColor: Color(0xff5979AA),
-        leading: Padding(
-          padding: EdgeInsets.only(left: 10),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context, 'itemRefresh');
-            },
-            child: Icon(
-              Icons.arrow_back_ios_sharp,
-              size: 20,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        title: RichText(
-          text: TextSpan(
-            children: [
-              WidgetSpan(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${widget.childName} ${widget.childHHID}',
-                      style: Styles.white145,
-                    ),
-                    // Text(
-                    //   '${widget.childHHID}',
-                    //   style: Styles.white126P,
-                    // ),
-                    // Add additional TextSpans here if needed
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-              child: ListView(
-                children: [
-                  if (vaccinesOverdue.isNotEmpty) ...[
-                    vaccinesOverdue.length > 0
-                        ? Text(
-                            Global.returnTrLable(
-                                labelControlls, CustomText.overdue, lng!),
-                            style: Styles.black123)
-                        : SizedBox(),
-                    vaccinesOverdue.length > 0
-                        ? SizedBox(
-                            height: 10,
-                          )
-                        : SizedBox(),
-                    vaccinesOverdue.length > 0
-                        ? GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, // Number of columns
-                              crossAxisSpacing: 10.0, // Spacing between columns
-                              mainAxisSpacing: 10.0, // Spacing between rows
-                              childAspectRatio:
-                                  2.0, // Aspect ratio of the grid items
-                            ),
-                            itemCount: vaccinesOverdue.length,
-                            itemBuilder: (context, index) {
-                              return GridTile(
-                                child: GestureDetector(
-                                    onTap: () async {
-                                     await createVaccine(vaccinesOverdue[index].name!,vaccinesOverdue[index].vaccine!,
-                                          vaccinesOverdue[index].site_for_vaccinations!);
-                                    },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(0xff5A5A5A).withOpacity(
-                                              0.2), // Shadow color with opacity
-                                          offset: Offset(0,
-                                              3), // Horizontal and vertical offset
-                                          blurRadius: 6, // Blur radius
-                                          spreadRadius: 0, // Spread radius
-                                        ),
-                                      ],
-                                      color: Color(0xffffdedd),
-                                      border:
-                                          Border.all(color: Color(0xfffccbca)),
-                                      borderRadius: BorderRadius.circular(10.r),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '${vaccinesOverdue[index].vaccine}',
-                                          style: Styles.black123,
-                                        ),
-                                        Text(
-                                          '${vaccinesOverdue[index].site_for_vaccinations}',
-                                          style: Styles.black123,
-                                        ),
-                                        // Text(
-                                        //   '${CustomText.childAgeInDays} : ${vaccinesOverdue[index].days}',
-                                        //   style: Styles.black123,
-                                        // ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          )
-                        : SizedBox(),
-                  ],
-                  SizedBox(
-                    height: 10,
-                  ),
-                  if (vaccinesCompleted.isNotEmpty) ...[
-                    vaccinesCompleted.length > 0
-                        ? Text(
-                            Global.returnTrLable(
-                                labelControlls, CustomText.complted, lng!),
-                            style: Styles.black123)
-                        : SizedBox(),
-                    vaccinesCompleted.length > 0
-                        ? SizedBox(
-                            height: 10,
-                          )
-                        : SizedBox(),
-                    vaccinesCompleted.length > 0
-                        ? GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, // Number of columns
-                              crossAxisSpacing: 10.0, // Spacing between columns
-                              mainAxisSpacing: 10.0, // Spacing between rows
-                              childAspectRatio:
-                                  2.0, // Aspect ratio of the grid items
-                            ),
-                            itemCount: vaccinesCompleted.length,
-                            itemBuilder: (context, index) {
-                              return GridTile(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0xff5A5A5A).withOpacity(
-                                            0.2), // Shadow color with opacity
-                                        offset: Offset(0,
-                                            3), // Horizontal and vertical offset
-                                        blurRadius: 6, // Blur radius
-                                        spreadRadius: 0, // Spread radius
-                                      ),
-                                    ],
-                                    color: Color(0xff8BF649),
-                                    border:
-                                        Border.all(color: Color(0xff3b9802)),
-                                    borderRadius: BorderRadius.circular(10.r),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${vaccinesCompleted[index].vaccine}',
-                                        style: Styles.black123,
-                                      ),
-                                      Text(
-                                        '${vaccinesCompleted[index].site_for_vaccinations}',
-                                        style: Styles.black123,
-                                      ),
-                                      Text(
-                                        '${CustomText.Date}${Validate().displeDateFormate(vaccinesDate[vaccinesCompleted[index].name])}',
-                                        style: Styles.black123,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          )
-                        : SizedBox(),
-                  ],
-                  SizedBox(
-                    height: 10,
-                  ),
-                  if (vaccinesUpComming.isNotEmpty) ...[
-                    vaccinesUpComming.length > 0
-                        ? Text(
-                            Global.returnTrLable(
-                                labelControlls, CustomText.upcomming, lng!),
-                            style: Styles.black123)
-                        : SizedBox(),
-                    vaccinesUpComming.length > 0
-                        ? SizedBox(
-                            height: 10,
-                          )
-                        : SizedBox(),
-                    vaccinesUpComming.length > 0
-                        ? GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, // Number of columns
-                              crossAxisSpacing: 10.0, // Spacing between columns
-                              mainAxisSpacing: 10.0, // Spacing between rows
-                              childAspectRatio:
-                                  2.0, // Aspect ratio of the grid items
-                            ),
-                            itemCount: vaccinesUpComming.length,
-                            itemBuilder: (context, index) {
-                              return GridTile(
-                                child: GestureDetector(
-                                  onTap: () async {
-                                    await createVaccine(vaccinesUpComming[index].name!,vaccinesUpComming[index].vaccine!,
-                                        vaccinesUpComming[index].site_for_vaccinations!);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(0xff5A5A5A).withOpacity(
-                                              0.2), // Shadow color with opacity
-                                          offset: Offset(0,
-                                              3), // Horizontal and vertical offset
-                                          blurRadius: 6, // Blur radius
-                                          spreadRadius: 0, // Spread radius
-                                        ),
-                                      ],
-                                      color: Color(0xffeae9e9),
-                                      border:
-                                          Border.all(color: Color(0xffb6b6b6)),
-                                      borderRadius: BorderRadius.circular(10.r),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '${vaccinesUpComming[index].vaccine}',
-                                          style: Styles.black123,
-                                        ),
-                                        Text(
-                                          '${vaccinesUpComming[index].site_for_vaccinations}',
-                                          style: Styles.black123,
-                                        ),
-                                        // Text(
-                                        //   '${CustomText.childAgeInDays} : ${vaccinesUpComming[index].days}',
-                                        //   style: Styles.black123,
-                                        // ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          )
-                        : SizedBox(),
-                  ]
-                ],
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        // floatingActionButton: InkWell(
+        //   onTap: () async {
+        //     // var refStatus = await Navigator.of(context).push(
+        //     //   MaterialPageRoute(
+        //     //     builder: (BuildContext context) => HHTabScreen(hhGuid: hhGuid),
+        //     //   ),
+        //     // );
+        //     // if (refStatus == 'itemRefresh') {
+        //     //   await fetchHhDataList();
+        //     // }
+        //   },
+        //   child: Image.asset(
+        //     "assets/add_btn.png",
+        //     scale: 2.7,
+        //     color: Color(0xff5979AA),
+        //   ),
+        // ),
+        appBar: AppBar(
+          toolbarHeight: 60,
+          backgroundColor: Color(0xff5979AA),
+          leading: Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context, 'itemRefresh');
+              },
+              child: Icon(
+                Icons.arrow_back_ios_sharp,
+                size: 20,
+                color: Colors.white,
               ),
             ),
+          ),
+          title: RichText(
+            text: TextSpan(
+              children: [
+                WidgetSpan(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${widget.childName} ${widget.childHHID}',
+                        style: Styles.white145,
+                      ),
+                      // Text(
+                      //   '${widget.childHHID}',
+                      //   style: Styles.white126P,
+                      // ),
+                      // Add additional TextSpans here if needed
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                child: ListView(
+                  children: [
+                    if (vaccinesOverdue.isNotEmpty) ...[
+                      vaccinesOverdue.length > 0
+                          ? Text(
+                              Global.returnTrLable(
+                                  labelControlls, CustomText.overdue, lng!),
+                              style: Styles.black123)
+                          : SizedBox(),
+                      vaccinesOverdue.length > 0
+                          ? SizedBox(
+                              height: 10,
+                            )
+                          : SizedBox(),
+                      vaccinesOverdue.length > 0
+                          ? GridView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2, // Number of columns
+                                crossAxisSpacing: 10.0, // Spacing between columns
+                                mainAxisSpacing: 10.0, // Spacing between rows
+                                childAspectRatio:
+                                    2.0, // Aspect ratio of the grid items
+                              ),
+                              itemCount: vaccinesOverdue.length,
+                              itemBuilder: (context, index) {
+                                return GridTile(
+                                  child: GestureDetector(
+                                      onTap: () async {
+                                       await createVaccine(vaccinesOverdue[index].name!,vaccinesOverdue[index].vaccine!,
+                                            vaccinesOverdue[index].site_for_vaccinations!);
+                                      },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xff5A5A5A).withOpacity(
+                                                0.2), // Shadow color with opacity
+                                            offset: Offset(0,
+                                                3), // Horizontal and vertical offset
+                                            blurRadius: 6, // Blur radius
+                                            spreadRadius: 0, // Spread radius
+                                          ),
+                                        ],
+                                        color: Color(0xffffdedd),
+                                        border:
+                                            Border.all(color: Color(0xfffccbca)),
+                                        borderRadius: BorderRadius.circular(10.r),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            '${vaccinesOverdue[index].vaccine}',
+                                            style: Styles.black123,
+                                          ),
+                                          Text(
+                                            '${vaccinesOverdue[index].site_for_vaccinations}',
+                                            style: Styles.black123,
+                                          ),
+                                          // Text(
+                                          //   '${CustomText.childAgeInDays} : ${vaccinesOverdue[index].days}',
+                                          //   style: Styles.black123,
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : SizedBox(),
+                    ],
+                    SizedBox(
+                      height: 10,
+                    ),
+                    if (vaccinesCompleted.isNotEmpty) ...[
+                      vaccinesCompleted.length > 0
+                          ? Text(
+                              Global.returnTrLable(
+                                  labelControlls, CustomText.complted, lng!),
+                              style: Styles.black123)
+                          : SizedBox(),
+                      vaccinesCompleted.length > 0
+                          ? SizedBox(
+                              height: 10,
+                            )
+                          : SizedBox(),
+                      vaccinesCompleted.length > 0
+                          ? GridView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2, // Number of columns
+                                crossAxisSpacing: 10.0, // Spacing between columns
+                                mainAxisSpacing: 10.0, // Spacing between rows
+                                childAspectRatio:
+                                    2.0, // Aspect ratio of the grid items
+                              ),
+                              itemCount: vaccinesCompleted.length,
+                              itemBuilder: (context, index) {
+                                return GridTile(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xff5A5A5A).withOpacity(
+                                              0.2), // Shadow color with opacity
+                                          offset: Offset(0,
+                                              3), // Horizontal and vertical offset
+                                          blurRadius: 6, // Blur radius
+                                          spreadRadius: 0, // Spread radius
+                                        ),
+                                      ],
+                                      color: Color(0xff8BF649),
+                                      border:
+                                          Border.all(color: Color(0xff3b9802)),
+                                      borderRadius: BorderRadius.circular(10.r),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          '${vaccinesCompleted[index].vaccine}',
+                                          style: Styles.black123,
+                                        ),
+                                        Text(
+                                          '${vaccinesCompleted[index].site_for_vaccinations}',
+                                          style: Styles.black123,
+                                        ),
+                                        Text(
+                                          '${CustomText.Date}${Validate().displeDateFormate(vaccinesDate[vaccinesCompleted[index].name])}',
+                                          style: Styles.black123,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : SizedBox(),
+                    ],
+                    SizedBox(
+                      height: 10,
+                    ),
+                    if (vaccinesUpComming.isNotEmpty) ...[
+                      vaccinesUpComming.length > 0
+                          ? Text(
+                              Global.returnTrLable(
+                                  labelControlls, CustomText.upcomming, lng!),
+                              style: Styles.black123)
+                          : SizedBox(),
+                      vaccinesUpComming.length > 0
+                          ? SizedBox(
+                              height: 10,
+                            )
+                          : SizedBox(),
+                      vaccinesUpComming.length > 0
+                          ? GridView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2, // Number of columns
+                                crossAxisSpacing: 10.0, // Spacing between columns
+                                mainAxisSpacing: 10.0, // Spacing between rows
+                                childAspectRatio:
+                                    2.0, // Aspect ratio of the grid items
+                              ),
+                              itemCount: vaccinesUpComming.length,
+                              itemBuilder: (context, index) {
+                                return GridTile(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      await createVaccine(vaccinesUpComming[index].name!,vaccinesUpComming[index].vaccine!,
+                                          vaccinesUpComming[index].site_for_vaccinations!);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xff5A5A5A).withOpacity(
+                                                0.2), // Shadow color with opacity
+                                            offset: Offset(0,
+                                                3), // Horizontal and vertical offset
+                                            blurRadius: 6, // Blur radius
+                                            spreadRadius: 0, // Spread radius
+                                          ),
+                                        ],
+                                        color: Color(0xffeae9e9),
+                                        border:
+                                            Border.all(color: Color(0xffb6b6b6)),
+                                        borderRadius: BorderRadius.circular(10.r),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            '${vaccinesUpComming[index].vaccine}',
+                                            style: Styles.black123,
+                                          ),
+                                          Text(
+                                            '${vaccinesUpComming[index].site_for_vaccinations}',
+                                            style: Styles.black123,
+                                          ),
+                                          // Text(
+                                          //   '${CustomText.childAgeInDays} : ${vaccinesUpComming[index].days}',
+                                          //   style: Styles.black123,
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : SizedBox(),
+                    ]
+                  ],
+                ),
+              ),
+      ),
     );
   }
 

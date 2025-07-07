@@ -94,365 +94,368 @@ class _CrecheMonitorListingScreenState
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context, 'itemRefresh');
-        return false;
-      },
-      child: Scaffold(
-        key: _scaffoldKey,
-        floatingActionButton: InkWell(
-          onTap: () async {
-            String cmgUid = '';
-            if (!(Global.validString(cmgUid))) {
-              cmgUid = Validate().randomGuid();
-              final allowRefresh = await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => CrecheMonitorTabForAdd(
-                    cmgUid: cmgUid,
-                    isEdit: false,
-                    isViewScreen: false,
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, 'itemRefresh');
+          return false;
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          floatingActionButton: InkWell(
+            onTap: () async {
+              String cmgUid = '';
+              if (!(Global.validString(cmgUid))) {
+                cmgUid = Validate().randomGuid();
+                final allowRefresh = await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CrecheMonitorTabForAdd(
+                      cmgUid: cmgUid,
+                      isEdit: false,
+                      isViewScreen: false,
+                    ),
                   ),
-                ),
-              );
-              if (allowRefresh == 'itemRefresh') {
-                fetchCMCdata();
+                );
+                if (allowRefresh == 'itemRefresh') {
+                  fetchCMCdata();
+                }
               }
-            }
-          },
-          child: Image.asset(
-            "assets/add_btn.png",
-            scale: 2.7,
-            color: Color(0xff5979AA),
+            },
+            child: Image.asset(
+              "assets/add_btn.png",
+              scale: 2.7,
+              color: Color(0xff5979AA),
+            ),
           ),
-        ),
-        appBar: CustomAppbar(
-          text:
-              Global.returnTrLable(translatsLabel, CustomText.VisitNotes, lng),
-          onTap: () {
-            Navigator.pop(context, CustomText.itemRefresh);
-          },
-        ),
-        endDrawer: SafeArea(
-          child: Drawer(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 30),
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              "assets/filter_icon.png",
-                              scale: 2.4,
-                            ),
-                            SizedBox(
-                              width: 10.w,
-                            ),
-                            Text(
-                              Global.returnTrLable(
-                                  translatsLabel, CustomText.Filter, lng),
-                              style: Styles.labelcontrollerfont,
-                            ),
-                            Spacer(),
-                            InkWell(
-                                onTap: () async {
-                                  _scaffoldKey.currentState!.closeEndDrawer();
-                                  // cleaAllFilter();
-                                },
-                                child: Image.asset(
-                                  'assets/cross.png',
-                                  color: Colors.grey,
-                                  scale: 4,
-                                )),
-                          ],
-                        ),
-                      ),
-                      SizedBox(),
-                      DynamicCustomDropdownForFilterField(
-                        hintText: Global.returnTrLable(
-                            translatsLabel, CustomText.Creches, lng),
-                        items: creches,
-                        selectedItem: selectedCreche,
-                        onChanged: (value) {
-                          selectedCreche = value?.name;
-                        },
-                      ),
-                      SizedBox(
-                        height: 10.h,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(3.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    translatsLabel, 'Clear', lng),
-                                color: Color(0xffF26BA3),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  cleaAllFilter();
-                                },
+          appBar: CustomAppbar(
+            text:
+                Global.returnTrLable(translatsLabel, CustomText.VisitNotes, lng),
+            onTap: () {
+              Navigator.pop(context, CustomText.itemRefresh);
+            },
+          ),
+          endDrawer: SafeArea(
+            child: Drawer(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 30),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                "assets/filter_icon.png",
+                                scale: 2.4,
                               ),
-                            ),
-                            // Spacer(),
-                            SizedBox(width: 4.w),
-                            Expanded(
-                              child: CElevatedButton(
-                                text: Global.returnTrLable(
-                                    translatsLabel, 'Search', lng),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  filteredGetData(context);
-                                },
+                              SizedBox(
+                                width: 10.w,
                               ),
-                            ),
-                          ],
+                              Text(
+                                Global.returnTrLable(
+                                    translatsLabel, CustomText.Filter, lng),
+                                style: Styles.labelcontrollerfont,
+                              ),
+                              Spacer(),
+                              InkWell(
+                                  onTap: () async {
+                                    _scaffoldKey.currentState!.closeEndDrawer();
+                                    // cleaAllFilter();
+                                  },
+                                  child: Image.asset(
+                                    'assets/cross.png',
+                                    color: Colors.grey,
+                                    scale: 4,
+                                  )),
+                            ],
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 25),
-                        child: AnimatedRollingSwitch(
-                          title1: Global.returnTrLable(
-                              translatsLabel, CustomText.all, lng),
-                          title2: Global.returnTrLable(
-                              translatsLabel, CustomText.usynchedAndDraft, lng),
-                          isOnlyUnsynched: isOnlyUnsynched ?? false,
-                          onChange: (value) async {
-                            setState(() {
-                              isOnlyUnsynched = value;
-                            });
-                            await fetchCMCdata();
+                        SizedBox(),
+                        DynamicCustomDropdownForFilterField(
+                          hintText: Global.returnTrLable(
+                              translatsLabel, CustomText.Creches, lng),
+                          items: creches,
+                          selectedItem: selectedCreche,
+                          onChanged: (value) {
+                            selectedCreche = value?.name;
                           },
                         ),
-                      ),
-                    ]),
-              )),
-        ),
-        // body
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-          child: Column(children: [
-            Row(
-              children: [
-                Expanded(child: SizedBox()),
-                SizedBox(
-                  width: 10.w,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    _scaffoldKey.currentState!.openEndDrawer();
-                  },
-                  child: Image.asset(
-                    "assets/filter_icon.png",
-                    scale: 2.4,
-                  ),
-                )
-              ],
-            ),
-            Expanded(
-              child: filterData.length > 0
-                  ? ListView.builder(
-                      itemCount: filterData.length,
-                      // shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        final responce = filterData[index].responces;
-                        return GestureDetector(
-                          onTap: () async {
-                            final cmgUid = filterData[index].cmguid;
-                            bool isEdited=await Validate().checkEditable(filterData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
-
-                            final allowRefresh =
-                                await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    CrecheMonitorTabForAdd(
-                                  cmgUid: cmgUid!,
-                                  dateOfVisit: Global.getItemValues(
-                                      filterData[index].responces,
-                                      'date_of_visit'),
-                                  isEdit: true,
-                                  isViewScreen: isEdited==true?false:true,
+                        SizedBox(
+                          height: 10.h,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(3.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      translatsLabel, 'Clear', lng),
+                                  color: Color(0xffF26BA3),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    cleaAllFilter();
+                                  },
                                 ),
                               ),
-                            );
+                              // Spacer(),
+                              SizedBox(width: 4.w),
+                              Expanded(
+                                child: CElevatedButton(
+                                  text: Global.returnTrLable(
+                                      translatsLabel, 'Search', lng),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    filteredGetData(context);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 25),
+                          child: AnimatedRollingSwitch(
+                            title1: Global.returnTrLable(
+                                translatsLabel, CustomText.all, lng),
+                            title2: Global.returnTrLable(
+                                translatsLabel, CustomText.usynchedAndDraft, lng),
+                            isOnlyUnsynched: isOnlyUnsynched ?? false,
+                            onChange: (value) async {
+                              setState(() {
+                                isOnlyUnsynched = value;
+                              });
+                              await fetchCMCdata();
+                            },
+                          ),
+                        ),
+                      ]),
+                )),
+          ),
+          // body
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+            child: Column(children: [
+              Row(
+                children: [
+                  Expanded(child: SizedBox()),
+                  SizedBox(
+                    width: 10.w,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    },
+                    child: Image.asset(
+                      "assets/filter_icon.png",
+                      scale: 2.4,
+                    ),
+                  )
+                ],
+              ),
+              Expanded(
+                child: filterData.length > 0
+                    ? ListView.builder(
+                        itemCount: filterData.length,
+                        // shrinkWrap: true,
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          final responce = filterData[index].responces;
+                          return GestureDetector(
+                            onTap: () async {
+                              final cmgUid = filterData[index].cmguid;
+                              bool isEdited=await Validate().checkEditable(filterData[index].created_at, Validate().callEditfromCnfig(backdatedConfigirationModel));
 
-                            if (allowRefresh == 'itemRefresh') {
-                              fetchCMCdata();
-                            }
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 5.h),
-                            child: Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween, // Space items
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border:
-                                          Border.all(color: Color(0xffE7F0FF)),
-                                      borderRadius: BorderRadius.circular(10.r),
-                                    ),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10.w, vertical: 8.h),
-                                      child: Row(
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '${Global.returnTrLable(translatsLabel, CustomText.Creches, lng)} : ',
-                                                style: Styles.black104,
-                                              ),
-                                              Text(
-                                                '${Global.returnTrLable(translatsLabel, CustomText.datevisit, lng)} : ',
-                                                style: Styles.black104,
-                                                strutStyle:
-                                                    StrutStyle(height: 1.2),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(width: 10),
-                                          VerticalDivider(
-                                            color: Color(0xffE6E6E6),
-                                            width: 2,
-                                            thickness: 2,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
+                              final allowRefresh =
+                                  await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      CrecheMonitorTabForAdd(
+                                    cmgUid: cmgUid!,
+                                    dateOfVisit: Global.getItemValues(
+                                        filterData[index].responces,
+                                        'date_of_visit'),
+                                    isEdit: true,
+                                    isViewScreen: isEdited==true?false:true,
+                                  ),
+                                ),
+                              );
+
+                              if (allowRefresh == 'itemRefresh') {
+                                fetchCMCdata();
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 5.h),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween, // Space items
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border:
+                                            Border.all(color: Color(0xffE7F0FF)),
+                                        borderRadius: BorderRadius.circular(10.r),
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w, vertical: 8.h),
+                                        child: Row(
+                                          children: [
+                                            Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  callCreCheName(
-                                                      Global.getItemValues(
-                                                          responce!,
-                                                          'creche_id')),
-                                                  style: Styles.cardBlue10,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
+                                                  '${Global.returnTrLable(translatsLabel, CustomText.Creches, lng)} : ',
+                                                  style: Styles.black104,
                                                 ),
                                                 Text(
-                                                  (Global.validString(
-                                                          Global.getItemValues(
-                                                              filterData[index]
-                                                                  .responces,
-                                                              'date_of_visit')))
-                                                      ? Validate().displeDateFormate(
-                                                          Global.getItemValues(
-                                                              responce!,
-                                                              'date_of_visit'))
-                                                      : '',
-                                                  style: Styles.cardBlue10,
+                                                  '${Global.returnTrLable(translatsLabel, CustomText.datevisit, lng)} : ',
+                                                  style: Styles.black104,
                                                   strutStyle:
                                                       StrutStyle(height: 1.2),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                          SizedBox(width: 5),
-                                          (filterData[index].is_edited == 0 &&
-                                                  filterData[index]
-                                                          .is_uploaded ==
-                                                      1)
-                                              ? Image.asset("assets/sync.png",
-                                                  scale: 1.5)
-                                              : (filterData[index].is_edited ==
-                                                          1 &&
-                                                      filterData[index]
-                                                              .is_uploaded ==
-                                                          0)
-                                                  ? Image.asset(
-                                                      "assets/sync_gray.png",
-                                                      scale: 1.5)
-                                                  : Row(
-                                                      children: [
-                                                        Icon(
-                                                          Icons
-                                                              .error_outline_outlined,
-                                                          color: Colors.red,
-                                                          shadows: [
-                                                            BoxShadow(
-                                                              spreadRadius: 2,
-                                                              blurRadius: 4,
-                                                              color: Colors
-                                                                  .red.shade200,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        InkWell(
-                                                          onTap: () async {
-                                                            showDeleteDialog(
-                                                                filterData[
-                                                                    index]);
-                                                            // setState(() {});
-                                                          },
-                                                          child: Container(
-                                                            margin: EdgeInsets.only(
-                                                                left: 8
-                                                                    .w), // Optional spacing from content
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          50),
-                                                              color: Colors.red,
-                                                            ),
-                                                            child: Padding(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      horizontal:
-                                                                          2.w,
-                                                                      vertical:
-                                                                          2.h),
-                                                              child: Icon(
-                                                                Icons
-                                                                    .delete_rounded,
+                                            SizedBox(width: 10),
+                                            VerticalDivider(
+                                              color: Color(0xffE6E6E6),
+                                              width: 2,
+                                              thickness: 2,
+                                            ),
+                                            SizedBox(width: 10),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    callCreCheName(
+                                                        Global.getItemValues(
+                                                            responce!,
+                                                            'creche_id')),
+                                                    style: Styles.cardBlue10,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  Text(
+                                                    (Global.validString(
+                                                            Global.getItemValues(
+                                                                filterData[index]
+                                                                    .responces,
+                                                                'date_of_visit')))
+                                                        ? Validate().displeDateFormate(
+                                                            Global.getItemValues(
+                                                                responce!,
+                                                                'date_of_visit'))
+                                                        : '',
+                                                    style: Styles.cardBlue10,
+                                                    strutStyle:
+                                                        StrutStyle(height: 1.2),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(width: 5),
+                                            (filterData[index].is_edited == 0 &&
+                                                    filterData[index]
+                                                            .is_uploaded ==
+                                                        1)
+                                                ? Image.asset("assets/sync.png",
+                                                    scale: 1.5)
+                                                : (filterData[index].is_edited ==
+                                                            1 &&
+                                                        filterData[index]
+                                                                .is_uploaded ==
+                                                            0)
+                                                    ? Image.asset(
+                                                        "assets/sync_gray.png",
+                                                        scale: 1.5)
+                                                    : Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .error_outline_outlined,
+                                                            color: Colors.red,
+                                                            shadows: [
+                                                              BoxShadow(
+                                                                spreadRadius: 2,
+                                                                blurRadius: 4,
                                                                 color: Colors
-                                                                    .white,
-                                                                size: 16,
+                                                                    .red.shade200,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          InkWell(
+                                                            onTap: () async {
+                                                              showDeleteDialog(
+                                                                  filterData[
+                                                                      index]);
+                                                              // setState(() {});
+                                                            },
+                                                            child: Container(
+                                                              margin: EdgeInsets.only(
+                                                                  left: 8
+                                                                      .w), // Optional spacing from content
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            50),
+                                                                color: Colors.red,
+                                                              ),
+                                                              child: Padding(
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            2.w,
+                                                                        vertical:
+                                                                            2.h),
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .delete_rounded,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 16,
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                        ],
+                                                        ],
+                                                      ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: Text(Global.returnTrLable(
-                          translatsLabel, CustomText.NorecordAvailable, lng))),
-            ),
-          ]),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text(Global.returnTrLable(
+                            translatsLabel, CustomText.NorecordAvailable, lng))),
+              ),
+            ]),
+          ),
         ),
       ),
     );

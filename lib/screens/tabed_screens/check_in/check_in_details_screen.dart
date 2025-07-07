@@ -849,148 +849,151 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppbar(
-        text: lng != null
-            ? Global.returnTrLable(translats, CustomText.checkIN, lng!)
-            : CustomText.checkIN,
-        onTap: () {
-          Navigator.pop(context, 'itemRefresh');
-        },
-      ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Divider(),
-                Expanded(
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                    child: SingleChildScrollView(
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                if (_image == null) {
-                                  if (widget.isEdit == false) selectImageFile();
-                                }
-                              },
-                              child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10.h),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Color(0xffF9F9F9),
-                                        border: Border.all(
-                                            color: Color(0xffACACAC)),
-                                        borderRadius:
-                                            BorderRadius.circular(5.r)),
-                                    height: 80.h,
-                                    width: 78.w,
-                                    child: !Global.validString(imagePath)
-                                        ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Image.asset(
-                                                "assets/add_btn.png",
-                                                scale: 4,
-                                                color: Color(0xff80E0AA),
-                                              ),
-                                              SizedBox(
-                                                height: 10.h,
-                                              ),
-                                              Text(
-                                                Global.returnTrLable(
-                                                    translats,
-                                                    CustomText.ChildPicture,
-                                                    lng!),
-                                                style: Styles.Grey104,
-                                                textAlign: TextAlign.center,
-                                              )
-                                            ],
-                                          )
-                                        : SizedBox(
-                                            child:
-                                                _buildImageWidget(imagePath)),
-                                  )),
-                            ),
-                            SizedBox(height: 3.h),
-                            (widget.isEdit == false)
-                                ? (_image != null)
-                                    ? Center(
-                                        child: Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.04, // Adjust height as needed
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.1, // Adjust width as needed
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomAppbar(
+          text: lng != null
+              ? Global.returnTrLable(translats, CustomText.checkIN, lng!)
+              : CustomText.checkIN,
+          onTap: () {
+            Navigator.pop(context, 'itemRefresh');
+          },
+        ),
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  Divider(),
+                  Expanded(
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      child: SingleChildScrollView(
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  if (_image == null) {
+                                    if (widget.isEdit == false) selectImageFile();
+                                  }
+                                },
+                                child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Color(0xffF9F9F9),
+                                          border: Border.all(
+                                              color: Color(0xffACACAC)),
+                                          borderRadius:
+                                              BorderRadius.circular(5.r)),
+                                      height: 80.h,
+                                      width: 78.w,
+                                      child: !Global.validString(imagePath)
+                                          ? Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Image.asset(
+                                                  "assets/add_btn.png",
+                                                  scale: 4,
+                                                  color: Color(0xff80E0AA),
+                                                ),
+                                                SizedBox(
+                                                  height: 10.h,
+                                                ),
+                                                Text(
+                                                  Global.returnTrLable(
+                                                      translats,
+                                                      CustomText.ChildPicture,
+                                                      lng!),
+                                                  style: Styles.Grey104,
+                                                  textAlign: TextAlign.center,
+                                                )
+                                              ],
+                                            )
+                                          : SizedBox(
+                                              child:
+                                                  _buildImageWidget(imagePath)),
+                                    )),
+                              ),
+                              SizedBox(height: 3.h),
+                              (widget.isEdit == false)
+                                  ? (_image != null)
+                                      ? Center(
+                                          child: Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.04, // Adjust height as needed
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.1, // Adjust width as needed
 
-                                          child: ElevatedButton(
-                                              onPressed: () =>
-                                                  _clearImagePath(),
-                                              style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors
-                                                      .red, // Background color
-                                                  // onPrimary: Colors.white, // Text color
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6),
-                                                  ),
-                                                  padding: EdgeInsets.zero),
-                                              child: Icon(
-                                                Icons.delete,
-                                                size: 20,
-                                              )),
-                                        ),
-                                      )
-                                    : SizedBox()
-                                : SizedBox(),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: cWidget(),
-                            ),
-                          ]),
+                                            child: ElevatedButton(
+                                                onPressed: () =>
+                                                    _clearImagePath(),
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors
+                                                        .red, // Background color
+                                                    // onPrimary: Colors.white, // Text color
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6),
+                                                    ),
+                                                    padding: EdgeInsets.zero),
+                                                child: Icon(
+                                                  Icons.delete,
+                                                  size: 20,
+                                                )),
+                                          ),
+                                        )
+                                      : SizedBox()
+                                  : SizedBox(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: cWidget(),
+                              ),
+                            ]),
+                      ),
                     ),
                   ),
-                ),
-                Divider(),
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  child: Row(children: [
-                    Expanded(
-                        child: CElevatedButton(
-                      color: Color(0xffF26BA3),
-                      onPressed: () {
-                        nextTab(0, context);
-                      },
-                      text: Global.returnTrLable(
-                          translats, CustomText.back, lng!),
-                    )),
-                    widget.isEdit ? SizedBox() : SizedBox(width: 10),
-                    widget.isEdit
-                        ? SizedBox()
-                        : Expanded(
-                            child: CElevatedButton(
-                            color: Color(0xff369A8D),
-                            onPressed: () {
-                              nextTab(1, context);
-                            },
-                            text: Global.returnTrLable(
-                                translats, CustomText.Submit, lng!),
-                          ))
-                  ]),
-                ),
-              ],
-            ),
+                  Divider(),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                    child: Row(children: [
+                      Expanded(
+                          child: CElevatedButton(
+                        color: Color(0xffF26BA3),
+                        onPressed: () {
+                          nextTab(0, context);
+                        },
+                        text: Global.returnTrLable(
+                            translats, CustomText.back, lng!),
+                      )),
+                      widget.isEdit ? SizedBox() : SizedBox(width: 10),
+                      widget.isEdit
+                          ? SizedBox()
+                          : Expanded(
+                              child: CElevatedButton(
+                              color: Color(0xff369A8D),
+                              onPressed: () {
+                                nextTab(1, context);
+                              },
+                              text: Global.returnTrLable(
+                                  translats, CustomText.Submit, lng!),
+                            ))
+                    ]),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 

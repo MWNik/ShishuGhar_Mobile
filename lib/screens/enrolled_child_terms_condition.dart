@@ -54,110 +54,113 @@ class _EnrolledChildTermsConditionState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppbar(
-        text: CustomText.BENEFICIARYCONSENTFORM,
-        onTap: () => Navigator.pop(context),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSectionTitle("Introduction"),
-                    _buildSectionText(
-                      "$parterName (“We”/ “Us”/ “Our”) operate the Shishughar at $villgeName Location. "
-                      "We are supported by Azim Premji Philanthropic Initiatives Pvt. Ltd. (APPI) "
-                      "through their Rural Creche Initiative Programme.",
-                    ),
-                    _buildSectionTitle("Purpose"),
-                    _buildSectionText(
-                      "We collect Personal Information and Sensitive Personal Information of your child "
-                      "to assess growth, health, and nutritional conditions and monitor the Programme progress.",
-                    ),
-                    _buildSectionTitle("What Information Do We Collect?"),
-                    _buildSectionText(
-                      "Personal Information: Child's name, age, gender, contact number, anthropometric data, etc.\n"
-                      "Sensitive Personal Information: Illness and immunization status.",
-                    ),
-                    _buildSectionTitle("Data Storage & Retention"),
-                    _buildSectionText(
-                      "Information is stored in the Shishughar App and retained as required for the stated purpose or by law.",
-                    ),
-                    _buildSectionTitle("Data Security"),
-                    _buildSectionText(
-                      "We use reasonable security measures to protect your Personal and Sensitive Information.",
-                    ),
-                    _buildSectionTitle("Sharing of Data"),
-                    _buildSectionText(
-                      "Data is shared with APPI for the stated purpose but is anonymized in reports.",
-                    ),
-                    _buildSectionTitle("Data Deletion"),
-                    _buildSectionText(
-                      "You may request deletion of data by contacting us at the Shishughar.",
-                    ),
-                    _buildSectionTitle("Contact Information"),
-                    _buildSectionText(
-                      "For questions, contact the Creche Caregiver or Supervisor at the Shishughar.",
-                    ),
-                  ],
+    Global.applyDisplayCutout(Color(0xff5979AA));
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomAppbar(
+          text: CustomText.BENEFICIARYCONSENTFORM,
+          onTap: () => Navigator.pop(context),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle("Introduction"),
+                      _buildSectionText(
+                        "$parterName (“We”/ “Us”/ “Our”) operate the Shishughar at $villgeName Location. "
+                        "We are supported by Azim Premji Philanthropic Initiatives Pvt. Ltd. (APPI) "
+                        "through their Rural Creche Initiative Programme.",
+                      ),
+                      _buildSectionTitle("Purpose"),
+                      _buildSectionText(
+                        "We collect Personal Information and Sensitive Personal Information of your child "
+                        "to assess growth, health, and nutritional conditions and monitor the Programme progress.",
+                      ),
+                      _buildSectionTitle("What Information Do We Collect?"),
+                      _buildSectionText(
+                        "Personal Information: Child's name, age, gender, contact number, anthropometric data, etc.\n"
+                        "Sensitive Personal Information: Illness and immunization status.",
+                      ),
+                      _buildSectionTitle("Data Storage & Retention"),
+                      _buildSectionText(
+                        "Information is stored in the Shishughar App and retained as required for the stated purpose or by law.",
+                      ),
+                      _buildSectionTitle("Data Security"),
+                      _buildSectionText(
+                        "We use reasonable security measures to protect your Personal and Sensitive Information.",
+                      ),
+                      _buildSectionTitle("Sharing of Data"),
+                      _buildSectionText(
+                        "Data is shared with APPI for the stated purpose but is anonymized in reports.",
+                      ),
+                      _buildSectionTitle("Data Deletion"),
+                      _buildSectionText(
+                        "You may request deletion of data by contacting us at the Shishughar.",
+                      ),
+                      _buildSectionTitle("Contact Information"),
+                      _buildSectionText(
+                        "For questions, contact the Creche Caregiver or Supervisor at the Shishughar.",
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                OutlinedButton(
-                  onPressed: () {
-                    // Handle cancel action
-                    Navigator.pop(context, 'cancel');
-                  },
-                  child: Text(CustomText.Cancel, style: Styles.red125),
-                ),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 30.0), // Adjust padding as needed
-                    backgroundColor: Color(0xff369A8D), // Background color
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(30.0), // Round corners
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {
+                      // Handle cancel action
+                      Navigator.pop(context, 'cancel');
+                    },
+                    child: Text(CustomText.Cancel, style: Styles.red125),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 30.0), // Adjust padding as needed
+                      backgroundColor: Color(0xff369A8D), // Background color
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(30.0), // Round corners
+                      ),
+                    ),
+                    onPressed: () async {
+                      // Navigator.pop(context, 'Accept');
+                      var reponce = await Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  EnrolledExitChilrenTab(
+                                      openingDate: widget.openingDate,
+                                      closingDate: widget.closingDate,
+                                      isEditable: widget.isEditable,
+                                      CHHGUID: widget.CHHGUID,
+                                      HHGUID: widget.HHGUID,
+                                      HHname: widget.HHname,
+                                      EnrolledChilGUID: widget.EnrolledChilGUID,
+                                      crecheId: widget.crecheId,
+                                      minDate: widget.minDate,
+                                      isNew: widget.isNew,
+                                      isImageUpdate: widget.isImageUpdate)));
+                      if (reponce == 'itemRefresh') {
+                        Navigator.pop(context, reponce);
+                      }
+                    },
+                    child: Text(
+                      CustomText.IAgree,
+                      style: Styles.white125,
                     ),
                   ),
-                  onPressed: () async {
-                    // Navigator.pop(context, 'Accept');
-                    var reponce = await Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                EnrolledExitChilrenTab(
-                                    openingDate: widget.openingDate,
-                                    closingDate: widget.closingDate,
-                                    isEditable: widget.isEditable,
-                                    CHHGUID: widget.CHHGUID,
-                                    HHGUID: widget.HHGUID,
-                                    HHname: widget.HHname,
-                                    EnrolledChilGUID: widget.EnrolledChilGUID,
-                                    crecheId: widget.crecheId,
-                                    minDate: widget.minDate,
-                                    isNew: widget.isNew,
-                                    isImageUpdate: widget.isImageUpdate)));
-                    if (reponce == 'itemRefresh') {
-                      Navigator.pop(context, reponce);
-                    }
-                  },
-                  child: Text(
-                    CustomText.IAgree,
-                    style: Styles.white125,
-                  ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
