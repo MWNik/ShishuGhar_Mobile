@@ -18,6 +18,7 @@ import '../style/styles.dart';
 import '../utils/globle_method.dart';
 import '../utils/validate.dart';
 import 'dashboard_report_for_all_creche_by_api.dart';
+import 'dashboard_report_for_all_creche_by_api_new.dart';
 
 class DashboardScreen extends StatefulWidget {
   int? index;
@@ -170,7 +171,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           builder: (BuildContext context) => EnrolledChildrenForCC()));
     } else if (_currentIndex == 2) {
       refreshStatus =  await Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => DashboardReportSupeByApiScreen()));
+          builder: (BuildContext context) => DashboardReportSupeByApiScreenNew()));
     } else if (_currentIndex == 4) {
       if (HomeReplicaScreen.scaffoldKey != null) {
         HomeReplicaScreen.scaffoldKey!.currentState?.openDrawer();

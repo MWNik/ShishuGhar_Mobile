@@ -14,6 +14,7 @@ class EnrolledExitChildResponceModel {
   String? created_by;
   String? update_at;
   String? updated_by;
+  int? reason_for_exit;
 
   EnrolledExitChildResponceModel({
     this.ChildEnrollGUID,
@@ -29,7 +30,8 @@ class EnrolledExitChildResponceModel {
     this.created_by,
     this.update_at,
     this.updated_by,
-    this.is_uploaded
+    this.is_uploaded,
+    this.reason_for_exit
   });
 
   factory EnrolledExitChildResponceModel.fromJson(Map<String, dynamic> json) => EnrolledExitChildResponceModel(
@@ -47,6 +49,7 @@ class EnrolledExitChildResponceModel {
     update_at: json["update_at"],
     updated_by: json["updated_by"],
     is_uploaded: json["is_uploaded"],
+    reason_for_exit: json["reason_for_exit"],
 
   );
 
@@ -65,5 +68,6 @@ class EnrolledExitChildResponceModel {
     "update_at": update_at,
     "updated_by": updated_by,
     "is_uploaded": is_uploaded,
+    "reason_for_exit": reason_for_exit,
   };
 }

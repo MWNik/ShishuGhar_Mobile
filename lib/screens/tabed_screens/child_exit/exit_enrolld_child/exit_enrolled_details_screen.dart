@@ -676,7 +676,7 @@ class _ExitEnrolledDetailsScreenState extends State<ExitEnrolledDetailsScreen> {
         myMap['appcreated_by'],
         myMap['app_updated_on'],
         myMap['app_updated_by'],
-        myMap['date_of_exit']);
+        myMap['date_of_exit'],Global.stringToIntNull(myMap['reason_for_exit'].toString()));
     var reffralItem = await ChildReferralTabResponseHelper()
         .callChildReffralsByEnrolledGUID(widget.EnrolledChilGUID);
     if (reffralItem.length > 0) {
@@ -966,7 +966,7 @@ class _ExitEnrolledDetailsScreenState extends State<ExitEnrolledDetailsScreen> {
           responseData['appcreated_by'],
           responseData['app_updated_on'],
           responseData['app_updated_by'],
-          responseData['date_of_exit']);
+          responseData['date_of_exit'],Global.stringToIntNull(myMap['reason_for_exit'].toString()));
     }
   }
 }

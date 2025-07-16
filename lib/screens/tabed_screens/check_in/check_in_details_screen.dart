@@ -397,8 +397,8 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           is_edited: 1,
           created_at: myMap['appcreated_on'],
           created_by: myMap['appcreated_by'],
-          update_at: Validate().currentDateTime(),
-          updated_by: userName);
+          update_at:  myMap['app_updated_on'],
+          updated_by:  myMap['app_updated_by']);
       await CheckInResponseHelper().inserts(checkinItems);
     }
   }

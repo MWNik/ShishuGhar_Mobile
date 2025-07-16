@@ -50,7 +50,9 @@ class EnrolledExitChilrenResponceHelper {
       String? created_by,
       String? update_at,
       String? updated_by,
-      String? date_of_exit) async {
+      String? date_of_exit,
+      int? reason_for_exit,
+      ) async {
     var item = EnrolledExitChildResponceModel(
         ChildEnrollGUID: childEnrolledGUID,
         CHHGUID: chhGuid,
@@ -65,7 +67,8 @@ class EnrolledExitChilrenResponceHelper {
         created_at: created_at,
         update_at: update_at,
         updated_by: updated_by,
-        date_of_exit: date_of_exit);
+        date_of_exit: date_of_exit,
+    reason_for_exit: reason_for_exit);
     await DatabaseHelper.database!.insert(
         'enrollred_exit_child_responce', item.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -352,7 +355,7 @@ class EnrolledExitChilrenResponceHelper {
   Future<List<Map<String, dynamic>>> getNotEnrollChildrenExited(
       String villageId,int creche_id) async {
     var query =
-        'select child.*,hh.responces as hhResponce from house_hold_children child left join house_hold_responce as hh on child.HHGUID=hh.HHGUID where child.CHHGUID in(select CHHGUID from enrollred_exit_child_responce where date_of_exit  NOTNULL  and child.CHHGUID not in(select CHHGUID from enrollred_exit_child_responce  where  (date_of_exit isnull or length(RTRIM(LTRIM(date_of_exit))) == 0)) GROUP by CHHGUID)  and  hh.creche_id=? ORDER BY LOWER( SUBSTR(child.responces, INSTR(child.responces, ?) + LENGTH(?) ) ) asc';
+        'select child.*,hh.responces as hhResponce from house_hold_children child left join house_hold_responce as hh on child.HHGUID=hh.HHGUID where child.CHHGUID in(select CHHGUID from enrollred_exit_child_responce where date_of_exit  NOTNULL  and child.CHHGUID not in(select CHHGUID from enrollred_exit_child_responce  where  (date_of_exit isnull or length(RTRIM(LTRIM(date_of_exit))) == 0) or reason_for_exit=4) GROUP by CHHGUID)  and  hh.creche_id=? ORDER BY LOWER( SUBSTR(child.responces, INSTR(child.responces, ?) + LENGTH(?) ) ) asc';
     List<Map<String, dynamic>> result =
     await DatabaseHelper.database!.rawQuery(query, [
       creche_id,
@@ -366,6 +369,27 @@ class EnrolledExitChilrenResponceHelper {
     //     villageId.toString()))
     //     .toList();
     return result;
+  }
+
+  Future<List<String>> excuteExitedChildDataWithResponce(
+      int creche_id)
+  async {
+    var query =
+        'select CHHGUID,responces as exitRsponce from enrollred_exit_child_responce where date_of_exit  NOTNULL  and CHHGUID not in( select CHHGUID from enrollred_exit_child_responce  where  (date_of_exit isnull or length(RTRIM(LTRIM(date_of_exit))) == 0)) and creche_id=? GROUP by CHHGUID' ;
+    List<String> chhGUID=[];
+    List<Map<String, dynamic>> result =
+    await DatabaseHelper.database!.rawQuery(query, [
+      creche_id
+    ]);
+
+    var filteredItem = result
+        .where((element) =>
+            (Global.getItemValues(element['exitRsponce'], 'reason_for_exit') != '3'))
+        .toList();
+    filteredItem.forEach((itemMap) {
+      chhGUID.add(itemMap['CHHGUID']);
+        });
+    return chhGUID;
   }
 
   Future<Map<String, dynamic>> getHHDataINMAP(String hhGuid) async {
@@ -598,6 +622,7 @@ class EnrolledExitChilrenResponceHelper {
         var date_of_exit = enrollExitData['date_of_exit'];
         var hh_child_id =
             Global.stringToInt(enrollExitData['child_id'].toString());
+        var reason_for_exit=Global.stringToIntNull(enrollExitData['reason_for_exit'].toString());
         var finalHHData = Validate().keyesFromResponce(enrollExitData);
         var hhDtaResponce = jsonEncode(finalHHData);
 
@@ -617,6 +642,7 @@ class EnrolledExitChilrenResponceHelper {
           updated_by: app_updated_by,
           created_by: appcreated_by,
           created_at: appCreatedOn,
+          reason_for_exit: reason_for_exit,
         );
 
         // Add the item to the list

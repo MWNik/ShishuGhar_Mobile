@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'dart:async';
-
 import 'package:shishughar/screens/login_screen.dart';
 import 'package:shishughar/style/styles.dart';
-
 import '../utils/validate.dart';
 import 'dashboardscreen_new.dart';
 

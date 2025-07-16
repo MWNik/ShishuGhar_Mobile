@@ -1002,7 +1002,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           myMap['appcreated_by'],
           myMap['app_updated_on'],
           myMap['app_updated_by'],
-          myMap['date_of_exit']);
+          myMap['date_of_exit'],Global.stringToIntNull(myMap['reason_for_exit'].toString()));
 
       var reffralItem = await ChildReferralTabResponseHelper()
           .callChildReffralsByEnrolledGUID(widget.EnrolledChilGUID);

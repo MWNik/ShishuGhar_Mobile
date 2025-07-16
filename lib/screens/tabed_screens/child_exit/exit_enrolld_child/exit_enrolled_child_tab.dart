@@ -540,7 +540,7 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
           responseData['appcreated_by'],
           responseData['app_updated_on'],
           responseData['app_updated_by'],
-          responseData['date_of_exit']);
+          responseData['date_of_exit'],Global.stringToIntNull(myMap['reason_for_exit'].toString()));
     }
   }
 }

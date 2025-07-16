@@ -27,7 +27,7 @@ class DatabaseHelper {
       print("Opening existing database");
     }
     database = await openDatabase(path,
-        version: 4,
+        version: 5,
         onUpgrade: (db, oldVersion, newVersion) =>
             upgradeVersion(db, oldVersion, newVersion));
 
@@ -134,6 +134,16 @@ class DatabaseHelper {
 	"date"	TEXT,
 	PRIMARY KEY("unique_id","type")
 );''');
+
+        } catch (e) {
+          print("$e");
+        }
+      }
+      if (oldVersion == 4 && newVersion > 4) {
+        try {
+            // table enrollred_exit_child_responce
+            await addNewColoumn(
+                db, 'enrollred_exit_child_responce', 'reason_for_exit', 'INTEGER');
 
         } catch (e) {
           print("$e");

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
@@ -111,13 +112,39 @@ class _DashboardReportCardDetailState
   List<TabVillage> villages = [];
   List<CresheDatabaseResponceModel> creches = [];
 
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController _controller = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     initializeData();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        // Scroll to the bottom to make sure autocomplete is visible
+        Future.delayed(Duration(milliseconds: 300), () {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+          );
+        });
+      }
+    });
+  }
+
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _scrollController.dispose(); // Clean up controller
+    _controller.dispose(); // Clean up controller
+    super.dispose();
   }
 
   Future<void> initializeData() async {
+
     role = (await Validate().readString(Validate.role))!;
     years = getYearList(2000);
     months = getMonthList(Global.stringToInt(years.first.name));
@@ -165,6 +192,7 @@ class _DashboardReportCardDetailState
       CustomText.CrecheStatus,
       CustomText.Partner,
       CustomText.totalCount,
+      CustomText.Search,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -179,6 +207,7 @@ class _DashboardReportCardDetailState
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
+        resizeToAvoidBottomInset: true,
         appBar: CustomAppbar(
           text: Global.returnTrLable(translats, widget.title, lng),
           onTap: () {
@@ -229,7 +258,12 @@ class _DashboardReportCardDetailState
                         SizedBox(),
                         Expanded(
                             child: SingleChildScrollView(
-                                child: Column(children: [
+                                controller: _scrollController,
+                                physics: BouncingScrollPhysics(),
+                                child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start,
+                                    children: [
                           parterns.length > 0
                               ? DynamicCustomDropdownField(
                                   hintText: Global.returnTrLable(
@@ -263,8 +297,8 @@ class _DashboardReportCardDetailState
                               selectedDistrict = null;
                               selectedBlock = null;
                               selectedGramPanchayat = null;
-                              selectedVillage = null;
-                              selectedCreche = null;
+                              // selectedVillage = null;
+                              // selectedCreche = null;
                               mstDistrict = Global.callDistrict(
                                   district, lng, selectedState);
                               if (mstDistrict.length == 1) {
@@ -277,14 +311,14 @@ class _DashboardReportCardDetailState
                                       gramPanchayat, lng, selectedBlock);
                                   if (mstGP.length == 1) {
                                     selectedGramPanchayat = mstGP.first;
-                                    mstVillage = Global.callFiltersVillages(
-                                        villages, lng, selectedGramPanchayat);
-
-                                    if (mstVillage.length == 1) {
-                                      selectedVillage = mstVillage.first;
-                                      mstcreches = Global.callFiltersCreches(
-                                          creches, lng, selectedVillage);
-                                    }
+                                    // mstVillage = Global.callFiltersVillages(
+                                    //     villages, lng, selectedGramPanchayat);
+                                    //
+                                    // if (mstVillage.length == 1) {
+                                    //   selectedVillage = mstVillage.first;
+                                    //   mstcreches = Global.callFiltersCreches(
+                                    //       creches, lng, selectedVillage);
+                                    // }
                                   }
                                 }
                               } else {
@@ -312,8 +346,8 @@ class _DashboardReportCardDetailState
                               selectedDistrict = value;
                               selectedBlock = null;
                               selectedGramPanchayat = null;
-                              selectedVillage = null;
-                              selectedCreche = null;
+                              // selectedVillage = null;
+                              // selectedCreche = null;
                               mstBlock = Global.callBlocks(
                                   block, lng, selectedDistrict);
                               if (mstBlock.length == 1) {
@@ -322,14 +356,14 @@ class _DashboardReportCardDetailState
                                     gramPanchayat, lng, selectedBlock);
                                 if (mstGP.length == 1) {
                                   selectedGramPanchayat = mstGP.first;
-                                  mstVillage = Global.callFiltersVillages(
-                                      villages, lng, selectedGramPanchayat);
-
-                                  if (mstVillage.length == 1) {
-                                    selectedVillage = mstVillage.first;
-                                    mstcreches = Global.callFiltersCreches(
-                                        creches, lng, selectedVillage);
-                                  }
+                                  // mstVillage = Global.callFiltersVillages(
+                                  //     villages, lng, selectedGramPanchayat);
+                                  //
+                                  // if (mstVillage.length == 1) {
+                                  //   selectedVillage = mstVillage.first;
+                                  //   mstcreches = Global.callFiltersCreches(
+                                  //       creches, lng, selectedVillage);
+                                  // }
                                 }
                               } else {
                                 mstGP = [];
@@ -354,19 +388,19 @@ class _DashboardReportCardDetailState
                             onChanged: (value) async {
                               selectedBlock = value;
                               selectedGramPanchayat = null;
-                              selectedVillage = null;
-                              selectedCreche = null;
+                              // selectedVillage = null;
+                              // selectedCreche = null;
                               mstGP = Global.callGramPanchyats(
                                   gramPanchayat, lng, selectedBlock);
                               if (mstGP.length == 1) {
                                 selectedGramPanchayat = mstGP.first;
-                                mstVillage = Global.callFiltersVillages(
-                                    villages, lng, selectedGramPanchayat);
-                                if (mstVillage.length == 1) {
-                                  selectedVillage = mstVillage.first;
-                                  mstcreches = Global.callFiltersCreches(
-                                      creches, lng, selectedVillage);
-                                }
+                                // mstVillage = Global.callFiltersVillages(
+                                //     villages, lng, selectedGramPanchayat);
+                                // if (mstVillage.length == 1) {
+                                //   selectedVillage = mstVillage.first;
+                                //   mstcreches = Global.callFiltersCreches(
+                                //       creches, lng, selectedVillage);
+                                // }
                               } else {
                                 mstVillage = [];
                               }
@@ -386,58 +420,158 @@ class _DashboardReportCardDetailState
                             onChanged: (value) async {
                               selectedGramPanchayat = value;
                               selectedVillage = null;
-                              selectedCreche = null;
-                              mstVillage = Global.callFiltersVillages(
-                                  villages, lng, selectedGramPanchayat);
-                              if (mstVillage.length == 1) {
-                                selectedVillage = mstVillage.first;
-                                if (mstVillage.length == 1) {
-                                  selectedVillage = mstVillage.first;
-                                  mstcreches = Global.callFiltersCreches(
-                                      creches, lng, selectedVillage);
-                                }
-                              }
+                              // selectedCreche = null;
+                              // mstVillage = Global.callFiltersVillages(
+                              //     villages, lng, selectedGramPanchayat);
+                              // if (mstVillage.length == 1) {
+                              //   selectedVillage = mstVillage.first;
+                              //   if (mstVillage.length == 1) {
+                              //     selectedVillage = mstVillage.first;
+                              //     mstcreches = Global.callFiltersCreches(
+                              //         creches, lng, selectedVillage);
+                              //   }
+                              // }
                               setState(() {});
                             },
                           ),
-                          DynamicCustomDropdownField(
-                            hintText: Global.returnTrLable(
-                                translats, CustomText.Selecthere, lng),
-                            titleText: Global.returnTrLable(
-                                translats, CustomText.Village, lng),
-                            isRequred: 0,
-                            items: mstVillage,
-                            selectedItem: selectedVillage != null
-                                ? selectedVillage?.name
-                                : null,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedVillage = value;
-                                selectedCreche = null;
-                                mstcreches = Global.callFiltersCreches(
-                                    creches, lng, selectedVillage);
-                                if (mstcreches.length == 1) {
-                                  selectedCreche = mstcreches.first;
-                                }
-                              });
-                            },
-                          ),
-                          DynamicCustomDropdownField(
-                            hintText: Global.returnTrLable(
-                                translats, CustomText.Selecthere, lng),
-                            titleText: Global.returnTrLable(
-                                translats, CustomText.Creches, lng),
-                            isRequred: 0,
-                            items: mstcreches,
-                            selectedItem: selectedCreche != null
-                                ? selectedCreche?.name
-                                : null,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedCreche = value;
-                              });
-                            },
-                          ),
+                          // DynamicCustomDropdownField(
+                          //   hintText: Global.returnTrLable(
+                          //       translats, CustomText.Selecthere, lng),
+                          //   titleText: Global.returnTrLable(
+                          //       translats, CustomText.Village, lng),
+                          //   isRequred: 0,
+                          //   items: mstVillage,
+                          //   selectedItem: selectedVillage != null
+                          //       ? selectedVillage?.name
+                          //       : null,
+                          //   onChanged: (value) {
+                          //     setState(() {
+                          //       selectedVillage = value;
+                          //       selectedCreche = null;
+                          //       mstcreches = Global.callFiltersCreches(
+                          //           creches, lng, selectedVillage);
+                          //       if (mstcreches.length == 1) {
+                          //         selectedCreche = mstcreches.first;
+                          //       }
+                          //     });
+                          //   },
+                          // ),
+                          // DynamicCustomDropdownField(
+                          //   hintText: Global.returnTrLable(
+                          //       translats, CustomText.Selecthere, lng),
+                          //   titleText: Global.returnTrLable(
+                          //       translats, CustomText.Creches, lng),
+                          //   isRequred: 0,
+                          //   items: mstcreches,
+                          //   selectedItem: selectedCreche != null
+                          //       ? selectedCreche?.name
+                          //       : null,
+                          //   onChanged: (value) {
+                          //     setState(() {
+                          //       selectedCreche = value;
+                          //     });
+                          //   },
+                          // ),
+                                  Text(Global.returnTrLable(
+                                      translats, CustomText.Creches, lng),
+                                    style: Styles.black124,),
+                                  SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: Color(0xffACACAC)),
+                                      borderRadius: BorderRadius.circular(
+                                          10.r),
+                                    ),
+                                    child: TypeAheadField<OptionsModel>(
+                                      controller: _controller,
+                                      scrollController: _scrollController,
+                                      suggestionsCallback: (pattern) async {
+                                        try {
+                                          return mstcreches.where((
+                                              element) =>
+                                          element.values != null &&
+                                              element.name != null &&
+                                              element.values!
+                                                  .toLowerCase()
+                                                  .contains(
+                                                  pattern.toLowerCase())
+                                          ).toList();
+                                        } catch (e) {
+                                          debugPrint('TypeAhead error: $e');
+                                          return [];
+                                        }
+                                      },
+                                      builder: (context, controller,
+                                          focusNode) {
+                                        return TextField(
+                                            controller: controller,
+                                            focusNode: focusNode,
+                                            // autofocus: true,
+                                            style:  Styles.black124,
+                                            decoration: InputDecoration(
+                                              hintText: Global.returnTrLable(
+                                                  translats, CustomText.Search, lng),
+                                              contentPadding: EdgeInsets
+                                                  .all(10),
+                                              border: InputBorder.none,
+                                              fillColor: Colors.white,
+                                              filled: true,
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors
+                                                        .transparent),
+                                                borderRadius: BorderRadius
+                                                    .circular(10),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors
+                                                        .transparent),
+                                                borderRadius: BorderRadius
+                                                    .circular(10),
+                                              ),
+                                              disabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors
+                                                        .transparent),
+                                                borderRadius: BorderRadius
+                                                    .circular(10),
+                                              ),
+                                            )
+                                        );
+                                      },
+                                      itemBuilder: (context, item) {
+                                        return ListTile(
+                                          title: Text(item.values!),
+                                          subtitle: Text(item.name!),
+                                        );
+                                      },
+                                      onSelected: (item) {
+                                        selectedCreche = item;
+                                        _controller.text = item.values ?? '';
+                                        print('itm $item');
+                                      },
+                                      offset: Offset(0, 12),
+                                      constraints: BoxConstraints(
+                                          maxHeight: 500),
+                                      hideOnUnfocus: true,
+                                      showOnFocus: true,
+                                      hideWithKeyboard: false,
+                                      loadingBuilder: (context) =>
+                                      const Text('Loading...'),
+                                      errorBuilder: (context,
+                                          error) => const Text('Error!'),
+                                      emptyBuilder: (context) =>
+                                      const Text('No items found!'),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10.h,
+                                  ),
                           DynamicCustomDropdownField(
                             hintText: Global.returnTrLable(
                                 translats, CustomText.Selecthere, lng),
@@ -506,6 +640,10 @@ class _DashboardReportCardDetailState
                             ],
                           ),
                         ),
+                        SizedBox(height: MediaQuery
+                            .of(context)
+                            .viewInsets
+                            .bottom),
                       ]),
                 ))),
         body: Padding(
@@ -785,7 +923,7 @@ class _DashboardReportCardDetailState
     tempSelectedCreche = widget.selectedCreche;
     tempSelectedPartner = widget.selectedPartner;
     tempSelectedCrecheStatus = widget.selectedCrecheStatus;
-
+    _controller.text=(widget.selectedCreche!=null?widget.selectedCreche?.values!:'')!;
     states = await StateDataHelper().getTabStateList();
     district = await DistrictDataHelper().getTabDistrictList();
     block = await BlockDataHelper().getTabBlockList();
@@ -793,6 +931,7 @@ class _DashboardReportCardDetailState
     villages = await VillageDataHelper().getTabVillageList();
     mstStates = Global.callSatates(states, lng);
     creches = await CrecheDataHelper().getCrecheResponce();
+    mstcreches = await OptionsModelHelper().callCrechInOptionAll('Creche');
     crecheStatus =
         await OptionsModelHelper().getMstCommonOptions('Creche Status', lng);
     parterns =
@@ -845,21 +984,21 @@ class _DashboardReportCardDetailState
           Global.callFiltersVillages(villages, lng, selectedGramPanchayat);
     }
 
-    if (mstVillage.length == 1) {
-      selectedVillage = mstVillage.first;
-      tempSelectedVillage = mstVillage.first;
-      mstcreches = Global.callFiltersCreches(creches, lng, selectedVillage);
-    }
-    if (mstVillage.length > 0 && widget.selectedVillage != null) {
-      selectedVillage = widget.selectedVillage;
-      mstcreches = Global.callFiltersCreches(creches, lng, selectedVillage);
-    }
+    // if (mstVillage.length == 1) {
+    //   selectedVillage = mstVillage.first;
+    //   tempSelectedVillage = mstVillage.first;
+    //   // mstcreches = Global.callFiltersCreches(creches, lng, selectedVillage);
+    // }
+    // if (mstVillage.length > 0 && widget.selectedVillage != null) {
+    //   selectedVillage = widget.selectedVillage;
+    //   // mstcreches = Global.callFiltersCreches(creches, lng, selectedVillage);
+    // }
 
     if (mstcreches.length > 0 && widget.selectedCreche != null) {
       selectedCreche = widget.selectedCreche;
-    } else if (mstcreches.length == 1) {
-      selectedCreche = mstcreches.first;
-      tempSelectedCreche = mstcreches.first;
+    // } else if (mstcreches.length == 1) {
+    //   selectedCreche = mstcreches.first;
+    //   tempSelectedCreche = mstcreches.first;
     }
 
     if (parterns.length > 0 && widget.selectedPartner != null) {
