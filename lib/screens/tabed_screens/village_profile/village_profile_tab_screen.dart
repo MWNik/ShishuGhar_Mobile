@@ -8,11 +8,6 @@ import 'package:shishughar/database/helper/village_profile/village_profile_respo
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/screens/tabed_screens/village_profile/village_profile_demografical/vilage-profile_demografical_listing_screen.dart';
 import 'package:shishughar/utils/validate.dart';
-import '../../../custom_widget/custom_btn.dart';
-import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
-import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_field_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
@@ -311,7 +306,7 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
       final textPainter = TextPainter(
         text: TextSpan(
             text: Global.returnTrLable(
-                translatsLabel, tabBreakItems[i].label!, lng!),
+                translatsLabel, tabBreakItems[i].label!, lng),
             style: Styles.white124P),
         maxLines: 1, // Single line text
         textDirection: TextDirection.ltr,

@@ -5,7 +5,6 @@ import 'package:archive/archive.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
@@ -17,10 +16,8 @@ import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/utils/constants.dart';
 import 'package:shishughar/utils/globle_method.dart';
-import 'package:shishughar/utils/secure_storage.dart';
 import 'package:shishughar/utils/year_month_custom_calender.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../custom_widget/single_poup_dailog.dart';
 import '../model/databasemodel/backdated_configiration_model.dart';
@@ -405,6 +402,16 @@ class Validate {
     return dateTime;
   }
 
+  String dateToMonthYear(String inputDate) {
+      try {
+        DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(inputDate);
+        return DateFormat('yyyy-MM').format(parsedDate);
+      } catch (e) {
+        print('Date parsing error: $e');
+        return '';
+      }
+  }
+
   DateTime? stringToDateNull(String inputDate) {
     DateTime? dateTime;
     try {
@@ -577,6 +584,7 @@ class Validate {
       // return TimeOfDay(hour:int.parse(time.split(":")[0]),minute: int.parse(time.split(":")[1]));
     } else
       TimeOfDay.now();
+    return null;
   }
 
   Future<void> shareFile(File filePath) async {
@@ -805,7 +813,7 @@ class Validate {
         var datePart = DateTime(creation.year, creation.month, creation.day);
         var now = DateTime.now();
         var nowDatePart = DateTime(now.year, now.month, now.day);
-        returnStatus = datePart.add(Duration(days: days!)).isAfter(nowDatePart);
+        returnStatus = datePart.add(Duration(days: days)).isAfter(nowDatePart);
       }
       var date = await Validate().readString(Validate.date);
       var applicableDate = Validate().stringToDate(date ?? "2025-03-31");

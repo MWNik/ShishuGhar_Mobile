@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
-import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 
 import '../style/styles.dart';
 import 'custom_btn.dart';

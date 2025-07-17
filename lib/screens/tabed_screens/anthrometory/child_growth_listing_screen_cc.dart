@@ -4,9 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 
 import '../../../custom_widget/custom_text.dart';
-import '../../../custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
-import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/databasemodel/child_growth_responce_model.dart';
@@ -562,7 +560,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenCC> {
     if(Global.validString(date)){
       DateTime? selectedDate = DateTime.parse(date.toString());
       DateTime currentDate = DateTime.parse(Validate().currentDate());
-      DateTime editableDate = DateTime(selectedDate!.year,selectedDate.month +1,11);
+      DateTime editableDate = DateTime(selectedDate.year,selectedDate.month +1,11);
       if(currentDate.isBefore(editableDate)){
         isEditable = true;
       } else {

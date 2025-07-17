@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -101,15 +100,13 @@ class _CustomImageDynamicState extends State<CustomImageDynamic> {
               if (file != null) {
                 var save = await savePickedImage(file, widget.child_guid);
 
-                if (save.path != null) {
-                  setState(() {
-                    image = File(save.path);
-                    widget.onChanged?.call(save.path);
-                    widget.imageName = basename(save.path);
-                    widget.onName?.call(widget.imageName!);
-                  });
-                }
-              }
+                setState(() {
+                  image = File(save.path);
+                  widget.onChanged?.call(save.path);
+                  widget.imageName = basename(save.path);
+                  widget.onName?.call(widget.imageName!);
+                });
+                            }
             }
           },
           child: _buildImageWidget(),

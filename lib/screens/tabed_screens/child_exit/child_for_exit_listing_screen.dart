@@ -16,7 +16,6 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dar
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import '../../../database/helper/child_exit/child_exit_response_Helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/village_data_helper.dart';
 import '../../../model/databasemodel/tabVillage_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
@@ -213,7 +212,7 @@ class _EnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, 'Clear', lng!),
+                                    translats, 'Clear', lng),
                                 color: Color(0xffF26BA3),
                                 onPressed: () {
                                   Navigator.of(context).pop();
@@ -226,7 +225,7 @@ class _EnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, 'Search', lng!),
+                                    translats, 'Search', lng),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   filteredGetData(context);
@@ -550,6 +549,7 @@ class _EnrolledChildrenListedScreenState
     //     flag: 'tabBlock'))
     //     .toList();
     setState(() {});
+    return null;
   }
 
   // filteredGetData(BuildContext context) async {

@@ -1052,73 +1052,71 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
   }
 
   Future initMasterData(MasterDataModel master) async {
-    if (master != null) {
-      List<TabState> stateList = master.tabState!;
+    List<TabState> stateList = master.tabState!;
 
-      await StateDataHelper().insertMasterStates(stateList);
+    await StateDataHelper().insertMasterStates(stateList);
 
-      List<TabBlock> blockList = master.tabBlock!;
+    List<TabBlock> blockList = master.tabBlock!;
 
-      await BlockDataHelper().insertMasterBlock(blockList);
+    await BlockDataHelper().insertMasterBlock(blockList);
 
-      List<TabDistrict> districtList = master.tabDistrict!;
+    List<TabDistrict> districtList = master.tabDistrict!;
 
-      await DistrictDataHelper().insertMasterDistrict(districtList);
+    await DistrictDataHelper().insertMasterDistrict(districtList);
 
-      List<TabVillage> villageList = master.tabVillage!;
+    List<TabVillage> villageList = master.tabVillage!;
 
-      await VillageDataHelper().insertMasterVillage(villageList);
+    await VillageDataHelper().insertMasterVillage(villageList);
 
-      List<TabGramPanchayat> gramPanchayatList = master.tabGramPanchayat!;
+    List<TabGramPanchayat> gramPanchayatList = master.tabGramPanchayat!;
 
-      await GramPanchayatDataHelper()
-          .insertMasterGramPanchayat(gramPanchayatList);
+    await GramPanchayatDataHelper()
+        .insertMasterGramPanchayat(gramPanchayatList);
 
-      if (master.tabSuperVisor != null) {
-        await MstSuperVisorHelper().inserts(master.tabSuperVisor!);
-      }
-
-      /////////Height Weight for age
-      if (master.tabHeightforAgeBoys != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertHeightForAgeBoys(master.tabHeightforAgeBoys!);
-      }
-
-      if (master.tabHeightforAgeGirls != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertHeightForAgeGirls(master.tabHeightforAgeGirls!);
-      }
-
-      if (master.tabWeightforAgeBoys != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertWeightForAgeBoys(master.tabWeightforAgeBoys!);
-      }
-
-      if (master.tabWeightforAgeGirls != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertWeightForAgeGirls(master.tabWeightforAgeGirls!);
-      }
-      if (master.tabWeightToHeightBoys != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertWeightToHeightBoys(master.tabWeightToHeightBoys!);
-      }
-
-      if (master.tabWeightToHeightGirls != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertWeightToHeightGirls(master.tabWeightToHeightGirls!);
-      }
-
-      if (master.tabVaccines != null) {
-        await VaccinesDataHelper().insert(master.tabVaccines!);
-      }
-      if (master.tabMasterStock != null) {
-        await MasterStockHelper().insert(master.tabMasterStock!);
-      }
-      if (master.tabPartnerStock != null) {
-        await PartnerStockHelper().insert(master.tabPartnerStock!);
-      }
+    if (master.tabSuperVisor != null) {
+      await MstSuperVisorHelper().inserts(master.tabSuperVisor!);
     }
-  }
+
+    /////////Height Weight for age
+    if (master.tabHeightforAgeBoys != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertHeightForAgeBoys(master.tabHeightforAgeBoys!);
+    }
+
+    if (master.tabHeightforAgeGirls != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertHeightForAgeGirls(master.tabHeightforAgeGirls!);
+    }
+
+    if (master.tabWeightforAgeBoys != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertWeightForAgeBoys(master.tabWeightforAgeBoys!);
+    }
+
+    if (master.tabWeightforAgeGirls != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertWeightForAgeGirls(master.tabWeightforAgeGirls!);
+    }
+    if (master.tabWeightToHeightBoys != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertWeightToHeightBoys(master.tabWeightToHeightBoys!);
+    }
+
+    if (master.tabWeightToHeightGirls != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertWeightToHeightGirls(master.tabWeightToHeightGirls!);
+    }
+
+    if (master.tabVaccines != null) {
+      await VaccinesDataHelper().insert(master.tabVaccines!);
+    }
+    if (master.tabMasterStock != null) {
+      await MasterStockHelper().insert(master.tabMasterStock!);
+    }
+    if (master.tabPartnerStock != null) {
+      await PartnerStockHelper().insert(master.tabPartnerStock!);
+    }
+    }
 
   Future<void> downMaster(BuildContext mContext, String userName,
       String password, String token) async {
@@ -1282,13 +1280,9 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
   Future<void> initFormLogic(FormLogicApiModel? formLogicApiModel) async {
     if (formLogicApiModel != null) {
       List<TabFormsLogic>? formLogicList = formLogicApiModel.tabFormsLogic;
-      if (formLogicList != null) {
-        print("Insert formlogic data into the database");
-        await FormLogicDataHelper().insertFormLogic(formLogicList);
-      } else {
-        print("Not Insert formlogic data into the database");
-      }
-    }
+      print("Insert formlogic data into the database");
+      await FormLogicDataHelper().insertFormLogic(formLogicList);
+        }
   }
 
   Future<void> getCrecheData(BuildContext mContext, String userName,

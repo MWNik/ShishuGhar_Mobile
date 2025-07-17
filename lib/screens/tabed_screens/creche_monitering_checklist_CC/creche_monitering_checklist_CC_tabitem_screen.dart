@@ -15,12 +15,10 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new
 import '../../../custom_widget/single_poup_dailog.dart';
 import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/cmc_CC/creche_monitering_checklist_CC_response_helper.dart';
-import '../../../database/helper/cmc_alm/creche_monitering_checkList_ALM_response_helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
-import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/databasemodel/backdated_configiration_model.dart';
@@ -298,7 +296,7 @@ class _CmcCCTabItemSCreenState extends State<CmcCCTabItemSCreen> {
             .toList();
         return DynamicCustomDropdownField(
           hintText: Global.returnTrLable(
-              _translation, CustomText.select_here, _language!),
+              _translation, CustomText.select_here, _language),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1

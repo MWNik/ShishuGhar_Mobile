@@ -286,7 +286,7 @@ class _NotEnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, CustomText.clear, lng!),
+                                    translats, CustomText.clear, lng),
                                 color: Color(0xffF26BA3),
                                 onPressed: () {
                                   Navigator.of(context).pop();
@@ -298,7 +298,7 @@ class _NotEnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, CustomText.Search, lng!),
+                                    translats, CustomText.Search, lng),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   filteredGetData(context);
@@ -563,6 +563,7 @@ class _NotEnrolledChildrenListedScreenState
             name: model.name.toString(), values: model.value, flag: 'tabBlock'))
         .toList();
     setState(() {});
+    return null;
   }
 
   String callVillageName(String crecheItem) {

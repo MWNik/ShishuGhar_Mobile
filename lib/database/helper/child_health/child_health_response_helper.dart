@@ -5,8 +5,6 @@ import 'package:shishughar/utils/validate.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../../model/databasemodel/child_health_respose_model.dart';
-import '../../../model/dynamic_screen_model/house_hold_children_model.dart';
-import '../../../model/dynamic_screen_model/house_hold_tab_responce_model.dart';
 import '../../database_helper.dart';
 
 class ChildHealthTabResponceHelper {

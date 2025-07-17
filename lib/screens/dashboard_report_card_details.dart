@@ -151,11 +151,9 @@ class _DashboardReportCardDetailState
     var crrentMonth = DateTime.now().month;
     selectedMonth = months[crrentMonth - 1].name;
     selectedYear = widget.year;
-    if (widget.year != null) {
-      months = getMonthList(Global.stringToInt(selectedYear));
-      selectedMonth = widget.month;
-    }
-
+    months = getMonthList(Global.stringToInt(selectedYear));
+    selectedMonth = widget.month;
+  
     await fetchStateList();
     // if(creches.length>0){
     //   selectedCreche=creches.first.name!;

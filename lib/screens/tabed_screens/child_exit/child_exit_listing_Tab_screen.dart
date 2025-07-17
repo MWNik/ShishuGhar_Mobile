@@ -84,7 +84,7 @@ class _ChildExitListingTabScreenState extends State<ChildExitListingTabScreen>
                         children: [
                           Text(
                             Global.returnTrLable(
-                                translats, CustomText.child_exit, lng!),
+                                translats, CustomText.child_exit, lng),
                             style: Styles.white145,
                           ),
                           Text(

@@ -6,9 +6,7 @@ import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/custom_text.dart';
-import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
-import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../style/styles.dart';
 import 'completed_followups_listing_screen_all.dart';
 
@@ -116,7 +114,7 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenAllChild>
                                 style: BorderStyle.solid))),
                     child: Tab(
                         child: Text(Global.returnTrLable(
-                            translats, CustomText.schduleDate, lng!))),
+                            translats, CustomText.schduleDate, lng))),
                   ),
                   Container(
                     width: tabIsScrollable ? null : screenWidth / 2,
@@ -133,7 +131,7 @@ class _FollowUpTabScreenState extends State<FollowUpTabScreenAllChild>
                                 style: BorderStyle.solid))),
                     child: Tab(
                         child: Text(Global.returnTrLable(
-                            translats, CustomText.complted, lng!))),
+                            translats, CustomText.complted, lng))),
                   ),
                 ],
               ),

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
@@ -295,7 +294,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
             .toList();
         return DynamicCustomDropdownField(
           hintText:
-              Global.returnTrLable(translats, CustomText.select_here, lng!),
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           focusNode: _focusNode[quesItem.fieldname],
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -998,7 +997,7 @@ class _AttendanceTabItemsState extends State<AttendanceTabItems> {
                   RegExp("@", caseSensitive: false), '$dateValue');
               Validate().singleButtonPopup(
                   message,
-                  Global.returnTrLable(translats, CustomText.ok, lng!),
+                  Global.returnTrLable(translats, CustomText.ok, lng),
                   false,
                   context);
               validStatus = false;

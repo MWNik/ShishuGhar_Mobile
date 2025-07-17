@@ -16,7 +16,6 @@ import 'package:shishughar/model/databasemodel/tabDistrict_model.dart';
 import 'package:shishughar/model/databasemodel/tabGramPanchayat_model.dart';
 import 'package:shishughar/model/databasemodel/tabVillage_model.dart';
 import 'package:shishughar/model/databasemodel/tabstate_model.dart';
-import 'package:shishughar/screens/dashboardscreen.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';

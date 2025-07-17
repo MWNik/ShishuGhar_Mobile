@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/src/response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shishughar/api/creche_Monitering_checkList_alm_api.dart';
 import 'package:shishughar/api/creche_monetering_checkList_cbm_api.dart';
@@ -48,7 +47,6 @@ import '../api/creche_monitering_checklist_cc_api.dart';
 import '../api/download_data_api.dart';
 import '../api/user_manual_pdf_api.dart';
 import '../api/village_profile_meta_api.dart';
-import '../custom_widget/custom_string_dropdown.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../custom_widget/muliselect_button_dailog.dart';
 import '../database/helper/anthromentory/child_growth_response_helper.dart';
@@ -1436,7 +1434,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
     } else {
       Validate().singleButtonPopup(
           Global.returnTrLable(locationControlls,
-              CustomText.nointernetconnectionavailable, lng!!),
+              CustomText.nointernetconnectionavailable, lng!),
           Global.returnTrLable(locationControlls, CustomText.ok, lng!),
           false,
           mContext);
@@ -1751,7 +1749,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
       showLoaderDialog(context);
 
       var response = await CrecheMonetringCheckListALMApi()
-          .cmcALMDownloadApi(userName!, password!, token!);
+          .cmcALMDownloadApi(userName, password, token);
       if (response.statusCode == 200) {
         await updateALMCMCchecklist(response);
         Navigator.pop(mContext);
@@ -1812,7 +1810,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
       showLoaderDialog(context);
 
       var response = await CrecheMonetringCheckListCBMApi()
-          .cmcCBMDownloadApi(userName!, password!, token!);
+          .cmcCBMDownloadApi(userName, password, token);
       if (response.statusCode == 200) {
         await updateCMCCBMchecklist(response);
         Navigator.pop(mContext);
@@ -1877,7 +1875,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
       // var token = await Validate().readString(Validate.appToken);
 
       var response = await StockApi()
-          .stockDownloadApiforCC(villages, username!, password!, token!);
+          .stockDownloadApiforCC(villages, username, password, token);
       if (response.statusCode == 200) {
         await updateStockResponse(response);
         Validate().saveString(
@@ -1943,7 +1941,7 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
       // var token = await Validate().readString(Validate.appToken);
 
       var response = await RequisitionApi()
-          .requisitionDownloadApiforCC(villages, username!, password!, token!);
+          .requisitionDownloadApiforCC(villages, username, password, token);
       if (response.statusCode == 200) {
         await updateRequisitionresponse(response);
         Validate().saveString(

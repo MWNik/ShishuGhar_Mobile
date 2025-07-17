@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:shishughar/database/helper/enrolled_children/enrolled_children_responce_helper.dart';
-import 'package:shishughar/utils/validate.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../../model/dynamic_screen_model/house_hold_children_model.dart';

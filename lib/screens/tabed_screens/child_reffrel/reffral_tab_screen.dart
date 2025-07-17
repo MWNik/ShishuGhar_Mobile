@@ -149,7 +149,7 @@ class _ReffralTabScreenState extends State<ReffralTabScreen>
                                 style: BorderStyle.solid))),
                     child: Tab(
                         child: Text(Global.returnTrLable(
-                            translats, CustomText.schduleDate, lng!))),
+                            translats, CustomText.schduleDate, lng))),
                   ),
                   Container(
                     width: tabIsScrollable ? null : screenWidth / 2,
@@ -166,7 +166,7 @@ class _ReffralTabScreenState extends State<ReffralTabScreen>
                                 style: BorderStyle.solid))),
                     child: Tab(
                         child: Text(Global.returnTrLable(
-                            translats, CustomText.complted, lng!))),
+                            translats, CustomText.complted, lng))),
                   ),
                 ],
               ),

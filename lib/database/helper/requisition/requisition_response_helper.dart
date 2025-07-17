@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shishughar/model/dynamic_screen_model/requisition_response_model.dart';
-import 'package:shishughar/model/dynamic_screen_model/village_profile_response_model.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 import 'package:sqflite/sqflite.dart';

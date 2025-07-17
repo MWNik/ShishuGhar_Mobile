@@ -1455,7 +1455,9 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
   }
 
   Future<void> callUpdateAnthroRecord(String enrollmentDate,Map<String, dynamic> itemStrodeColor) async{
-      var lastRecord=await ChildGrowthResponseHelper().anthroDataForEnrolledAdd(enrollmentDate,widget.crecheId);
+    var dateMonthYear=Validate().dateToMonthYear(enrollmentDate);
+    if(dateMonthYear.length>0){
+    var lastRecord=await ChildGrowthResponseHelper().anthroDataForEnrolledAdd(dateMonthYear,widget.crecheId);
       if (lastRecord.length > 0) {
         if (lastRecord.first.responces != null) {
           Map<String, dynamic> responseData = jsonDecode(lastRecord.first.responces!);
@@ -1498,6 +1500,6 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
             }
           }
         }
-      }
+      }}
   }
 }

@@ -19,7 +19,6 @@ import '../../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../../database/helper/form_logic_helper.dart';
 import '../../../../database/helper/translation_language_helper.dart';
-import '../../../../model/apimodel/form_logic_api_model.dart';
 import '../../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../../model/apimodel/translation_language_api_model.dart';
 import '../../../../model/dynamic_screen_model/cashbook_receipt_response_model.dart';
@@ -501,7 +500,7 @@ class _CashBookReceiptDetailsScreenState
   Future<void> updateHiddenValue() async {
     userName = (await Validate().readString(Validate.userName))!;
     var alrecords = await CashBookReceiptResponseHelper()
-        .getChildEventResponcewithGuid(widget.name!);
+        .getChildEventResponcewithGuid(widget.name);
     if (alrecords.length > 0) {
       Map<String, dynamic> responcesData = jsonDecode(alrecords[0].responces!);
       responcesData.forEach((key, value) {

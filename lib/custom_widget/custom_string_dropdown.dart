@@ -42,7 +42,7 @@ class _CustomDropdownFieldState extends State<CustomDropdownFieldString> {
     bool isDropdownEnabled = widget.items.length > 1;
     if (widget.items.length == 1 && widget.selectedItem == null) {
       // Automatically select the only item and call onChanged
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.onChanged(widget.items.first);
       });
     }

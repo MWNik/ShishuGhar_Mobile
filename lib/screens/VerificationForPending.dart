@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
@@ -16,7 +15,6 @@ import 'package:shishughar/screens/tabed_screens/house_hold/hh_tabview_screen.da
 import 'package:shishughar/style/styles.dart';
 import 'package:http/src/response.dart';
 import '../custom_widget/custom_radio_btn.dart';
-import '../custom_widget/custom_string_dropdown.dart';
 import '../custom_widget/custom_textfield.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.dart';
@@ -1467,12 +1465,10 @@ class _VerficationForPendingState extends State<VerficationForPending> {
 
       // Extract the specific element
       int itemName = int.parse(parsedJson[key]);
-      if (itemName != null) {
-        if (!_specificElementList.contains(itemName)) {
-          _specificElementList.add(itemName);
-        }
+      if (!_specificElementList.contains(itemName)) {
+        _specificElementList.add(itemName);
       }
-    }
+        }
     return _specificElementList;
   }
 

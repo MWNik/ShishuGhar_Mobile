@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
-import 'package:shishughar/screens/tabed_screens/creche_Monitering_checkList_CBM/creche_Monitering_checkList__CBM_TAbItem_screen.dart';
 
 import '../../../../custom_widget/custom_text.dart';
 import '../../../../database/helper/cmc_cbm/creche_monitering_checklist_CBM_fields_helper.dart';
@@ -15,9 +13,7 @@ import '../../../../model/dynamic_screen_model/options_model.dart';
 import '../../../../style/styles.dart';
 import '../../../../utils/globle_method.dart';
 import '../../../../utils/validate.dart';
-import '../../../database/helper/cmc_CC/creche_monitering_checklist_CC_response_helper.dart';
 import '../../../model/dynamic_screen_model/creche_monitering_checkList_cbm_response_model.dart';
-import '../../../model/dynamic_screen_model/creche_monitering_checklist_CC_response_model.dart';
 import 'creche_monitering_checklist_CBM_Tab_items_forAdd.dart';
 import 'creche_monitering_checklist_CBM_tabItems_view_foradd.dart';
 
@@ -204,14 +200,14 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
       if (tabBreakItems[i].parent == 'Creche Monitoring Checklist CBM') {
         tabItem.add(widget.isViewScreen
             ? CmcCBMTabItemViewSCreenForAdd(
-                cbmguid: widget.cbmguid!,
+                cbmguid: widget.cbmguid,
                 tabBreakItem: tabBreakItems[i],
                 screenItem: expendedItems,
                 changeTab: changeTab,
                 tabIndex: i,
                 totalTab: tabBreakItems.length)
             : CmcCBMTabItemSCreenForAdd(
-                cbmguid: widget.cbmguid!,
+                cbmguid: widget.cbmguid,
                 tabBreakItem: tabBreakItems[i],
                 screenItem: expendedItems,
                 changeTab: changeTab,
@@ -239,7 +235,7 @@ class _CmcCBMTabSCreenForAddState extends State<CmcCBMTabSCreenForAdd>
   Future<bool> checkConditionsBeforeChangingTab(int index) async {
     bool returnStatus = false;
     var alredRecord = await CmcCBMTabResponseHelper()
-        .getCrecheCommittieResponcewithGuid(widget.cbmguid!);
+        .getCrecheCommittieResponcewithGuid(widget.cbmguid);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
 

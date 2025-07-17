@@ -6,7 +6,6 @@ import 'package:shishughar/custom_widget/custom_appbar.dart';
 
 import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
-import '../../../custom_widget/dynamic_screen_widget/custom_dynamic_image.dart';
 import '../../../custom_widget/dynamic_screen_widget/custom_dynamic_image_replica.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_yesno_checkbox.dart';
@@ -22,10 +21,8 @@ import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/image_file_tab_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
-import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
-import '../../../model/databasemodel/child_event_tab_response_model.dart';
 import '../../../model/databasemodel/creche_committie_response_model.dart';
 import '../../../model/databasemodel/tab_image_file_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';

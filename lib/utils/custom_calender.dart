@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
 import '../model/databasemodel/child_attendance_responce_model.dart';
-import '../style/styles.dart';
 
 class CustomCalendar extends StatefulWidget {
   final DateTime initialDate;

@@ -17,7 +17,6 @@ import '../model/apimodel/translation_language_api_model.dart';
 import '../style/styles.dart';
 import '../utils/globle_method.dart';
 import '../utils/validate.dart';
-import 'dashboard_report_for_all_creche_by_api.dart';
 import 'dashboard_report_for_all_creche_by_api_new.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -205,7 +204,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           color: _currentIndex == 0 ? Color(0xff5979AA) : Color(0xffAAAAAA),
         ),
       ),
-      label: Global.returnTrLable(dashboardControlls, CustomText.Home, lng!),
+      label: Global.returnTrLable(dashboardControlls, CustomText.Home, lng),
     ));
     bottomItem.add(BottomNavigationBarItem(
       icon: Padding(
@@ -217,7 +216,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
       label: Global.returnTrLable(
-          dashboardControlls, CustomText.enrolled_children, lng!),
+          dashboardControlls, CustomText.enrolled_children, lng),
     ));
     bottomItem.add(BottomNavigationBarItem(
       icon: Padding(
@@ -229,7 +228,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
       label:
-          Global.returnTrLable(dashboardControlls, CustomText.Dashboard, lng!),
+          Global.returnTrLable(dashboardControlls, CustomText.Dashboard, lng),
     ));
     bottomItem.add(BottomNavigationBarItem(
       icon: Padding(
@@ -240,7 +239,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           color: _currentIndex == 3 ? Color(0xff5979AA) : Color(0xffAAAAAA),
         ),
       ),
-      label: Global.returnTrLable(dashboardControlls, CustomText.Report, lng!),
+      label: Global.returnTrLable(dashboardControlls, CustomText.Report, lng),
     ));
     bottomItem.add(BottomNavigationBarItem(
       icon: Padding(
@@ -251,7 +250,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           color: _currentIndex == 4 ? Color(0xff5979AA) : Color(0xffAAAAAA),
         ),
       ),
-      label: Global.returnTrLable(dashboardControlls, CustomText.More, lng!),
+      label: Global.returnTrLable(dashboardControlls, CustomText.More, lng),
     ));
     // if (role == 'Creche Supervisor') {
     //   bottomItem.add(BottomNavigationBarItem(
@@ -292,7 +291,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const CircularProgressIndicator(),
                 SizedBox(height: 10.h),
                 Text(Global.returnTrLable(
-                    dashboardControlls, CustomText.pleaseWait, lng!)),
+                    dashboardControlls, CustomText.pleaseWait, lng)),
               ],
             ),
           ),

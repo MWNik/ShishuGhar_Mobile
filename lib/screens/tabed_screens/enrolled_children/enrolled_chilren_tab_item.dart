@@ -5,7 +5,6 @@ import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/enrolled_children_responce_model.dart';
@@ -33,7 +32,6 @@ import '../../../utils/globle_method.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../house_hold/depending_logic.dart';
-import 'enrolled_children_tab.dart';
 
 class EnrolledChilrenTabItem extends StatefulWidget {
   final String HHGUID;

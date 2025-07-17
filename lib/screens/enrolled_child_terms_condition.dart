@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
@@ -10,7 +9,6 @@ import '../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../database/helper/village_data_helper.dart';
 import '../style/styles.dart';
 import '../utils/globle_method.dart';
-import '../utils/validate.dart';
 
 class EnrolledChildTermsCondition extends StatefulWidget {
   final String CHHGUID;

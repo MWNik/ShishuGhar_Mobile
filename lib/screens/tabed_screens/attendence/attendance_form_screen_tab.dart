@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:shishughar/database/helper/child_attendence/child_attendance_helper_responce.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
@@ -147,7 +146,7 @@ class _AddAttendanceState extends State<AddAttendanceScreenFormTab>
                   children: [
                     Text(
                       Global.returnTrLable(
-                          translatsLabel, CustomText.Add_Attendance, lng!),
+                          translatsLabel, CustomText.Add_Attendance, lng),
                       style: Styles.white145,
                     ),
                     Text(

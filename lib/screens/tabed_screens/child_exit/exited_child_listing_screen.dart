@@ -8,21 +8,15 @@ import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_customtex
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
-import 'package:shishughar/model/dynamic_screen_model/enrolled_children_responce_model.dart';
-import 'package:shishughar/screens/tabed_screens/child_exit/child_exit_details_screen.dart';
 import 'package:shishughar/screens/tabed_screens/child_exit/exit_enrolld_child/exit_enrolled_child_tab.dart';
-import 'package:shishughar/screens/tabed_screens/child_exit/exit_enrolld_child/exit_enrolled_details_screen.dart';
 
 import '../../../custom_widget/custom_text.dart';
 import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/child_exit/child_exit_response_Helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/databasemodel/backdated_configiration_model.dart';
-import '../../../model/databasemodel/child_exit_response_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
-import '../../../screens/tabed_screens/child_exit/exited_child_detail_view_screen.dart';
 import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';

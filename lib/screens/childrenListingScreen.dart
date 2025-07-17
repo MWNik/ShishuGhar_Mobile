@@ -6,12 +6,10 @@ import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/house_hold_children_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
-import 'package:shishughar/model/databasemodel/hh_children_show_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/house_hold_children_model.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/validate.dart';
 
-import '../database/database_helper.dart';
 import '../database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import '../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../model/dynamic_screen_model/options_model.dart';

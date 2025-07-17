@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,7 +10,6 @@ import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
-import 'package:shishughar/database/helper/mst_common_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/databasemodel/mst_cammon_model.dart';
@@ -19,12 +17,9 @@ import 'package:shishughar/model/dynamic_screen_model/house_hold_tab_responce_mo
 import 'package:shishughar/screens/tabed_screens/house_hold/hh_tabview_screen.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:http/src/response.dart';
-import '../api/verification_status_update_api.dart';
 import '../custom_widget/custom_radio_btn.dart';
-import '../custom_widget/custom_string_dropdown.dart';
 import '../custom_widget/custom_textfield.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.dart';
-import '../custom_widget/single_poup_dailog.dart';
 import '../database/helper/backdated_configiration_helper.dart';
 import '../database/helper/block_data_helper.dart';
 import '../database/helper/creche_helper/creche_data_helper.dart';
@@ -1732,12 +1727,10 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
 
       // Extract the specific element
       int itemName = int.parse(parsedJson[key]);
-      if (itemName != null) {
-        if (!_specificElementList.contains(itemName)) {
-          _specificElementList.add(itemName);
-        }
+      if (!_specificElementList.contains(itemName)) {
+        _specificElementList.add(itemName);
       }
-    }
+        }
     return _specificElementList;
   }
 

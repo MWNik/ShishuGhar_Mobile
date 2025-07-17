@@ -122,6 +122,7 @@ Future<ChildGrowthMetaResponseModel?> callMaxAnthroResponce(
     if(result.length>0){
     return ChildGrowthMetaResponseModel.fromJson(result.first);
     }else null;
+    return null;
   }
 
   Future<List<ChildGrowthMetaResponseModel>>
@@ -404,8 +405,9 @@ Future<ChildGrowthMetaResponseModel?> callMaxAnthroResponce(
 
   Future<List<ChildGrowthMetaResponseModel>> anthroDataForEnrolledAdd(
       String selectedDate, int crecheId) async {
+
     var query =
-    'SELECT * FROM child_anthormentry_responce WHERE strftime(?, measurement_date) <= ? AND creche_id = ? and responces NOTNULL ORDER BY measurement_date DESC limit 1';
+    'SELECT * FROM child_anthormentry_responce WHERE strftime(?, measurement_date) = ? AND creche_id = ? and responces NOTNULL ORDER BY measurement_date DESC limit 1';
 
     List<Map<String, dynamic>> result = await DatabaseHelper.database!
         .rawQuery(query, ['%Y-%m', selectedDate,crecheId]);

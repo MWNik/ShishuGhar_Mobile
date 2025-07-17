@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:path/path.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
-import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_checkbox.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/style/styles.dart';
@@ -334,7 +332,7 @@ class _NotEnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, CustomText.clear, lng!),
+                                    translats, CustomText.clear, lng),
                                 color: Color(0xffF26BA3),
                                 onPressed: () {
                                   Navigator.of(context).pop();
@@ -346,7 +344,7 @@ class _NotEnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, CustomText.Search, lng!),
+                                    translats, CustomText.Search, lng),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   filteredGetData(context);
@@ -733,6 +731,7 @@ class _NotEnrolledChildrenListedScreenState
             name: model.name.toString(), values: model.value, flag: 'tabBlock'))
         .toList();
     setState(() {});
+    return null;
   }
 
   String callVillageName(String crecheItem) {

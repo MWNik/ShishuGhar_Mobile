@@ -561,7 +561,7 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
                 children: [
                   DynamicCustomDropdownField(
                     hintText: Global.returnTrLable(
-                        translatsLabel, CustomText.select_here, lng!),
+                        translatsLabel, CustomText.select_here, lng),
                     titleText: verifiable,
                     isRequred: 0,
                     items: varyItem,
@@ -583,17 +583,17 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
                               Navigator.of(mContext).pop();
                               Validate().singleButtonPopup(
                                   Global.returnTrLable(translatsLabel,
-                                      CustomText.statusUpdateSuccssFully, lng!),
+                                      CustomText.statusUpdateSuccssFully, lng),
                                   Global.returnTrLable(
-                                      translatsLabel, CustomText.ok, lng!),
+                                      translatsLabel, CustomText.ok, lng),
                                   true,
                                   mContext);
                             } else {
                               Validate().singleButtonPopup(
                                   Global.returnTrLable(translatsLabel,
-                                      CustomText.selectVerifyStatus, lng!),
+                                      CustomText.selectVerifyStatus, lng),
                                   Global.returnTrLable(
-                                      translatsLabel, CustomText.ok, lng!),
+                                      translatsLabel, CustomText.ok, lng),
                                   false,
                                   mContext);
                             }

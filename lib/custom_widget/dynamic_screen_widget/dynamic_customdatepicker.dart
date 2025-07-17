@@ -3,9 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 import 'package:shishughar/style/styles.dart';
-import 'package:shishughar/utils/globle_method.dart';
 
-import '../../model/apimodel/form_logic_api_model.dart';
 import '../../utils/validate.dart';
 
 // ignore: must_be_immutable

@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:intl/intl.dart';
 import 'package:shishughar/firebase_options.dart';
@@ -49,7 +48,6 @@ import 'database/helper/stock/stock_response_helper.dart';
 import 'database/helper/translation_language_helper.dart';
 import 'database/helper/village_profile/village_profile_response_helper.dart';
 import 'model/apimodel/translation_language_api_model.dart';
-import 'utils/notification_service.dart';
 
 // @pragma('vm:entry-point')
 // void callbackDispatcher() {

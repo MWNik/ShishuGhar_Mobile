@@ -16,7 +16,6 @@ import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.
 import '../../../custom_widget/single_poup_dailog.dart';
 import '../../../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
-import '../../../database/helper/follow_up/child_followUp_response_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/form_logic_api_model.dart';
@@ -762,8 +761,8 @@ class _ChildFollowUpTabItemSCreenState
           if (algoData.length == 3) {
             if (algoData[2] == 'child_dob') {
               var dependValue = answred[element.dependentControls];
-              if (dependValue != null && widget.ChildDOB != null) {
-                var dateDob = Validate().stringToDate(widget.ChildDOB!);
+              if (dependValue != null) {
+                var dateDob = Validate().stringToDate(widget.ChildDOB);
                 var dependDate = Validate().stringToDate(dependValue!);
                 int? calucalteDate;
                 if (algoData[1].toLowerCase() == 'm')

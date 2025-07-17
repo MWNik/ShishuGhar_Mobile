@@ -10,7 +10,6 @@ import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_customtex
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';

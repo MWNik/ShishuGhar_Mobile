@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../custom_widget/custom_text.dart';
 import '../../../../database/helper/cmc_alm/creche_monitering_checkList_ALM_fields_helper.dart';
-import '../../../../database/helper/cmc_cbm/creche_monitering_checklist_CBM_response_helper.dart';
 import '../../../../database/helper/translation_language_helper.dart';
 import '../../../../model/apimodel/form_logic_api_model.dart';
 import '../../../../model/apimodel/house_hold_field_item_model_api.dart';
@@ -17,7 +16,6 @@ import '../../../database/helper/cmc_alm/creche_monitering_checkList_ALM_respons
 import '../../../model/dynamic_screen_model/creche_Monitering_checkList_ALM_response_model.dart';
 import 'creche_monitering_checkList_ALM_tab_items_forAdd.dart';
 import 'creche_monitering_checklist_ALM_tabItem_view_forAdd.dart';
-import 'creche_monitering_checklist_tabItem_ALM_view_screen.dart';
 
 class CmcALMTabSCreenForAdd extends StatefulWidget {
   //  String? crecheName;
@@ -127,7 +125,7 @@ class _CmcALMTabSCreenForAddState extends State<CmcALMTabSCreenForAdd>
                   children: [
                     Text(
                       Global.returnTrLable(
-                          translatsLabel, CustomText.VisitNote, lng!),
+                          translatsLabel, CustomText.VisitNote, lng),
                       style: Styles.white145,
                     ),
                     // Text(
@@ -238,7 +236,7 @@ class _CmcALMTabSCreenForAddState extends State<CmcALMTabSCreenForAdd>
   Future<bool> checkConditionsBeforeChangingTab(int index) async {
     bool returnStatus = false;
     var alredRecord = await CmcALMTabResponseHelper()
-        .getCrecheCommittieResponcewithGuid(widget.almguid!);
+        .getCrecheCommittieResponcewithGuid(widget.almguid);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
 

@@ -11,8 +11,6 @@ import 'package:shishughar/model/dynamic_screen_model/month_and_year_model.dart'
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/requisition_response_model.dart';
 import 'package:shishughar/screens/tabed_screens/stock/requisition/requisition_details_screen.dart';
-import 'package:shishughar/screens/tabed_screens/stock/requisition/requisition_expended_form_screen.dart';
-import 'package:shishughar/screens/tabed_screens/stock/requisition/requisition_listing_screen.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -350,11 +348,11 @@ class _RequisitionCalenderListingScreenState
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${Global.returnTrLable(translats, 'Month', lng!).trim()} :',
+                                            '${Global.returnTrLable(translats, 'Month', lng).trim()} :',
                                             style: Styles.black104,
                                           ),
                                           Text(
-                                            '${Global.returnTrLable(translats, 'Year', lng!).trim()} :',
+                                            '${Global.returnTrLable(translats, 'Year', lng).trim()} :',
                                             style: Styles.black104,
                                             strutStyle: StrutStyle(height: 1.2),
                                           ),
@@ -432,7 +430,7 @@ class _RequisitionCalenderListingScreenState
                 : Expanded(
                     child: Center(
                       child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng!)),
+                          translats, CustomText.NorecordAvailable, lng)),
                     ),
                   ),
           ]),

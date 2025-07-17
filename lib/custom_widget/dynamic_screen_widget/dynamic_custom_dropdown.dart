@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
-import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 
 import 'package:shishughar/style/styles.dart';
-import 'package:shishughar/utils/globle_method.dart';
 
 import '../../model/dynamic_screen_model/options_model.dart';
 

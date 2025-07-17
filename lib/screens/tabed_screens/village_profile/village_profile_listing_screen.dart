@@ -1,9 +1,7 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
-import 'package:shishughar/custom_widget/custom_string_dropdown.dart';
 import 'package:shishughar/custom_widget/custom_textfield.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/database/helper/village_profile/village_profile_response_helper.dart';
@@ -11,11 +9,8 @@ import 'package:shishughar/model/dynamic_screen_model/village_profile_response_m
 import 'package:shishughar/screens/tabed_screens/village_profile/village_profile_tab_screen.dart';
 
 import '../../../custom_widget/custom_text.dart';
-import '../../../database/helper/district_data_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
-import '../../../database/helper/village_data_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
-import '../../../model/databasemodel/tabDistrict_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
@@ -148,7 +143,7 @@ class _VillageProfileListingState extends State<VillageProfileListingScreen> {
                           filterDataQu(value);
                         },
                         hintText: (lng != null)
-                            ? Global.returnTrLable(translatsLabel, 'Search', lng!)
+                            ? Global.returnTrLable(translatsLabel, 'Search', lng)
                             : '',
                         prefixIcon: Image.asset(
                           "assets/search.png",

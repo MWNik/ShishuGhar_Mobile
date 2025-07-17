@@ -1,7 +1,6 @@
 import 'package:shishughar/database/database_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/utils/validate.dart';
-import 'package:sqflite/sqflite.dart';
 
 class TranslationDataHelper {
   DatabaseHelper databaseHelper = DatabaseHelper();

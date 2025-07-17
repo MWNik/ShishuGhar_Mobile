@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
-import 'package:shishughar/custom_widget/customdatepicker.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_dynamic_image.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_textfield_float.dart';
@@ -22,7 +21,6 @@ import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_chi
 import 'package:shishughar/database/helper/form_logic_helper.dart';
 import 'package:shishughar/database/helper/image_file_tab_responce_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/databasemodel/tab_image_file_model.dart';
@@ -211,52 +209,48 @@ class _ExitEnrolledDetailsScreenState extends State<ExitEnrolledDetailsScreen> {
   bool _checkValidation() {
     var validStatus = true;
     var items = allItems;
-    if (items != null) {
-      for (int i = 0; i < items.length; i++) {
-        var element = items[i];
-        if (element.reqd == 1) {
-          var valuees = myMap[element.fieldname];
-          if (!Global.validString(valuees.toString().trim())) {
-            Validate().singleButtonPopup(
-                Global.returnTrLable(
-                    translatsLabel, CustomText.plsFilManForm, lng),
-                Global.returnTrLable(translatsLabel, CustomText.ok, lng),
-                false,
-                context);
-            validStatus = false;
-            break;
-          }
-        } else if (element.fieldname == "reason_for_exit") {
-          var valuess = myMap[element.fieldname];
-          if (!Global.validString(valuess.toString().trim())) {
-            Validate().singleButtonPopup(
-                Global.returnTrLable(
-                    translatsLabel, CustomText.plsFilManForm, lng),
-                Global.returnTrLable(translatsLabel, CustomText.ok, lng),
-                false,
-                context);
-            validStatus = false;
-            break;
-          }
+    for (int i = 0; i < items.length; i++) {
+      var element = items[i];
+      if (element.reqd == 1) {
+        var valuees = myMap[element.fieldname];
+        if (!Global.validString(valuees.toString().trim())) {
+          Validate().singleButtonPopup(
+              Global.returnTrLable(
+                  translatsLabel, CustomText.plsFilManForm, lng),
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
+          validStatus = false;
+          break;
         }
-        var validationMsg = logic!.validationMessge(myMap, element);
-        if (Global.validString(validationMsg)) {
-          if ((Global.validString(myMap['reason_for_exit'].toString()) &&
-              element.fieldname == 'age_at_enrollment_in_months')) {
-            validStatus = true;
-          } else {
-            Validate().singleButtonPopup(
-                validationMsg!, Global.returnTrLable(translatsLabel, CustomText.ok, lng), false, context);
-            validStatus = false;
-            break;
-          }
+      } else if (element.fieldname == "reason_for_exit") {
+        var valuess = myMap[element.fieldname];
+        if (!Global.validString(valuess.toString().trim())) {
+          Validate().singleButtonPopup(
+              Global.returnTrLable(
+                  translatsLabel, CustomText.plsFilManForm, lng),
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
+          validStatus = false;
+          break;
         }
       }
-      ;
-    } else {
-      print("selected items is null");
+      var validationMsg = logic!.validationMessge(myMap, element);
+      if (Global.validString(validationMsg)) {
+        if ((Global.validString(myMap['reason_for_exit'].toString()) &&
+            element.fieldname == 'age_at_enrollment_in_months')) {
+          validStatus = true;
+        } else {
+          Validate().singleButtonPopup(
+              validationMsg!, Global.returnTrLable(translatsLabel, CustomText.ok, lng), false, context);
+          validStatus = false;
+          break;
+        }
+      }
     }
-
+    ;
+  
     return validStatus;
   }
 
@@ -650,16 +644,14 @@ class _ExitEnrolledDetailsScreenState extends State<ExitEnrolledDetailsScreen> {
   List<Widget> cWidget() {
     List<Widget> screenItems = [];
     var items = allItems;
-    if (items != null) {
-      for (int i = 0; i < items.length; i++) {
-        screenItems.add(widgetTypeWidget(i, items[i]));
-        screenItems.add(SizedBox(height: 5.h));
-        if (!logic!.callDependingLogic(myMap, items[i])) {
-          myMap.remove(items[i].fieldname);
-        }
+    for (int i = 0; i < items.length; i++) {
+      screenItems.add(widgetTypeWidget(i, items[i]));
+      screenItems.add(SizedBox(height: 5.h));
+      if (!logic!.callDependingLogic(myMap, items[i])) {
+        myMap.remove(items[i].fieldname);
       }
     }
-    return screenItems;
+      return screenItems;
   }
 
   Future<void> saveDataInData() async {
@@ -903,17 +895,17 @@ class _ExitEnrolledDetailsScreenState extends State<ExitEnrolledDetailsScreen> {
                               Navigator.of(mContext).pop();
                               Validate().singleButtonPopup(
                                   Global.returnTrLable(translatsLabel,
-                                      CustomText.statusUpdateSuccssFully, lng!),
+                                      CustomText.statusUpdateSuccssFully, lng),
                                   Global.returnTrLable(
-                                      translatsLabel, CustomText.ok, lng!),
+                                      translatsLabel, CustomText.ok, lng),
                                   true,
                                   mContext);
                             } else {
                               Validate().singleButtonPopup(
                                   Global.returnTrLable(translatsLabel,
-                                      CustomText.selectVerifyStatus, lng!),
+                                      CustomText.selectVerifyStatus, lng),
                                   Global.returnTrLable(
-                                      translatsLabel, CustomText.ok, lng!),
+                                      translatsLabel, CustomText.ok, lng),
                                   false,
                                   mContext);
                             }

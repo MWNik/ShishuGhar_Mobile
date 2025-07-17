@@ -82,7 +82,7 @@ class _CashBookListingTabScreenState extends State<CashBookListingTabScreen>
                         children: [
                           Text(
                             Global.returnTrLable(
-                                translats, CustomText.Cashbook, lng!),
+                                translats, CustomText.Cashbook, lng),
                             style: Styles.white145,
                           ),
                           Text(
@@ -124,7 +124,7 @@ class _CashBookListingTabScreenState extends State<CashBookListingTabScreen>
                                 style: BorderStyle.solid))),
                     child: Tab(
                         child: Text(Global.returnTrLable(
-                            translats, CustomText.Expenses, lng!))),
+                            translats, CustomText.Expenses, lng))),
                   ),
                   Container(
                     width: tabIsScrollable ? null : screenWidth / 2,
@@ -141,7 +141,7 @@ class _CashBookListingTabScreenState extends State<CashBookListingTabScreen>
                                 style: BorderStyle.solid))),
                     child: Tab(
                         child: Text(Global.returnTrLable(
-                            translats, CustomText.Receipt, lng!))),
+                            translats, CustomText.Receipt, lng))),
                   ),
                 ],
               ),

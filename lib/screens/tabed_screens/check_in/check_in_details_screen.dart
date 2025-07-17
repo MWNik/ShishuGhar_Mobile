@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
@@ -26,7 +26,6 @@ import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_h
 import 'package:shishughar/database/helper/form_logic_helper.dart';
 import 'package:shishughar/database/helper/image_file_tab_responce_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/databasemodel/tab_image_file_model.dart';
@@ -34,7 +33,6 @@ import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/constants.dart';
-import 'package:shishughar/utils/get_Location.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
@@ -237,9 +235,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
 
   initImage(String? assetPath) async {
     if (Global.validString(assetPath)) {
-      var tempFile = File('${Constants.phoneImagePath}$assetPath'!);
+      var tempFile = File('${Constants.phoneImagePath}$assetPath');
       var alradyFile = await tempFile.exists();
-      if (alradyFile) _image = File('${Constants.phoneImagePath}$assetPath'!);
+      if (alradyFile) _image = File('${Constants.phoneImagePath}$assetPath');
     } else {
       String imageData = 'assets/image_placeholder.jpg';
       _image = await loadAssetImageAsFile(imageData);
@@ -775,7 +773,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
 
   saveImageInDatabase(String imageName, String imageFieldName) async {
     var item = await ImageFileTabHelper()
-        .getImageByDoctypeId(widget.ccinguid!, CustomText.checkInsCrech);
+        .getImageByDoctypeId(widget.ccinguid, CustomText.checkInsCrech);
     var items = ImageFileTabResponceModel(
       image_name: imageName,
       doctype: CustomText.checkInsCrech,
@@ -816,7 +814,6 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
       } else
         file = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (file != null) {
-//
         var save = await savePickedImage(file,
             "image_${widget.ccinguid}_${DateTime.now().millisecondsSinceEpoch}.png");
         imagePath = save.path.split('/').last;
@@ -830,20 +827,58 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
     }
   }
 
+  // Future<File> savePickedImage(XFile pickedImage, String docType) async {
+  //   final Directory appDirectory = await getApplicationDocumentsDirectory();
+  //   final Directory imagesDirectory =
+  //       Directory('${appDirectory.path}/shishughar_images');
+  //   final bool exist = await imagesDirectory.exists();
+  //   if (!exist) {
+  //     await imagesDirectory.create(recursive: true);
+  //   }
+  //   final String fileName = docType;
+  //   final File newImagePath = File('${imagesDirectory.path}/$fileName');
+  //
+  //   final Uint8List bytes = await pickedImage.readAsBytes();
+  //   await newImagePath.writeAsBytes(bytes);
+  //
+  //   return newImagePath;
+  // }
+
   Future<File> savePickedImage(XFile pickedImage, String docType) async {
     final Directory appDirectory = await getApplicationDocumentsDirectory();
     final Directory imagesDirectory =
-        Directory('${appDirectory.path}/shishughar_images');
-    final bool exist = await imagesDirectory.exists();
-    if (!exist) {
+    Directory('${appDirectory.path}/shishughar_images');
+    int sizeInBytes = await pickedImage.length();
+    double sizeInKB = sizeInBytes / 1024;
+    double sizeInMB = sizeInKB / 1024;
+    print('lenth ${sizeInKB} $sizeInMB');
+    if (!await imagesDirectory.exists()) {
       await imagesDirectory.create(recursive: true);
     }
+
     final String fileName = docType;
     final File newImagePath = File('${imagesDirectory.path}/$fileName');
 
-    final Uint8List bytes = await pickedImage.readAsBytes();
-    await newImagePath.writeAsBytes(bytes);
+    // Compress the image before saving
+    final Uint8List? compressedBytes = await FlutterImageCompress.compressWithFile(
+      pickedImage.path,
+      quality: 90, // Adjust quality (0 - 100)
+      format: CompressFormat.png, // or .jpeg depending on your use
+    );
 
+    if (compressedBytes != null) {
+      await newImagePath.writeAsBytes(compressedBytes);
+    } else {
+      // fallback if compression fails
+      final Uint8List originalBytes = await pickedImage.readAsBytes();
+      await newImagePath.writeAsBytes(originalBytes);
+    }
+
+    int sizeInByteskk = newImagePath.lengthSync();
+    double sizeInKBskk = sizeInByteskk / 1024;
+    double sizeInMBskk = sizeInKBskk / 1024;
+
+    print('lenth ${sizeInKBskk} $sizeInMBskk');
     return newImagePath;
   }
 
@@ -1416,7 +1451,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         lats = currentLocation.latitude.toString();
         langs = currentLocation.longitude.toString();
         address = await Validate().getAddressFromLatLng(
-            currentLocation.latitude!, currentLocation.longitude!);
+            currentLocation.latitude, currentLocation.longitude);
         myMap['checkin_location'] = address??'';
         if (address != null) {
           setState(() {});

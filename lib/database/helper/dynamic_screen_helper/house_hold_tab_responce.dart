@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
-import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_responce_model.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 import 'package:sqflite/sqflite.dart';
@@ -10,7 +9,6 @@ import 'package:sqflite/sqflite.dart';
 import '../../../model/dynamic_screen_model/house_hold_children_model.dart';
 import '../../../model/dynamic_screen_model/house_hold_tab_responce_model.dart';
 import '../../database_helper.dart';
-import '../enrolled_children/enrolled_children_responce_helper.dart';
 
 class HouseHoldTabResponceHelper {
   Future<void> inserts(HouseHoldTabResponceMosdel items) async {

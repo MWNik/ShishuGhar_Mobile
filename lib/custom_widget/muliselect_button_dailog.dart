@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
-import 'package:shishughar/model/apimodel/mater_data_other_model.dart';
 
 import '../model/dynamic_screen_model/options_model.dart';
 import '../style/styles.dart';
-import '../utils/globle_method.dart';
 import 'custom_btn.dart';
 
 class MultiSelectButtonDialog extends StatefulWidget {

@@ -840,8 +840,8 @@ class _ChildFollowUpTabItemSCreenState
           if (algoData.length == 3) {
             if (algoData[2] == 'child_dob') {
               var dependValue = answred[element.dependentControls];
-              if (dependValue != null && widget.ChildDOB != null) {
-                var dateDob = Validate().stringToDate(widget.ChildDOB!);
+              if (dependValue != null) {
+                var dateDob = Validate().stringToDate(widget.ChildDOB);
                 var dependDate = Validate().stringToDate(dependValue!);
                 int? calucalteDate;
                 if (algoData[1].toLowerCase() == 'm')
@@ -981,7 +981,7 @@ class _ChildFollowUpTabItemSCreenState
                   growhthDetails['any_medical_major_illness'].toString()) ==
               1) {
             //medical  is yes
-            DateTime folloupDate = followUpGenratedDate!.add(Duration(days: 7));
+            DateTime folloupDate = followUpGenratedDate.add(Duration(days: 7));
             await ChildFollowUpTabResponseHelper().autoCreateFollowRecord(
                 '${DateFormat('yyyy-MM-dd').format(folloupDate)}',
                 widget.child_referral_guid,
@@ -997,7 +997,7 @@ class _ChildFollowUpTabItemSCreenState
               //     2
               ) {
             DateTime folloupDate =
-                followUpGenratedDate!.add(Duration(days: 15));
+                followUpGenratedDate.add(Duration(days: 15));
             await ChildFollowUpTabResponseHelper().autoCreateFollowRecord(
                 '${DateFormat('yyyy-MM-dd').format(folloupDate)}',
                 widget.child_referral_guid,
@@ -1012,7 +1012,7 @@ class _ChildFollowUpTabItemSCreenState
               (Global.stringToDouble(lastGrowhthDetails['weight'].toString()) ==
                   Global.stringToDouble(growhthDetails['weight'].toString()))) {
             DateTime folloupDate =
-                followUpGenratedDate!.add(Duration(days: 15));
+                followUpGenratedDate.add(Duration(days: 15));
             await ChildFollowUpTabResponseHelper().autoCreateFollowRecord(
                 '${DateFormat('yyyy-MM-dd').format(folloupDate)}',
                 widget.child_referral_guid,
@@ -1025,7 +1025,7 @@ class _ChildFollowUpTabItemSCreenState
               1) {
             //SUW  weight_for_age  red
             DateTime folloupDate =
-                followUpGenratedDate!.add(Duration(days: 15));
+                followUpGenratedDate.add(Duration(days: 15));
             await ChildFollowUpTabResponseHelper().autoCreateFollowRecord(
                 '${DateFormat('yyyy-MM-dd').format(folloupDate)}',
                 widget.child_referral_guid,

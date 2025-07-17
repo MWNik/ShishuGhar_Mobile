@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
 
@@ -275,7 +274,7 @@ class _AttendanceTabItemsViewState extends State<AttendanceTabItemsView> {
             .toList();
         return DynamicCustomDropdownField(
           hintText:
-              Global.returnTrLable(translats, CustomText.select_here, lng!),
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1

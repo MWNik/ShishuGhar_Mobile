@@ -4,7 +4,6 @@ import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_r
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
-import 'package:shishughar/screens/tabed_screens/child_exit/exit_enrolld_child/exit_enrolled_details_screen.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -20,7 +19,6 @@ import '../../../../database/helper/village_data_helper.dart';
 import '../../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../../model/databasemodel/tabVillage_model.dart';
 import '../../../../model/dynamic_screen_model/options_model.dart';
-import '../../../enrolled_child_details_screen_new.dart';
 import 'exit_enrolled_child_tab.dart';
 
 class EnrolledExitChildrenListedScreen extends StatefulWidget {
@@ -212,7 +210,7 @@ class _EnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, 'Clear', lng!),
+                                    translats, 'Clear', lng),
                                 color: Color(0xffF26BA3),
                                 onPressed: () {
                                   Navigator.of(context).pop();
@@ -225,7 +223,7 @@ class _EnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, 'Search', lng!),
+                                    translats, 'Search', lng),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   filteredGetData(context);
@@ -562,6 +560,7 @@ class _EnrolledChildrenListedScreenState
     //     flag: 'tabBlock'))
     //     .toList();
     setState(() {});
+    return null;
   }
 
   filteredGetData(BuildContext context) async {

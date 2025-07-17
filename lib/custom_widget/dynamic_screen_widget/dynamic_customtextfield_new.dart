@@ -6,7 +6,6 @@ import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 
 import '../../model/apimodel/form_logic_api_model.dart';
-import '../../utils/imogi_disable_formator.dart';
 
 // ignore: must_be_immutable
 class DynamicCustomTextFieldNew extends StatefulWidget {

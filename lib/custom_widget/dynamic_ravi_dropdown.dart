@@ -5,7 +5,6 @@ import 'package:shishughar/model/databasemodel/mst_cammon_model.dart';
 
 import 'package:shishughar/style/styles.dart';
 
-import '../../model/dynamic_screen_model/options_model.dart';
 
 // ignore: must_be_immutable
 class DynamicRaviCustomDropdownField extends StatefulWidget {

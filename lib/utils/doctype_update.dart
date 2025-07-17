@@ -133,7 +133,7 @@ class DoctypeUpdate {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(Global.returnTrLable(
-                  locationControlls, CustomText.token_expired, lng!))),
+                  locationControlls, CustomText.token_expired, lng))),
         );
         Navigator.pushReplacement(
             context,
@@ -146,7 +146,7 @@ class DoctypeUpdate {
         Navigator.pop(context);
         Validate().singleButtonPopup(
             Global.errorBodyToString(response.body, 'message'),
-            Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng),
             false,
             context);
         return false;
@@ -154,8 +154,8 @@ class DoctypeUpdate {
     } else {
       Validate().singleButtonPopup(
           Global.returnTrLable(locationControlls,
-              CustomText.nointernetconnectionavailable, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              CustomText.nointernetconnectionavailable, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
       return false;
@@ -196,7 +196,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -207,7 +207,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(logisResponce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -216,13 +216,9 @@ class DoctypeUpdate {
   Future<void> initFormLogic(FormLogicApiModel? formLogicApiModel) async {
     if (formLogicApiModel != null) {
       List<TabFormsLogic>? formLogicList = formLogicApiModel.tabFormsLogic;
-      if (formLogicList != null) {
-        print("Insert formlogic data into the database");
-        await FormLogicDataHelper().insertFormLogic(formLogicList);
-      } else {
-        print("Not Insert formlogic data into the database");
-      }
-    }
+      print("Insert formlogic data into the database");
+      await FormLogicDataHelper().insertFormLogic(formLogicList);
+        }
   }
 
   Future<void> callEnrooledChildrenDataApi(String userName, String password,
@@ -249,7 +245,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -260,7 +256,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(child_data.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -312,7 +308,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -323,7 +319,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(child_data.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -361,7 +357,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -372,7 +368,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(cresheData.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -413,7 +409,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -424,7 +420,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -466,7 +462,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -477,7 +473,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -519,7 +515,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -530,7 +526,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -566,7 +562,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -577,7 +573,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -618,7 +614,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -629,7 +625,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -666,7 +662,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -677,7 +673,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -714,7 +710,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -725,7 +721,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -763,7 +759,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -774,7 +770,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -832,7 +828,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -843,7 +839,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -881,7 +877,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -892,7 +888,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -931,15 +927,15 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -976,15 +972,15 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1021,15 +1017,15 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1071,15 +1067,15 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1115,15 +1111,15 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1170,15 +1166,15 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1218,15 +1214,15 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1269,7 +1265,7 @@ class DoctypeUpdate {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -1280,7 +1276,7 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(response.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1321,15 +1317,15 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1368,15 +1364,15 @@ class DoctypeUpdate {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }

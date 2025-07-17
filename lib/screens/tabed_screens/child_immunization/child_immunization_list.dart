@@ -1,12 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/database/helper/child_immunization/child_immunization_response_helper.dart';
 import 'package:shishughar/model/dynamic_screen_model/child_immunization_response_model.dart';
-import 'package:shishughar/screens/tabed_screens/child_immunization/child_immunization_details_screen.dart';
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/custom_text.dart';
@@ -17,7 +15,6 @@ import '../../../model/databasemodel/vaccines_model.dart';
 import '../../../model/dynamic_screen_model/enrolled_children_responce_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
-import 'child_immunization_expended_details_screen.dart';
 
 class ChildImmunizationListing extends StatefulWidget {
   final int? enName;

@@ -25,7 +25,6 @@ import 'package:shishughar/model/apimodel/stock_fields_meta_model.dart';
 
 import 'package:shishughar/screens/pad_viewer_using_dio.dart';
 import 'package:shishughar/screens/shishu_ghar_screen.dart';
-import 'package:shishughar/screens/synchronization_screen.dart';
 import 'package:shishughar/screens/synchronization_screen_new.dart';
 import 'package:shishughar/screens/tabed_screens/child_follow_up/child_followup_completed_list_CC.dart';
 import 'package:shishughar/screens/tabed_screens/child_follow_up/follow_up_tab_screen_all_child.dart';
@@ -40,7 +39,6 @@ import 'package:shishughar/screens/tabed_screens/village_profile/village_profile
 import 'package:shishughar/screens/user_my_profile_details.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/constants.dart';
-import 'package:shishughar/utils/get_Location.dart';
 import 'package:shishughar/utils/secure_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -145,7 +143,6 @@ import '../utils/globle_method.dart';
 import '../utils/validate.dart';
 import 'change_password_screen.dart';
 import 'dashboardscreen_new.dart';
-import 'enrolled_child_terms_condition.dart';
 import 'login_screen.dart';
 
 class HomeReplicaScreen extends StatefulWidget {
@@ -1272,13 +1269,9 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   Future<void> initFormLogic(FormLogicApiModel? formLogicApiModel) async {
     if (formLogicApiModel != null) {
       List<TabFormsLogic>? formLogicList = formLogicApiModel.tabFormsLogic;
-      if (formLogicList != null) {
-        print("Insert formlogic data into the database");
-        await FormLogicDataHelper().insertFormLogic(formLogicList);
-      } else {
-        print("Not Insert formlogic data into the database");
-      }
-    }
+      print("Insert formlogic data into the database");
+      await FormLogicDataHelper().insertFormLogic(formLogicList);
+        }
   }
 
   @override
@@ -3043,40 +3036,37 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future initMasterData(MasterDataModel master) async {
-    if (master != null) {
+    /////////Height Weight for age
+    if (master.tabHeightforAgeBoys != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertHeightForAgeBoys(master.tabHeightforAgeBoys!);
+    }
 
-      /////////Height Weight for age
-      if (master.tabHeightforAgeBoys != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertHeightForAgeBoys(master.tabHeightforAgeBoys!);
-      }
+    if (master.tabHeightforAgeGirls != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertHeightForAgeGirls(master.tabHeightforAgeGirls!);
+    }
 
-      if (master.tabHeightforAgeGirls != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertHeightForAgeGirls(master.tabHeightforAgeGirls!);
-      }
+    if (master.tabWeightforAgeBoys != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertWeightForAgeBoys(master.tabWeightforAgeBoys!);
+    }
 
-      if (master.tabWeightforAgeBoys != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertWeightForAgeBoys(master.tabWeightforAgeBoys!);
-      }
+    if (master.tabWeightforAgeGirls != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertWeightForAgeGirls(master.tabWeightforAgeGirls!);
+    }
+    if (master.tabWeightToHeightBoys != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertWeightToHeightBoys(master.tabWeightToHeightBoys!);
+    }
 
-      if (master.tabWeightforAgeGirls != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertWeightForAgeGirls(master.tabWeightforAgeGirls!);
-      }
-      if (master.tabWeightToHeightBoys != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertWeightToHeightBoys(master.tabWeightToHeightBoys!);
-      }
-
-      if (master.tabWeightToHeightGirls != null) {
-        await HeightWeightBoysGirlsHelper()
-            .insertWeightToHeightGirls(master.tabWeightToHeightGirls!);
-      }
+    if (master.tabWeightToHeightGirls != null) {
+      await HeightWeightBoysGirlsHelper()
+          .insertWeightToHeightGirls(master.tabWeightToHeightGirls!);
+    }
 
     }
-  }
 
 
 }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 
-import '../../../custom_widget/custom_appbar.dart';
 import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
@@ -13,12 +12,10 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.da
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
-import '../../../database/database_helper.dart';
 import '../../../database/helper/child_exit/child_exit_meta_fields_helper.dart';
 import '../../../database/helper/child_exit/child_exit_response_Helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/form_logic_api_model.dart';
@@ -134,7 +131,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomChildAppbar(
-        text: Global.returnTrLable(labelControlls, CustomText.ChildExit, lng!),
+        text: Global.returnTrLable(labelControlls, CustomText.ChildExit, lng),
         subTitle1: widget.childName,
         subTitle2: widget.childId,
         onTap: () => Navigator.pop(context, 'itemRefresh'),
@@ -166,7 +163,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
                         nextTab(0, context);
                       },
                       text: Global.returnTrLable(
-                          labelControlls, CustomText.back, lng!),
+                          labelControlls, CustomText.back, lng),
                     )),
                     SizedBox(width: 10),
                     Expanded(
@@ -176,7 +173,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
                         nextTab(1, context);
                       },
                       text: Global.returnTrLable(
-                          labelControlls, CustomText.Submit, lng!),
+                          labelControlls, CustomText.Submit, lng),
                     ))
                   ]),
                 )
@@ -209,7 +206,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
 
         return DynamicCustomDropdownField(
           hintText: Global.returnTrLable(
-              labelControlls, CustomText.select_here, lng!),
+              labelControlls, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -279,7 +276,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
             .toList();
         return DynamicCustomDropdownField(
           hintText: Global.returnTrLable(
-              labelControlls, CustomText.select_here, lng!),
+              labelControlls, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -320,7 +317,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
         return DynamicCustomTextFieldNew(
           maxline: 3,
           titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
+              labelControlls, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
@@ -328,7 +325,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
           maxlength: quesItem.length,
           readable: logic!.callReadableLogic(myMap, quesItem),
           hintText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
+              labelControlls, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
@@ -441,8 +438,8 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(
-                    labelControlls, CustomText.plsFilManForm, lng!),
-                Global.returnTrLable(labelControlls, CustomText.ok, lng!),
+                    labelControlls, CustomText.plsFilManForm, lng),
+                Global.returnTrLable(labelControlls, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
@@ -453,7 +450,7 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
-              Global.returnTrLable(labelControlls, CustomText.ok, lng!),
+              Global.returnTrLable(labelControlls, CustomText.ok, lng),
               false,
               context);
           validStatus = false;
@@ -477,9 +474,9 @@ class _ChildExitDetailsScreenState extends State<ChildExitDetailsScreen> {
           builder: (context) {
             return SingleButtonPopupDialog(
                 message: Global.returnTrLable(
-                    labelControlls, CustomText.dataSaveSuc, lng!),
+                    labelControlls, CustomText.dataSaveSuc, lng),
                 button:
-                    Global.returnTrLable(labelControlls, CustomText.ok, lng!));
+                    Global.returnTrLable(labelControlls, CustomText.ok, lng));
           },
         );
         if (shouldProceed) {

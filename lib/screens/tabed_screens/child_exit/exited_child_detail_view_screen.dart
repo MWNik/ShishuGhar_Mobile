@@ -120,7 +120,7 @@ class _ExitedChildDetailViewState extends State<ExitedChildDetailView> {
     return SafeArea(
       child: Scaffold(
         appBar: CustomChildAppbar(
-          text: Global.returnTrLable(labelControlls, CustomText.ChildExit, lng!),
+          text: Global.returnTrLable(labelControlls, CustomText.ChildExit, lng),
           subTitle1: widget.childName,
           subTitle2: widget.childId,
           onTap: () => Navigator.pop(context, 'itemRefresh'),
@@ -152,7 +152,7 @@ class _ExitedChildDetailViewState extends State<ExitedChildDetailView> {
                           nextTab(0, context);
                         },
                         text: Global.returnTrLable(
-                            labelControlls, CustomText.back, lng!),
+                            labelControlls, CustomText.back, lng),
                       )),
                       // SizedBox(width: 10),
                       // Expanded(
@@ -196,7 +196,7 @@ class _ExitedChildDetailViewState extends State<ExitedChildDetailView> {
 
         return DynamicCustomDropdownField(
           hintText: Global.returnTrLable(
-              labelControlls, CustomText.select_here, lng!),
+              labelControlls, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -273,7 +273,7 @@ class _ExitedChildDetailViewState extends State<ExitedChildDetailView> {
             .toList();
         return DynamicCustomDropdownField(
           hintText: Global.returnTrLable(
-              labelControlls, CustomText.select_here, lng!),
+              labelControlls, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(labelControlls, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
@@ -330,7 +330,7 @@ class _ExitedChildDetailViewState extends State<ExitedChildDetailView> {
         return DynamicCustomTextFieldNew(
           maxline: 3,
           titleText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
+              labelControlls, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
@@ -339,7 +339,7 @@ class _ExitedChildDetailViewState extends State<ExitedChildDetailView> {
           readable: true,
           // readable: logic!.callReadableLogic( myMap, quesItem),
           hintText: Global.returnTrLable(
-              labelControlls, quesItem.label!.trim(), lng!),
+              labelControlls, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
@@ -450,8 +450,8 @@ class _ExitedChildDetailViewState extends State<ExitedChildDetailView> {
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(
-                    labelControlls, CustomText.plsFilManForm, lng!),
-                Global.returnTrLable(labelControlls, CustomText.ok, lng!),
+                    labelControlls, CustomText.plsFilManForm, lng),
+                Global.returnTrLable(labelControlls, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
@@ -462,7 +462,7 @@ class _ExitedChildDetailViewState extends State<ExitedChildDetailView> {
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
-              Global.returnTrLable(labelControlls, CustomText.ok, lng!),
+              Global.returnTrLable(labelControlls, CustomText.ok, lng),
               false,
               context);
           validStatus = false;
@@ -486,9 +486,9 @@ class _ExitedChildDetailViewState extends State<ExitedChildDetailView> {
           builder: (context) {
             return SingleButtonPopupDialog(
                 message: Global.returnTrLable(
-                    labelControlls, CustomText.dataSaveSuc, lng!),
+                    labelControlls, CustomText.dataSaveSuc, lng),
                 button:
-                    Global.returnTrLable(labelControlls, CustomText.ok, lng!));
+                    Global.returnTrLable(labelControlls, CustomText.ok, lng));
           },
         );
         if (shouldProceed) {

@@ -279,7 +279,7 @@ class _HouseholdScreenState
             .toList();
         return DynamicCustomDropdownField(
           hintText:
-              Global.returnTrLable(translats, CustomText.select_here, lng!),
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           titleText: Global.returnTrLable(translats, quesItem.label, lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -422,7 +422,7 @@ class _HouseholdScreenState
         return DynamicCustomTextFieldNew(
           maxline: 3,
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
@@ -434,7 +434,7 @@ class _HouseholdScreenState
                   : true
               : true,
           hintText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
@@ -660,8 +660,8 @@ class _HouseholdScreenState
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(
-                    translats, 'Please fill all mandatory fields!', lng!),
-                Global.returnTrLable(translats, CustomText.ok, lng!),
+                    translats, 'Please fill all mandatory fields!', lng),
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
 
@@ -673,8 +673,8 @@ class _HouseholdScreenState
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(
-                    translats, 'Please fill all mandatory fields!', lng!),
-                Global.returnTrLable(translats, CustomText.ok, lng!),
+                    translats, 'Please fill all mandatory fields!', lng),
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
 
@@ -686,7 +686,7 @@ class _HouseholdScreenState
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
-              Global.returnTrLable(translats, CustomText.ok, lng!),
+              Global.returnTrLable(translats, CustomText.ok, lng),
               false,
               context);
           validStatus = false;

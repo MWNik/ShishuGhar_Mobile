@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../model/dynamic_screen_model/options_model.dart';
 import '../../style/styles.dart';

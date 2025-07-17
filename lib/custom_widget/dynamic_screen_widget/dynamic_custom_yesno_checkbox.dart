@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/utils/globle_method.dart';
-import 'package:shishughar/utils/validate.dart';
 
-import '../../../database/helper/translation_language_helper.dart';
 import '../../../style/styles.dart';
 
 enum SingingCharacter { Yes, No, value }

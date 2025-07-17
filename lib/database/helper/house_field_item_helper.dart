@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:shishughar/model/databasemodel/tabstate_model.dart';
 
 import '../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../database_helper.dart';

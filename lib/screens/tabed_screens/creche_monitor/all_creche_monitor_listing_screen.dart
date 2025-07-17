@@ -5,11 +5,9 @@ import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/database/helper/creche_monitoring/creche_monitoring_response_helper.dart';
-import 'package:shishughar/screens/tabed_screens/creche_monitor/creche_monitor_tab.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 import '../../../custom_widget/custom_btn.dart';
-import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown_for_filter.dart';
 import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
@@ -359,7 +357,7 @@ class _CrecheMonitorListingScreenState
                                                                 'date_of_visit')))
                                                         ? Validate().displeDateFormate(
                                                             Global.getItemValues(
-                                                                responce!,
+                                                                responce,
                                                                 'date_of_visit'))
                                                         : '',
                                                     style: Styles.cardBlue10,

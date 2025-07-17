@@ -2,7 +2,6 @@
 
 import 'package:shishughar/model/databasemodel/tabVillage_model.dart';
 import 'package:shishughar/model/databasemodel/tab_primary_occupation_model.dart';
-import 'package:shishughar/model/databasemodel/tab_social_category_model.dart';
 
 import '../database_helper.dart';
 

@@ -221,7 +221,7 @@ class _EnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, 'Clear', lng!),
+                                    translats, 'Clear', lng),
                                 color: Color(0xffF26BA3),
                                 onPressed: () {
                                   Navigator.of(context).pop();
@@ -234,7 +234,7 @@ class _EnrolledChildrenListedScreenState
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, 'Search', lng!),
+                                    translats, 'Search', lng),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   filteredGetData(context);
@@ -688,6 +688,7 @@ class _EnrolledChildrenListedScreenState
     //     flag: 'tabBlock'))
     //     .toList();
     setState(() {});
+    return null;
   }
 
   String getGender(int gender_id) {

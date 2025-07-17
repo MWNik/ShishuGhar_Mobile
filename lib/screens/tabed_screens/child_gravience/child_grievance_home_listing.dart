@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
-import 'package:shishughar/screens/tabed_screens/child_gravience/graviences_tabs_screen.dart';
 import 'package:shishughar/utils/validate.dart';
 
 import '../../../custom_widget/custom_btn.dart';
@@ -203,7 +201,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, CustomText.clear, lng!),
+                                    translats, CustomText.clear, lng),
                                 color: Color(0xffF26BA3),
                                 onPressed: () {
                                   Navigator.of(context).pop();
@@ -216,7 +214,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, CustomText.Search, lng!),
+                                    translats, CustomText.Search, lng),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   filteredGetData(context);

@@ -2,13 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_children_field_helper.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
@@ -23,7 +21,6 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new
 import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.dart';
 import '../../../database/helper/dynamic_screen_helper/house_hold_children_helper.dart';
 import '../../../database/helper/enrolled_children/enrolled_children_field_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../utils/globle_method.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
@@ -174,16 +171,14 @@ class _EnrolledChilrenTabItemViewState
   List<Widget> cWidget(List item) {
     List<Widget> screenItems = [];
     var items = item;
-    if (items != null) {
-      for (int i = 0; i < items.length; i++) {
-        screenItems.add(widgetTypeWidget(i, items[i]));
-        screenItems.add(SizedBox(height: 5.h));
-        if (!logic!.callDependingLogic(myMap, items[i])) {
-          myMap.remove(items[i].fieldname);
-        }
+    for (int i = 0; i < items.length; i++) {
+      screenItems.add(widgetTypeWidget(i, items[i]));
+      screenItems.add(SizedBox(height: 5.h));
+      if (!logic!.callDependingLogic(myMap, items[i])) {
+        myMap.remove(items[i].fieldname);
       }
     }
-    return screenItems;
+      return screenItems;
   }
 
   widgetTypeWidget(int index, HouseHoldFielItemdModel quesItem) {
@@ -194,7 +189,7 @@ class _EnrolledChilrenTabItemViewState
             .toList();
         return DynamicCustomDropdownField(
           hintText:
-              Global.returnTrLable(translats, CustomText.select_here, lng!),
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1

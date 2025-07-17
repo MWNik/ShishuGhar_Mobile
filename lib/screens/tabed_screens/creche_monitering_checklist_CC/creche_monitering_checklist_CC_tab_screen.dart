@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 
 import '../../../custom_widget/custom_text.dart';
 import '../../../database/helper/cmc_CC/creche_monitering_checklist_CC_fields_helper.dart';
@@ -127,7 +126,7 @@ class _CmcCCTabSCreenState extends State<CmcCCTabSCreen>
                   children: [
                     Text(
                       Global.returnTrLable(
-                          translatsLabel, CustomText.VisitNote, lng!),
+                          translatsLabel, CustomText.VisitNote, lng),
                       style: Styles.white145,
                     ),
                     Text(
@@ -240,7 +239,7 @@ class _CmcCCTabSCreenState extends State<CmcCCTabSCreen>
   Future<bool> checkConditionsBeforeChangingTab(int index) async {
     bool returnStatus = false;
     var alredRecord = await CmcCCTabResponseHelper()
-        .getCrecheCommittieResponcewithGuid(widget.cmc_cc_guid!);
+        .getCrecheCommittieResponcewithGuid(widget.cmc_cc_guid);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
 

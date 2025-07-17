@@ -333,7 +333,7 @@ class _CheckInsScreenState extends State<CheckIns> {
     items.forEach((element) {
       var date = Global.getItemValues(element.responces, 'date_of_checkin');
       if (Global.validString(date)) {
-        dateStringData.add(date!);
+        dateStringData.add(date);
       }
     });
     var dateList = dateStringData.map((dateString) {
@@ -355,7 +355,7 @@ class _CheckInsScreenState extends State<CheckIns> {
     items.forEach((element) {
       var date = Global.getItemValues(element.responces, 'date_of_checkin');
       if (Global.validString(date)) {
-        dateStringData.add(date!);
+        dateStringData.add(date);
       }
     });
     var dateList = dateStringData.map((dateString) {

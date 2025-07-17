@@ -11,7 +11,6 @@ import 'package:shishughar/model/dynamic_screen_model/enrolled_child_exit_respon
 import 'package:shishughar/screens/tabed_screens/anthrometory/child_growth_listing_screen_in_child.dart';
 import 'package:shishughar/screens/tabed_screens/child_event/child_event_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/child_follow_up/child_followUp_completed_list_forChild_CC.dart';
-import 'package:shishughar/screens/tabed_screens/child_follow_up/child_followup_completed_list_CC.dart';
 import 'package:shishughar/screens/tabed_screens/child_follow_up/follow_up_tab_screen_for_child.dart';
 import 'package:shishughar/screens/tabed_screens/child_health/child_health_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/child_immunization/child_immunization_details_tab.dart';
@@ -19,7 +18,6 @@ import 'package:shishughar/screens/tabed_screens/child_reffrel/referral_complete
 import 'package:shishughar/screens/tabed_screens/child_reffrel/reffral_tab_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_enrollment/creche_enroll_child_enroll_single.dart';
 import 'package:shishughar/screens/tabed_screens/enrolled_exit_child/enrolled_exit_child_tab.dart';
-import 'package:shishughar/screens/tabed_screens/enrolled_exit_child/enrolled_exit_chilren_tab_item.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';

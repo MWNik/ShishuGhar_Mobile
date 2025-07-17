@@ -5,8 +5,6 @@ import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/customtextfield.dart';
-import 'package:shishughar/screens/login_screen.dart';
-import 'package:shishughar/screens/verificationScreen.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/validate.dart';
 

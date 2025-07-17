@@ -1,8 +1,6 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:shishughar/model/databasemodel/tabVillage_model.dart';
-import 'package:shishughar/model/databasemodel/tab_gender_model.dart';
 import '../../model/apimodel/supervisor_model.dart';
 import '../database_helper.dart';
 

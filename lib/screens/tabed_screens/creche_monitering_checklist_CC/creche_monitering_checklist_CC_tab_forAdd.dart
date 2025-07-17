@@ -1,11 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 
 import '../../../../custom_widget/custom_text.dart';
 import '../../../../database/helper/cmc_CC/creche_monitering_checklist_CC_fields_helper.dart';
-import '../../../../database/helper/cmc_cbm/creche_monitering_checklist_CBM_response_helper.dart';
 import '../../../../database/helper/translation_language_helper.dart';
 import '../../../../model/apimodel/form_logic_api_model.dart';
 import '../../../../model/apimodel/house_hold_field_item_model_api.dart';
@@ -127,7 +125,7 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
                   children: [
                     Text(
                       Global.returnTrLable(
-                          translatsLabel, CustomText.VisitNote, lng!),
+                          translatsLabel, CustomText.VisitNote, lng),
                       style: Styles.white145,
                     ),
                     // Text(
@@ -238,7 +236,7 @@ class _CmcCCTabSCreenForAddState extends State<CmcCCTabSCreenForAdd>
   Future<bool> checkConditionsBeforeChangingTab(int index) async {
     bool returnStatus = false;
     var alredRecord = await CmcCCTabResponseHelper()
-        .getCrecheCommittieResponcewithGuid(widget.cmc_cc_guid!);
+        .getCrecheCommittieResponcewithGuid(widget.cmc_cc_guid);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
 

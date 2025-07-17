@@ -12,7 +12,6 @@ import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/databasemodel/backdated_configiration_model.dart';
 import '../../../model/dynamic_screen_model/creche_monitering_checklist_CC_response_model.dart';
-import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/validate.dart';
 import 'creche_monitering_checklist_CC_tab_screen.dart';

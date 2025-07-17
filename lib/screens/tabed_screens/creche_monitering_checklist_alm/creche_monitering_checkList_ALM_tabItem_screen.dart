@@ -19,7 +19,6 @@ import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
-import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/databasemodel/backdated_configiration_model.dart';
@@ -312,7 +311,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
             .toList();
         return DynamicCustomDropdownField(
           hintText: Global.returnTrLable(
-              _translation, CustomText.select_here, _language!),
+              _translation, CustomText.select_here, _language),
           titleText: Global.returnTrLable(
               _translation, quesItem.label!.trim(), _language),
           isRequred: quesItem.reqd == 1

@@ -6,18 +6,8 @@ import 'package:shishughar/model/dynamic_screen_model/house_hold_tab_responce_mo
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../../../custom_widget/custom_text.dart';
 import '../../../model/dynamic_screen_model/enrolled_children_responce_model.dart';
 import '../../../utils/validate.dart';
-import '../anthromentory/child_growth_response_helper.dart';
-import '../child_attendence/child_attendence_helper.dart';
-import '../child_event/child_event_response_helper.dart';
-import '../child_exit/child_exit_response_Helper.dart';
-import '../child_health/child_health_response_helper.dart';
-import '../child_immunization/child_immunization_response_helper.dart';
-import '../child_reffrel/child_refferal_response_helper.dart';
-import '../follow_up/child_followUp_response_helper.dart';
-import '../image_file_tab_responce_helper.dart';
 
 class EnrolledChilrenResponceHelper {
   Future<void> inserts(EnrolledChildrenResponceModel items) async {

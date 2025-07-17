@@ -1,27 +1,19 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';
-import 'package:shishughar/model/apimodel/creche_database_responce_model.dart';
-import 'package:shishughar/screens/tabed_screens/child_exit/child_exit_details_screen.dart';
 import 'package:shishughar/screens/tabed_screens/child_exit/exit_enrolld_child/exit_enrolled_child_tab.dart';
 
-import '../../../custom_widget/custom_appbar.dart';
 import '../../../custom_widget/custom_text.dart';
 import '../../../database/helper/child_exit/child_exit_response_Helper.dart';
 import '../../../database/helper/creche_helper/creche_data_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
-import '../../../model/databasemodel/child_exit_response_model.dart';
-import '../../../model/dynamic_screen_model/enrolled_children_responce_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
-import '../child_exit/exited_child_detail_view_screen.dart';
 import 'enrolled_children_tab_item_details_only_view.dart';
 
 class CrecheEnrollChildEnrollSingleScreen extends StatefulWidget {

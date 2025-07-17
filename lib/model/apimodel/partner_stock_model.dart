@@ -1,4 +1,3 @@
-import 'package:shishughar/utils/globle_method.dart';
 
 class PartnerStockModel {
   int? name;

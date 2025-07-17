@@ -9,7 +9,6 @@ import 'package:shishughar/database/helper/stock/stock_response_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
 import 'package:shishughar/screens/tabed_screens/stock/stock/stock_details_screen.dart';
-import 'package:shishughar/screens/tabed_screens/stock/stock/stock_details_screen_replica.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -132,21 +131,19 @@ class _StockListingScreenState extends State<StockListingScreen> {
         }
         print(resultList.length);
       }
-      if (newItem != null) {
-        for (var elem in newItem) {
-          if (Global.stringToDouble(elem['quantity_received'].toString()) >
-              0.0) {
-            Map<String, dynamic> item = {
-              "month": elem['month'],
-              "year": elem['year'],
-              "stock_item": elem['requistion_item'],
-              "quantity_received": elem['quantity_received']
-            };
-            resultList.add(item);
-          }
+      for (var elem in newItem) {
+        if (Global.stringToDouble(elem['quantity_received'].toString()) >
+            0.0) {
+          Map<String, dynamic> item = {
+            "month": elem['month'],
+            "year": elem['year'],
+            "stock_item": elem['requistion_item'],
+            "quantity_received": elem['quantity_received']
+          };
+          resultList.add(item);
         }
       }
-    } else {
+        } else {
       for (var element in requiList) {
         if (Global.stringToDouble(element['quantity_received'].toString()) >
             0.0) {
@@ -313,11 +310,11 @@ class _StockListingScreenState extends State<StockListingScreen> {
                                                     MainAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    '${Global.returnTrLable(translats, 'Month', lng!).trim()} :',
+                                                    '${Global.returnTrLable(translats, 'Month', lng).trim()} :',
                                                     style: Styles.black104,
                                                   ),
                                                   Text(
-                                                    '${Global.returnTrLable(translats, 'Year', lng!).trim()} :',
+                                                    '${Global.returnTrLable(translats, 'Year', lng).trim()} :',
                                                     style: Styles.black104,
                                                     strutStyle:
                                                         StrutStyle(height: 1.2),

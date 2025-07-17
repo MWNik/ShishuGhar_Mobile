@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shishughar/database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 
 import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/custom_text.dart';
@@ -18,7 +17,6 @@ import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart
 import '../../../database/helper/follow_up/child_followUp_response_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
-import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
@@ -264,7 +262,7 @@ class _ChildFollowupTabItemsViewScreenState
             .toList();
         return DynamicCustomDropdownField(
           hintText:
-              Global.returnTrLable(translats, CustomText.select_here, lng!),
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd,

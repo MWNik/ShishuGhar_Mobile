@@ -1,14 +1,10 @@
 import 'dart:convert';
-import 'dart:ffi';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/database/helper/creche_helper/creche_care_giver_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/caregiver_responce_model.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/house_hold_tab_responce_model.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
@@ -352,7 +348,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
           focusNode: _focusNode[quesItem.fieldname],
           maxline: 3,
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
@@ -367,7 +363,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
           //     ? logic!.callReadableLogic(myMap, quesItem)
           //     : !widget.isEditable,
           hintText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
@@ -604,8 +600,8 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
           var valuees = myMap[element.fieldname];
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
-                Global.returnTrLable(translats, CustomText.plsFilManForm, lng!),
-                Global.returnTrLable(translats, CustomText.ok, lng!),
+                Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
@@ -616,7 +612,7 @@ class _CareGiverScreenItemState extends State<CareGiverScreenItem> {
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
-              Global.returnTrLable(translats, CustomText.ok, lng!),
+              Global.returnTrLable(translats, CustomText.ok, lng),
               false,
               context);
           validStatus = false;

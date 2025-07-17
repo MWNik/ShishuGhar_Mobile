@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';
@@ -945,113 +944,111 @@ class _ChildGrowthExpendedFormState
 
       enrolledChild.forEach((element) {
         var item = Validate().keyesFromResponce(attepmtChild[element.ChildEnrollGUID]!);
-        if (item != null) {
-          item['childenrollguid'] = element.ChildEnrollGUID;
-          item['chhguid'] = element.CHHGUID;
-          item['child_id'] = element.name;
-          item['cgmguid'] = widget.cgmguid;
+        item['childenrollguid'] = element.ChildEnrollGUID;
+        item['chhguid'] = element.CHHGUID;
+        item['child_id'] = element.name;
+        item['cgmguid'] = widget.cgmguid;
 
-          // if (((Global.stringToInt(
-          //     item['do_you_have_height_weight'].toString()) !=
-          //     1) ||
-          //     item['measurement_equipment'] == null ||
-          //     item['weight'] == null &&
-          //     item['height'] == null)&&
-          //     isMesurement(myMap[measurement_date!.fieldname])
-          // )
-          if ( item['do_you_have_height_weight'].toString()!= '1')
-          {
-            item.remove('weight_for_age');
-            item.remove('height_for_age');
-            item.remove('weight_for_height');
-            item.remove('weight_for_age_zscore');
-            item.remove('weight_for_height_zscore');
-            item.remove('height_for_age_zscore');
-            item.remove('measurement_equipment');
-            item.remove('measurement_taken_date');
-            item.remove('dob_when_measurement_taken');
-            item.remove('height');
-            item.remove('weight');
-            item['do_you_have_height_weight'] = 0;
-            // print(item['height']);
-          } else {
-            var gender = Global.getItemValues(element.responces, 'gender_id');
-            var weightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
-                tabHeightforageBoys,
-                tHeightforageGirls,
-                tabWeightforageBoys,
-                tabWeightforageGirls,
-                tabWeightToHeightBoys,
-                tabWeightToHeightGirls,
-                'weight_for_age',
-                gender,item['measurement_taken_date'],
-                item);
-            var heightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
-                tabHeightforageBoys,
-                tHeightforageGirls,
-                tabWeightforageBoys,
-                tabWeightforageGirls,
-                tabWeightToHeightBoys,
-                tabWeightToHeightGirls,
-                'height_for_age',
-                gender,item['measurement_taken_date'],
-                item);
+        // if (((Global.stringToInt(
+        //     item['do_you_have_height_weight'].toString()) !=
+        //     1) ||
+        //     item['measurement_equipment'] == null ||
+        //     item['weight'] == null &&
+        //     item['height'] == null)&&
+        //     isMesurement(myMap[measurement_date!.fieldname])
+        // )
+        if ( item['do_you_have_height_weight'].toString()!= '1')
+        {
+          item.remove('weight_for_age');
+          item.remove('height_for_age');
+          item.remove('weight_for_height');
+          item.remove('weight_for_age_zscore');
+          item.remove('weight_for_height_zscore');
+          item.remove('height_for_age_zscore');
+          item.remove('measurement_equipment');
+          item.remove('measurement_taken_date');
+          item.remove('dob_when_measurement_taken');
+          item.remove('height');
+          item.remove('weight');
+          item['do_you_have_height_weight'] = 0;
+          // print(item['height']);
+        } else {
+          var gender = Global.getItemValues(element.responces, 'gender_id');
+          var weightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
+              tabHeightforageBoys,
+              tHeightforageGirls,
+              tabWeightforageBoys,
+              tabWeightforageGirls,
+              tabWeightToHeightBoys,
+              tabWeightToHeightGirls,
+              'weight_for_age',
+              gender,item['measurement_taken_date'],
+              item);
+          var heightForAge = DependingLogic.AutoColorCreateByHeightWightNew(
+              tabHeightforageBoys,
+              tHeightforageGirls,
+              tabWeightforageBoys,
+              tabWeightforageGirls,
+              tabWeightToHeightBoys,
+              tabWeightToHeightGirls,
+              'height_for_age',
+              gender,item['measurement_taken_date'],
+              item);
 
-            var weightForHeight = DependingLogic.AutoColorCreateByHeightWightNew(
-                tabHeightforageBoys,
-                tHeightforageGirls,
-                tabWeightforageBoys,
-                tabWeightforageGirls,
-                tabWeightToHeightBoys,
-                tabWeightToHeightGirls,
-                'weight_for_height',
-                gender,item['measurement_taken_date'],
-                item);
+          var weightForHeight = DependingLogic.AutoColorCreateByHeightWightNew(
+              tabHeightforageBoys,
+              tHeightforageGirls,
+              tabWeightforageBoys,
+              tabWeightforageGirls,
+              tabWeightToHeightBoys,
+              tabWeightToHeightGirls,
+              'weight_for_height',
+              gender,item['measurement_taken_date'],
+              item);
 
-            item['weight_for_age'] = weightForAge;
-            item['height_for_age'] = heightForAge;
-            item['weight_for_height'] = weightForHeight;
+          item['weight_for_age'] = weightForAge;
+          item['height_for_age'] = heightForAge;
+          item['weight_for_height'] = weightForHeight;
 
-            var weight_for_age_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
-                tabHeightforageBoys,
-                tHeightforageGirls,
-                tabWeightforageBoys,
-                tabWeightforageGirls,
-                tabWeightToHeightBoys,
-                tabWeightToHeightGirls,
-                'weight_for_age',
-                gender,item['measurement_taken_date'],
-                item);
-            var height_for_age_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
-                tabHeightforageBoys,
-                tHeightforageGirls,
-                tabWeightforageBoys,
-                tabWeightforageGirls,
-                tabWeightToHeightBoys,
-                tabWeightToHeightGirls,
-                'height_for_age',
-                gender,item['measurement_taken_date'],
-                item);
-            var weight_for_height_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
-                tabHeightforageBoys,
-                tHeightforageGirls,
-                tabWeightforageBoys,
-                tabWeightforageGirls,
-                tabWeightToHeightBoys,
-                tabWeightToHeightGirls,
-                'weight_for_height',
-                gender,item['measurement_taken_date'],
-                item);
+          var weight_for_age_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
+              tabHeightforageBoys,
+              tHeightforageGirls,
+              tabWeightforageBoys,
+              tabWeightforageGirls,
+              tabWeightToHeightBoys,
+              tabWeightToHeightGirls,
+              'weight_for_age',
+              gender,item['measurement_taken_date'],
+              item);
+          var height_for_age_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
+              tabHeightforageBoys,
+              tHeightforageGirls,
+              tabWeightforageBoys,
+              tabWeightforageGirls,
+              tabWeightToHeightBoys,
+              tabWeightToHeightGirls,
+              'height_for_age',
+              gender,item['measurement_taken_date'],
+              item);
+          var weight_for_height_zscore = DependingLogic.AutoColorCreateByHeightWightStringNew(
+              tabHeightforageBoys,
+              tHeightforageGirls,
+              tabWeightforageBoys,
+              tabWeightforageGirls,
+              tabWeightToHeightBoys,
+              tabWeightToHeightGirls,
+              'weight_for_height',
+              gender,item['measurement_taken_date'],
+              item);
 
-            item['weight_for_age_zscore'] = weight_for_age_zscore;
-            item['weight_for_height_zscore'] = weight_for_height_zscore;
-            item['height_for_age_zscore'] = height_for_age_zscore;
-            item['s_flag'] = 1;
+          item['weight_for_age_zscore'] = weight_for_age_zscore;
+          item['weight_for_height_zscore'] = weight_for_height_zscore;
+          item['height_for_age_zscore'] = height_for_age_zscore;
+          item['s_flag'] = 1;
 
-          }
-          childValues.add(item);
         }
-      });
+        childValues.add(item);
+            });
       myMap['anthropromatic_details'] = childValues;
       var measurementDate = myMap['measurement_date'];
       var responcesJs = jsonEncode(myMap);
@@ -1279,7 +1276,7 @@ class _ChildGrowthExpendedFormState
         // print("Current Link Field Type ======> ${quesItem.label}");
         return DynamicCustomDropdownField(
           hintText: Global.returnTrLable(
-              translatsLabel, CustomText.select_here, lng!),
+              translatsLabel, CustomText.select_here, lng),
           titleText:
           Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           // isRequred: quesItem.fieldname == 'measurement_equipment'
@@ -1679,7 +1676,7 @@ class _ChildGrowthExpendedFormState
             .toList();
         return DynamicCustomDropdownField(
           hintText: Global.returnTrLable(
-              translatsLabel, CustomText.select_here, lng!),
+              translatsLabel, CustomText.select_here, lng),
           titleText:
           Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
           isRequred: logic!.dependeOnMendotory(itemsAnswred, quesItem),
@@ -2482,7 +2479,7 @@ class _ChildGrowthExpendedFormState
                                           cWidgetDatamap[
                                           re_measurement_taken_date!.fieldname!] = value;
                                           var logData = logic!.callDateDiffrenceLogic(
-                                              cWidgetDatamap, re_measurement_taken_date!);
+                                              cWidgetDatamap, re_measurement_taken_date);
                                           if (logData.isNotEmpty) {
                                             if (logData.keys.length > 0) {
                                               cWidgetDatamap.addEntries([

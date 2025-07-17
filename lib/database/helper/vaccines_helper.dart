@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:shishughar/model/databasemodel/auth_model.dart';
 import 'package:shishughar/model/databasemodel/vaccines_model.dart';
 import 'package:sqflite/sqflite.dart';
 import '../database_helper.dart';

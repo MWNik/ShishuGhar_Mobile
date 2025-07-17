@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/screens/tabed_screens/creche_Monitering_checkList_CBM/creche_Monitering_checkList__CBM_TAbItem_screen.dart';
 
 import '../../../custom_widget/custom_text.dart';
@@ -203,7 +202,7 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
         tabItem.add(isView
             ? CmcCBMTabItemViewSCreen(
                 creche_id: widget.creche_id.toString(),
-                cbmguid: widget.cbmguid!,
+                cbmguid: widget.cbmguid,
                 tabBreakItem: tabBreakItems[i],
                 screenItem: expendedItems,
                 changeTab: changeTab,
@@ -211,7 +210,7 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
                 totalTab: tabBreakItems.length)
             : CmcCBMTabItemSCreen(
                 creche_id: widget.creche_id.toString(),
-                cbmguid: widget.cbmguid!,
+                cbmguid: widget.cbmguid,
                 tabBreakItem: tabBreakItems[i],
                 screenItem: expendedItems,
                 changeTab: changeTab,
@@ -239,7 +238,7 @@ class _CmcCBMTabSCreenState extends State<CmcCBMTabSCreen>
   Future<bool> checkConditionsBeforeChangingTab(int index) async {
     bool returnStatus = false;
     var alredRecord = await CmcCBMTabResponseHelper()
-        .getCrecheCommittieResponcewithGuid(widget.cbmguid!);
+        .getCrecheCommittieResponcewithGuid(widget.cbmguid);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
 

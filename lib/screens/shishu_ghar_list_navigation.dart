@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:path/path.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/custom_textfield.dart';
-import 'package:shishughar/custom_widget/customdatepicker.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import 'package:shishughar/database/helper/block_data_helper.dart';
 import 'package:shishughar/database/helper/creche_helper/creche_data_helper.dart';
@@ -167,9 +165,9 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                       ),
                       SizedBox(),
                       DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(translats, CustomText.select_here, lng!),
+                        hintText: Global.returnTrLable(translats, CustomText.select_here, lng),
                         titleText: Global.returnTrLable(
-                            translats, CustomText.state, lng!),
+                            translats, CustomText.state, lng),
                         items: mstStates,
                         isRequred: 0,
                         selectedItem:
@@ -181,7 +179,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                           selectedGramPanchayat = null;
                           selectedVillage = null;
                           mstDistrict =
-                              Global.callDistrict(district, lng!, selectedState);
+                              Global.callDistrict(district, lng, selectedState);
                           if (mstDistrict.length == 1) {
                             selectedDistrict = mstDistrict.first;
                             mstBlock =
@@ -204,9 +202,9 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                         },
                       ),
                       DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(translats, CustomText.select_here, lng!),
+                        hintText: Global.returnTrLable(translats, CustomText.select_here, lng),
                         titleText: Global.returnTrLable(
-                            translats, CustomText.District, lng!),
+                            translats, CustomText.District, lng),
                         items: mstDistrict,
                         isRequred: 0,
                         selectedItem: selectedDistrict != null
@@ -236,9 +234,9 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                         },
                       ),
                       DynamicCustomDropdownField(
-                        hintText: Global.returnTrLable(translats, CustomText.select_here, lng!),
+                        hintText: Global.returnTrLable(translats, CustomText.select_here, lng),
                         titleText: Global.returnTrLable(
-                            translats, CustomText.Block, lng!),
+                            translats, CustomText.Block, lng),
                         items: mstBlock,
                         isRequred: 0,
                         selectedItem:
@@ -248,11 +246,11 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                           selectedGramPanchayat = null;
                           selectedVillage = null;
                           mstGP = Global.callGramPanchyats(
-                              gramPanchayat, lng!, selectedBlock);
+                              gramPanchayat, lng, selectedBlock);
                           if (mstGP.length == 1) {
                             selectedGramPanchayat = mstGP.first;
                             mstVillage = Global.callFiltersVillages(
-                                villages, lng!, selectedGramPanchayat);
+                                villages, lng, selectedGramPanchayat);
                           }
                           setState(() {
                             // Update gramPanchayatList based on selectedBlock
@@ -263,7 +261,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                       DynamicCustomDropdownField(
                         isRequred: 0,
                         titleText: Global.returnTrLable(
-                            translats, CustomText.GramPanchayat, lng!),
+                            translats, CustomText.GramPanchayat, lng),
                         items: mstGP,
                         hintText: Global.returnTrLable(
                             translats, CustomText.Selecthere, lng),
@@ -274,7 +272,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                           selectedGramPanchayat = value;
                           selectedVillage = null;
                           mstVillage = Global.callFiltersVillages(
-                              villages, lng!, selectedGramPanchayat);
+                              villages, lng, selectedGramPanchayat);
                           if (mstVillage.length == 1) {
                             selectedVillage = mstVillage.first;
                           }
@@ -288,7 +286,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                         hintText: Global.returnTrLable(
                             translats, CustomText.Selecthere, lng),
                         titleText: Global.returnTrLable(
-                            translats, CustomText.Village, lng!),
+                            translats, CustomText.Village, lng),
                         isRequred: 0,
                         items: mstVillage,
                         selectedItem: selectedVillage != null
@@ -310,7 +308,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, 'Clear', lng!),
+                                    translats, 'Clear', lng),
                                 color: Color(0xffF26BA3),
                                 onPressed: () {
                                   Navigator.of(context).pop();
@@ -322,7 +320,7 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
                             Expanded(
                               child: CElevatedButton(
                                 text: Global.returnTrLable(
-                                    translats, 'Search', lng!),
+                                    translats, 'Search', lng),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   filteredgetData(context);

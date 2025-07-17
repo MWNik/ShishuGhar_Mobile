@@ -16,12 +16,10 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dar
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown_for_filter.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../database/helper/village_data_helper.dart';
 import '../../../model/databasemodel/tabVillage_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../enrolled_child_details_screen_new.dart';
-import 'enrolled_children_tab.dart';
 
 class EnrolledChildrenForCC extends StatefulWidget {
   // final String creCheName;
@@ -236,7 +234,7 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
                               Expanded(
                                 child: CElevatedButton(
                                   text: Global.returnTrLable(
-                                      translats, 'Clear', lng!),
+                                      translats, 'Clear', lng),
                                   color: Color(0xffF26BA3),
                                   onPressed: () {
                                     Navigator.of(context).pop();
@@ -249,7 +247,7 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
                               Expanded(
                                 child: CElevatedButton(
                                   text: Global.returnTrLable(
-                                      translats, 'Search', lng!),
+                                      translats, 'Search', lng),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                     filteredGetData(context);
@@ -526,6 +524,7 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
     //     flag: 'tabBlock'))
     //     .toList();
     setState(() {});
+    return null;
   }
 
   filteredGetData(BuildContext context) async {

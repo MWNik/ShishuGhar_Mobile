@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/custom_textfield.dart';
-import 'package:shishughar/custom_widget/customtextfield.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_textfield_float.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_yesno_checkbox.dart';
@@ -27,7 +26,6 @@ import 'package:shishughar/model/apimodel/partner_stock_model.dart';
 // import 'package:shishughar/model/apimodel/partner_stock_model.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
-import 'package:shishughar/model/dynamic_screen_model/requisition_response_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/stock_response_model.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
 import 'package:shishughar/style/styles.dart';
@@ -573,16 +571,14 @@ class _StockExpendableDetailScreenState
             //     // }
             //   }
             // }
-            if (value != null) {
-              if (itemMap.containsKey(itemName.toString())) {
-                setState(() {
-                  itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-                });
-              }
+            if (itemMap.containsKey(itemName.toString())) {
+              setState(() {
+                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
+              });
             }
-          },
+                    },
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
         );
 
       case 'Float':
@@ -591,7 +587,7 @@ class _StockExpendableDetailScreenState
         // }
         return DynamicCustomTextFieldFloat(
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -724,11 +720,11 @@ class _StockExpendableDetailScreenState
       }
     }
     await OptionsModelHelper()
-        .callPartnerStockOptions('Partner Stock', lng!, 'Stock Child table',
+        .callPartnerStockOptions('Partner Stock', lng, 'Stock Child table',
             Global.stringToInt(widget.creche_id), widget.month, widget.year)
         .then((value) => options.addAll(value));
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon, lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((value) => options.addAll(value));
     List<TabFormsLogic> logics=[];
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
@@ -768,8 +764,8 @@ class _StockExpendableDetailScreenState
           var values = itemMap[name]?[element.fieldname];
           if (!Global.validString(values.toString())) {
             Validate().singleButtonPopup(
-                Global.returnTrLable(translats, CustomText.plsFilManForm, lng!),
-                Global.returnTrLable(translats, CustomText.ok, lng!),
+                Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
@@ -780,7 +776,7 @@ class _StockExpendableDetailScreenState
           if (Global.validString(validationMsg)) {
             Validate().singleButtonPopup(
                 validationMsg!,
-                Global.returnTrLable(translats, CustomText.ok, lng!),
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
@@ -839,8 +835,8 @@ class _StockExpendableDetailScreenState
           builder: (context) {
             return SingleButtonPopupDialog(
                 message: Global.returnTrLable(
-                    translats, CustomText.dataSaveSuc, lng!),
-                button: Global.returnTrLable(translats, CustomText.ok, lng!));
+                    translats, CustomText.dataSaveSuc, lng),
+                button: Global.returnTrLable(translats, CustomText.ok, lng));
           },
         );
         if (shouldProceed) {
@@ -988,7 +984,7 @@ class _StockExpendableDetailScreenState
                                   nextTab(0, context);
                                 },
                                 text: Global.returnTrLable(
-                                    translats, CustomText.back, lng!),
+                                    translats, CustomText.back, lng),
                               )),
                               SizedBox(width: 10),
                               Expanded(
@@ -998,7 +994,7 @@ class _StockExpendableDetailScreenState
                                   nextTab(1, context);
                                 },
                                 text: Global.returnTrLable(
-                                    translats, CustomText.Submit, lng!),
+                                    translats, CustomText.Submit, lng),
                               ))
                             ],
                           ))

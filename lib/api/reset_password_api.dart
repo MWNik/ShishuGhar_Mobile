@@ -1,8 +1,6 @@
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart';
 import 'package:shishughar/utils/constants.dart';
-import 'package:shishughar/utils/validate.dart';
 
 class ResetPaswordScreenApiService {
   Future<Response> getResetPaswordScreenApi(String userName) async {

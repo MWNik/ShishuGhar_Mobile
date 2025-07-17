@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/custom_textfield.dart';
-import 'package:shishughar/custom_widget/customtextfield.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_textfield_float.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_yesno_checkbox.dart';
@@ -17,7 +16,6 @@ import 'package:shishughar/database/helper/creche_helper/creche_data_helper.dart
 import 'package:shishughar/database/helper/dynamic_screen_helper/options_model_helper.dart';
 import 'package:shishughar/database/helper/form_logic_helper.dart';
 import 'package:shishughar/database/helper/partner_stock_helper.dart';
-import 'package:shishughar/database/helper/requisition/requisition_response_helper.dart';
 import 'package:shishughar/database/helper/stock/stock_fields_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/creche_database_responce_model.dart';
@@ -27,7 +25,6 @@ import 'package:shishughar/model/apimodel/partner_stock_model.dart';
 // import 'package:shishughar/model/apimodel/partner_stock_model.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
-import 'package:shishughar/model/dynamic_screen_model/requisition_response_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/stock_response_model.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
 import 'package:shishughar/style/styles.dart';
@@ -440,16 +437,10 @@ class _ReplicaState extends State<Replica> {
           isVisible:
               logic!.callDependingLogic( itemFields, quesItem),
           onChanged: (value) {
-            if (value != null) {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-              }
-            } else {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]!.remove(quesItem.fieldname);
-              }
+            if (itemMap.containsKey(itemName.toString())) {
+              itemMap[itemName.toString()]![quesItem.fieldname!] = value;
             }
-            // updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
+                      // updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
           },
         );
       case 'Select':
@@ -493,16 +484,10 @@ class _ReplicaState extends State<Replica> {
           initialvalue: itemFields[quesItem.fieldname!],
           onChanged: (value) {
             print('Entered text: $value');
-            if (value != null) {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-              }
-            } else {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]!.remove(quesItem.fieldname);
-              }
+            if (itemMap.containsKey(itemName.toString())) {
+              itemMap[itemName.toString()]![quesItem.fieldname!] = value;
             }
-
+          
             // updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
           },
         );
@@ -524,16 +509,10 @@ class _ReplicaState extends State<Replica> {
           isVisible:
               logic!.callDependingLogic( itemFields, quesItem),
           onChanged: (value) {
-            if (value != null) {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-              }
-            } else {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]!.remove(quesItem.fieldname);
-              }
+            if (itemMap.containsKey(itemName.toString())) {
+              itemMap[itemName.toString()]![quesItem.fieldname!] = value;
             }
-
+          
             // updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
           },
         );
@@ -567,20 +546,14 @@ class _ReplicaState extends State<Replica> {
             //     // }
             //   }
             // }
-            if (value != null) {
-              if (itemMap.containsKey(itemName.toString())) {
-                setState(() {
-                  itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-                });
-              }
-            } else {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]!.remove(quesItem.fieldname);
-              }
+            if (itemMap.containsKey(itemName.toString())) {
+              setState(() {
+                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
+              });
             }
-          },
+                    },
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
         );
 
       case 'Float':
@@ -590,7 +563,7 @@ class _ReplicaState extends State<Replica> {
         return DynamicCustomTextFieldFloat(
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
@@ -738,11 +711,11 @@ class _ReplicaState extends State<Replica> {
       }
     }
     await OptionsModelHelper()
-        .callPartnerStockOptions('Partner Stock', lng!, 'Stock Child table',
+        .callPartnerStockOptions('Partner Stock', lng, 'Stock Child table',
             Global.stringToInt(widget.creche_id), widget.month, widget.year)
         .then((value) => options.addAll(value));
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon, lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((value) => options.addAll(value));
     
     List<TabFormsLogic> logics=[];
@@ -802,8 +775,8 @@ class _ReplicaState extends State<Replica> {
           var values = itemMap[name]?[element.fieldname];
           if (!Global.validString(values.toString())) {
             Validate().singleButtonPopup(
-                Global.returnTrLable(translats, CustomText.plsFilManForm, lng!),
-                Global.returnTrLable(translats, CustomText.ok, lng!),
+                Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
@@ -814,7 +787,7 @@ class _ReplicaState extends State<Replica> {
           if (Global.validString(validationMsg)) {
             Validate().singleButtonPopup(
                 validationMsg!,
-                Global.returnTrLable(translats, CustomText.ok, lng!),
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
@@ -873,8 +846,8 @@ class _ReplicaState extends State<Replica> {
           builder: (context) {
             return SingleButtonPopupDialog(
                 message: Global.returnTrLable(
-                    translats, CustomText.dataSaveSuc, lng!),
-                button: Global.returnTrLable(translats, CustomText.ok, lng!));
+                    translats, CustomText.dataSaveSuc, lng),
+                button: Global.returnTrLable(translats, CustomText.ok, lng));
           },
         );
         if (shouldProceed) {
@@ -1020,7 +993,7 @@ class _ReplicaState extends State<Replica> {
                                 nextTab(0, context);
                               },
                               text: Global.returnTrLable(
-                                  translats, CustomText.back, lng!),
+                                  translats, CustomText.back, lng),
                             )),
                             widget.isEdit?SizedBox(width: 10):SizedBox(),
                             widget.isEdit?Expanded(
@@ -1030,7 +1003,7 @@ class _ReplicaState extends State<Replica> {
                                 nextTab(1, context);
                               },
                               text: Global.returnTrLable(
-                                  translats, CustomText.Submit, lng!),
+                                  translats, CustomText.Submit, lng),
                             )):SizedBox()
                           ],
                         ))

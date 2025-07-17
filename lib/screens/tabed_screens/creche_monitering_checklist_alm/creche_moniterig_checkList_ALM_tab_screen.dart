@@ -125,7 +125,7 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
                   children: [
                     Text(
                       Global.returnTrLable(
-                          translatsLabel, CustomText.VisitNote, lng!),
+                          translatsLabel, CustomText.VisitNote, lng),
                       style: Styles.white145,
                     ),
                     Text(
@@ -236,7 +236,7 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
   Future<bool> checkConditionsBeforeChangingTab(int index) async {
     bool returnStatus = false;
     var alredRecord = await CmcALMTabResponseHelper()
-        .getCrecheCommittieResponcewithGuid(widget.almguid!);
+        .getCrecheCommittieResponcewithGuid(widget.almguid);
     if (alredRecord.isNotEmpty) {
       Map<String, dynamic> responseData = jsonDecode(alredRecord[0].responces!);
 
@@ -317,7 +317,7 @@ class _CmcALMTabSCreenState extends State<CmcALMTabSCreen>
       final textPainter = TextPainter(
         text: TextSpan(
             text: Global.returnTrLable(
-                translatsLabel, tabBreakItems[i].label!, lng!),
+                translatsLabel, tabBreakItems[i].label!, lng),
             style: Styles.white124P),
         maxLines: 1, // Single line text
         textDirection: TextDirection.ltr,

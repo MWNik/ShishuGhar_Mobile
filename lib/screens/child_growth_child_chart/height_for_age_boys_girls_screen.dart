@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:shishughar/custom_widget/custom_appbar_child.dart';
 import 'package:shishughar/database/helper/height_weight_boys_girls_helper.dart';
@@ -9,7 +8,6 @@ import 'package:shishughar/model/databasemodel/child_growth_responce_model.dart'
 import 'package:flutter/material.dart';
 import 'package:shishughar/utils/validate.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
-import '../../custom_widget/custom_appbar.dart';
 import '../../custom_widget/custom_text.dart';
 import '../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../model/apimodel/translation_language_api_model.dart';
@@ -222,7 +220,7 @@ class _HeightforAgeBoysGirlsScreenState
                       ? MultiLineChart(
                           crechId: widget.crechId,
                           coordinatesOne: red_cor!,
-                          child: child!,
+                          child: child,
                           childName: widget.childName,
                           childId: widget.childId,
                           coordinatesTwo: green_cor!,
@@ -255,7 +253,7 @@ class _HeightforAgeBoysGirlsScreenState
                             bottomName: "Age",
                             leftName: "Height",
                             maxY: maxY!,
-                            child: child!,
+                            child: child,
                             maxX: maxX!,minX: 35,
                             // minX: minX!,
                             // minY: minY!,

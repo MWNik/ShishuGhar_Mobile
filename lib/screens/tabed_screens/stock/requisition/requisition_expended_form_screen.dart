@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/custom_textfield.dart';
@@ -22,7 +20,6 @@ import 'package:shishughar/database/helper/requisition/requisition_fields_helper
 import 'package:shishughar/database/helper/requisition/requisition_response_helper.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/creche_database_responce_model.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/partner_stock_model.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
@@ -113,10 +110,8 @@ class _RequisitionExpendedFormScreenState
   Future<void> initializeData() async {
     role = (await Validate().readString(Validate.role))!;
     var lngtr = (await Validate().readString(Validate.sLanguage))!;
-    if (lngtr != null) {
-      lng = lngtr;
-    }
-    List<String> valueNames = [
+    lng = lngtr;
+      List<String> valueNames = [
       CustomText.noItemsAvail,
       CustomText.ok,
       CustomText.selectItemForAdd,
@@ -240,14 +235,14 @@ class _RequisitionExpendedFormScreenState
     await OptionsModelHelper()
         .callPartnerStockOptions(
             'Partner Stock',
-            lng!,
+            lng,
             'Requisition Child table',
             Global.stringToInt(widget.creche_id),
             widget.month,
             widget.year)
         .then((value) => options.addAll(value));
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon, lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((value) => options.addAll(value));
 
     await FormLogicDataHelper().callFormLogic(screen_type).then((data) {
@@ -326,7 +321,7 @@ class _RequisitionExpendedFormScreenState
                     children: [
                       Text(
                         Global.returnTrLable(
-                            translats, CustomText.requiDetails, lng!),
+                            translats, CustomText.requiDetails, lng),
                         style: Styles.white145,
                       ),
                       Text(
@@ -490,7 +485,7 @@ class _RequisitionExpendedFormScreenState
                                 nextTab(0, context);
                               },
                               text: Global.returnTrLable(
-                                  translats, CustomText.back, lng!),
+                                  translats, CustomText.back, lng),
                             )),
                             widget.isEdit?SizedBox(width: 10):SizedBox(),
                             widget.isEdit?Expanded(
@@ -500,7 +495,7 @@ class _RequisitionExpendedFormScreenState
                                 nextTab(1, context);
                               },
                               text: Global.returnTrLable(
-                                  translats, CustomText.Submit, lng!),
+                                  translats, CustomText.Submit, lng),
                             )):SizedBox()
                           ],
                         ))
@@ -519,8 +514,8 @@ class _RequisitionExpendedFormScreenState
           var values = itemMap[name]?[element.fieldname];
           if (!Global.validString(values.toString())) {
             Validate().singleButtonPopup(
-                Global.returnTrLable(translats, CustomText.plsFilManForm, lng!),
-                Global.returnTrLable(translats, CustomText.ok, lng!),
+                Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
@@ -533,7 +528,7 @@ class _RequisitionExpendedFormScreenState
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
-              Global.returnTrLable(translats, CustomText.ok, lng!),
+              Global.returnTrLable(translats, CustomText.ok, lng),
               false,
               context);
           validStatus = false;
@@ -590,8 +585,8 @@ class _RequisitionExpendedFormScreenState
           builder: (context) {
             return SingleButtonPopupDialog(
                 message: Global.returnTrLable(
-                    translats, CustomText.dataSaveSuc, lng!),
-                button: Global.returnTrLable(translats, CustomText.ok, lng!));
+                    translats, CustomText.dataSaveSuc, lng),
+                button: Global.returnTrLable(translats, CustomText.ok, lng));
           },
         );
         if (shouldProceed) {
@@ -1237,20 +1232,14 @@ class _RequisitionExpendedFormScreenState
             //     // }
             //   }
             // }
-            if (value != null) {
-              if (itemMap.containsKey(itemName.toString())) {
-                setState(() {
-                  itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-                });
-              }
-            } else {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]!.remove(quesItem.fieldname);
-              }
+            if (itemMap.containsKey(itemName.toString())) {
+              setState(() {
+                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
+              });
             }
-          },
+                    },
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
         );
 
       case 'Float':
@@ -1260,7 +1249,7 @@ class _RequisitionExpendedFormScreenState
         return DynamicCustomTextFieldFloat(
           focusNode: _foocusNode[quesItem.fieldname],
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd

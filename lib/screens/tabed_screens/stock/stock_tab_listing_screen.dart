@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shishughar/database/helper/creche_helper/creche_data_helper.dart';
 import 'package:shishughar/model/apimodel/creche_database_responce_model.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
-import 'package:shishughar/screens/tabed_screens/cashbook/reciept/cashbook_receipt_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/stock/requisition/requisition_calender_listing_screen.dart';
-import 'package:shishughar/screens/tabed_screens/stock/requisition/requisition_listing_screen.dart';
-import 'package:shishughar/screens/tabed_screens/stock/stock/stock_calender_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/stock/stock/stock_listing_screen.dart';
 import 'package:shishughar/utils/validate.dart';
 
@@ -85,7 +82,7 @@ class _StockTabListingScreenState extends State<StockTabListingScreen>
                         children: [
                           Text(
                             Global.returnTrLable(
-                                translats, CustomText.Stock, lng!),
+                                translats, CustomText.Stock, lng),
                             style: Styles.white145,
                           ),
                           Text(

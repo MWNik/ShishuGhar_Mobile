@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/cashbook_response_expences_model.dart';
@@ -520,7 +519,7 @@ class _CashbookExpensesDetailsScreenState
   Future<void> updateHiddenValue() async {
     userName = (await Validate().readString(Validate.userName))!;
     var alrecords = await CashBookResponseExpencesHelper()
-        .getCashbookExpencesResponcewithGuid(widget.cashbook_guid!);
+        .getCashbookExpencesResponcewithGuid(widget.cashbook_guid);
     if (alrecords.length > 0) {
       Map<String, dynamic> responcesData = jsonDecode(alrecords[0].responces!);
       responcesData.forEach((key, value) {

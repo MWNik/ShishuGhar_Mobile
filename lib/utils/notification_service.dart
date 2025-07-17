@@ -1,11 +1,9 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
-import 'package:shishughar/utils/constants.dart';
 import 'package:shishughar/utils/validate.dart';
 
 class NotificationService {

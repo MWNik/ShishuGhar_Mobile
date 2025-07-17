@@ -3,14 +3,12 @@ import 'dart:convert';
 
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_time_picker.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/screens/tabed_screens/house_hold/depending_logic.dart';
 
@@ -360,7 +358,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
           focusNode: _focusNode[quesItem.fieldname],
           maxline: 3,
           titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
@@ -369,7 +367,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
           readable:
               isOnlyView ? true : logic!.callReadableLogic(myMap, quesItem),
           hintText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
+              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isVisible: logic!.callDependingLogic(myMap, quesItem),
           onChanged: (value) {
             if (value.isNotEmpty)
@@ -540,7 +538,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
     }
     print("item v ${defaultCommon.length}");
     await OptionsModelHelper()
-        .getAllMstCommonNotINOptions(defaultCommon, lng!)
+        .getAllMstCommonNotINOptions(defaultCommon, lng)
         .then((data) {
       options.addAll(data);
     });
@@ -603,7 +601,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
           await saveDataInData();
           Validate().singleButtonPopup(
               Global.returnTrLable(translats, CustomText.dataSaveSuc, lng),
-              Global.returnTrLable(translats, CustomText.ok, lng!),
+              Global.returnTrLable(translats, CustomText.ok, lng),
               false,
               context);
         }
@@ -638,7 +636,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         // setState(() {});
         Validate().singleButtonPopup(
             Global.returnTrLable(translats, CustomText.dataSaveSuc, lng),
-            Global.returnTrLable(translats, CustomText.ok, lng!),
+            Global.returnTrLable(translats, CustomText.ok, lng),
             false,
             context);
       } else {
@@ -666,7 +664,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
           if (!Global.validString(valuees.toString().trim())) {
             Validate().singleButtonPopup(
                 Global.returnTrLable(translats, CustomText.plsFilManForm, lng),
-                Global.returnTrLable(translats, CustomText.ok, lng!),
+                Global.returnTrLable(translats, CustomText.ok, lng),
                 false,
                 context);
             validStatus = false;
@@ -677,7 +675,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
         if (Global.validString(validationMsg)) {
           Validate().singleButtonPopup(
               validationMsg!,
-              Global.returnTrLable(translats, CustomText.ok, lng!),
+              Global.returnTrLable(translats, CustomText.ok, lng),
               false,
               context);
           validStatus = false;
@@ -983,7 +981,7 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
                 const CircularProgressIndicator(),
                 SizedBox(height: 10.h),
                 Text(Global.returnTrLable(
-                    translats, CustomText.pleaseWait, lng!)),
+                    translats, CustomText.pleaseWait, lng)),
               ],
             ),
           ),

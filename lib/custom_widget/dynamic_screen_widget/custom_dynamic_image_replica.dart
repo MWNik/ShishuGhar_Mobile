@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,7 +13,6 @@ import '../../style/styles.dart';
 import '../../utils/constants.dart';
 import '../custom_btn.dart';
 import '../custom_text.dart';
-import '../double_button_dailog.dart';
 
 class CustomImageDynamicReplica extends StatefulWidget {
   String? assetPath;
@@ -377,14 +375,12 @@ class _CustomImageDynamicReplicaState extends State<CustomImageDynamicReplica> {
     if (file != null) {
       var save = await savePickedImage(file, widget.child_guid);
 
-      if (save.path != null) {
-        setState(() {
-          image = File(save.path);
-          widget.onChanged?.call(save.path);
-          widget.imageName = basename(save.path);
-          widget.onName?.call(widget.imageName!);
-        });
-      }
-    }
+      setState(() {
+        image = File(save.path);
+        widget.onChanged?.call(save.path);
+        widget.imageName = basename(save.path);
+        widget.onName?.call(widget.imageName!);
+      });
+        }
   }
 }

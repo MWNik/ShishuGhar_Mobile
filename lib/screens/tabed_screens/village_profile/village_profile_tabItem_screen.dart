@@ -2,13 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import 'package:shishughar/database/helper/village_profile/village_profiile_fileds_helper.dart';
 import 'package:shishughar/database/helper/village_profile/village_profile_response_helper.dart';
-import 'package:shishughar/model/apimodel/form_logic_api_model.dart';
 import 'package:shishughar/model/apimodel/house_hold_field_item_model_api.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
@@ -22,7 +20,6 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_field_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../utils/globle_method.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
@@ -268,7 +265,7 @@ class _VillageProfileTbaItemState extends State<VillageProfileTbaItem> {
         }
         return DynamicCustomDropdownField(
           hintText:
-              Global.returnTrLable(translats, CustomText.select_here, lng!),
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1

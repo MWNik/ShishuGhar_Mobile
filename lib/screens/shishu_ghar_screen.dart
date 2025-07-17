@@ -1,26 +1,19 @@
-import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
 import 'package:shishughar/custom_widget/custom_textfield.dart';
 import 'package:shishughar/database/helper/translation_language_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/model/databasemodel/tabVillage_model.dart';
-import 'package:shishughar/screens/shishu_ghar_details.dart';
-import 'package:shishughar/screens/shishu_ghar_details_bottom_bar.dart';
 import 'package:shishughar/screens/shishu_ghar_details_bottom_bar_new.dart';
-import 'package:shishughar/screens/shishu_ghar_details_replica_screen.dart';
 import 'package:shishughar/screens/shishu_ghar_list_navigation.dart';
 import 'package:shishughar/screens/tabed_screens/child_gravience/child_grievances_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checkList_cbm/creche_monitering_checklist_CBM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_CC/creche_monitering_checklist_CC_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_alm/creche_monitering_checklist_ALM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitor/creche_monitor_listing_screen.dart';
-import 'package:shishughar/screens/tabed_screens/creshe/creshe_tab_screen.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -29,7 +22,6 @@ import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/village_data_helper.dart';
 import '../../../model/apimodel/creche_database_responce_model.dart';
 import '../custom_widget/custom_btn.dart';
-import '../custom_widget/custom_string_dropdown.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../database/helper/block_data_helper.dart';
 import '../database/helper/district_data_helper.dart';
@@ -204,9 +196,9 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                           ),
                           SizedBox(),
                           DynamicCustomDropdownField(
-                            hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng!),
+                            hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng),
                             titleText: Global.returnTrLable(
-                                translatsLabel, CustomText.state, lng!),
+                                translatsLabel, CustomText.state, lng),
                             items: mstStates,
                             isRequred: 0,
                             selectedItem: selectedState != null
@@ -219,7 +211,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                               selectedGramPanchayat = null;
                               selectedVillage = null;
                               mstDistrict = Global.callDistrict(
-                                  district, lng!, selectedState);
+                                  district, lng, selectedState);
                               if (mstDistrict.length == 1) {
                                 selectedDistrict = mstDistrict.first;
                                 mstBlock = Global.callBlocks(
@@ -242,9 +234,9 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                             },
                           ),
                           DynamicCustomDropdownField(
-                            hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng!),
+                            hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng),
                             titleText: Global.returnTrLable(
-                                translatsLabel, CustomText.District, lng!),
+                                translatsLabel, CustomText.District, lng),
                             items: mstDistrict,
                             isRequred: 0,
                             selectedItem: selectedDistrict != null
@@ -274,9 +266,9 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                             },
                           ),
                           DynamicCustomDropdownField(
-                            hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng!),
+                            hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng),
                             titleText: Global.returnTrLable(
-                                translatsLabel, CustomText.Block, lng!),
+                                translatsLabel, CustomText.Block, lng),
                             items: mstBlock,
                             isRequred: 0,
                             selectedItem: selectedBlock != null
@@ -287,11 +279,11 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                               selectedGramPanchayat = null;
                               selectedVillage = null;
                               mstGP = Global.callGramPanchyats(
-                                  gramPanchayat, lng!, selectedBlock);
+                                  gramPanchayat, lng, selectedBlock);
                               if (mstGP.length == 1) {
                                 selectedGramPanchayat = mstGP.first;
                                 mstVillage = Global.callFiltersVillages(
-                                    villages, lng!, selectedGramPanchayat);
+                                    villages, lng, selectedGramPanchayat);
                               }
                               setState(() {
                                 // Update gramPanchayatList based on selectedBlock
@@ -302,7 +294,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                           DynamicCustomDropdownField(
                             isRequred: 0,
                             titleText: Global.returnTrLable(
-                                translatsLabel, CustomText.GramPanchayat, lng!),
+                                translatsLabel, CustomText.GramPanchayat, lng),
                             items: mstGP,
                             hintText: Global.returnTrLable(
                                 translatsLabel, CustomText.Selecthere, lng),
@@ -313,7 +305,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                               selectedGramPanchayat = value;
                               selectedVillage = null;
                               mstVillage = Global.callFiltersVillages(
-                                  villages, lng!, selectedGramPanchayat);
+                                  villages, lng, selectedGramPanchayat);
                               if (mstVillage.length == 1) {
                                 selectedVillage = mstVillage.first;
                               }
@@ -327,7 +319,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                             hintText: Global.returnTrLable(
                                 translatsLabel, CustomText.Selecthere, lng),
                             titleText: Global.returnTrLable(
-                                translatsLabel, CustomText.Village, lng!),
+                                translatsLabel, CustomText.Village, lng),
                             isRequred: 0,
                             items: mstVillage,
                             selectedItem: selectedVillage != null
@@ -349,7 +341,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                                 Expanded(
                                   child: CElevatedButton(
                                     text: Global.returnTrLable(
-                                        translatsLabel, 'Clear', lng!),
+                                        translatsLabel, 'Clear', lng),
                                     color: Color(0xffF26BA3),
                                     onPressed: () {
                                       Navigator.of(context).pop();
@@ -361,7 +353,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                                 Expanded(
                                   child: CElevatedButton(
                                     text: Global.returnTrLable(
-                                        translatsLabel, 'Search', lng!),
+                                        translatsLabel, 'Search', lng),
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                       filteredgetData(context);

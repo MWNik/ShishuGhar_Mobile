@@ -179,11 +179,11 @@ class _StockCalenderListingScreenState
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${Global.returnTrLable(translats, 'Month', lng!).trim()}',
+                                            '${Global.returnTrLable(translats, 'Month', lng).trim()}',
                                             style: Styles.black104,
                                           ),
                                           Text(
-                                            '${Global.returnTrLable(translats, 'Year', lng!).trim()}',
+                                            '${Global.returnTrLable(translats, 'Year', lng).trim()}',
                                             style: Styles.black104,
                                             strutStyle: StrutStyle(height: 1),
                                           ),
@@ -261,7 +261,7 @@ class _StockCalenderListingScreenState
                 : Expanded(
                     child: Center(
                       child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng!)),
+                          translats, CustomText.NorecordAvailable, lng)),
                     ),
                   ),
           ]),

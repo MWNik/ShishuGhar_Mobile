@@ -1,7 +1,6 @@
 import 'package:shishughar/database/database_helper.dart';
 
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
-import '../../../model/dynamic_screen_model/house_hold_tab_responce_model.dart';
 
 class ChildAttendanceFieldHelper {
   DatabaseHelper databaseHelper = DatabaseHelper();

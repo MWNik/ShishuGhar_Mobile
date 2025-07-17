@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
@@ -9,7 +8,6 @@ import '../../../custom_widget/custom_btn.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/enrolled_children/enrolled_children_field_helper.dart';
-import '../../../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
 import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
@@ -446,17 +444,17 @@ class _EnrolledChilrenTabState extends State<EnrolledChilrenTab>
                               Navigator.of(mContext).pop();
                               Validate().singleButtonPopup(
                                   Global.returnTrLable(translatsLabel,
-                                      CustomText.statusUpdateSuccssFully, lng!),
+                                      CustomText.statusUpdateSuccssFully, lng),
                                   Global.returnTrLable(
-                                      translatsLabel, CustomText.ok, lng!),
+                                      translatsLabel, CustomText.ok, lng),
                                   true,
                                   mContext);
                             } else {
                               Validate().singleButtonPopup(
                                   Global.returnTrLable(translatsLabel,
-                                      CustomText.selectVerifyStatus, lng!),
+                                      CustomText.selectVerifyStatus, lng),
                                   Global.returnTrLable(
-                                      translatsLabel, CustomText.ok, lng!),
+                                      translatsLabel, CustomText.ok, lng),
                                   false,
                                   mContext);
                             }

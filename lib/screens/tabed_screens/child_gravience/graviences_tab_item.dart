@@ -17,13 +17,10 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
-import '../../../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
-import '../../../database/helper/follow_up/child_followUp_response_helper.dart';
 import '../../../database/helper/form_logic_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
 import '../../../model/apimodel/creche_database_responce_model.dart';
-import '../../../model/apimodel/form_logic_api_model.dart';
 import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
@@ -306,7 +303,7 @@ class _ChildFollowUpTabItemSCreenState extends State<GraviencesTabItem> {
         }
         return DynamicCustomDropdownField(
           hintText:
-              Global.returnTrLable(translats, CustomText.select_here, lng!),
+              Global.returnTrLable(translats, CustomText.select_here, lng),
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd == 1

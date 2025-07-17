@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/database/helper/village_profile/village_profiile_fileds_helper.dart';
@@ -14,12 +13,10 @@ import '../../../../custom_widget/dynamic_screen_widget/dynamic_custom_yesno_che
 import '../../../../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.dart';
 import '../../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import '../../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
-import '../../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.dart';
 import '../../../../custom_widget/single_poup_dailog.dart';
 import '../../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../../database/helper/form_logic_helper.dart';
 import '../../../../database/helper/translation_language_helper.dart';
-import '../../../../model/apimodel/form_logic_api_model.dart';
 import '../../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../../model/apimodel/translation_language_api_model.dart';
 import '../../../../model/dynamic_screen_model/options_model.dart';
