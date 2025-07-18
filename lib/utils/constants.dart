@@ -4,14 +4,14 @@ class Constants {
 
   // Api constants
 
-  static String baseUrl = "http://shishughar.microwarecomp.com:8000/api/";
-  static String ImagebaseUrl = "http://shishughar.microwarecomp.com:8000/";
+  // static String baseUrl = "http://shishughar.microwarecomp.com:8000/api/";
+  // static String ImagebaseUrl = "http://shishughar.microwarecomp.com:8000/";
 
   // static String baseUrl = "http://216.48.182.186:8000/api/"; //UAT  old
   // static String ImagebaseUrl = "http://216.48.182.186:8000/";
 
-  // static String baseUrl = "https://uat.shishughar.in/api/"; //UAT New
-  // static String ImagebaseUrl = "https://uat.shishughar.in/";
+  static String baseUrl = "https://uat.shishughar.in/api/"; //UAT New
+  static String ImagebaseUrl = "https://uat.shishughar.in/";
 
   // static String baseUrl = "https://shishughar.in/api/"; //Prod
   // static String ImagebaseUrl = "https://shishughar.in/";

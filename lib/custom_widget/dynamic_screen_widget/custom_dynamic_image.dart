@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,6 +12,8 @@ import '../../style/styles.dart';
 import '../../utils/constants.dart';
 import '../custom_text.dart';
 import '../double_button_dailog.dart';
+import 'package:path/path.dart' as path;
+
 
 class CustomImageDynamic extends StatefulWidget {
   final String? assetPath;
@@ -168,21 +171,66 @@ class _CustomImageDynamicState extends State<CustomImageDynamic> {
     }
   }
 
-  static Future<File> savePickedImage(XFile pickedImage, String? childGuid) async {
+  Future<File> savePickedImage(XFile pickedImage, String? childGuid) async {
+    // Get app document directory
     final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final Directory imagesDirectory = Directory('${appDirectory.path}/shishughar_images');
-    final bool exist = await imagesDirectory.exists();
-    if (!exist) {
+    final Directory imagesDirectory =
+    Directory('${appDirectory.path}/shishughar_images');
+
+    // Create directory if not exists
+    if (!await imagesDirectory.exists()) {
       await imagesDirectory.create(recursive: true);
     }
-    final String uniqueFileName = 'image_${childGuid}_${DateTime.now().millisecondsSinceEpoch}.png';
-    final File newImagePath = File('${imagesDirectory.path}/$uniqueFileName');
 
-    final Uint8List bytes = await pickedImage.readAsBytes();
-    await newImagePath.writeAsBytes(bytes);
+    // Set file name and target path
 
-    return newImagePath;
+    final String fileName = 'image_${childGuid}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final String targetPath =  path.join(imagesDirectory.path, fileName);
+
+    // Compress the image file
+    final List<int>? compressedBytes = await FlutterImageCompress.compressWithFile(
+      pickedImage.path,
+      quality: 10, // You can adjust this for more/less compression
+      format: CompressFormat.jpeg,
+    );
+
+    // Write compressed file
+    final File newImageFile = File(targetPath);
+    await newImageFile.writeAsBytes(compressedBytes!);
+
+    // Delete original picked image file if it's a temp file
+    try {
+      final File originalFile = File(pickedImage.path);
+      if (await originalFile.exists()) {
+        await originalFile.delete();
+        print('Original image deleted: ${pickedImage.path}');
+      }
+    } catch (e) {
+      print('Failed to delete original file: $e');
+    }
+
+    print('Compressed Image Path: $targetPath');
+    // print('Compressed Image Size: ${compressedBytes.lengthInBytes} bytes');
+
+    return newImageFile;
   }
+
+
+  // static Future<File> savePickedImage(XFile pickedImage, String? childGuid) async {
+  //   final Directory appDirectory = await getApplicationDocumentsDirectory();
+  //   final Directory imagesDirectory = Directory('${appDirectory.path}/shishughar_images');
+  //   final bool exist = await imagesDirectory.exists();
+  //   if (!exist) {
+  //     await imagesDirectory.create(recursive: true);
+  //   }
+  //   final String uniqueFileName = 'image_${childGuid}_${DateTime.now().millisecondsSinceEpoch}.png';
+  //   final File newImagePath = File('${imagesDirectory.path}/$uniqueFileName');
+  //
+  //   final Uint8List bytes = await pickedImage.readAsBytes();
+  //   await newImagePath.writeAsBytes(bytes);
+  //
+  //   return newImagePath;
+  // }
 
   void initImage(String? assetPath) async {
     if (Global.validString(assetPath)) {
