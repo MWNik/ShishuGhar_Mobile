@@ -41,6 +41,8 @@ import '../../../database/helper/check_in/check_in_response_helper.dart';
 import '../../../database/helper/check_in/checkin_meta_helper.dart';
 import '../../../model/dynamic_screen_model/checkIn_response_model.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:path/path.dart' as path;
+
 
 class CheckInDetailsScreen extends StatefulWidget {
   final int creche_id;
@@ -815,7 +817,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         file = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (file != null) {
         var save = await savePickedImage(file,
-            "image_${widget.ccinguid}_${DateTime.now().millisecondsSinceEpoch}.png");
+            "image_${widget.ccinguid}_${DateTime.now().millisecondsSinceEpoch}");
         imagePath = save.path.split('/').last;
         _image = File(save.path);
         setState(() {
@@ -825,6 +827,52 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
             imagePath!, Global.validToString('creche_image'));
       }
     }
+  }
+
+
+
+
+  Future<File> savePickedImage(XFile pickedImage, String docType) async {
+    // Get app document directory
+    final Directory appDirectory = await getApplicationDocumentsDirectory();
+    final Directory imagesDirectory =
+    Directory('${appDirectory.path}/shishughar_images');
+
+    // Create directory if not exists
+    if (!await imagesDirectory.exists()) {
+      await imagesDirectory.create(recursive: true);
+    }
+
+    // Set file name and target path
+    final String fileName = '$docType.jpg';
+    final String targetPath =  path.join(imagesDirectory.path, fileName);
+
+    // Compress the image file
+    final List<int>? compressedBytes = await FlutterImageCompress.compressWithFile(
+      pickedImage.path,
+      quality: 10, // You can adjust this for more/less compression
+      format: CompressFormat.jpeg,
+    );
+
+    // Write compressed file
+    final File newImageFile = File(targetPath);
+    await newImageFile.writeAsBytes(compressedBytes!);
+
+    // Delete original picked image file if it's a temp file
+    try {
+      final File originalFile = File(pickedImage.path);
+      if (await originalFile.exists()) {
+        await originalFile.delete();
+        print('Original image deleted: ${pickedImage.path}');
+      }
+    } catch (e) {
+      print('Failed to delete original file: $e');
+    }
+
+    print('Compressed Image Path: $targetPath');
+    // print('Compressed Image Size: ${compressedBytes.lengthInBytes} bytes');
+
+    return newImageFile;
   }
 
   // Future<File> savePickedImage(XFile pickedImage, String docType) async {
@@ -841,46 +889,41 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
   //   final Uint8List bytes = await pickedImage.readAsBytes();
   //   await newImagePath.writeAsBytes(bytes);
   //
+  //   print('Image Path: $newImagePath');
+  //
   //   return newImagePath;
   // }
 
-  Future<File> savePickedImage(XFile pickedImage, String docType) async {
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final Directory imagesDirectory =
-    Directory('${appDirectory.path}/shishughar_images');
-    int sizeInBytes = await pickedImage.length();
-    double sizeInKB = sizeInBytes / 1024;
-    double sizeInMB = sizeInKB / 1024;
-    print('lenth ${sizeInKB} $sizeInMB');
-    if (!await imagesDirectory.exists()) {
-      await imagesDirectory.create(recursive: true);
-    }
-
-    final String fileName = docType;
-    final File newImagePath = File('${imagesDirectory.path}/$fileName');
-
-    // Compress the image before saving
-    final Uint8List? compressedBytes = await FlutterImageCompress.compressWithFile(
-      pickedImage.path,
-      quality: 90, // Adjust quality (0 - 100)
-      format: CompressFormat.png, // or .jpeg depending on your use
-    );
-
-    if (compressedBytes != null) {
-      await newImagePath.writeAsBytes(compressedBytes);
-    } else {
-      // fallback if compression fails
-      final Uint8List originalBytes = await pickedImage.readAsBytes();
-      await newImagePath.writeAsBytes(originalBytes);
-    }
-
-    int sizeInByteskk = newImagePath.lengthSync();
-    double sizeInKBskk = sizeInByteskk / 1024;
-    double sizeInMBskk = sizeInKBskk / 1024;
-
-    print('lenth ${sizeInKBskk} $sizeInMBskk');
-    return newImagePath;
-  }
+  // Future<File> savePickedImage(XFile pickedImage, String docType) async {
+  //   final Directory appDirectory = await getApplicationDocumentsDirectory();
+  //   final Directory imagesDirectory =
+  //   Directory('${appDirectory.path}/shishughar_images');
+  //
+  //   if (!await imagesDirectory.exists()) {
+  //     await imagesDirectory.create(recursive: true);
+  //   }
+  //
+  //   final String fileName = docType;
+  //   final File newImagePath = File('${imagesDirectory.path}/$fileName');
+  //
+  //   // Compress the image before saving
+  //   final Uint8List? compressedBytes = await FlutterImageCompress.compressWithFile(
+  //       pickedImage.path,
+  //       quality: 90, // Adjust quality (0 - 100)
+  //       format: CompressFormat.png, // or .jpeg depending on your use
+  //     );//
+  //
+  //   if (compressedBytes != null) {
+  //     await newImagePath.writeAsBytes(compressedBytes);
+  //   } else {
+  //     // fallback if compression fails
+  //     final Uint8List originalBytes = await pickedImage.readAsBytes();
+  //     await newImagePath.writeAsBytes(originalBytes);
+  //   }
+  //
+  //
+  //   return newImagePath;
+  // }
 
   @override
   Widget build(BuildContext context) {
