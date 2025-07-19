@@ -11,7 +11,7 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> initialize(Function(String? payload) onTap) async {
-    const android = AndroidInitializationSettings('@drawable/launcher_icon');
+    const android = AndroidInitializationSettings('@mipmap/launcher_icon');
 
     const ios = DarwinInitializationSettings(
       requestAlertPermission: true,
@@ -55,7 +55,7 @@ class NotificationService {
         CustomText.ShishuGhar,
         importance: Importance.max,
         priority: Priority.high,
-        icon: '@drawable/launcher_icon',
+        icon: '@mipmap/launcher_icon',
         enableVibration: true,
         styleInformation: bigTextStyle,
       ),

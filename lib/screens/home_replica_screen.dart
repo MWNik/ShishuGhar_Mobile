@@ -258,6 +258,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
               ),
             ),
             Visibility(
+              visible:false,
               child: Stack(
                 children: [
                     SizedBox(

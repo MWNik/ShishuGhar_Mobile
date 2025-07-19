@@ -20,32 +20,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
+    Future.delayed(Duration(seconds: 3), () {
+      if (!mounted) return;
+      callScreenCondition(context);
+    });
 
-
-    // var network = await Validate().checkNetworkConnection();
-    // if (network) {
-      Timer(
-        const Duration(seconds: 3),
-            () =>callScreenCondition(context)
-
-      );
-    // } else {
-    //   Validate().singleButtonPopup(
-    //       CustomText.nointernetconnectionavailable, false, context);
-    // }
   }
 
   @override
   Widget build(BuildContext context) {
     return
-        // Upgrade Alert(
-        // upgrader: Upgrader(
-        //   canDismissDialog: false,
-        //   shouldPopScope: () => false,
-        //   showIgnore: false,
-        //   showLater: false,
-        // ),
-        // child:
         Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,

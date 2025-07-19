@@ -109,8 +109,7 @@ class _ChildReferralListingScreenState
   Future<void> allChildWithlatest(
       List<ChildGrowthMetaResponseModel> childAnthro) async {
     if (childAnthro.isEmpty) {
-      throw ArgumentError('The list of objects cannot be empty.');
-    }
+
 
     Map<String, dynamic> allAnthroWithChild = {};
     childAnthro.forEach((element) {
@@ -186,7 +185,7 @@ class _ChildReferralListingScreenState
       growthGuidByDate.remove(element);
     });
     filteredGrowthGuidByDate = growthGuidByDate;
-
+    }
     setState(() {});
   }
 

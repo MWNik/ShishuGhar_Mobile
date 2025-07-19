@@ -477,6 +477,7 @@ class _DashboardReportCardDetailState
                                     height: 5.h,
                                   ),
                                   Container(
+                                    height: 35.h,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       border: Border.all(

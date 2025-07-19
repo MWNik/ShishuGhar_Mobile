@@ -49,19 +49,6 @@ import 'database/helper/translation_language_helper.dart';
 import 'database/helper/village_profile/village_profile_response_helper.dart';
 import 'model/apimodel/translation_language_api_model.dart';
 
-// @pragma('vm:entry-point')
-// void callbackDispatcher() {
-//   Workmanager().executeTask((task, inputData) async {
-//     try {
-//       print("workManager success task");
-//     await checkConditionAndNotify();
-//     return true;
-//     } catch (e) {
-//       print("workManager $e");
-//       return false;
-//     }
-//   });
-// }
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
@@ -130,7 +117,6 @@ void main() async {
   await FlutterLocalNotificationsPlugin().getNotificationAppLaunchDetails();
 
   String? initialPayload = notificationAppLaunchDetails?.notificationResponse?.payload;
-  var anthroItems = await ChildGrowthResponseHelper().excuteIsNotSubmitedDate();
 
   if (Platform.isAndroid) {
     final androidInfo = await DeviceInfoPlugin().androidInfo;
@@ -341,9 +327,8 @@ Future<Map<String, dynamic>> excuteReffralItems() async {
   var childAnthro = await ChildGrowthResponseHelper().allAnthormentryDisableOCT();
   Map<String, dynamic> growthGuidByDate = {};
   List<String> childrenIdList = [];
-  if (childAnthro.isEmpty) {
-    throw ArgumentError('The list of objects cannot be empty.');
-  }
+  if (childAnthro.isNotEmpty) {
+
 
   Map<String, dynamic> allAnthroWithChild = {};
   childAnthro.forEach((element) {
@@ -419,7 +404,7 @@ Future<Map<String, dynamic>> excuteReffralItems() async {
     growthGuidByDate.remove(element);
   });
   return growthGuidByDate;
-
+  }else return growthGuidByDate;
 }
 
 
