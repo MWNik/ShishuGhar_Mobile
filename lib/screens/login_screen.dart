@@ -460,6 +460,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     List<TabState> stateList = master.tabState!;
 
     await StateDataHelper().insertMasterStates(stateList);
+    await StateDataHelper().insertMasterNativeStates(master.tabNativeState!);
 
     List<TabBlock> blockList = master.tabBlock!;
 
@@ -468,6 +469,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     List<TabDistrict> districtList = master.tabDistrict!;
 
     await DistrictDataHelper().insertMasterDistrict(districtList);
+    await DistrictDataHelper().insertNativeDistrict(master.tabNativeDistrict!);
 
     List<TabVillage> villageList = master.tabVillage!;
 
@@ -517,6 +519,14 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     if (master.tabMasterStock != null) {
       await MasterStockHelper().insert(master.tabMasterStock!);
     }
+    if (master.tabPartnerStock != null) {
+      await PartnerStockHelper().insert(master.tabPartnerStock!);
+    }
+
+    if (master.tabPartnerStock != null) {
+      await PartnerStockHelper().insert(master.tabPartnerStock!);
+    }
+
     if (master.tabPartnerStock != null) {
       await PartnerStockHelper().insert(master.tabPartnerStock!);
     }
@@ -935,7 +945,11 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         var token = 'token ' + key + ':' + secret;
         var oUserName = loginApiModel.auth!.username!;
         var backDateDataEntry = loginApiModel.auth!.backDateDataEntry!;
+        var max_allow_range = loginApiModel.auth!.max_allow_range;
          Validate().saveString(Validate.date, backDateDataEntry);
+         if(max_allow_range!=null){
+           Validate().saveInt(Validate.max_allow_range, max_allow_range);
+         }
         if (selectedlanguages == 'English') {
           Validate().saveString(Validate.sLanguage, 'en');
         } else if (selectedlanguages == 'Hindi') {

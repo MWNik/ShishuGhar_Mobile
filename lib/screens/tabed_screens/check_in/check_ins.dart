@@ -14,11 +14,13 @@ import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../model/apimodel/creche_database_responce_model.dart';
 import '../../../model/dynamic_screen_model/checkIn_response_model.dart';
 import '../../../utils/globle_method.dart';
+import '../../../utils/location_accuracy_dialog.dart';
+import '../../../utils/location_accuracy_dialog_with_distance.dart';
 import 'check_in_details_screen.dart';
 
 class CheckIns extends StatefulWidget {
   final int crechId;
-  const CheckIns({super.key, required this.crechId});
+   CheckIns({super.key, required this.crechId});
 
   @override
   _CheckInsScreenState createState() => _CheckInsScreenState();
@@ -38,6 +40,7 @@ class _CheckInsScreenState extends State<CheckIns> {
   List<CheckInResponseModel> allList = [];
   bool isOnlyUnsynched = false;
   bool _isLoading = true;
+  String crecheLatLang='';
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +85,7 @@ class _CheckInsScreenState extends State<CheckIns> {
                                     isEdit: false,
                                     lastGrowthDate: maxDate,
                                     creche_id: widget.crechId,
+                                        crecheLatLang: crecheLatLang,
                                   ),
                                 ),
                               );
@@ -89,6 +93,9 @@ class _CheckInsScreenState extends State<CheckIns> {
                                 initData();
                               }
                             }
+
+
+
                           },
                           child: Image.asset(
                             "assets/add_btn.png",
@@ -145,6 +152,7 @@ class _CheckInsScreenState extends State<CheckIns> {
                                                 lastGrowthDate: lstDate,
                                                 minGrowthDate: minDate,
                                                 creche_id: widget.crechId,
+                                                crecheLatLang: crecheLatLang,
                                                 // isEdit: role ==
                                                 //         CustomText
                                                 //             .crecheSupervisor
@@ -291,6 +299,10 @@ class _CheckInsScreenState extends State<CheckIns> {
     if (crechItemData.length > 0) {
       crecheName =
           Global.getItemValues(crechItemData[0].responces!, 'creche_name');
+      var location=Global.getItemValues(crechItemData[0].responces!, 'location');
+      var latLng='${Global.getItemValues(crechItemData[0].responces!, 'latitude')},${Global.getItemValues(crechItemData[0].responces!, 'longitude')}';
+      crecheLatLang=Global.validString(location)?location:latLng;
+
     }
     List<String> valueItems = [
       CustomText.datevisit,

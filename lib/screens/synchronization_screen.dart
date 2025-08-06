@@ -1055,6 +1055,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
     List<TabState> stateList = master.tabState!;
 
     await StateDataHelper().insertMasterStates(stateList);
+    await StateDataHelper().insertMasterNativeStates(master.tabNativeState!);
 
     List<TabBlock> blockList = master.tabBlock!;
 
@@ -1063,6 +1064,7 @@ class _SynchronizationScreenState extends State<SynchronizationScreen> {
     List<TabDistrict> districtList = master.tabDistrict!;
 
     await DistrictDataHelper().insertMasterDistrict(districtList);
+    await DistrictDataHelper().insertNativeDistrict(master.tabNativeDistrict!);
 
     List<TabVillage> villageList = master.tabVillage!;
 

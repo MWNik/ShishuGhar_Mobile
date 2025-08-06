@@ -655,4 +655,16 @@ class CustomText {
   static String GrowthMonitoringNotification = "You have not submitted growth monitoring of child";
   static String RedFlagNotification = "Red flag child visit is pending. Please complete and sync";
   static String FollowupNotification = "Child follow up visit is pending. Please complete and sync";
+
+
+  static String Elapsed = "Elapsed";
+  static String Accuracy = "Accuracy";
+  static String LatLng = "LatLng";
+  static String Distance = "Distance from creche";
+  static String WithinAllowedRange = "Within allowed range";
+  static String TooFar = "Too far";
+  static String NotAllowedWithInRange = "Location not within allowed range";
+  static String gettingLocationWithAccuracy = "Getting location with accuracy";
+  static String Phase = "Phase";
+  static String LocationIsNotAvailableInYourCreche = "Location is not available in your creche please updated first";
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:shishughar/database/helper/anthromentory/child_growth_response_helper.dart';
 import 'package:shishughar/database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
@@ -61,6 +62,8 @@ class _ChildReferralListingScreenState
   var applicableDate = Validate().stringToDate("2024-12-31");
   var now = DateTime.parse(Validate().currentDate());
   BackdatedConfigirationModel? backdatedConfigirationModel;
+  final TextEditingController _creceSearchcontroller = TextEditingController();
+
 
   @override
   void initState() {
@@ -108,8 +111,7 @@ class _ChildReferralListingScreenState
 
   Future<void> allChildWithlatest(
       List<ChildGrowthMetaResponseModel> childAnthro) async {
-    if (childAnthro.isEmpty) {
-
+    if (childAnthro.isNotEmpty) {
 
     Map<String, dynamic> allAnthroWithChild = {};
     childAnthro.forEach((element) {
@@ -200,6 +202,7 @@ class _ChildReferralListingScreenState
   void cleaAllFilter() {
     filteredGrowthGuidByDate = growthGuidByDate;
     selectedCreche = null;
+    _creceSearchcontroller.text = '';
 
     setState(() {});
   }
@@ -212,8 +215,10 @@ class _ChildReferralListingScreenState
           (entry) =>
               callDataByKey(entry.key, 'creche_id').toString() ==
               selectedCreche.toString()));
-      setState(() {});
+    }else{
+      filteredGrowthGuidByDate = growthGuidByDate;
     }
+    setState(() {});
   }
 
   filterDataQu(String entry) {
@@ -276,7 +281,7 @@ class _ChildReferralListingScreenState
                       ),
                     ),
                     SizedBox(),
-                    DynamicCustomDropdownForFilterField(
+                    creches.length<=1?DynamicCustomDropdownForFilterField(
                       hintText: Global.returnTrLable(
                           translats, CustomText.Creches, lng),
                       items: creches,
@@ -284,6 +289,104 @@ class _ChildReferralListingScreenState
                       onChanged: (value) {
                         selectedCreche = value?.name;
                       },
+                    )
+                        :Container(
+                      height: 35.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                            color: Color(0xffACACAC)),
+                        borderRadius: BorderRadius.circular(
+                            10.r),
+                      ),
+                      child: TypeAheadField<OptionsModel>(
+                        controller: _creceSearchcontroller,
+                        suggestionsCallback: (pattern) async {
+                          try {
+                            var items=creches.where((
+                                element) =>
+                            element.values != null &&
+                                element.name != null &&
+                                element.values!
+                                    .toLowerCase()
+                                    .contains(
+                                    pattern.toLowerCase())
+                            ).toList();
+
+                            if(items.isEmpty||pattern.isEmpty){
+                                selectedCreche=null;
+                              _creceSearchcontroller.text='';
+                            }
+                            return items;
+
+                          } catch (e) {
+                            debugPrint('TypeAhead error: $e');
+                            return [];
+                          }
+                        },
+                        builder: (context, controller,
+                            focusNode) {
+                          return TextField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              style:  Styles.black124,
+                              // autofocus: true,
+                              decoration: InputDecoration(
+                                hintText: Global.returnTrLable(
+                                    translats, CustomText.creche, lng),
+                                contentPadding: EdgeInsets
+                                    .all(10),
+                                border: InputBorder.none,
+                                fillColor: Colors.white,
+                                filled: true,
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors
+                                          .transparent),
+                                  borderRadius: BorderRadius
+                                      .circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors
+                                          .transparent),
+                                  borderRadius: BorderRadius
+                                      .circular(10),
+                                ),
+                                disabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors
+                                          .transparent),
+                                  borderRadius: BorderRadius
+                                      .circular(10),
+                                ),
+                              )
+                          );
+                        },
+                        itemBuilder: (context, item) {
+                          return ListTile(
+                            title: Text(item.values!),
+                            subtitle: Text(item.name!),
+                          );
+                        },
+                        onSelected: (item) {
+                          selectedCreche=item.name ?? null;
+                          _creceSearchcontroller.text = item.values ?? '';
+                          print('itm $item');
+                        },
+                        offset: Offset(0, 12),
+                        constraints: BoxConstraints(
+                            maxHeight: 500),
+                        hideOnUnfocus: true,
+                        showOnFocus: true,
+                        hideWithKeyboard: false,
+                        loadingBuilder: (context) =>
+                        const Text('Loading...'),
+                        errorBuilder: (context,
+                            error) => const Text('Error!'),
+                        emptyBuilder: (context) =>
+                        const Text('No items found!'),
+                      ),
                     ),
                     SizedBox(
                       height: 10.h,
@@ -608,5 +711,11 @@ class _ChildReferralListingScreenState
       returnValue = cgmguid;
 
     return returnValue;
+  }
+
+  @override
+  void dispose() {
+    _creceSearchcontroller.dispose(); // Clean up controller
+    super.dispose();
   }
 }

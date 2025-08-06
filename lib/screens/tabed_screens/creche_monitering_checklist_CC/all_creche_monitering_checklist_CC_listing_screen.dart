@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_double_button_dialog.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
@@ -45,6 +46,8 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
   List<CmcCCResponseModel> unsynchedList = [];
   List<CmcCCResponseModel> allList = [];
   BackdatedConfigirationModel? backdatedConfigirationModel;
+  final TextEditingController _crecheSearchController = TextEditingController();
+
 
   @override
   void initState() {
@@ -173,7 +176,7 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
                           ),
                         ),
                         SizedBox(),
-                        DynamicCustomDropdownForFilterField(
+                        creches.length<=1?DynamicCustomDropdownForFilterField(
                           hintText: Global.returnTrLable(
                               translats, CustomText.Creches, lng),
                           items: creches,
@@ -181,6 +184,102 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
                           onChanged: (value) {
                             selectedCreche = value?.name;
                           },
+                        )
+                            :Container(
+                          height: 35.h,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                                color: Color(0xffACACAC)),
+                            borderRadius: BorderRadius.circular(
+                                10.r),
+                          ),
+                          child: TypeAheadField<OptionsModel>(
+                            controller: _crecheSearchController,
+                            suggestionsCallback: (pattern) async {
+                              try {
+                                var filItems= creches.where((
+                                    element) =>
+                                element.values != null &&
+                                    element.name != null &&
+                                    element.values!
+                                        .toLowerCase()
+                                        .contains(
+                                        pattern.toLowerCase())
+                                ).toList();
+                                if(filItems.isEmpty||pattern.isEmpty){
+                                  selectedCreche=null;
+                                  _crecheSearchController.text='';
+                                }
+                                return filItems;
+                              } catch (e) {
+                                debugPrint('TypeAhead error: $e');
+                                return [];
+                              }
+                            },
+                            builder: (context, controller,
+                                focusNode) {
+                              return TextField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  style:  Styles.black124,
+                                  // autofocus: true,
+                                  decoration: InputDecoration(
+                                    hintText: Global.returnTrLable(
+                                        translats, CustomText.creche, lng),
+                                    contentPadding: EdgeInsets
+                                        .all(10),
+                                    border: InputBorder.none,
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors
+                                              .transparent),
+                                      borderRadius: BorderRadius
+                                          .circular(10),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors
+                                              .transparent),
+                                      borderRadius: BorderRadius
+                                          .circular(10),
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors
+                                              .transparent),
+                                      borderRadius: BorderRadius
+                                          .circular(10),
+                                    ),
+                                  )
+                              );
+                            },
+                            itemBuilder: (context, item) {
+                              return ListTile(
+                                title: Text(item.values!),
+                                subtitle: Text(item.name!),
+                              );
+                            },
+                            onSelected: (item) {
+                              selectedCreche=item.name ?? null;
+                              _crecheSearchController.text = item.values ?? '';
+                              print('itm $item');
+                            },
+                            offset: Offset(0, 12),
+                            constraints: BoxConstraints(
+                                maxHeight: 500),
+                            hideOnUnfocus: true,
+                            showOnFocus: true,
+                            hideWithKeyboard: false,
+                            loadingBuilder: (context) =>
+                            const Text('Loading...'),
+                            errorBuilder: (context,
+                                error) => const Text('Error!'),
+                            emptyBuilder: (context) =>
+                            const Text('No items found!'),
+                          ),
                         ),
                         SizedBox(
                           height: 10.h,
@@ -484,6 +583,7 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
   void cleaAllFilter() {
     filterData = isOnlyUnsynched ? unsynchedList : allList;
     selectedCreche = null;
+    _crecheSearchController.text='';
     setState(() {});
   }
 
@@ -510,5 +610,11 @@ class _cmcCCListingScreenState extends State<AllcmcCCListingScreen> {
       creCheItem = crechSelected.first.values!;
     }
     return creCheItem;
+  }
+
+  @override
+  void dispose() {
+    _crecheSearchController.dispose(); // Clean up controller
+    super.dispose();
   }
 }

@@ -231,7 +231,8 @@ class _CustomDatepickerState extends State<CustomDatepickerDynamic> {
  //        firstDate: minDate != null?minDate.add(Duration(days: 1)):dateinilizataion('<')!=null ?dateinilizataion('<')!.add(Duration(days: 1)):DateTime(1990),
  //        lastDate:maxDate != null?maxDate.subtract(Duration(days: 1)):dateinilizataion('>')!=null?dateinilizataion('>')!.subtract(Duration(days: 1)): DateTime.now());
 
-    if (pickedDate != null && pickedDate != currentDate) {
+    // if (pickedDate != null && pickedDate != currentDate) {
+    if (pickedDate != null ) {
       setState(() {
         currentDate = pickedDate;
         _currentDate = DateFormat('yyyy-MM-dd').format(pickedDate!);

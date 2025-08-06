@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/custom_animated_rolling_switch.dart';
 import 'package:shishughar/custom_widget/dynamic_screen_widget/dynamic_custom_dropdown_for_filter.dart';
@@ -54,6 +55,8 @@ class _ChildReferralListingScreenState
   var applicableDate = Validate().stringToDate("2024-12-31");
   var now = DateTime.parse(Validate().currentDate());
   BackdatedConfigirationModel? backdatedConfigirationModel;
+  final TextEditingController _creceSearchcontroller = TextEditingController();
+
 
   @override
   void initState() {
@@ -115,7 +118,7 @@ class _ChildReferralListingScreenState
   void cleaAllFilter() {
     filteredReferral = isOnlyUnsyched ? usynchedList : allList;
     selectedCreche = null;
-
+    _creceSearchcontroller.text = '';
     setState(() {});
   }
 
@@ -196,6 +199,7 @@ class _ChildReferralListingScreenState
                       ),
                     ),
                     SizedBox(),
+                    creches.length<=1?
                     DynamicCustomDropdownForFilterField(
                       hintText: Global.returnTrLable(
                           translats, CustomText.Creches, lng),
@@ -204,7 +208,104 @@ class _ChildReferralListingScreenState
                       onChanged: (value) {
                         selectedCreche = value?.name;
                       },
-                    ),
+                    )
+                        :Container(
+                      height: 35.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                            color: Color(0xffACACAC)),
+                        borderRadius: BorderRadius.circular(
+                            10.r),
+                      ),
+                      child: TypeAheadField<OptionsModel>(
+                        controller: _creceSearchcontroller,
+                        suggestionsCallback: (pattern) async {
+                          try {
+                            var filItems= creches.where((
+                                element) =>
+                            element.values != null &&
+                                element.name != null &&
+                                element.values!
+                                    .toLowerCase()
+                                    .contains(
+                                    pattern.toLowerCase())
+                            ).toList();
+                            if(filItems.isEmpty||pattern.isEmpty){
+                              selectedCreche=null;
+                              _creceSearchcontroller.text='';
+                            }
+                            return filItems;
+                          } catch (e) {
+                            debugPrint('TypeAhead error: $e');
+                            return [];
+                          }
+                        },
+                        builder: (context, controller,
+                            focusNode) {
+                          return TextField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              style:  Styles.black124,
+                              // autofocus: true,
+                              decoration: InputDecoration(
+                                hintText: Global.returnTrLable(
+                                    translats, CustomText.creche, lng),
+                                contentPadding: EdgeInsets
+                                    .all(10),
+                                border: InputBorder.none,
+                                fillColor: Colors.white,
+                                filled: true,
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors
+                                          .transparent),
+                                  borderRadius: BorderRadius
+                                      .circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors
+                                          .transparent),
+                                  borderRadius: BorderRadius
+                                      .circular(10),
+                                ),
+                                disabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors
+                                          .transparent),
+                                  borderRadius: BorderRadius
+                                      .circular(10),
+                                ),
+                              )
+                          );
+                        },
+                        itemBuilder: (context, item) {
+                          return ListTile(
+                            title: Text(item.values!),
+                            subtitle: Text(item.name!),
+                          );
+                        },
+                        onSelected: (item) {
+                          selectedCreche=item.name ?? null;
+                          _creceSearchcontroller.text = item.values ?? '';
+                          print('itm $item');
+                        },
+                        offset: Offset(0, 12),
+                        constraints: BoxConstraints(
+                            maxHeight: 500),
+                        hideOnUnfocus: true,
+                        showOnFocus: true,
+                        hideWithKeyboard: false,
+                        loadingBuilder: (context) =>
+                        const Text('Loading...'),
+                        errorBuilder: (context,
+                            error) => const Text('Error!'),
+                        emptyBuilder: (context) =>
+                        const Text('No items found!'),
+                      ),
+                    )
+                    ,
                     SizedBox(
                       height: 10.h,
                     ),
@@ -561,5 +662,11 @@ class _ChildReferralListingScreenState
       returnValue = Global.getItemValues(items[0].responces!, 'creche_name');
     }
     return returnValue;
+  }
+
+  @override
+  void dispose() {
+    _creceSearchcontroller.dispose(); // Clean up controller
+    super.dispose();
   }
 }

@@ -33,6 +33,7 @@ import '../../../model/apimodel/tabWeight_for_age_Boys _model.dart';
 import '../../../model/apimodel/tabWeight_for_age_Girls _model.dart';
 import '../../../model/apimodel/tabWeight_to_Height_Boys_model.dart';
 import '../../../model/apimodel/tabWeight_to_Height_Girls_model.dart';
+import '../../../model/databasemodel/child_growth_responce_model.dart';
 import '../../../model/databasemodel/tab_image_file_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
@@ -137,6 +138,8 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
   List<TabWeightforageGirlsModel> tabWeightforageGirls = [];
   List<TabWeightToHeightBoysModel> tabWeightToHeightBoys = [];
   List<TabWeightToHeightGirlsModel> tabWeightToHeightGirls = [];
+  List<ChildGrowthMetaResponseModel>  childGrowthItems=[];
+
 
   @override
   void initState() {
@@ -226,8 +229,9 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
       isRecordNew = false;
     }
 
-    multselectItemTab =
-        await EnrolledChildrenFieldHelper().callMultiSelectTabItem();
+    multselectItemTab = await EnrolledChildrenFieldHelper().callMultiSelectTabItem();
+    childGrowthItems=await ChildGrowthResponseHelper().excuteGrowthMonitoring(widget.EnrolledChilGUID);
+
     await updateHiddenValue();
     await callScrenControllers(widget.screenType);
     if (widget.tabIndex == (widget.totalTab - 1)) {
@@ -240,7 +244,6 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
 
   @override
   void dispose() {
-    // Dispose all lazily created FocusNodes
     _focusNode.forEach((_, focusNode) => focusNode.dispose());
     _scrollController.dispose();
     super.dispose();
@@ -601,6 +604,9 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
                 // }
               }
             }
+            if(quesItem.fieldname == 'measurement_date' || quesItem.fieldname == 'child_dob'){
+              chekMeasumentEqupment();
+            }
             setState(() {});
           },
           titleText:
@@ -741,6 +747,9 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
             myMap[quesItem.fieldname!] = value;
             if (myMap['child_specially_abled'] == 0) {
               myMap['specially_abled_option'] = [];
+            }
+            if(quesItem.fieldname == 'measurement_taken'){
+              chekMeasumentEqupment();
             }
             setState(() {});
           },
@@ -1031,8 +1040,6 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
           Map<String, dynamic> childResponce = {
             'weight': myMap['weight'],
             'height': myMap['height'],
-            // 'age_months': Validate()
-            //     .calculateAgeInDays(Validate().stringToDate(myMap['child_dob'])),
             'age_months': Validate().calculateAgeInDaysEx(
                 Validate().stringToDate(myMap['child_dob']),
                 Validate().stringToDate(myMap['measurement_date'])),
@@ -1117,6 +1124,13 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
         await HouseHoldChildrenHelperHelper().UpdateCrecheId(
             widget.cHHGuid, Global.stringToInt(myMap['creche_id'].toString()));
       }
+      if (childDOB != Global.getItemValues(responcesJs, 'child_dob') ||
+          genderId != Global.getItemValues(responcesJs, 'gender_id')) {
+        if(!isRecordNew){
+          await updateAnthroRecordsByChild();
+        }
+      }
+
     }
   }
 
@@ -1454,33 +1468,40 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     return screenItems;
   }
 
-  Future<void> callUpdateAnthroRecord(String enrollmentDate,Map<String, dynamic> itemStrodeColor) async{
-    var dateMonthYear=Validate().dateToMonthYear(enrollmentDate);
-    if(dateMonthYear.length>0){
-    var lastRecord=await ChildGrowthResponseHelper().anthroDataForEnrolledAdd(dateMonthYear,widget.crecheId);
+  Future<void> callUpdateAnthroRecord(String enrollmentDate,Map<String, dynamic> itemStrodeColor) async {
+    var dateMonthYear = Validate().dateToMonthYear(enrollmentDate);
+    if (dateMonthYear.length > 0) {
+      var lastRecord = await ChildGrowthResponseHelper()
+          .anthroDataForEnrolledAdd(dateMonthYear, widget.crecheId);
       if (lastRecord.length > 0) {
         if (lastRecord.first.responces != null) {
-          Map<String, dynamic> responseData = jsonDecode(lastRecord.first.responces!);
+          Map<String, dynamic> responseData = jsonDecode(
+              lastRecord.first.responces!);
           var childs = responseData['anthropromatic_details'];
           if (childs != null) {
-            List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(responseData['anthropromatic_details']);
+            List<Map<String, dynamic>> children = List<
+                Map<String, dynamic>>.from(
+                responseData['anthropromatic_details']);
             var childItem = children
-                .where((element) => element['childenrollguid'] == widget.EnrolledChilGUID)
+                .where((element) =>
+            element['childenrollguid'] == widget.EnrolledChilGUID)
                 .toList();
-            if(childItem.length==0){
-              Map<String, dynamic> newChild=itemStrodeColor;
-              newChild['do_you_have_height_weight']=myMap['measurement_taken'];
-              newChild['dob_when_measurement_taken']=myMap['child_dob'];
-              newChild['measurement_equipment']=myMap['measurement_equipment'];
-              newChild['measurement_taken_date']=myMap['measurement_date'];
-              newChild['s_flag']='0';
-              newChild['thr']='0';
-              newChild['vhsnd']='1';
-              newChild['awc']='0';
-              newChild['any_medical_major_illness']='0';
-              newChild['childenrollguid']=widget.EnrolledChilGUID;
-              newChild['chhguid']=widget.cHHGuid;
-              newChild['cgmguid']=lastRecord.first.cgmguid;
+            if (childItem.length == 0) {
+              Map<String, dynamic> newChild = itemStrodeColor;
+              newChild['do_you_have_height_weight'] =
+              myMap['measurement_taken'];
+              newChild['dob_when_measurement_taken'] = myMap['child_dob'];
+              newChild['measurement_equipment'] =
+              myMap['measurement_equipment'];
+              newChild['measurement_taken_date'] = myMap['measurement_date'];
+              newChild['s_flag'] = '0';
+              newChild['thr'] = '0';
+              newChild['vhsnd'] = '1';
+              newChild['awc'] = '0';
+              newChild['any_medical_major_illness'] = '0';
+              newChild['childenrollguid'] = widget.EnrolledChilGUID;
+              newChild['chhguid'] = widget.cHHGuid;
+              newChild['cgmguid'] = lastRecord.first.cgmguid;
               print("print $newChild");
               children.add(newChild);
 
@@ -1496,10 +1517,118 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
                   widget.crecheId,
                   responcesJs,
                   responseData['created_by'],
-                  responseData['created_on'],Validate().currentDateTime(),userName);
+                  responseData['created_on'],
+                  Validate().currentDateTime(),
+                  userName);
             }
           }
         }
-      }}
+      }
+    }
   }
+
+  Future<void> updateAnthroRecordsByChild() async{
+    for (int i = 0; i < childGrowthItems.length; i++) {
+      if(childGrowthItems[i].responces != null){
+        Map<String, dynamic> responseData = jsonDecode(childGrowthItems[i].responces!);
+        var childs = responseData['anthropromatic_details'];
+        if (childs != null) {
+          List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(responseData['anthropromatic_details']);
+          var childItem = children
+              .where((element) => element['childenrollguid'] == widget.EnrolledChilGUID&&Global.stringToIntNull(element['do_you_have_height_weight'].toString())==1)
+              .toList();
+          if(childItem.isNotEmpty){
+            children.remove(childItem.first);
+            var child_dob = Validate().stringToDateNull(myMap['child_dob']);
+            int calucalteDate = 0;
+            if (childItem.first['measurement_taken_date'] != null&&child_dob!=null) {
+              var mesurmentDate = Validate()
+                  .stringToDate(childItem.first['measurement_taken_date']);
+              calucalteDate =
+                  Validate().calculateAgeInDaysEx(child_dob, mesurmentDate);
+
+              print('old ->${childItem.first}');
+              Map<String, dynamic> growthChild=childItem.first;
+              growthChild['weight']=childItem.first['weight'];
+              growthChild['height']=childItem.first['height'];
+              growthChild['measurement_equipment']=Global.validString(childItem.first['measurement_equipment'])?childItem.first['measurement_equipment']:myMap['measurement_equipment'];
+              growthChild['measurement_taken_date']=childItem.first['measurement_taken_date'];
+              growthChild['gender_id']=myMap['gender_id'];
+              growthChild['age_months']=calucalteDate;
+              growthChild['dob_when_measurement_taken']=myMap['child_dob'];
+              var widgets = widget.screenItem[widget.tabBreakItem.name];
+              var colorIndicatorItems = widgets?.where((item) =>
+                  colorIndicatorForMeasure.contains(item.fieldname)).toList();
+
+              colorIndicatorItems?.forEach((item) {
+                var itemColor = DependingLogic.AutoColorCreateByHeightWightNew(
+                    tabHeightforageBoys,
+                    tHeightforageGirls,
+                    tabWeightforageBoys,
+                    tabWeightforageGirls,
+                    tabWeightToHeightBoys,
+                    tabWeightToHeightGirls,
+                    item.fieldname!,
+                    myMap['gender_id'],
+                    growthChild['measurement_taken_date'],
+                    growthChild);
+                growthChild[item.fieldname!]=itemColor;
+                var zscroreValue= DependingLogic.AutoColorCreateByHeightWightStringNew(
+                    tabHeightforageBoys,
+                    tHeightforageGirls,
+                    tabWeightforageBoys,
+                    tabWeightforageGirls,
+                    tabWeightToHeightBoys,
+                    tabWeightToHeightGirls,
+                    item.fieldname!,
+                    myMap['gender_id'],
+                    growthChild['measurement_taken_date'],
+                    growthChild);
+                growthChild['${item.fieldname}_zscore']=zscroreValue;
+
+              });
+
+              print('updated-> ${growthChild}');
+              children.add(growthChild);
+              responseData['anthropromatic_details'] = children;
+              var measurementDate = responseData['measurement_date'];
+              var responcesJs = jsonEncode(responseData);
+              print('final-> ${responcesJs}');
+              var name = responseData['name'];
+              await ChildGrowthResponseHelper().insertUpdate(
+                  childGrowthItems[i].cgmguid!,
+                  measurementDate,
+                  name as int?,
+                  childGrowthItems[i].creche_id,
+                  responcesJs,
+                  responseData['created_by'],
+                  responseData['created_on'],Validate().currentDateTime(),userName);
+          }
+        }
+      }
+    }
+  }
+}
+
+  chekMeasumentEqupment(){
+    var measurement_taken = myMap['measurement_taken'];
+    if(measurement_taken!=null){
+      if(measurement_taken.toString()=='1'){
+        if(myMap['child_dob']!=null&&myMap['measurement_date']!=null){
+          var child_dob = Validate().stringToDateNull(myMap['child_dob']);
+          var mesurmentDate = Validate().stringToDateNull(myMap['measurement_date']);
+         if(child_dob!=null&&mesurmentDate!=null){
+          var  calucalteDate = Validate().calculateAgeInDaysEx(child_dob, mesurmentDate);
+          if(calucalteDate<=730){
+            myMap['measurement_equipment']='2';
+          }else myMap['measurement_equipment']='1';
+         }
+        }
+      }
+    }
+
+
+  }
+
+
 }

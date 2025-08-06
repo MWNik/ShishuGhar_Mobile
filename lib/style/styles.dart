@@ -43,6 +43,8 @@ class Styles {
       fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xff333333));
   static TextStyle black12700 = GoogleFonts.poppins(
       fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xff000000));
+  static TextStyle black15500 = GoogleFonts.poppins(
+      fontSize: 15, fontWeight: FontWeight.w500, color: Color(0xff000000));
   static TextStyle red145 = GoogleFonts.poppins(
       fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xff5979AA));
   static TextStyle blue148 = GoogleFonts.poppins(

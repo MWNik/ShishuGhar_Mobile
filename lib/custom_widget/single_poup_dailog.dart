@@ -15,6 +15,7 @@ class SingleButtonPopupDialog extends StatelessWidget {
     return WillPopScope(
         onWillPop: () async => false,
     child:AlertDialog(
+
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),

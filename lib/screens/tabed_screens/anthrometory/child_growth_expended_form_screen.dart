@@ -618,7 +618,11 @@ class _ChildGrowthExpendedFormState
             cWidgetDatamap['measurement_taken_date'] =
             myMap['measurement_date'];
           }
-
+          if(Global.stringToInt(cWidgetDatamap['do_you_have_height_weight'].toString()) == 1){
+            if(calucalteDate<=730){
+              cWidgetDatamap['measurement_equipment']='2';
+            }else cWidgetDatamap['measurement_equipment']='1';
+          }
           ///default value 1
           attepmtChild[filterdData[i].ChildEnrollGUID!] = cWidgetDatamap;
         } else {
@@ -630,14 +634,21 @@ class _ChildGrowthExpendedFormState
                 .stringToDate(cWidgetDatamap['measurement_taken_date']);
             calucalteDate =
                 Validate().calculateAgeInDaysEx(date, mesurmentDate);
-          } else
+          } else{
             calucalteDate = Validate().calculateAgeInDays(date);
+          }
+
           cWidgetDatamap['age_months'] = calucalteDate;
           cWidgetDatamap['dob_when_measurement_taken'] = Global.getItemValues(filterdData[i].responces, 'child_dob');
           //    commented By Satish dafult date remove show old record to copy to new
           if (!widget.isNew && cWidgetDatamap['measurement_taken_date'] == null) {
             cWidgetDatamap['measurement_taken_date'] =
             myMap['measurement_date'];
+          }
+          if(Global.stringToInt(cWidgetDatamap['do_you_have_height_weight'].toString()) == 1&&cWidgetDatamap['measurement_equipment']==null){
+            if(calucalteDate<=730){
+            cWidgetDatamap['measurement_equipment']='2';
+            }else cWidgetDatamap['measurement_equipment']='1';
           }
           attepmtChild[filterdData[i].ChildEnrollGUID!] = cWidgetDatamap;
         }
@@ -1932,9 +1943,9 @@ class _ChildGrowthExpendedFormState
                             if ((Global.stringToDouble(value.toString()) > 0)&&key == 'height') {
                               childItem[key] = value;
                             }
-                            if ((Global.stringToDouble(value.toString()) > 0)&&key == 'measurement_equipment') {
-                              childItem[key] = value;
-                            }
+                            // if ((Global.stringToDouble(value.toString()) > 0)&&key == 'measurement_equipment') {
+                            //   childItem[key] = value;
+                            // }
                           }
                         });
                         attepmtChild[childEnrolleGUID] = childItem;
@@ -2191,8 +2202,8 @@ class _ChildGrowthExpendedFormState
                       childItem[key] = value;
                     }else   if(key!='height'){
                       childItem[key] = value;
-                    }else if(key=='measurement_equipment' && Global.stringToInt(value.toString())>0) {
-                      childItem[key] = value;
+                    // }else if(key=='measurement_equipment' && Global.stringToInt(value.toString())>0) {
+                    //   childItem[key] = value;
                     }
                   }
                 });

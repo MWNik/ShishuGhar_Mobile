@@ -30,6 +30,7 @@ import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../../model/databasemodel/tab_image_file_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../utils/globle_method.dart';
+import '../../../utils/location_accuracy_dialog.dart';
 
 class CrecheScreenItem extends StatefulWidget {
   final int name;
@@ -890,25 +891,38 @@ class _CrecheScreenItemState extends State<CrecheScreenItem> {
 
   Future<void> _getLocation(String fieldName) async {
     try {
-      showLoaderDialog(context);
+      // showLoaderDialog(context);
 
-      final currentLocation = await getCurrentPositionWithTimeout();
+      // final currentLocation = await getCurrentPositionWithTimeout();
+      showDialog(
+        context: context,
+        builder: (context) => LocationAccuracyDialog(
+          onLocationResult: (lat, lng, address) {
+            print("Got: $lat, $lng, $address");
+            myMap['latitude'] = '$lat';
+            myMap['longitude'] = '$lng';
+            myMap[fieldName] = '${lat},${lng}';
+            isNew = false;
+            setState(() {});
+          },
+        ),
+      );
 
-      myMap['latitude'] = '${currentLocation.latitude}';
-      myMap['longitude'] = '${currentLocation.longitude}';
-      myMap[fieldName] =
-          '${currentLocation.latitude},${currentLocation.longitude}';
-      isNew = false;
-      setState(() {});
+      // myMap['latitude'] = '${currentLocation.latitude}';
+      // myMap['longitude'] = '${currentLocation.longitude}';
+      // myMap[fieldName] =
+      //     '${currentLocation.latitude},${currentLocation.longitude}';
+      // isNew = false;
+
     } catch (e) {
       if (e is TimeoutException) {
-        Navigator.pop(context);
+        // Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text("Location is not captured. Please try again.")));
       }
       print('Error getting location: $e');
     } finally {
-      Navigator.pop(context);
+      // Navigator.pop(context);
     }
   }
 

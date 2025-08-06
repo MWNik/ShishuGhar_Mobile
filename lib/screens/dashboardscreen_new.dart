@@ -47,6 +47,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Scaffold(
               body: pages[widget.index!],
               bottomNavigationBar: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
                 useLegacyColorScheme: true,
                 showUnselectedLabels: true,
                 showSelectedLabels: true,
@@ -171,7 +172,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } else if (_currentIndex == 2) {
       refreshStatus =  await Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => DashboardReportSupeByApiScreenNew()));
-    } else if (_currentIndex == 4) {
+    } else if (_currentIndex == 3) {
       if (HomeReplicaScreen.scaffoldKey != null) {
         HomeReplicaScreen.scaffoldKey!.currentState?.openDrawer();
         setState(() {
@@ -230,24 +231,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
       label:
           Global.returnTrLable(dashboardControlls, CustomText.Dashboard, lng),
     ));
-    bottomItem.add(BottomNavigationBarItem(
-      icon: Padding(
-        padding: EdgeInsets.only(bottom: 5.h),
-        child: Image.asset(
-          "assets/report_ic.png",
-          scale: 4,
-          color: _currentIndex == 3 ? Color(0xff5979AA) : Color(0xffAAAAAA),
-        ),
-      ),
-      label: Global.returnTrLable(dashboardControlls, CustomText.Report, lng),
-    ));
+    // bottomItem.add(BottomNavigationBarItem(
+    //   icon: Padding(
+    //     padding: EdgeInsets.only(bottom: 5.h),
+    //     child: Image.asset(
+    //       "assets/report_ic.png",
+    //       scale: 4,
+    //       color: _currentIndex == 3 ? Color(0xff5979AA) : Color(0xffAAAAAA),
+    //     ),
+    //   ),
+    //   label: Global.returnTrLable(dashboardControlls, CustomText.Report, lng),
+    // ));
     bottomItem.add(BottomNavigationBarItem(
       icon: Padding(
         padding: EdgeInsets.only(bottom: 10.h),
         child: Image.asset(
           "assets/more.png",
           scale: 2.3,
-          color: _currentIndex == 4 ? Color(0xff5979AA) : Color(0xffAAAAAA),
+          color: _currentIndex == 3 ? Color(0xff5979AA) : Color(0xffAAAAAA),
         ),
       ),
       label: Global.returnTrLable(dashboardControlls, CustomText.More, lng),

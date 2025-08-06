@@ -979,7 +979,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
     List<TabState> stateList = master.tabState!;
 
     await StateDataHelper().insertMasterStates(stateList);
-
+    await StateDataHelper().insertMasterNativeStates(master.tabNativeState!);
     List<TabBlock> blockList = master.tabBlock!;
 
     await BlockDataHelper().insertMasterBlock(blockList);
@@ -987,6 +987,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
     List<TabDistrict> districtList = master.tabDistrict!;
 
     await DistrictDataHelper().insertMasterDistrict(districtList);
+    await DistrictDataHelper().insertNativeDistrict(master.tabNativeDistrict!);
 
     List<TabVillage> villageList = master.tabVillage!;
 
@@ -1194,6 +1195,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
             MasterDataModel.fromJson(json.decode(msterDataResponse.body));
         Validate().saveString(Validate.date,
             masterDataApiModel.backDateDataEntry ?? "2025-03-31");
+        Validate().saveInt(Validate.max_allow_range,
+            masterDataApiModel.max_allow_range ?? 50);
         await initMasterData(masterDataApiModel);
         await downMaster(mContext, userName, password, token);
       } else if (msterDataResponse.statusCode == 401) {

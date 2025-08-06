@@ -43,6 +43,7 @@ class DashboardReportCardDetailScreen extends StatefulWidget {
   OptionsModel? selectedCreche;
   OptionsModel? selectedCrecheStatus;
   OptionsModel? selectedPartner;
+  OptionsModel? selectedPhase;
 
   DashboardReportCardDetailScreen(
       {super.key,
@@ -57,7 +58,9 @@ class DashboardReportCardDetailScreen extends StatefulWidget {
       this.selectedVillage,
       this.selectedCreche,
       this.selectedCrecheStatus,
-      this.selectedPartner});
+      this.selectedPartner,
+      this.selectedPhase
+      });
 
   @override
   _DashboardReportCardDetailState createState() =>
@@ -86,6 +89,7 @@ class _DashboardReportCardDetailState
   OptionsModel? selectedCreche;
   OptionsModel? selectedCrecheStatus;
   OptionsModel? selectedPartner;
+  OptionsModel? selectedPhase;
 
   OptionsModel? tempSelectedState;
   OptionsModel? tempSelectedDistrict;
@@ -95,6 +99,7 @@ class _DashboardReportCardDetailState
   OptionsModel? tempSelectedCreche;
   OptionsModel? tempSelectedCrecheStatus;
   OptionsModel? tempSelectedPartner;
+  OptionsModel? tempSelectedPhase;
 
   List<OptionsModel> mstStates = [];
   List<OptionsModel> mstDistrict = [];
@@ -104,6 +109,7 @@ class _DashboardReportCardDetailState
   List<OptionsModel> mstcreches = [];
   List<OptionsModel> crecheStatus = [];
   List<OptionsModel> parterns = [];
+  List<OptionsModel> phases = [];
 
   List<TabState> states = [];
   List<TabDistrict> district = [];
@@ -114,7 +120,7 @@ class _DashboardReportCardDetailState
 
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _crecheSearchcontroller = TextEditingController();
 
   @override
   void initState() {
@@ -139,7 +145,7 @@ class _DashboardReportCardDetailState
   void dispose() {
     _focusNode.dispose();
     _scrollController.dispose(); // Clean up controller
-    _controller.dispose(); // Clean up controller
+    _crecheSearchcontroller.dispose(); // Clean up controller
     super.dispose();
   }
 
@@ -191,6 +197,7 @@ class _DashboardReportCardDetailState
       CustomText.Partner,
       CustomText.totalCount,
       CustomText.Search,
+      CustomText.Phase,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)
@@ -303,12 +310,24 @@ class _DashboardReportCardDetailState
                                 selectedDistrict = mstDistrict.first;
                                 mstBlock = Global.callBlocks(
                                     block, lng, selectedDistrict);
+                                mstcreches = Global.callFiltersCrechesByDistric(creches, lng, selectedDistrict);
+                                if (mstcreches.length == 1) {
+                                  selectedCreche = mstcreches.first;
+                                }
                                 if (mstBlock.length == 1) {
                                   selectedBlock = mstBlock.first;
                                   mstGP = Global.callGramPanchyats(
                                       gramPanchayat, lng, selectedBlock);
+                                  mstcreches = Global.callFiltersCrechesByBlock(creches, lng, selectedBlock);
+                                  if (mstcreches.length == 1) {
+                                    selectedCreche = mstcreches.first;
+                                  }
                                   if (mstGP.length == 1) {
                                     selectedGramPanchayat = mstGP.first;
+                                    mstcreches = Global.callFiltersCrechesByGP(creches, lng, selectedGramPanchayat);
+                                    if (mstcreches.length == 1) {
+                                      selectedCreche = mstcreches.first;
+                                    }
                                     // mstVillage = Global.callFiltersVillages(
                                     //     villages, lng, selectedGramPanchayat);
                                     //
@@ -323,6 +342,10 @@ class _DashboardReportCardDetailState
                                 mstBlock = [];
                                 mstGP = [];
                                 mstVillage = [];
+                                mstcreches = Global.callFiltersCrechesByState(creches, lng, selectedState);
+                                if (mstcreches.length == 1) {
+                                  selectedCreche = mstcreches.first;
+                                }
                               }
                               setState(() {
                                 // Update districtList based on selectedState
@@ -352,8 +375,16 @@ class _DashboardReportCardDetailState
                                 selectedBlock = mstBlock.first;
                                 mstGP = Global.callGramPanchyats(
                                     gramPanchayat, lng, selectedBlock);
+                                mstcreches = Global.callFiltersCrechesByBlock(creches, lng, selectedBlock);
+                                if (mstcreches.length == 1) {
+                                  selectedCreche = mstcreches.first;
+                                }
                                 if (mstGP.length == 1) {
                                   selectedGramPanchayat = mstGP.first;
+                                  mstcreches = Global.callFiltersCrechesByGP(creches, lng, selectedGramPanchayat);
+                                  if (mstcreches.length == 1) {
+                                    selectedCreche = mstcreches.first;
+                                  }
                                   // mstVillage = Global.callFiltersVillages(
                                   //     villages, lng, selectedGramPanchayat);
                                   //
@@ -366,6 +397,10 @@ class _DashboardReportCardDetailState
                               } else {
                                 mstGP = [];
                                 mstVillage = [];
+                                mstcreches = Global.callFiltersCrechesByDistric(creches, lng, selectedDistrict);
+                                if (mstcreches.length == 1) {
+                                  selectedCreche = mstcreches.first;
+                                }
                               }
                               setState(() {
                                 // Update blockList based on selectedDistrict
@@ -392,6 +427,10 @@ class _DashboardReportCardDetailState
                                   gramPanchayat, lng, selectedBlock);
                               if (mstGP.length == 1) {
                                 selectedGramPanchayat = mstGP.first;
+                                mstcreches = Global.callFiltersCrechesByGP(creches, lng, selectedGramPanchayat);
+                                if (mstcreches.length == 1) {
+                                  selectedCreche = mstcreches.first;
+                                }
                                 // mstVillage = Global.callFiltersVillages(
                                 //     villages, lng, selectedGramPanchayat);
                                 // if (mstVillage.length == 1) {
@@ -401,6 +440,10 @@ class _DashboardReportCardDetailState
                                 // }
                               } else {
                                 mstVillage = [];
+                                mstcreches = Global.callFiltersCrechesByBlock(creches, lng, selectedBlock);
+                                if (mstcreches.length == 1) {
+                                  selectedCreche = mstcreches.first;
+                                }
                               }
                               setState(() {});
                             },
@@ -418,6 +461,10 @@ class _DashboardReportCardDetailState
                             onChanged: (value) async {
                               selectedGramPanchayat = value;
                               selectedVillage = null;
+                              mstcreches = Global.callFiltersCrechesByGP(creches, lng, selectedGramPanchayat);
+                              if (mstcreches.length == 1) {
+                                selectedCreche = mstcreches.first;
+                              }
                               // selectedCreche = null;
                               // mstVillage = Global.callFiltersVillages(
                               //     villages, lng, selectedGramPanchayat);
@@ -470,107 +517,131 @@ class _DashboardReportCardDetailState
                           //     });
                           //   },
                           // ),
-                                  Text(Global.returnTrLable(
-                                      translats, CustomText.Creches, lng),
-                                    style: Styles.black124,),
-                                  SizedBox(
-                                    height: 5.h,
+                                      creches.length<=1? DynamicCustomDropdownField(
+                                        hintText: Global.returnTrLable(
+                                            translats, CustomText.Creches, lng),
+                                        titleText: Global.returnTrLable(
+                                            translats, CustomText.Creches, lng),
+                                        isRequred: 0,
+                                        items: mstcreches,
+                                        selectedItem:  selectedCreche != null? selectedCreche?.name:null,
+                                        onChanged: (value) {
+                                          selectedCreche = value;
+                                        },
+                                      ):Column(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start,
+                                    children: [
+                                      Text(Global.returnTrLable(
+                                          translats, CustomText.Creches, lng),
+                                        style: Styles.black124,),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Container(
+                                        height: 35.h,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(
+                                              color: Color(0xffACACAC)),
+                                          borderRadius: BorderRadius.circular(
+                                              10.r),
+                                        ),
+                                        child: TypeAheadField<OptionsModel>(
+                                          controller: _crecheSearchcontroller,
+                                          scrollController: _scrollController,
+                                          suggestionsCallback: (pattern) async {
+                                            try {
+                                              var filItems= mstcreches.where((
+                                                  element) =>
+                                              element.values != null &&
+                                                  element.name != null &&
+                                                  element.values!
+                                                      .toLowerCase()
+                                                      .contains(
+                                                      pattern.toLowerCase())
+                                              ).toList();
+                                              if(filItems.isEmpty||pattern.isEmpty){
+                                                selectedCreche=null;
+                                                tempSelectedCreche=null;
+                                                _crecheSearchcontroller.text='';
+                                              }
+                                              return filItems;
+                                            } catch (e) {
+                                              debugPrint('TypeAhead error: $e');
+                                              return [];
+                                            }
+                                          },
+                                          builder: (context, controller,
+                                              focusNode) {
+                                            return TextField(
+                                                controller: controller,
+                                                focusNode: focusNode,
+                                                // autofocus: true,
+                                                style:  Styles.black124,
+                                                decoration: InputDecoration(
+                                                  hintText: Global.returnTrLable(
+                                                      translats, CustomText.Search, lng),
+                                                  contentPadding: EdgeInsets
+                                                      .all(10),
+                                                  border: InputBorder.none,
+                                                  fillColor: Colors.white,
+                                                  filled: true,
+                                                  focusedBorder: OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Colors
+                                                            .transparent),
+                                                    borderRadius: BorderRadius
+                                                        .circular(10),
+                                                  ),
+                                                  enabledBorder: OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Colors
+                                                            .transparent),
+                                                    borderRadius: BorderRadius
+                                                        .circular(10),
+                                                  ),
+                                                  disabledBorder: OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Colors
+                                                            .transparent),
+                                                    borderRadius: BorderRadius
+                                                        .circular(10),
+                                                  ),
+                                                )
+                                            );
+                                          },
+                                          itemBuilder: (context, item) {
+                                            return ListTile(
+                                              title: Text(item.values!),
+                                              subtitle: Text(item.name!),
+                                            );
+                                          },
+                                          onSelected: (item) {
+                                            selectedCreche = item;
+                                            _crecheSearchcontroller.text = item.values ?? '';
+                                            print('itm $item');
+                                          },
+                                          offset: Offset(0, 12),
+                                          constraints: BoxConstraints(
+                                              maxHeight: 500),
+                                          hideOnUnfocus: true,
+                                          showOnFocus: true,
+                                          hideWithKeyboard: false,
+                                          loadingBuilder: (context) =>
+                                          const Text('Loading...'),
+                                          errorBuilder: (context,
+                                              error) => const Text('Error!'),
+                                          emptyBuilder: (context) =>
+                                          const Text('No items found!'),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 10.h,
+                                      ),
+                                    ],
                                   ),
-                                  Container(
-                                    height: 35.h,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(
-                                          color: Color(0xffACACAC)),
-                                      borderRadius: BorderRadius.circular(
-                                          10.r),
-                                    ),
-                                    child: TypeAheadField<OptionsModel>(
-                                      controller: _controller,
-                                      scrollController: _scrollController,
-                                      suggestionsCallback: (pattern) async {
-                                        try {
-                                          return mstcreches.where((
-                                              element) =>
-                                          element.values != null &&
-                                              element.name != null &&
-                                              element.values!
-                                                  .toLowerCase()
-                                                  .contains(
-                                                  pattern.toLowerCase())
-                                          ).toList();
-                                        } catch (e) {
-                                          debugPrint('TypeAhead error: $e');
-                                          return [];
-                                        }
-                                      },
-                                      builder: (context, controller,
-                                          focusNode) {
-                                        return TextField(
-                                            controller: controller,
-                                            focusNode: focusNode,
-                                            // autofocus: true,
-                                            style:  Styles.black124,
-                                            decoration: InputDecoration(
-                                              hintText: Global.returnTrLable(
-                                                  translats, CustomText.Search, lng),
-                                              contentPadding: EdgeInsets
-                                                  .all(10),
-                                              border: InputBorder.none,
-                                              fillColor: Colors.white,
-                                              filled: true,
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors
-                                                        .transparent),
-                                                borderRadius: BorderRadius
-                                                    .circular(10),
-                                              ),
-                                              enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors
-                                                        .transparent),
-                                                borderRadius: BorderRadius
-                                                    .circular(10),
-                                              ),
-                                              disabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors
-                                                        .transparent),
-                                                borderRadius: BorderRadius
-                                                    .circular(10),
-                                              ),
-                                            )
-                                        );
-                                      },
-                                      itemBuilder: (context, item) {
-                                        return ListTile(
-                                          title: Text(item.values!),
-                                          subtitle: Text(item.name!),
-                                        );
-                                      },
-                                      onSelected: (item) {
-                                        selectedCreche = item;
-                                        _controller.text = item.values ?? '';
-                                        print('itm $item');
-                                      },
-                                      offset: Offset(0, 12),
-                                      constraints: BoxConstraints(
-                                          maxHeight: 500),
-                                      hideOnUnfocus: true,
-                                      showOnFocus: true,
-                                      hideWithKeyboard: false,
-                                      loadingBuilder: (context) =>
-                                      const Text('Loading...'),
-                                      errorBuilder: (context,
-                                          error) => const Text('Error!'),
-                                      emptyBuilder: (context) =>
-                                      const Text('No items found!'),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 10.h,
-                                  ),
+
                           DynamicCustomDropdownField(
                             hintText: Global.returnTrLable(
                                 translats, CustomText.Selecthere, lng),
@@ -584,6 +655,22 @@ class _DashboardReportCardDetailState
                             onChanged: (value) {
                               setState(() {
                                 selectedCrecheStatus = value;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.Selecthere, lng),
+                            titleText: Global.returnTrLable(
+                                translats, CustomText.Phase, lng),
+                            isRequred: 0,
+                            items: phases,
+                            selectedItem: selectedPhase != null
+                                ? selectedPhase?.name
+                                : null,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedPhase = value;
                               });
                             },
                           ),
@@ -631,6 +718,7 @@ class _DashboardReportCardDetailState
                                     tempSelectedCrecheStatus =
                                         selectedCrecheStatus;
                                     tempSelectedPartner = selectedPartner;
+                                    tempSelectedPhase = selectedPhase;
                                     Navigator.of(context).pop();
                                     callApiForDashboardApi();
                                   },
@@ -783,6 +871,7 @@ class _DashboardReportCardDetailState
           tempSelectedCreche,
           tempSelectedCrecheStatus,
           tempSelectedPartner,
+          tempSelectedPhase,
           token!,
           usr,
           pswd);
@@ -794,6 +883,13 @@ class _DashboardReportCardDetailState
           setState(() {
             // apiIsCall = true;
           });
+        }else{
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(Global.returnTrLable(
+                    translats, data['Error']??'No data found', lng))),
+          );
         }
       } else if (response.statusCode == 401) {
         Navigator.pop(context);
@@ -922,7 +1018,8 @@ class _DashboardReportCardDetailState
     tempSelectedCreche = widget.selectedCreche;
     tempSelectedPartner = widget.selectedPartner;
     tempSelectedCrecheStatus = widget.selectedCrecheStatus;
-    _controller.text=(widget.selectedCreche!=null?widget.selectedCreche?.values!:'')!;
+    tempSelectedPhase = widget.selectedPhase;
+    _crecheSearchcontroller.text=(widget.selectedCreche!=null?widget.selectedCreche?.values!:'')!;
     states = await StateDataHelper().getTabStateList();
     district = await DistrictDataHelper().getTabDistrictList();
     block = await BlockDataHelper().getTabBlockList();
@@ -930,6 +1027,7 @@ class _DashboardReportCardDetailState
     villages = await VillageDataHelper().getTabVillageList();
     mstStates = Global.callSatates(states, lng);
     creches = await CrecheDataHelper().getCrecheResponce();
+    phases = await OptionsModelHelper().callDayOfWeekMstCommonOptions('Phase',lng);
     mstcreches = await OptionsModelHelper().callCrechInOptionAll('Creche');
     crecheStatus =
         await OptionsModelHelper().getMstCommonOptions('Creche Status', lng);
@@ -942,33 +1040,39 @@ class _DashboardReportCardDetailState
       selectedState = mstStates.first;
       tempSelectedState = mstStates.first;
       mstDistrict = Global.callDistrict(district, lng, selectedState);
+      mstcreches = Global.callFiltersCrechesByState(creches, lng, selectedState);
     }
     if (mstStates.length > 0 && widget.selectedState != null) {
       selectedState = widget.selectedState;
       tempSelectedState = widget.selectedState;
       mstDistrict = Global.callDistrict(district, lng, selectedState);
+      mstcreches = Global.callFiltersCrechesByState(creches, lng, selectedState);
     }
 
     if (mstDistrict.length == 1) {
       selectedDistrict = mstDistrict.first;
       tempSelectedDistrict = mstDistrict.first;
       mstBlock = Global.callBlocks(block, lng, selectedDistrict);
+      mstcreches = Global.callFiltersCrechesByDistric(creches, lng, selectedDistrict);
     }
 
     if (mstDistrict.length > 0 && widget.selectedDistrict != null) {
       selectedDistrict = widget.selectedDistrict;
       mstBlock = Global.callBlocks(block, lng, selectedDistrict);
+      mstcreches = Global.callFiltersCrechesByDistric(creches, lng, selectedDistrict);
     }
 
     if (mstBlock.length == 1) {
       selectedBlock = mstBlock.first;
       tempSelectedBlock = mstBlock.first;
       mstGP = Global.callGramPanchyats(gramPanchayat, lng, selectedBlock);
+      mstcreches = Global.callFiltersCrechesByBlock(creches, lng, selectedBlock);
     }
     if (mstBlock.length > 0 && widget.selectedBlock != null) {
       selectedBlock = widget.selectedBlock;
       tempSelectedBlock = widget.selectedBlock;
       mstGP = Global.callGramPanchyats(gramPanchayat, lng, selectedBlock);
+      mstcreches = Global.callFiltersCrechesByBlock(creches, lng, selectedBlock);
     }
 
     if (mstGP.length == 1) {
@@ -976,11 +1080,13 @@ class _DashboardReportCardDetailState
       tempSelectedGramPanchayat = mstGP.first;
       mstVillage =
           Global.callFiltersVillages(villages, lng, selectedGramPanchayat);
+      mstcreches = Global.callFiltersCrechesByGP(creches, lng, selectedGramPanchayat);
     }
     if (mstGP.length > 0 && widget.selectedGramPanchayat != null) {
       selectedGramPanchayat = widget.selectedGramPanchayat;
       mstVillage =
           Global.callFiltersVillages(villages, lng, selectedGramPanchayat);
+      mstcreches = Global.callFiltersCrechesByGP(creches, lng, selectedGramPanchayat);
     }
 
     // if (mstVillage.length == 1) {
@@ -995,17 +1101,23 @@ class _DashboardReportCardDetailState
 
     if (mstcreches.length > 0 && widget.selectedCreche != null) {
       selectedCreche = widget.selectedCreche;
-    // } else if (mstcreches.length == 1) {
-    //   selectedCreche = mstcreches.first;
-    //   tempSelectedCreche = mstcreches.first;
+      tempSelectedCreche = widget.selectedCreche;
     }
-
+    if (mstcreches.length ==  1&& widget.selectedCreche == null) {
+      selectedCreche = widget.selectedCreche;
+      tempSelectedCreche = widget.selectedCreche;
+    }
     if (parterns.length > 0 && widget.selectedPartner != null) {
       selectedPartner = widget.selectedPartner;
     } else if (parterns.length == 1) {
       selectedPartner = parterns.first;
       tempSelectedPartner = parterns.first;
     }
+    if (phases.length > 0 && widget.selectedPhase != null) {
+      selectedPhase = widget.selectedPhase;
+      tempSelectedPhase = widget.selectedPhase;
+    }
+
     if (crecheStatus.length > 0 && widget.selectedCrecheStatus != null) {
       selectedCrecheStatus = widget.selectedCrecheStatus;
     } else if (crecheStatus.length == 1) {
@@ -1033,6 +1145,7 @@ class _DashboardReportCardDetailState
     selectedCreche = null;
     selectedPartner = null;
     selectedCrecheStatus = null;
+    selectedPhase = null;
 
     tempSelectedState = null;
     tempSelectedDistrict = null;
@@ -1042,6 +1155,7 @@ class _DashboardReportCardDetailState
     tempSelectedCreche = null;
     tempSelectedPartner = null;
     tempSelectedCrecheStatus = null;
+    tempSelectedPhase = null;
 
     widget.selectedState = null;
     widget.selectedDistrict = null;
@@ -1051,7 +1165,8 @@ class _DashboardReportCardDetailState
     widget.selectedCreche = null;
     widget.selectedPartner = null;
     widget.selectedCrecheStatus = null;
-
+    widget.selectedPhase = null;
+    _crecheSearchcontroller.text = '';
     mstStates = [];
     mstDistrict = [];
     mstBlock = [];
@@ -1060,6 +1175,7 @@ class _DashboardReportCardDetailState
     mstcreches = [];
     crecheStatus = [];
     parterns = [];
+    phases = [];
     await fetchStateList();
     await callApiForDashboardApi();
   }

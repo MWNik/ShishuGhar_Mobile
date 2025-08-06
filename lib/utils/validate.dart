@@ -92,6 +92,7 @@ class Validate {
   static String stockmetaUpdateDate = "stockmetaUpdateDate";
   static String requisitionMetaUpdateDate = "requisitionMetaUpdateDate";
   static String household = "household";
+  static String max_allow_range = 'max_allow_range';
 
 //
 

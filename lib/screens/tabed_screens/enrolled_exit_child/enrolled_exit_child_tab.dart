@@ -214,6 +214,7 @@ class _EnrolledChilrenTabState extends State<EnrolledExitChilrenTab>
         tabItem.add(EnrolledExitChildTabItem(
           isForExit: false,
           isEditable: widget.isEditable,
+          // isEditable: true,
           EnrolledChilGUID: widget.EnrolledChilGUID,
           cHHGuid: widget.CHHGUID,
           isImageUpdate: widget.isImageUpdate,

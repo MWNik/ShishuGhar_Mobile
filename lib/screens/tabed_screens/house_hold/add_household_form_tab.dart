@@ -38,8 +38,8 @@ import 'depending_logic.dart';
 
 class AddHouseholdScreenFromTab extends StatefulWidget {
   final String hhGuid;
-   String? minDate;
-   String? maxDate;
+  String? minDate;
+  String? maxDate;
   final HouseHoldFielItemdModel tabBreakItem;
   final Map<String, List<HouseHoldFielItemdModel>> screenItem;
   final Function(int) changeTab;
@@ -47,18 +47,18 @@ class AddHouseholdScreenFromTab extends StatefulWidget {
   final int totalTab;
   final int crecheId;
 
-   AddHouseholdScreenFromTab(
-      {super.key,
-      required this.hhGuid,
-      required this.tabBreakItem,
-      required this.screenItem,
-      required this.changeTab,
-      required this.tabIndex,
-      required this.crecheId,
-      required this.totalTab,
-       this.minDate,
-       this.maxDate,
-     });
+  AddHouseholdScreenFromTab({
+    super.key,
+    required this.hhGuid,
+    required this.tabBreakItem,
+    required this.screenItem,
+    required this.changeTab,
+    required this.tabIndex,
+    required this.crecheId,
+    required this.totalTab,
+    this.minDate,
+    this.maxDate,
+  });
 
   @override
   State<AddHouseholdScreenFromTab> createState() =>
@@ -69,6 +69,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   bool _isLoading = true; // Change this to true initially
   List<CresheDatabaseResponceModel> allCrecheRecords = [];
   List<OptionsModel> options = [];
+
   // List<TabFormsLogic> logics = [];
   List<Translation> translats = [];
   Map<String, dynamic> myMap = {};
@@ -81,11 +82,14 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   List<Translation> labelControlls = [];
   List<TabState> states = [];
   List<TabDistrict> districts = [];
+  List<TabState> nativeStates = [];
+  List<TabDistrict> nativeDistricts = [];
   List<TabBlock> blocks = [];
   List<TabGramPanchayat> gramPanchayats = [];
   List<TabVillage> villages = [];
   int? nameId;
   DependingLogic? logic;
+
   // String autoFocs ='';
   @override
   void initState() {
@@ -108,7 +112,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
               Divider(),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,8 +133,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
                         onPressed: () {
                           nextTab(0);
                         },
-                        text:
-                            Global.returnTrLable(translats, CustomText.back, lng),
+                        text: Global.returnTrLable(
+                            translats, CustomText.back, lng),
                       ),
                     ),
                     role == 'Creche Supervisor'
@@ -156,8 +161,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
                           nextTab(1);
                           // widget.changeTab(1);
                         },
-                        text:
-                            Global.returnTrLable(translats, CustomText.Next, lng),
+                        text: Global.returnTrLable(
+                            translats, CustomText.Next, lng),
                       ),
                     ),
                   ],
@@ -189,20 +194,6 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   widgetTypeWidget(int index, HouseHoldFielItemdModel quesItem) {
     switch (quesItem.fieldtype) {
       case 'Link':
-        // List<OptionsModel> items = [];
-        // if (quesItem.fieldname == 'creche_id') {
-        //   var village_id = myMap['village_id'];
-        //   if(village_id!=null) {
-        //     items = filterCreche(village_id);
-        //   }else items=[];
-        // }else {
-        //   items = options
-        //       .where((element) => element.flag == "tab${quesItem.options}")
-        //       .toList();
-        // }
-        // if (items.length == 1) {
-        //   myMap[quesItem.fieldname!] = items.first.name;
-        // }
         return DynamicCustomDropdownField(
           hintText:
               Global.returnTrLable(translats, CustomText.select_here, lng),
@@ -220,6 +211,9 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
           onChanged: (value) {
             if (quesItem.fieldname == 'village_id' && value!.name != null) {
               myMap.remove('creche_id');
+            }
+            if (quesItem.fieldname == 'which_is_your_native_state') {
+              myMap.remove('which_is_your_native_district');
             }
             if (value != null)
               myMap[quesItem.fieldname!] = value.name!;
@@ -241,8 +235,14 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
                   ? logic!.callReadableLogic(myMap, quesItem)
                   : true
               : true,
-          minDate: (quesItem.fieldname == 'date_of_visit' && Global.validString(widget.minDate))?DateTime.parse(widget.minDate!).subtract(Duration(days: 1)):null,
-          maxDate: (quesItem.fieldname == 'date_of_visit' && Global.validString(widget.maxDate))?DateTime.parse(widget.maxDate!):null,
+          minDate: (quesItem.fieldname == 'date_of_visit' &&
+                  Global.validString(widget.minDate))
+              ? DateTime.parse(widget.minDate!).subtract(Duration(days: 1))
+              : null,
+          maxDate: (quesItem.fieldname == 'date_of_visit' &&
+                  Global.validString(widget.maxDate))
+              ? DateTime.parse(widget.maxDate!)
+              : null,
           onChanged: (value) {
             myMap[quesItem.fieldname!] = value;
             var logData = logic!.callDateDiffrenceLogic(myMap, quesItem);
@@ -520,7 +520,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   nextTab(int type) async {
     if (role == 'Creche Supervisor') {
       if (type == 1) {
-        var checVali=await checkValidation();
+        var checVali = await checkValidation();
         if (checVali) {
           if (widget.tabIndex < (widget.totalTab - 1)) {
             // myMap['verification_status'] = children__3_years != null
@@ -582,7 +582,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   nextTabSave(int type) async {
     if (role == 'Creche Supervisor') {
       if (type == 1) {
-        var checVali=await checkValidation();
+        var checVali = await checkValidation();
         if (checVali) {
           if (widget.tabIndex < (widget.totalTab - 1)) {
             // myMap['verification_status'] = myMap['verification_status'] == "1";
@@ -672,35 +672,38 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
         //   validStatus = false;
         //   break;
         // }
-      };
-      var crechees=items.where((element) => element.fieldname=='creche_id').toList();
-      if(myMap['creche_id']!=null&&crechees.length>0) {
-        if(widget.crecheId!=Global.stringToInt(myMap['creche_id'].toString())){
+      }
+      ;
+      var crechees =
+          items.where((element) => element.fieldname == 'creche_id').toList();
+      if (myMap['creche_id'] != null && crechees.length > 0) {
+        if (widget.crecheId !=
+            Global.stringToInt(myMap['creche_id'].toString())) {
           validStatus = await checkValidCrech();
         }
-
       }
     } else {
       print("selected items is null");
-
     }
 
     return validStatus;
   }
 
   Future<bool> checkValidCrech() async {
-   bool validStatus = true;
-   var childCount =await EnrolledExitChilrenResponceHelper().enrolledChildCountByHHGUID(widget.hhGuid,widget.crecheId);
+    bool validStatus = true;
+    var childCount = await EnrolledExitChilrenResponceHelper()
+        .enrolledChildCountByHHGUID(widget.hhGuid, widget.crecheId);
 
-    if(childCount.length>0){
-      validStatus=false;
-      Validate()
-          .singleButtonPopup( Global.returnTrLable(translats,
-          CustomText.crecheUpdateInHH, lng), Global.returnTrLable(translats, CustomText.ok, lng), false, context);
+    if (childCount.length > 0) {
+      validStatus = false;
+      Validate().singleButtonPopup(
+          Global.returnTrLable(translats, CustomText.crecheUpdateInHH, lng),
+          Global.returnTrLable(translats, CustomText.ok, lng),
+          false,
+          context);
     }
     return validStatus;
   }
-
 
   Future<void> saveDataInData() async {
     var widgets = widget.screenItem[widget.tabBreakItem.name];
@@ -883,6 +886,8 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
     blocks = await BlockDataHelper().getTabBlockList();
     gramPanchayats = await GramPanchayatDataHelper().getTabGramPanchayatList();
     villages = await VillageDataHelper().getTabVillageList();
+    nativeStates = await StateDataHelper().getTabNativeStateList();
+    nativeDistricts = await DistrictDataHelper().getNativeDistrictList();
   }
 
   List<OptionsModel> updateLocationDropDown(HouseHoldFielItemdModel item) {
@@ -991,10 +996,40 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
           defaultDisableDailog(item.fieldname!, item.options!);
         }
       }
+    } else if (item.fieldtype == 'Link' &&
+        item.fieldname == 'which_is_your_native_state' &&
+        item.options == 'State') {
+      options.removeWhere((element) => element.flag == 'tabNativeState');
+      List<OptionsModel> updatedItems = Global.callNativeSatates(nativeStates, lng);
+      options.addAll(updatedItems);
+      if (updatedItems.length == 1) {
+        defaultDisableDailog(item.fieldname!, item.options!);
+      }
+    } else if (item.fieldtype == 'Link' &&
+        item.fieldname == 'which_is_your_native_district' &&
+        item.options == 'District') {
+      options.removeWhere((element) => element.flag == 'tabNativeDistrict');
+      var statesId = myMap['which_is_your_native_state'];
+      if (statesId != null) {
+        var updatedDistrict = Global.callNativeDistrict(
+            nativeDistricts, lng, OptionsModel(name: statesId));
+        options.addAll(updatedDistrict);
+        if (updatedDistrict.length == 1) {
+          defaultDisableDailog(item.fieldname!, item.options!);
+        }
+      }
     }
-    List<OptionsModel> items = options
-        .where((element) => element.flag == 'tab${item.options}')
-        .toList();
+    List<OptionsModel> items=[];
+    if(item.fieldname == 'which_is_your_native_state'||item.fieldname == 'which_is_your_native_district'){
+       items = options
+          .where((element) => element.flag == 'tabNative${item.options}')
+          .toList();
+    }else{
+       items = options
+          .where((element) => element.flag == 'tab${item.options}')
+          .toList();
+    }
+
 
     var selectedValue = myMap[item.fieldname];
     if (selectedValue != null) {
@@ -1024,21 +1059,21 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
     return crecheOptionsList;
   }
 
-  // bool crechedOpeningDate(String enrollmenDate) {
-  //   DateTime? openningDate = Global.stringToDate(widget.openingDate);
-  //   DateTime? dateOfEnrole = Global.stringToDate(enrollmenDate);
-  //   if (openningDate != null&&dateOfEnrole != null) {
-  //     return dateOfEnrole.isAfter(openningDate) ||
-  //         openningDate.isAtSameMomentAs(dateOfEnrole);
-  //   } else
-  //     return false;
-  // }
-  // bool crechedClosingDate(String enrollmenDate) {
-  //   DateTime? closingDate = Global.stringToDate(widget.closingDate);
-  //   DateTime? dateOfEnrole = Global.stringToDate(enrollmenDate);
-  //   if (closingDate != null&&dateOfEnrole != null) {
-  //     return closingDate.isAfter(dateOfEnrole);
-  //   } else
-  //     return true;
-  // }
+// bool crechedOpeningDate(String enrollmenDate) {
+//   DateTime? openningDate = Global.stringToDate(widget.openingDate);
+//   DateTime? dateOfEnrole = Global.stringToDate(enrollmenDate);
+//   if (openningDate != null&&dateOfEnrole != null) {
+//     return dateOfEnrole.isAfter(openningDate) ||
+//         openningDate.isAtSameMomentAs(dateOfEnrole);
+//   } else
+//     return false;
+// }
+// bool crechedClosingDate(String enrollmenDate) {
+//   DateTime? closingDate = Global.stringToDate(widget.closingDate);
+//   DateTime? dateOfEnrole = Global.stringToDate(enrollmenDate);
+//   if (closingDate != null&&dateOfEnrole != null) {
+//     return closingDate.isAfter(dateOfEnrole);
+//   } else
+//     return true;
+// }
 }

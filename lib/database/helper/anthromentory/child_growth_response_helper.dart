@@ -372,7 +372,8 @@ Future<ChildGrowthMetaResponseModel?> callMaxAnthroResponce(
   }
 
   Future<List<ChildGrowthMetaResponseModel>> anthroByReferral(
-      String child_referral_guid) async {
+      String child_referral_guid)
+  async {
     var query =
         'select * from child_anthormentry_responce where cgmguid = (select cgmguid from child_referral_responce where child_referral_guid=?) ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
 
@@ -424,5 +425,20 @@ Future<ChildGrowthMetaResponseModel?> callMaxAnthroResponce(
     return await DatabaseHelper.database!.rawQuery(
       '''SELECT * FROM ( SELECT    creche_id,    MIN(max_month) AS min_of_max_months  FROM ( SELECT  creche_id,    MAX(strftime('%Y-%m', date(measurement_date))) AS max_month FROM  child_anthormentry_responce GROUP BY creche_id ) WHERE max_month < strftime('%Y-%m', 'now')) AS date_records LEFT JOIN tab_creche_response AS creche  ON date_records.creche_id = creche.name''',
     );
+  }
+
+  Future<List<ChildGrowthMetaResponseModel>> excuteGrowthMonitoring(String enrollmentGuid) async {
+    var query =
+    'select *  from child_anthormentry_responce where responces like ? ';
+
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery(query, ['%childenrollguid":"$enrollmentGuid%']);
+
+    List<ChildGrowthMetaResponseModel> items = [];
+    result.forEach((itemMap) {
+      items.add(ChildGrowthMetaResponseModel.fromJson(itemMap));
+    });
+
+    return items;
   }
 }

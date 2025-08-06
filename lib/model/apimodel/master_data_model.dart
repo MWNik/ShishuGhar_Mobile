@@ -53,7 +53,10 @@ class MasterDataModel {
   List<VaccineModel>? tabVaccines;
   List<MasterStockModel>? tabMasterStock;
   List<PartnerStockModel>? tabPartnerStock;
+  List<TabState>? tabNativeState;
+  List<TabDistrict>? tabNativeDistrict;
   String? backDateDataEntry;
+  int? max_allow_range;
 
   MasterDataModel({
     this.tabState,
@@ -76,7 +79,10 @@ class MasterDataModel {
     this.tabVaccines,
     this.tabMasterStock,
     this.tabPartnerStock,
-    this.backDateDataEntry
+    this.tabNativeState,
+    this.tabNativeDistrict,
+    this.backDateDataEntry,
+    this.max_allow_range
   });
 
   factory MasterDataModel.fromJson(Map<String, dynamic> json) =>
@@ -169,7 +175,16 @@ class MasterDataModel {
             ? []
             : List<PartnerStockModel>.from(json["tabPartner Stock"]!
                 .map((x) => PartnerStockModel.fromJson(x))),
-        backDateDataEntry: json["Back_data_entry_date"]
+          tabNativeState: json["Native_State"] == null
+              ? []
+              : List<TabState>.from(json["Native_State"]!
+              .map((x) => TabState.fromJson(x))),
+          tabNativeDistrict: json["Native_District"] == null
+              ? []
+              : List<TabDistrict>.from(json["Native_District"]!
+              .map((x) => TabDistrict.fromJson(x))),
+        backDateDataEntry: json["Back_data_entry_date"],
+          max_allow_range: json["max_allow_range"]
       );
 
   Map<String, dynamic> toJson() => {
@@ -234,6 +249,13 @@ class MasterDataModel {
         "tabPartner Stock": tabPartnerStock == null
             ? []
             : List<dynamic>.from(tabPartnerStock!.map((x) => x.toJson())),
-        "Back_data_entry_date": backDateDataEntry
+       "Native_State": tabNativeState == null
+        ? []
+        : List<dynamic>.from(tabNativeState!.map((x) => x.toJson())),
+        "Native_District": tabNativeDistrict == null
+        ? []
+        : List<dynamic>.from(tabNativeDistrict!.map((x) => x.toJson())),
+        "Back_data_entry_date": backDateDataEntry,
+        "max_allow_range": max_allow_range
       };
 }

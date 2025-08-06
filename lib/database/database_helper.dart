@@ -27,7 +27,7 @@ class DatabaseHelper {
       print("Opening existing database");
     }
     database = await openDatabase(path,
-        version: 5,
+        version: 6,
         onUpgrade: (db, oldVersion, newVersion) =>
             upgradeVersion(db, oldVersion, newVersion));
 
@@ -112,13 +112,13 @@ class DatabaseHelper {
           // table tabWeightToHeightGirls
           await addColumnsToTable(db, 'tabWeightToHeightGirls', newColumns);
 
-            // table tabWeightToHeightBoys
-            await addNewColoumn(
-                db, 'tabWeightToHeightBoys', 'age_type', 'INTEGER');
+          // table tabWeightToHeightBoys
+          await addNewColoumn(
+              db, 'tabWeightToHeightBoys', 'age_type', 'INTEGER');
 
-            // table tabWeightToHeightGirls
-            await addNewColoumn(
-                db, 'tabWeightToHeightGirls', 'age_type', 'INTEGER');
+          // table tabWeightToHeightGirls
+          await addNewColoumn(
+              db, 'tabWeightToHeightGirls', 'age_type', 'INTEGER');
 
           await db.execute('''CREATE TABLE "backdated_configiration" (
 	"name"	INTEGER,
@@ -134,17 +134,37 @@ class DatabaseHelper {
 	"date"	TEXT,
 	PRIMARY KEY("unique_id","type")
 );''');
-
         } catch (e) {
           print("$e");
         }
       }
       if (oldVersion == 4 && newVersion > 4) {
         try {
-            // table enrollred_exit_child_responce
-            await addNewColoumn(
-                db, 'enrollred_exit_child_responce', 'reason_for_exit', 'INTEGER');
+          // table enrollred_exit_child_responce
+          await addNewColoumn(db, 'enrollred_exit_child_responce',
+              'reason_for_exit', 'INTEGER');
+        } catch (e) {
+          print("$e");
+        }
+      }
+      if (oldVersion == 5 && newVersion > 5) {
+        try {
+          await db.execute('''CREATE TABLE "tabNativState" (
+	                                                      "name"	INTEGER,
+	                                                      "state_code"	TEXT,
+	                                                      "value"	TEXT,
+	                                                      "state_od"	TEXT,
+	                                                      "state_hi"	TEXT
+                                                      );''');
 
+          await db.execute('''CREATE TABLE "tabNativeDistrict" (
+                                            	"name"	INTEGER,
+	                                            "state_id"	TEXT,
+                                             	"district_code"	TEXT,
+	                                            "value"	TEXT,
+	                                            "district_od"	TEXT,
+                                             	"district_hi"	TEXT
+                                              );''');
         } catch (e) {
           print("$e");
         }

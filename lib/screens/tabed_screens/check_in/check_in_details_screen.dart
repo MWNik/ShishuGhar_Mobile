@@ -43,6 +43,7 @@ import '../../../model/dynamic_screen_model/checkIn_response_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart' as path;
 
+import '../../../utils/location_accuracy_dialog_with_distance.dart';
 
 class CheckInDetailsScreen extends StatefulWidget {
   final int creche_id;
@@ -50,6 +51,7 @@ class CheckInDetailsScreen extends StatefulWidget {
   DateTime? lastGrowthDate;
   DateTime? minGrowthDate;
   bool isEdit;
+  String? crecheLatLang;
 
   CheckInDetailsScreen(
       {super.key,
@@ -57,6 +59,7 @@ class CheckInDetailsScreen extends StatefulWidget {
       required this.creche_id,
       this.lastGrowthDate,
       this.minGrowthDate,
+      this.crecheLatLang,
       required this.isEdit});
 
   State<CheckInDetailsScreen> createState() => _CheckInDetailsScreen();
@@ -84,6 +87,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
   List<CheckInResponseModel> checkItems = [];
   bool isSettingOpen = false;
   String itemResopnceField = '';
+
   List<dynamic> itemsList = [];
   Map<String, dynamic> visitpurpose = {'tabEntitlement': []};
   List<String> hiddens = [
@@ -156,7 +160,8 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
       CustomText.PleaseSelectBeforTimeInIsValidTime,
       CustomText.plsFilManForm,
       CustomText.wesUsageGraterQuatOpen,
-      CustomText.leavingLesThanjoining
+      CustomText.leavingLesThanjoining,
+      CustomText.LocationIsNotAvailableInYourCreche
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -397,8 +402,8 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           is_edited: 1,
           created_at: myMap['appcreated_on'],
           created_by: myMap['appcreated_by'],
-          update_at:  myMap['app_updated_on'],
-          updated_by:  myMap['app_updated_by']);
+          update_at: myMap['app_updated_on'],
+          updated_by: myMap['app_updated_by']);
       await CheckInResponseHelper().inserts(checkinItems);
     }
   }
@@ -700,29 +705,77 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           },
         );
       case 'Small Text':
-        return DynamicCustomTextFieldNew(
-          titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng!),
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : logic!.dependeOnMendotory(myMap, quesItem),
-          maxlength: quesItem.length,
-          readable: (quesItem.fieldname == 'checkin_location')
-              ? true
-              : widget.isEdit
-              ? true
-              : logic!.callReadableLogic(myMap, quesItem),
-          initialvalue:
-          // quesItem.fieldname == 'checkin_location'?address ?? '':
-          myMap[quesItem.fieldname!],
-          onChanged: (value) {
-            print('Entered text: $value');
-            if (value.isNotEmpty)
-              myMap[quesItem.fieldname!] = value;
-            else
-              myMap.remove(quesItem.fieldname);
-          },
-        );
+        return (quesItem.fieldname == 'checkin_location')
+            ? Row(
+                children: [
+                  Expanded(
+                    child: DynamicCustomTextFieldNew(
+                      titleText: Global.returnTrLable(
+                          translats, quesItem.label!.trim(), lng!),
+                      isRequred: quesItem.reqd == 1
+                          ? quesItem.reqd
+                          : logic!.dependeOnMendotory(myMap, quesItem),
+                      maxlength: quesItem.length,
+                      readable: (quesItem.fieldname == 'checkin_location')
+                          ? true
+                          : widget.isEdit
+                              ? true
+                              : logic!.callReadableLogic(myMap, quesItem),
+                      initialvalue:
+                          // quesItem.fieldname == 'checkin_location'?address ?? '':
+                          myMap[quesItem.fieldname!],
+                      onChanged: (value) {
+                        print('Entered text: $value');
+                        if (value.isNotEmpty)
+                          myMap[quesItem.fieldname!] = value;
+                        else
+                          myMap.remove(quesItem.fieldname);
+                      },
+                    ),
+                  ),
+                  widget.isEdit ?SizedBox() :Padding(
+                    padding: EdgeInsetsGeometry.all(5),
+                    child: Container(
+                      padding: EdgeInsets.all(8), // Adjust padding as needed
+                      decoration: BoxDecoration(
+                        color: Color(0xff5979AA), // Background color
+                        shape: BoxShape.circle,
+                      ),
+                      child: InkWell(
+                          onTap: () {
+                            checkLocationPermission();
+                          },
+                          child: Image.asset(
+                            'assets/ic_sync_n.png',
+                            scale: 4,color: Colors.white,
+                          )),
+                    ),
+                  )
+                ],
+              )
+            : DynamicCustomTextFieldNew(
+                titleText: Global.returnTrLable(
+                    translats, quesItem.label!.trim(), lng!),
+                isRequred: quesItem.reqd == 1
+                    ? quesItem.reqd
+                    : logic!.dependeOnMendotory(myMap, quesItem),
+                maxlength: quesItem.length,
+                readable: (quesItem.fieldname == 'checkin_location')
+                    ? true
+                    : widget.isEdit
+                        ? true
+                        : logic!.callReadableLogic(myMap, quesItem),
+                initialvalue:
+                    // quesItem.fieldname == 'checkin_location'?address ?? '':
+                    myMap[quesItem.fieldname!],
+                onChanged: (value) {
+                  print('Entered text: $value');
+                  if (value.isNotEmpty)
+                    myMap[quesItem.fieldname!] = value;
+                  else
+                    myMap.remove(quesItem.fieldname);
+                },
+              );
       case 'Float':
         return DynamicCustomTextFieldFloat(
           titleText:
@@ -829,14 +882,11 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
     }
   }
 
-
-
-
   Future<File> savePickedImage(XFile pickedImage, String docType) async {
     // Get app document directory
     final Directory appDirectory = await getApplicationDocumentsDirectory();
     final Directory imagesDirectory =
-    Directory('${appDirectory.path}/shishughar_images');
+        Directory('${appDirectory.path}/shishughar_images');
 
     // Create directory if not exists
     if (!await imagesDirectory.exists()) {
@@ -845,10 +895,11 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
 
     // Set file name and target path
     final String fileName = '$docType.jpg';
-    final String targetPath =  path.join(imagesDirectory.path, fileName);
+    final String targetPath = path.join(imagesDirectory.path, fileName);
 
     // Compress the image file
-    final List<int>? compressedBytes = await FlutterImageCompress.compressWithFile(
+    final List<int>? compressedBytes =
+        await FlutterImageCompress.compressWithFile(
       pickedImage.path,
       quality: 10, // You can adjust this for more/less compression
       format: CompressFormat.jpeg,
@@ -945,8 +996,8 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
                   Divider(),
                   Expanded(
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.w, vertical: 10.h),
                       child: SingleChildScrollView(
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -954,11 +1005,13 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
                               InkWell(
                                 onTap: () {
                                   if (_image == null) {
-                                    if (widget.isEdit == false) selectImageFile();
+                                    if (widget.isEdit == false)
+                                      selectImageFile();
                                   }
                                 },
                                 child: Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 10.h),
                                     child: Container(
                                       decoration: BoxDecoration(
                                           color: Color(0xffF9F9F9),
@@ -1016,10 +1069,11 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
                                                 onPressed: () =>
                                                     _clearImagePath(),
                                                 style: ElevatedButton.styleFrom(
-                                                    backgroundColor: Colors
-                                                        .red, // Background color
+                                                    backgroundColor: Colors.red,
+                                                    // Background color
                                                     // onPrimary: Colors.white, // Text color
-                                                    shape: RoundedRectangleBorder(
+                                                    shape:
+                                                        RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               6),
@@ -1192,6 +1246,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
       Navigator.pop(context);
     }
   }
+
 // Future<void> checkLocationPermission(
 //       ) async {
 //     if (await _hasLocationPermission()) {
@@ -1487,27 +1542,63 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
   Future<void> _getLocation(bool shouldProceed) async {
     if (shouldProceed) {
       try {
-        showLoaderDialog(context);
+        // showLoaderDialog(context);
 
-        final currentLocation = await getCurrentPositionWithTimeout();
-
-        lats = currentLocation.latitude.toString();
-        langs = currentLocation.longitude.toString();
-        address = await Validate().getAddressFromLatLng(
-            currentLocation.latitude, currentLocation.longitude);
-        myMap['checkin_location'] = address??'';
-        if (address != null) {
-          setState(() {});
+        // final currentLocation = await getCurrentPositionWithTimeout();
+        //
+        // lats = currentLocation.latitude.toString();
+        // langs = currentLocation.longitude.toString();
+        // address = await Validate().getAddressFromLatLng(
+        //     currentLocation.latitude, currentLocation.longitude);
+        // myMap['checkin_location'] = address??'';
+        // if (address != null) {
+        //   setState(() {});
+        // }
+        List<String> locations = Global.splitData(widget.crecheLatLang, ',');
+        if (locations.length > 1) {
+          double targetLat = Global.stringToDouble(locations[0]);
+          double targetLng = Global.stringToDouble(locations[1]);
+          int maxAllowedDistance =
+              await Validate().readInt(Validate.max_allow_range) ?? 50;
+          if (locations[0].length > 3 && locations[1].length > 3) {
+            showDialog(
+              context: context,
+              builder: (context) => LocationAccuracyWithDistanceDialog(
+                maxAllowedDistance: maxAllowedDistance.toDouble(),
+                targetLat: targetLat,
+                targetLng: targetLng,
+                onLocationResult: (lat, lng, address) async {
+                  lats = lat.toString();
+                  langs = lng.toString();
+                  address = await Validate().getAddressFromLatLng(lat, lng);
+                  myMap['checkin_location'] = address ?? '';
+                  setState(() {});
+                },
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      translats, CustomText.LocationIsNotAvailableInYourCreche, lng!))),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(Global.returnTrLable(
+                    translats, CustomText.LocationIsNotAvailableInYourCreche, lng!))),
+          );
         }
       } catch (e) {
         // if (e is TimeoutException) {
-        Navigator.pop(context);
+        // Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(Global.returnTrLable(
                 translats, CustomText.locationNotCaptured, lng!))));
         // }
       } finally {
-        Navigator.pop(context);
+        // Navigator.pop(context);
       }
     } else {
       Validate().singleButtonPopup(

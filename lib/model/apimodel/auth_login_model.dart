@@ -12,6 +12,7 @@ class Auth {
   int? isDeviceChanged;
   int? houseHoldNumber;
   String? backDateDataEntry;
+  int? max_allow_range;
 
   Auth({
     this.apiKey,
@@ -23,7 +24,8 @@ class Auth {
     this.mobile_no,
     this.isDeviceChanged,
     this.houseHoldNumber,
-    this.backDateDataEntry
+    this.backDateDataEntry,
+    this.max_allow_range
   });
 
   factory Auth.fromJson(Map<String, dynamic> json) => Auth(
@@ -39,7 +41,9 @@ class Auth {
       partner: json["partner"],
       isDeviceChanged: json["is_device_changed"],
       houseHoldNumber: json["household"],
-      backDateDataEntry: json["Back_data_entry_date"]);
+      backDateDataEntry: json["Back_data_entry_date"],
+    max_allow_range: json["max_allow_range"],
+  );
 
   Map<String, dynamic> toJson() => {
         "api_key": apiKey,
@@ -53,6 +57,7 @@ class Auth {
         "partner": partner,
         "is_device_changed": isDeviceChanged,
         "household": houseHoldNumber,
-        "Back_data_entry_date": backDateDataEntry
+        "Back_data_entry_date": backDateDataEntry,
+        "max_allow_range": max_allow_range
       };
 }

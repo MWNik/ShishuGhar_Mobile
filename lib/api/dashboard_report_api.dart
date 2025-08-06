@@ -41,6 +41,7 @@ class DashboardReportApi {
       OptionsModel? selectedCreche,
       OptionsModel? selectedCrecheStatus,
       OptionsModel? selectedPartner,
+      OptionsModel? selectedPhase,
       String token,
       String? usr,
       String? psd,
@@ -82,6 +83,9 @@ class DashboardReportApi {
     }
     if (selectedPartner != null) {
       body['partner_id'] = '${selectedPartner.name}';
+    }
+    if (selectedPhase != null) {
+      body['phases'] = '${selectedPhase.name}';
     }
     if (usr != null) {
       body['usr'] = usr;
@@ -170,6 +174,7 @@ class DashboardReportApi {
       OptionsModel? selectedCreche,
       OptionsModel? selectedCrecheStatus,
       OptionsModel? selectedPartner,
+      OptionsModel? selectedPhase,
       String token,String? usr,
       String? psd,) async {
     var endurl =
@@ -208,6 +213,9 @@ class DashboardReportApi {
     }
     if (selectedPartner != null) {
       body['partner_id'] = '${selectedPartner.name}';
+    }
+    if (selectedPhase != null) {
+      body['phases'] = '${selectedPhase.name}';
     }
     if (userName != null) {
       body['supervisor_id'] = '${userName}';

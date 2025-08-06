@@ -384,6 +384,78 @@ class Global {
     return teCreches;
   }
 
+  static List<OptionsModel> callFiltersCrechesByState(
+      List<CresheDatabaseResponceModel> creches, String lng, OptionsModel? parentItem)
+  {
+    List<OptionsModel> teCreches = [];
+    if (parentItem != null && creches.length > 0) {
+      creches =
+          creches.where((element) => getItemValues(element.responces, 'state_id') == parentItem.name).toList();
+      creches.forEach((element) {
+        var item = OptionsModel();
+        item.name = "${element.name}";
+        item.flag = "tabCreche";
+        item.values = getItemValues(element.responces, 'creche_name');
+        teCreches.add(item);
+      });
+    }
+    return teCreches;
+  }
+
+  static List<OptionsModel> callFiltersCrechesByDistric(
+      List<CresheDatabaseResponceModel> creches, String lng, OptionsModel? parentItem)
+  {
+    List<OptionsModel> teCreches = [];
+    if (parentItem != null && creches.length > 0) {
+      creches =
+          creches.where((element) => getItemValues(element.responces, 'district_id') == parentItem.name).toList();
+      creches.forEach((element) {
+        var item = OptionsModel();
+        item.name = "${element.name}";
+        item.flag = "tabCreche";
+        item.values = getItemValues(element.responces, 'creche_name');
+        teCreches.add(item);
+      });
+    }
+    return teCreches;
+  }
+
+  static List<OptionsModel> callFiltersCrechesByBlock(
+      List<CresheDatabaseResponceModel> creches, String lng, OptionsModel? parentItem)
+  {
+    List<OptionsModel> teCreches = [];
+    if (parentItem != null && creches.length > 0) {
+      creches =
+          creches.where((element) => getItemValues(element.responces, 'block_id') == parentItem.name).toList();
+      creches.forEach((element) {
+        var item = OptionsModel();
+        item.name = "${element.name}";
+        item.flag = "tabCreche";
+        item.values = getItemValues(element.responces, 'creche_name');
+        teCreches.add(item);
+      });
+    }
+    return teCreches;
+  }
+
+  static List<OptionsModel> callFiltersCrechesByGP(
+      List<CresheDatabaseResponceModel> creches, String lng, OptionsModel? parentItem)
+  {
+    List<OptionsModel> teCreches = [];
+    if (parentItem != null && creches.length > 0) {
+      creches =
+          creches.where((element) => getItemValues(element.responces, 'gp_id') == parentItem.name).toList();
+      creches.forEach((element) {
+        var item = OptionsModel();
+        item.name = "${element.name}";
+        item.flag = "tabCreche";
+        item.values = getItemValues(element.responces, 'creche_name');
+        teCreches.add(item);
+      });
+    }
+    return teCreches;
+  }
+
   static List<OptionsModel> callFiltersVillages(
       List<TabVillage> villages, String lng, OptionsModel? parentItem)
   {
@@ -487,6 +559,32 @@ class Global {
     return teDistrict;
   }
 
+  static List<OptionsModel> callNativeDistrict(
+      List<TabDistrict> districts, String lng, OptionsModel? parentItem)
+  {
+    List<OptionsModel> teDistrict = [];
+    if (parentItem != null && districts.length > 0) {
+      districts = districts
+          .where((element) => element.stateId == parentItem.name)
+          .toList();
+      districts.forEach((element) {
+        var item = OptionsModel();
+        item.name = "${element.name}";
+        item.flag = "tabNativeDistrict";
+        var value = "${element.value}";
+        if (lng == 'hi' && Global.validString(element.district_hi.toString())) {
+          value = element.district_hi.toString();
+        } else if (lng == 'od' &&
+            Global.validString(element.district_od.toString())) {
+          value = element.district_od.toString();
+        }
+        item.values = value;
+        teDistrict.add(item);
+      });
+    }
+    return teDistrict;
+  }
+
   static List<OptionsModel> callSatates(List<TabState> states, String lng)
   {
     List<OptionsModel> teStates = [];
@@ -495,6 +593,28 @@ class Global {
         var item = OptionsModel();
         item.name = "${element.name}";
         item.flag = "tabState";
+        var value = "${element.value}";
+        if (lng == 'hi' && Global.validString(element.state_hi.toString())) {
+          value = element.state_hi.toString();
+        } else if (lng == 'od' &&
+            Global.validString(element.state_od.toString())) {
+          value = element.state_od.toString();
+        }
+        item.values = value;
+        teStates.add(item);
+      });
+    }
+    return teStates;
+  }
+
+  static List<OptionsModel> callNativeSatates(List<TabState> states, String lng)
+  {
+    List<OptionsModel> teStates = [];
+    if (states.length > 0) {
+      states.forEach((element) {
+        var item = OptionsModel();
+        item.name = "${element.name}";
+        item.flag = "tabNativeState";
         var value = "${element.value}";
         if (lng == 'hi' && Global.validString(element.state_hi.toString())) {
           value = element.state_hi.toString();
