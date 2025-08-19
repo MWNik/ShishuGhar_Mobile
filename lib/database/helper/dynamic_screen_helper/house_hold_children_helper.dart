@@ -167,4 +167,33 @@ class HouseHoldChildrenHelperHelper {
       }
     }
   }
+
+
+  Future<void> hhChildIsUpdateMotherToung(String HHGUID,String cHHGuid, String mother_tongue) async {
+    var result = await HouseHoldChildrenHelperHelper()
+        .callHouseHoldChildrenItem(cHHGuid);
+    if (result.length > 0) {
+        var response = jsonDecode(result[0].responces!);
+        response['mother_tongue'] = mother_tongue;
+
+        var resp = jsonEncode(response);
+
+        await DatabaseHelper.database!.rawQuery(
+            'update house_hold_children set responces=? , is_edited=1 where CHHGUID=? ',
+            [resp,  cHHGuid]);
+
+        var hhItem = await HouseHoldTabResponceHelper()
+            .getHouseHoldResponceByCHHGUID(cHHGuid);
+        if (hhItem.length > 0) {
+          var HHresponse = jsonDecode(hhItem[0].responces!);
+          if (hhItem[0].name != null) {
+            HHresponse['name'] = hhItem[0].name;
+          }
+
+          var resp = jsonEncode(HHresponse);
+          await HouseHoldTabResponceHelper()
+              .updateResponceWithAddUpload(resp, hhItem[0].HHGUID!);
+        }
+    }
+  }
 }

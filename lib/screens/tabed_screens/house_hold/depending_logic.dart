@@ -1583,26 +1583,39 @@ class DependingLogic {
       var weight = cWidgetDatamap['weight'];
       var height = cWidgetDatamap['height'];
       var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      var age = cWidgetDatamap['age_months'];
       if(fieldname == 're_weight_for_height'){
         weight = cWidgetDatamap['re_weight'];
         height = cWidgetDatamap['re_height'];
         measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+         age = cWidgetDatamap['re_age_months'];
       }
-
+      int preHeight=0;
       if (weight != null && height != null) {
-        if (height > 0 && measurement_equipment == '1') {
-          ///Stediometer
-          height = height + 0.7;
-        } else if (height > 0 && measurement_equipment == '2') {
-          ///Infantometer
-          // height = Global.stringToDoubleTr(height.toString()) - 0.7;
+        if(age <= 730){
+          preHeight=0;
+          if(measurement_equipment == '1'){
+            height =  Global.stringToDouble(height.toString()) + 0.7;
+          }
+        }else  if (age > 730){
+          preHeight=24;
+          if(measurement_equipment == '2'){
+            height =  Global.stringToDouble(height.toString()) - 0.7;
+          }
         }
+
+        // if (height > 0 && measurement_equipment == '1') {
+        //   ///Stediometer
+        //   height = height + 0.7;
+        // } else if (height > 0 && measurement_equipment == '2') {
+        //   ///Infantometer
+        //   // height = Global.stringToDoubleTr(height.toString()) - 0.7;
+        // }
         if (gender == '1') {
           var fHeight= Global.roundToNearest(Global.validNum(height.toString()));
           var filtredItem = tabWeightToHeightBoys
-              .where((element) =>
-          element.length ==
-              fHeight)
+              .where((element) => element.length == fHeight
+              &&element.age_type==preHeight)
               .toList();
           if (filtredItem.length > 0) {
             if (weight <  filtredItem[0].sd3neg!) {
@@ -1623,7 +1636,7 @@ class DependingLogic {
           var filtredItem = tabWeightToHeightGirls
               .where((element) =>
           element.length ==
-              Global.roundToNearest(Global.validNum(height.toString())))
+              Global.roundToNearest(Global.validNum(height.toString()))&&element.age_type==preHeight)
               .toList();
           if (filtredItem.length > 0) {
             if (weight <  filtredItem[0].sd3neg!) {
@@ -1748,6 +1761,8 @@ class DependingLogic {
       }
 
       if (age != null && height != null) {
+
+
         if (age < Global.getbackDaysByMonth(mesurmentTakenDate,24) && height >
             0 && measurement_equipment == '1') {
           ///Stediometer
@@ -1838,42 +1853,40 @@ class DependingLogic {
       }
       int preHeight=0;
       if (weight != null && height != null) {
-        // if (height > 0 && measurement_equipment == '1') {
+
+
+          // commented by feedback  with pankaj sir
+        // if (height < 65) {
         //   ///Stediometer
-        //   height = Global.stringToDouble(height.toString()) + 0.7;
-        // } else if (height > 0 && measurement_equipment == '2') {
-        //   ///Infantometer
-        //   // height = Global.stringToDouble(height.toString()) - 0.7;
+        //   if(measurement_equipment == '2'){
+        //     // height = Global.stringToDouble(height.toString()) - 0.7;
+        //   }else if(measurement_equipment == '1') {
+        //     height = Global.stringToDouble(height.toString()) + 0.7;
+        //   }
         // }
-
-        if (height < 65) {
-          ///Stediometer
-          // height = Global.stringToDouble(height.toString()) + 0.7;
-
-          // if(measurement_equipment == '1'){
-          //   // height = Global.stringToDouble(height.toString()) + 0.7;
-          // }else if(measurement_equipment == '2') {
-          //   height = Global.stringToDouble(height.toString()) - 0.7;
-          // }
-          if(measurement_equipment == '2'){
-            // height = Global.stringToDouble(height.toString()) - 0.7;
-          }else if(measurement_equipment == '1') {
-            height = Global.stringToDouble(height.toString()) + 0.7;
-          }
-
-
-        }
-        else if (height >= 65) {
-          preHeight=24;
-          ///Infantometer
+        // else if (height >= 65) {
+        //   preHeight=24;
+        //   if(measurement_equipment == '1'){
+        //     // height = Global.stringToDouble(height.toString()) + 0.7;
+        //   }else if(measurement_equipment == '2') {
+        //     height = Global.stringToDouble(height.toString())- 0.7;
+        //   }
+        //
+        // }
+        if(age <= 730){
+          preHeight=0;
           if(measurement_equipment == '1'){
-            // height = Global.stringToDouble(height.toString()) + 0.7;
-          }else if(measurement_equipment == '2') {
-            height = Global.stringToDouble(height.toString())- 0.7;
+            height =  Global.stringToDouble(height.toString()) + 0.7;
           }
-
-
+        }else  if (age > 730){
+          preHeight=24;
+          if(measurement_equipment == '2'){
+            height =  Global.stringToDouble(height.toString()) - 0.7;
+          }
         }
+
+
+
         if (gender == '1') {
           var roundedHeight=Global.roundToNearest(Global.validNum(height.toString()));
           var filtredItem = tabWeightToHeightBoys

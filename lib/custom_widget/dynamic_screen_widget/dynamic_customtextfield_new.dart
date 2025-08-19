@@ -117,8 +117,6 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldNew> {
               ),
               child: TextFormField(
                 focusNode: widget.focusNode,
-                minLines: widget.maxline,
-                maxLines: widget.maxline,
                 readOnly: widget.readable ?? false,
                 onTap: widget.onTap,
                 maxLength: widget.maxlength != null && widget.maxlength! > 0

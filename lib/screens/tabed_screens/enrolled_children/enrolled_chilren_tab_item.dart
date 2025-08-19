@@ -86,6 +86,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
   String lng = 'eng';
   bool isRecordNew = true;
   String genderId = '';
+  String? mother_tongue;
   int? isEditedFromExisting = 0;
   int? isUploaded = 0;
   Map<String, FocusNode> _focusNode = {};
@@ -886,7 +887,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
       });
       var responcesJs = jsonEncode(myMap);
       var name = myMap['name'];
-      EnrolledExitChilrenTab.childName = myMap['child_name'];
+      // EnrolledExitChilrenTab.childName = myMap['child_name'];
       print(responcesJs);
       var childItems = EnrolledChildrenResponceModel(
           CHHGUID: widget.cHHGuid,
@@ -912,10 +913,10 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
             .updateEditFlag(widget.cHHGuid, widget.crecheId);
       }
 
-      // if (genderId != Global.getItemValues(responcesJs, 'gender_id')) {
-      //   await EnrolledExitChilrenResponceHelper()
-      //       .isUpdateEdit(widget.EnrolledChilGUID, responcesJs);
-      // }
+      if (mother_tongue != Global.getItemValues(responcesJs, 'mother_tongue')) {
+        await HouseHoldChildrenHelperHelper()
+            .hhChildIsUpdateMotherToung(widget.HHGUID,widget.cHHGuid, Global.getItemValues(responcesJs, 'mother_tongue'));
+      }
       if (isRecordNew && myMap['creche_id'] != null) {
         await HouseHoldChildrenHelperHelper().UpdateCrecheId(
             widget.cHHGuid, Global.stringToInt(myMap['creche_id'].toString()));
@@ -989,6 +990,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
         myMap['appcreated_on'] = Validate().currentDateTime();
       }
       genderId = Global.getItemValues(alredRecord[0].responces, 'gender_id');
+      mother_tongue = Global.getItemValues(alredRecord[0].responces, 'mother_tongue');
       var name = alredRecord[0].name;
       if (name != null) {
         myMap['name'] = name;
@@ -1019,6 +1021,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledChilrenTabItem> {
       Map<String, dynamic> responseData = jsonDecode(fromHHInfo[0].responces!);
 
       genderId = Global.getItemValues(fromHHInfo[0].responces, 'gender_id');
+      mother_tongue = Global.getItemValues(fromHHInfo[0].responces, 'mother_tongue');
 
       responseData.forEach((key, value) {
         if (key != 'appcreated_on' &&

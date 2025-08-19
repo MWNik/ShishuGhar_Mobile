@@ -149,48 +149,50 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                    '${Global.returnTrLable(locationControlls, CustomText.Creche_Name, lng!)} :',
-                                    style: Styles.black104),
-                                Text(
-                                  '${Global.returnTrLable(locationControlls, CustomText.Village, lng!)} :',
-                                  style: Styles.black104,
-                                  strutStyle: StrutStyle(height: 1.2),
-                                ),
-                                Text(
-                                  '${Global.returnTrLable(locationControlls, CustomText.GramPanchayat, lng!)} :',
-                                  style: Styles.black104,
-                                  strutStyle: StrutStyle(height: 1.2),
-                                ),
-                                Text(
-                                  '${Global.returnTrLable(locationControlls, CustomText.Block, lng!)} :',
-                                  style: Styles.black104,
-                                  strutStyle: StrutStyle(height: 1.2),
-                                ),
-                                Text(
-                                  '${Global.returnTrLable(locationControlls, CustomText.District, lng!)} :',
-                                  style: Styles.black104,
-                                  strutStyle: StrutStyle(height: 1.2),
-                                ),
-                                Text(
-                                  '${Global.returnTrLable(locationControlls, CustomText.State, lng!)} :',
-                                  style: Styles.black104,
-                                  strutStyle: StrutStyle(height: 1.2),
-                                ),
-                                Text(
-                                  '${Global.returnTrLable(locationControlls, CustomText.Supervisor, lng!)} :',
-                                  style: Styles.black104,
-                                  strutStyle: StrutStyle(height: 1.2),
-                                ),
-                              ],
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      '${Global.returnTrLable(locationControlls, CustomText.Creche_Name, lng!)} :',
+                                      style: Styles.black104),
+                                  Text(
+                                    '${Global.returnTrLable(locationControlls, CustomText.Village, lng!)} :',
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
+                                  ),
+                                  Text(
+                                    '${Global.returnTrLable(locationControlls, CustomText.GramPanchayat, lng!)} :',
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
+                                  ),
+                                  Text(
+                                    '${Global.returnTrLable(locationControlls, CustomText.Block, lng!)} :',
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
+                                  ),
+                                  Text(
+                                    '${Global.returnTrLable(locationControlls, CustomText.District, lng!)} :',
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
+                                  ),
+                                  Text(
+                                    '${Global.returnTrLable(locationControlls, CustomText.State, lng!)} :',
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
+                                  ),
+                                  Text(
+                                    '${Global.returnTrLable(locationControlls, CustomText.Supervisor, lng!)} :',
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
+                                  ),
+                                ],
+                              ),
                             ),
                             SizedBox(width: 10),
                             SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.14,
+                              height: MediaQuery.of(context).size.height * 0.15,
                               width: 2,
                               child: VerticalDivider(
                                 color: Color(0xffE6E6E6),
@@ -217,6 +219,11 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
                                         ),
                                         Text(
                                           gp != null ? '$gp' : '',
+                                          style: Styles.cardBlue10,
+                                          strutStyle: StrutStyle(height: 1.2),
+                                        ),
+                                        Text(
+                                          '',
                                           style: Styles.cardBlue10,
                                           strutStyle: StrutStyle(height: 1.2),
                                         ),
