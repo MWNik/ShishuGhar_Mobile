@@ -11,6 +11,7 @@ import 'package:shishughar/model/dynamic_screen_model/month_and_year_model.dart'
 import 'package:shishughar/model/dynamic_screen_model/options_model.dart';
 import 'package:shishughar/model/dynamic_screen_model/requisition_response_model.dart';
 import 'package:shishughar/screens/tabed_screens/stock/requisition/requisition_details_screen.dart';
+import 'package:shishughar/screens/tabed_screens/stock/requisition/requisition_details_screen_new.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
@@ -162,6 +163,7 @@ class _RequisitionCalenderListingScreenState
     List<MonthYearModel> missingMonths = [];
     int year = latestYear;
     int month = latestMonth;
+    int days = now.day;
 
     // Loop from the current month to the latest month, adding missing months
     while (currentYear > year ||
@@ -172,6 +174,25 @@ class _RequisitionCalenderListingScreenState
       if (!monthExists) {
         missingMonths.add(MonthYearModel(
             Year: year, month: month, is_edited: 0, is_uploaded: 0));
+      }
+
+      if(currentMonth == month&&currentYear == year&&days>=20){
+        var generateMonth=currentMonth;
+        var generateYear=currentYear;
+        if(currentMonth == 12){
+          generateMonth=1;
+          generateYear=currentYear+1;
+        }else{
+          generateMonth=currentMonth+1;
+        }
+        bool monthExists =
+        monthYearList.any((m) => m.Year == generateYear && m.month == generateMonth);
+
+        if (!monthExists) {
+          missingMonths.add(MonthYearModel(
+              Year: generateYear, month: generateMonth, is_edited: 0, is_uploaded: 0));
+        }
+
       }
 
       // Move to the next month
@@ -284,7 +305,7 @@ class _RequisitionCalenderListingScreenState
                                   var refStatus = await Navigator.of(context)
                                       .push(MaterialPageRoute(
                                           builder: (BuildContext context) =>
-                                              RequisitionDetails(
+                                              RequisitionDetailsNew(
                                                   child_count: childCount,
                                                   stockData:
                                                       stockData.firstOrNull,

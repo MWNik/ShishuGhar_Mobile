@@ -933,8 +933,11 @@ class _ChildFollowUpTabItemSCreenState
     var childAnthroDDetails = await ChildGrowthResponseHelper()
         .callAnthropometryByGuid(widget.GrowthMonitoringGUID);
     if (childAnthroDDetails.length > 0) {
-      var lastAntroRecord = await ChildGrowthResponseHelper().lastAnthroRecord(
-          widget.enrolChildGuid, childAnthroDDetails.first.measurement_date!);
+      var lastMonthYear = Validate().dateToMonthYear(childAnthroDDetails.first.measurement_date!);
+      var lastAntroRecord = await ChildGrowthResponseHelper()
+          .anthroDataForEnrolledAdd(lastMonthYear, widget.creche_id);
+      // var lastAntroRecord = await ChildGrowthResponseHelper().lastAnthroRecord(
+      //     widget.enrolChildGuid, childAnthroDDetails.first.measurement_date!);
       Map<String, dynamic> lastGrowhthDetails = {};
       if (lastAntroRecord.length > 0) {
         Map<String, dynamic> lastGrowthRec =
@@ -1009,8 +1012,8 @@ class _ChildFollowUpTabItemSCreenState
 
           /// SAM/MAM  weight_for_height   red and yellow
           else if (lastGrowhthDetails.isNotEmpty &&
-              (Global.stringToDouble(lastGrowhthDetails['weight'].toString()) ==
-                  Global.stringToDouble(growhthDetails['weight'].toString()))) {
+              (Global.stringToDouble(growhthDetails['weight'].toString()) <=
+                  Global.stringToDouble(lastGrowhthDetails['weight'].toString()))) {
             DateTime folloupDate =
                 followUpGenratedDate.add(Duration(days: 15));
             await ChildFollowUpTabResponseHelper().autoCreateFollowRecord(

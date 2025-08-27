@@ -63,7 +63,7 @@ class _ChildReferralListingScreenState
   var now = DateTime.parse(Validate().currentDate());
   BackdatedConfigirationModel? backdatedConfigirationModel;
   final TextEditingController _creceSearchcontroller = TextEditingController();
-
+  bool isLoading=true;
 
   @override
   void initState() {
@@ -112,86 +112,127 @@ class _ChildReferralListingScreenState
   Future<void> allChildWithlatest(
       List<ChildGrowthMetaResponseModel> childAnthro) async {
     if (childAnthro.isNotEmpty) {
-
-    Map<String, dynamic> allAnthroWithChild = {};
-    childAnthro.forEach((element) {
-      allAnthroWithChild[
-              Global.getItemValues(element.responces!, 'measurement_date')] =
-          jsonDecode(element.responces!)['anthropromatic_details'];
-    });
-    DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-
-    // Sort the entries by date keys
-    List<MapEntry<String, dynamic>> sortedEntries = allAnthroWithChild.entries
-        .toList()
-      ..sort((e1, e2) =>
-          dateFormat.parse(e1.key).compareTo(dateFormat.parse(e2.key)));
-
-    // Create a new map from the sorted entries
-    Map<String, dynamic> sortedMap = Map.fromEntries(sortedEntries);
-    Map<String, dynamic> childWith = {};
-    sortedMap.forEach((key, value) {
-      List<dynamic> childItem = value as List<dynamic>;
-      childItem.forEach((element) {
-        if (Global.stringToDouble(element['weight_for_height'].toString()) ==
-                1 ||
-            // Global.stringToDouble(element['weight_for_height'].toString()) ==
-            //     2 ||
-            Global.stringToInt(
-                    element['any_medical_major_illness'].toString()) ==
-                1 ||
-            Global.stringToDouble(element['weight_for_age'].toString()) == 1) {
-          Map<String, dynamic> growthData = {};
-          growthData['childenrollguid'] = element['childenrollguid'];
-          growthData['cgmguid'] = element['cgmguid'];
-          growthData['measurement_taken_date'] =
-              element['measurement_taken_date'];
-          childWith['$key#!${element['childenrollguid']}'] = growthData;
-        }
+      Map<String, dynamic> allAnthroWithChild = {};
+      childAnthro.forEach((element) {
+        allAnthroWithChild[
+                Global.getItemValues(element.responces!, 'measurement_date')] =
+            jsonDecode(element.responces!)['anthropromatic_details'];
       });
-    });
-    childWith.forEach((key, value) {
-      var enrolChilGUID = value['childenrollguid'];
-      childrenIdList.add(enrolChilGUID);
-      growthGuidByDate[key] = value;
-    });
+      DateFormat dateFormat = DateFormat('yyyy-MM-dd');
 
-    print("final child $childWith");
-    enrolledChildrenList = await EnrolledExitChilrenResponceHelper()
-        .callEnrollChildrenforByMultiEnrollGuid(childrenIdList);
+      // Sort the entries by date keys
+      List<MapEntry<String, dynamic>> sortedEntries = allAnthroWithChild.entries
+          .toList()
+        ..sort((e1, e2) =>
+            dateFormat.parse(e1.key).compareTo(dateFormat.parse(e2.key)));
 
-    reffrelChildrenList =
-        await ChildReferralTabResponseHelper().callAllReffralsWithoutExit();
+      // Create a new map from the sorted entries
+      Map<String, dynamic> sortedMap = Map.fromEntries(sortedEntries);
+      Map<String, dynamic> childWith = {};
+      var entries = sortedMap.entries.toList();
+      // sortedMap.forEach((key, value) async {
+      for (int i = 0; i < entries.length; i++) {
+        var key = entries[i].key;
+        var value = entries[i].value;
+        List<dynamic> childItem = value as List<dynamic>;
+        for (int i = 0; i < childItem.length; i++) {
+          var element = childItem[i];
+          if(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ) {
+            var gfReco =
+            await checkSUWCondition(element['childenrollguid'], key, element);
+            if (Global.stringToDouble(
+                element['weight_for_height'].toString()) ==
+                1 ||
+                Global.validString(gfReco) ||
+                Global.stringToInt(
+                    element['any_medical_major_illness'].toString()) ==
+                    1 ||
+                Global.stringToDouble(element['weight_for_age'].toString()) ==
+                    1) {
+              Map<String, dynamic> growthData = {};
+              growthData['childenrollguid'] = element['childenrollguid'];
+              growthData['cgmguid'] = element['cgmguid'];
+              growthData['measurement_taken_date'] =
+              element['measurement_taken_date'];
+              var category = '';
+              if (Global.stringToInt(
+                  element['any_medical_major_illness'].toString()) ==
+                  1) {
+                category = Global.validString(category)
+                    ? '$category,Major Illness'
+                    : 'Major Illness';
+                // growthData['category'] = 'Major Illness';
+              }
+              if (Global.stringToDouble(element['weight_for_age'].toString()) ==
+                  1 ||
+                  Global.stringToDouble(
+                      element['weight_for_height'].toString()) ==
+                      1) {
+                // growthData['category'] = 'SAM';
+                category =
+                Global.validString(category) ? '$category,SAM' : 'SAM';
+              }
+              if (Global.validString(gfReco)) {
+                // growthData['category'] = gfReco;
+                category = Global.validString(category)
+                    ? '$category,$gfReco'
+                    : '$gfReco';
+              }
+              growthData['category'] = category;
+              if(category!='GF1'){
+                childWith['$key#!${element['childenrollguid']}'] = growthData;
+              }
 
-    List<String> tempFoeRemove = [];
-    growthGuidByDate.forEach((key, value) {
-      var enrolledGUID = value['childenrollguid'];
-      var cgmguid = value['cgmguid'];
-      var filterItem = reffrelChildrenList
-          .where((element) => (element.childenrolledguid == enrolledGUID &&
-              element.cgmguid == cgmguid))
-          .toList();
-      if (filterItem.length > 0) {
-        tempFoeRemove.add(key);
-      } else {
-        var extedItem = enrolledChildrenList
-            .where((element) => (element.ChildEnrollGUID == enrolledGUID &&
-                Global.validString(element.date_of_exit)))
-            .toList();
-        if (extedItem.length > 0) {
-          tempFoeRemove.add(key);
+            }
+          }
         }
       }
-    });
-    tempFoeRemove.forEach((element) {
-      growthGuidByDate.remove(element);
-    });
-    filteredGrowthGuidByDate = growthGuidByDate;
+
+      // });
+      childWith.forEach((key, value) {
+        var enrolChilGUID = value['childenrollguid'];
+        childrenIdList.add(enrolChilGUID);
+        growthGuidByDate[key] = value;
+      });
+
+      print("final child $childWith");
+      enrolledChildrenList = await EnrolledExitChilrenResponceHelper()
+          .callEnrollChildrenforByMultiEnrollGuid(childrenIdList);
+
+      reffrelChildrenList =
+          await ChildReferralTabResponseHelper().callAllReffralsWithoutExit();
+
+      List<String> tempFoeRemove = [];
+      growthGuidByDate.forEach((key, value) {
+        var enrolledGUID = value['childenrollguid'];
+        var cgmguid = value['cgmguid'];
+        var filterItem = reffrelChildrenList
+            .where((element) => (element.childenrolledguid == enrolledGUID &&
+                element.cgmguid == cgmguid))
+            .toList();
+        if (filterItem.length > 0) {
+          tempFoeRemove.add(key);
+        } else {
+          var extedItem = enrolledChildrenList
+              .where((element) => (element.ChildEnrollGUID == enrolledGUID &&
+                  Global.validString(element.date_of_exit)))
+              .toList();
+          if (extedItem.length > 0) {
+            tempFoeRemove.add(key);
+          }
+        }
+      });
+      tempFoeRemove.forEach((element) {
+        growthGuidByDate.remove(element);
+      });
+      filteredGrowthGuidByDate = growthGuidByDate;
     }
+    isLoading=false;
     setState(() {});
   }
 
   Future<void> fetchAllAnthroRecords() async {
+     isLoading=true;
     childAnthro = await ChildGrowthResponseHelper().allAnthormentryDisableOCT();
     crecheData = await CrecheDataHelper().getCrecheResponce();
     if (childAnthro.length > 0) {
@@ -215,7 +256,7 @@ class _ChildReferralListingScreenState
           (entry) =>
               callDataByKey(entry.key, 'creche_id').toString() ==
               selectedCreche.toString()));
-    }else{
+    } else {
       filteredGrowthGuidByDate = growthGuidByDate;
     }
     setState(() {});
@@ -281,113 +322,100 @@ class _ChildReferralListingScreenState
                       ),
                     ),
                     SizedBox(),
-                    creches.length<=1?DynamicCustomDropdownForFilterField(
-                      hintText: Global.returnTrLable(
-                          translats, CustomText.Creches, lng),
-                      items: creches,
-                      selectedItem: selectedCreche,
-                      onChanged: (value) {
-                        selectedCreche = value?.name;
-                      },
-                    )
-                        :Container(
-                      height: 35.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                            color: Color(0xffACACAC)),
-                        borderRadius: BorderRadius.circular(
-                            10.r),
-                      ),
-                      child: TypeAheadField<OptionsModel>(
-                        controller: _creceSearchcontroller,
-                        suggestionsCallback: (pattern) async {
-                          try {
-                            var items=creches.where((
-                                element) =>
-                            element.values != null &&
-                                element.name != null &&
-                                element.values!
-                                    .toLowerCase()
-                                    .contains(
-                                    pattern.toLowerCase())
-                            ).toList();
+                    creches.length <= 1
+                        ? DynamicCustomDropdownForFilterField(
+                            hintText: Global.returnTrLable(
+                                translats, CustomText.Creches, lng),
+                            items: creches,
+                            selectedItem: selectedCreche,
+                            onChanged: (value) {
+                              selectedCreche = value?.name;
+                            },
+                          )
+                        : Container(
+                            height: 35.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: Color(0xffACACAC)),
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: TypeAheadField<OptionsModel>(
+                              controller: _creceSearchcontroller,
+                              suggestionsCallback: (pattern) async {
+                                try {
+                                  var items = creches
+                                      .where((element) =>
+                                          element.values != null &&
+                                          element.name != null &&
+                                          element.values!
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()))
+                                      .toList();
 
-                            if(items.isEmpty||pattern.isEmpty){
-                                selectedCreche=null;
-                              _creceSearchcontroller.text='';
-                            }
-                            return items;
-
-                          } catch (e) {
-                            debugPrint('TypeAhead error: $e');
-                            return [];
-                          }
-                        },
-                        builder: (context, controller,
-                            focusNode) {
-                          return TextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              style:  Styles.black124,
-                              // autofocus: true,
-                              decoration: InputDecoration(
-                                hintText: Global.returnTrLable(
-                                    translats, CustomText.creche, lng),
-                                contentPadding: EdgeInsets
-                                    .all(10),
-                                border: InputBorder.none,
-                                fillColor: Colors.white,
-                                filled: true,
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent),
-                                  borderRadius: BorderRadius
-                                      .circular(10),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent),
-                                  borderRadius: BorderRadius
-                                      .circular(10),
-                                ),
-                                disabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent),
-                                  borderRadius: BorderRadius
-                                      .circular(10),
-                                ),
-                              )
-                          );
-                        },
-                        itemBuilder: (context, item) {
-                          return ListTile(
-                            title: Text(item.values!),
-                            subtitle: Text(item.name!),
-                          );
-                        },
-                        onSelected: (item) {
-                          selectedCreche=item.name ?? null;
-                          _creceSearchcontroller.text = item.values ?? '';
-                          print('itm $item');
-                        },
-                        offset: Offset(0, 12),
-                        constraints: BoxConstraints(
-                            maxHeight: 500),
-                        hideOnUnfocus: true,
-                        showOnFocus: true,
-                        hideWithKeyboard: false,
-                        loadingBuilder: (context) =>
-                        const Text('Loading...'),
-                        errorBuilder: (context,
-                            error) => const Text('Error!'),
-                        emptyBuilder: (context) =>
-                        const Text('No items found!'),
-                      ),
-                    ),
+                                  if (items.isEmpty || pattern.isEmpty) {
+                                    selectedCreche = null;
+                                    _creceSearchcontroller.text = '';
+                                  }
+                                  return items;
+                                } catch (e) {
+                                  debugPrint('TypeAhead error: $e');
+                                  return [];
+                                }
+                              },
+                              builder: (context, controller, focusNode) {
+                                return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    style: Styles.black124,
+                                    // autofocus: true,
+                                    decoration: InputDecoration(
+                                      hintText: Global.returnTrLable(
+                                          translats, CustomText.creche, lng),
+                                      contentPadding: EdgeInsets.all(10),
+                                      border: InputBorder.none,
+                                      fillColor: Colors.white,
+                                      filled: true,
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      disabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.transparent),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ));
+                              },
+                              itemBuilder: (context, item) {
+                                return ListTile(
+                                  title: Text(item.values!),
+                                  subtitle: Text(item.name!),
+                                );
+                              },
+                              onSelected: (item) {
+                                selectedCreche = item.name ?? null;
+                                _creceSearchcontroller.text = item.values ?? '';
+                                print('itm $item');
+                              },
+                              offset: Offset(0, 12),
+                              constraints: BoxConstraints(maxHeight: 500),
+                              hideOnUnfocus: true,
+                              showOnFocus: true,
+                              hideWithKeyboard: false,
+                              loadingBuilder: (context) =>
+                                  const Text('Loading...'),
+                              errorBuilder: (context, error) =>
+                                  const Text('Error!'),
+                              emptyBuilder: (context) =>
+                                  const Text('No items found!'),
+                            ),
+                          ),
                     SizedBox(
                       height: 10.h,
                     ),
@@ -460,7 +488,9 @@ class _ChildReferralListingScreenState
             ],
           ),
           Expanded(
-            child: (filteredGrowthGuidByDate.keys.toList().length > 0)
+            child: isLoading?Center(
+              child: CircularProgressIndicator(),
+            ):(filteredGrowthGuidByDate.keys.toList().length > 0)
                 ? ListView.builder(
                     itemCount: filteredGrowthGuidByDate.keys.toList().length,
                     shrinkWrap: true,
@@ -490,8 +520,9 @@ class _ChildReferralListingScreenState
                             var backDate = now.isBefore(applicableDate)
                                 ? DateTime(1992)
                                 : DateTime.parse(Validate().currentDate())
-                                    .subtract(Duration(days: backdatedConfigirationModel
-                                !.back_dated_data_entry_allowed!));
+                                    .subtract(Duration(
+                                        days: backdatedConfigirationModel!
+                                            .back_dated_data_entry_allowed!));
                             if (backDate.isAfter(DateTime.parse(keyParts[0]))) {
                               minDate = backDate;
                             } else {
@@ -599,6 +630,11 @@ class _ChildReferralListingScreenState
                                           strutStyle: StrutStyle(height: 1.2),
                                           style: Styles.black104,
                                         ),
+                                        Text(
+                                          '${Global.returnTrLable(translats, CustomText.category, lng).trim()} : ',
+                                          strutStyle: StrutStyle(height: 1.2),
+                                          style: Styles.black104,
+                                        ),
                                       ],
                                     ),
                                     SizedBox(width: 10),
@@ -654,6 +690,15 @@ class _ChildReferralListingScreenState
                                             strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
                                           ),
+                                          Text(
+                                            callDataByKey(
+                                                filteredGrowthGuidByDate.keys
+                                                    .toList()[index],
+                                                'category'),
+                                            style: Styles.red185,
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -700,6 +745,8 @@ class _ChildReferralListingScreenState
     var measurement_taken_date = growthData['measurement_taken_date'];
     if ('measurement_taken_date' == valueKey) {
       returnValue = measurement_taken_date;
+    } else if ('category' == valueKey) {
+      returnValue = growthData['category'] ?? '';
     } else if (valueKey != 'cgmguid') {
       var reffItems = enrolledChildrenList
           .where((element) => element.ChildEnrollGUID == enrolledGUID)
@@ -711,6 +758,74 @@ class _ChildReferralListingScreenState
       returnValue = cgmguid;
 
     return returnValue;
+  }
+
+  Future<String?> checkSUWCondition(String enrolChildGuid,
+      String measurement_date, Map<String, dynamic> growhthDetails)
+  async {
+    String? genratedValue;
+    String lastMonthDate = Validate().getOneMonthPreviousDate(measurement_date);
+    var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
+    var lastAntroRecord = await ChildGrowthResponseHelper()
+        .lastAntroDataByCmGuid(lastMonthYear, growhthDetails['cgmguid']);
+    print('rgggg check $measurement_date $lastMonthYear');
+
+    String secoundLast = Validate().getOneMonthPreviousDate(lastMonthDate);
+    var secoundLastMonthYear = Validate().dateToMonthYear(secoundLast);
+    var secondLastAntroRecord = await ChildGrowthResponseHelper()
+        .lastAntroDataByCmGuid(secoundLastMonthYear, growhthDetails['cgmguid']);
+    print('rgggg check2 $measurement_date $secoundLast $secoundLastMonthYear');
+
+    Map<String, dynamic> lastGrowhthDetails = {};
+    if (lastAntroRecord.length > 0) {
+      Map<String, dynamic> lastGrowthRec =
+          jsonDecode(lastAntroRecord.first.responces!);
+      var lastdChild = lastGrowthRec['anthropromatic_details'];
+      if (lastdChild != null) {
+        var child = lastdChild
+            .where((element) => element['childenrollguid'] == enrolChildGuid
+            &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+            .toList();
+        if (child.length > 0) {
+          lastGrowhthDetails = child.first;
+        }
+      }
+    }
+
+    Map<String, dynamic> secondlastGrowhthDetails = {};
+    if (secondLastAntroRecord.length > 0) {
+      Map<String, dynamic> secondlastGrowthRec =
+          jsonDecode(secondLastAntroRecord.first.responces!);
+      var lastdChild = secondlastGrowthRec['anthropromatic_details'];
+      if (lastdChild != null) {
+        var child = lastdChild
+            .where((element) => element['childenrollguid'] == enrolChildGuid
+            &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+            .toList();
+        if (child.length > 0) {
+          secondlastGrowhthDetails = child.first;
+        }
+      }
+    }
+
+    if (lastGrowhthDetails.isNotEmpty &&
+        (Global.stringToDouble(growhthDetails['weight'].toString()) <=
+            Global.stringToDouble(lastGrowhthDetails['weight'].toString()))) {
+      genratedValue = 'GF1';
+
+      if (secondlastGrowhthDetails.isNotEmpty &&
+          (Global.stringToDouble(
+              growhthDetails['weight'].toString())<=
+              Global.stringToDouble(secondlastGrowhthDetails['weight'].toString()))) {
+        genratedValue = 'GF2';
+      }
+    }
+    // else if (secondlastGrowhthDetails.isNotEmpty && lastGrowhthDetails.isEmpty &&
+    //     (Global.stringToDouble(secondlastGrowhthDetails['weight'].toString()) <=
+    //         Global.stringToDouble(growhthDetails['weight'].toString()))) {
+    //   genratedValue = 'GF1';
+    // }
+    return genratedValue;
   }
 
   @override

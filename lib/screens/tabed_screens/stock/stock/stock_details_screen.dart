@@ -92,7 +92,9 @@ class _StockDetailsState extends State<StockDetails> {
   List<dynamic> filtered_stock_items_list = [];
   List<Map<String, dynamic>> previous_month_stock = [];
   Map<int, double> closing_stock_Map = {};
-  Map<String, FocusNode> _foocusNode = {};
+  Map<String, FocusNode> _foocusNodeUsase = {};
+  Map<String, FocusNode> _foocusNodeWastage = {};
+  Map<String, FocusNode> _foocusNodeClosing = {};
   ScrollController _scrollController = ScrollController();
 
   @override
@@ -191,7 +193,8 @@ class _StockDetailsState extends State<StockDetails> {
     stock_item_list = widget.itemList;
     filtered_stock_items_list = stock_item_list;
     if (filtered_stock_items_list.isNotEmpty) {
-      for (var stockitems in stock_item_list) {
+       for (int i = 0; i < stock_item_list.length; i++) {
+        var stockitems =stock_item_list[i];
         Map<String, dynamic> itemIndivMap = {};
         stockitems.forEach((key, value) {
           itemIndivMap[key] = value;
@@ -200,8 +203,13 @@ class _StockDetailsState extends State<StockDetails> {
             closing_stock_Map[Global.stringToInt(stockitems['stock_item'])];
         itemMap.addEntries(
             [MapEntry('${stockitems['stock_item']}', itemIndivMap)]);
+
+
       }
+       resetFocusNodes();
+       initFocusNodes(stock_item_list);
     }
+
     setState(() {
       _isLoading = false;
     });
@@ -222,10 +230,6 @@ class _StockDetailsState extends State<StockDetails> {
                 Global.stringToInt(value.name) == Global.stringToInt(itemValue))
             .toList();
         var nameofItem = Global.stringToInt(itemValueTranslats.first.name);
-        // itemMap.addEntries([
-        //   MapEntry('${itemValueTranslats.first.name}', stockItemList[index])
-        // ]);
-        // var fieldData =
         return Container(
           margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           width: MediaQuery.of(context).size.width * 0.8,
@@ -274,8 +278,9 @@ class _StockDetailsState extends State<StockDetails> {
                           ),
                           TextSpan(
                               text: itemMap[nameofItem.toString()]![
-                                      'opening_stock']
-                                  .toString(),
+                                      'opening_stock']!=null?itemMap[nameofItem.toString()]![
+                              'opening_stock']
+                                  .toString():'',
                               style: Styles.blue125)
                         ]),
                       ),
@@ -303,6 +308,7 @@ class _StockDetailsState extends State<StockDetails> {
                   children: [
                     Expanded(
                       child: DynamicCustomTextFieldFloat(
+                        focusNode: _foocusNodeUsase['$index@Usase'],
                         isCenterTitle: true,
                         maxlength: 4,
                         hintText: Global.returnTrLable(
@@ -324,8 +330,9 @@ class _StockDetailsState extends State<StockDetails> {
                                         'quantity_received'],
                                     value,
                                     itemMap[nameofItem.toString()]!['wastage']);
-                            setState(() {});
-                          } else {
+                            //
+                          }
+                          else {
                             if (itemMap.containsKey(nameofItem.toString())) {
                               itemMap[nameofItem.toString()]!.remove('usage');
                             }
@@ -337,13 +344,14 @@ class _StockDetailsState extends State<StockDetails> {
                                         'quantity_received'],
                                     itemMap[nameofItem.toString()]!['usage'],
                                     itemMap[nameofItem.toString()]!['wastage']);
-                            setState(() {});
                           }
+                          // setState(() {});
                         },
                       ),
                     ),
                     Expanded(
                       child: DynamicCustomTextFieldFloat(
+                        focusNode: _foocusNodeWastage['$index@Wastage'],
                         isCenterTitle: true,
                         maxlength: 4,
                         hintText: Global.returnTrLable(
@@ -367,8 +375,9 @@ class _StockDetailsState extends State<StockDetails> {
                                         'quantity_received'],
                                     itemMap[nameofItem.toString()]!['usage'],
                                     value);
-                            setState(() {});
-                          } else {
+                            // setState(() {});
+                          }
+                          else {
                             if (itemMap.containsKey(nameofItem.toString())) {
                               itemMap[nameofItem.toString()]!.remove('wastage');
                             }
@@ -380,13 +389,15 @@ class _StockDetailsState extends State<StockDetails> {
                                         'quantity_received'],
                                     itemMap[nameofItem.toString()]!['usage'],
                                     itemMap[nameofItem.toString()]!['wastage']);
-                            setState(() {});
+                            // setState(() {});
                           }
+                          // setState(() {});
                         },
                       ),
                     ),
                     Expanded(
                       child: DynamicCustomTextFieldFloat(
+                          focusNode: _foocusNodeClosing['$index@Closing'],
                         isCenterTitle: true,
                         maxlength: 4,
                         hintText: Global.returnTrLable(
@@ -396,7 +407,12 @@ class _StockDetailsState extends State<StockDetails> {
                         // fieldType: "Float",
                         initialvalue:
                             itemMap[nameofItem.toString()]!['closing_stock'],
-                        readable: true,
+                          onChanged: (value) {
+                            if (value != null) {
+                              itemMap[nameofItem.toString()]!['closing_stock'] = value;
+                              // setState(() {});
+                              // setState(() {});
+                            }}
                       ),
                     ),
                   ],
@@ -409,332 +425,7 @@ class _StockDetailsState extends State<StockDetails> {
     );
   }
 
-  List<Widget> cWidget(List<HouseHoldFielItemdModel> itemfields, int itemName,
-      Map<String, dynamic> itemFields) {
-    List<Widget> screenItems = [];
-    if (itemfields.length > 0) {
-      for (int i = 0; i < itemfields.length; i++) {
-        screenItems
-            .add(widgetTypeWidget(i, itemfields[i], itemName, itemFields));
-        screenItems.add(SizedBox(height: 5.h));
-        if (!logic!.callDependingLogic(myMap, itemfields[i])) {
-          // myMap.remove(itemfields[i].fieldname);
-          // itemMap[itemName]!.remove(itemfields[i].fieldname);
-        }
-      }
-    }
-    return screenItems;
-  }
 
-  widgetTypeWidget(int index, HouseHoldFielItemdModel quesItem, int itemName,
-      Map<String, dynamic> itemFields) {
-    switch (quesItem.fieldtype) {
-      case 'Link':
-        List<OptionsModel> items = options
-            .where((element) => element.flag == 'tab${quesItem.options}')
-            .toList();
-        // if (quesItem.fieldname == 'do_you_have_height_weight' &&
-        //     Global.stringToInt(
-        //         itemsAnswred['do_you_have_height_weight'].toString()) !=
-        //         1) {
-        //   itemsAnswred['do_you_have_height_weight'] = '2';
-        //   updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-        // }
-        return DynamicCustomDropdownField(
-          focusNode: _foocusNode[quesItem.fieldname],
-          titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
-          items: items,
-          readable: role == CustomText.crecheSupervisor ? null : true,
-          selectedItem: itemFields[quesItem.fieldname!],
-          isVisible: logic!.callDependingLogic(itemFields, quesItem),
-          onChanged: (value) {
-            if (value != null) {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-              }
-            } else {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]!.remove(quesItem.fieldname);
-              }
-            }
-
-            // updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-
-            // setState(() {});
-          },
-        );
-      case 'Int':
-        return DynamicCustomTextFieldInt(
-          focusNode: _foocusNode[quesItem.fieldname],
-          titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          keyboardtype: TextInputType.number,
-          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
-          maxlength: quesItem.length,
-          initialvalue: itemFields[quesItem.fieldname!],
-          readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(itemFields, quesItem)
-              : true,
-          isVisible: logic!.callDependingLogic(itemFields, quesItem),
-          onChanged: (value) {
-            print('Entered text: $value');
-            if (value != null) {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-              }
-              var logData = logic!.callAutoGeneratedValue(itemFields, quesItem);
-              if (logData.isNotEmpty) {
-                if (logData.keys.length > 0) {
-                  itemFields.addEntries(
-                      [MapEntry(logData.keys.first, logData.values.first)]);
-                  // updateItemsForChildren(itemFields, ChildEnrollGUID);
-                  // setState(() {});
-                }
-              }
-            } else {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]!.remove(quesItem.fieldname);
-              }
-            }
-          },
-        );
-      case 'Check':
-        return DynamicCustomYesNoCheckboxWithLabel(
-          label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          initialValue: itemFields[quesItem.fieldname],
-          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
-          labelControlls: translats,
-          lng: lng,
-          readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(itemFields, quesItem)
-              : true,
-          isVisible: logic!.callDependingLogic(itemFields, quesItem),
-          onChanged: (value) {
-            // if (value > 0)
-            print('yesNo $value');
-            if (itemMap.containsKey(itemName.toString())) {
-              itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-            }
-            // updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-            setState(() {});
-          },
-        );
-      case 'Long Text':
-        return DynamicCustomTextFieldNew(
-          focusNode: _foocusNode[quesItem.fieldname],
-          maxline: 3,
-          titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
-          initialvalue: itemFields[quesItem.fieldname!],
-          maxlength: quesItem.length,
-          readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(itemFields, quesItem)
-              : true,
-          hintText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible: logic!.callDependingLogic(itemFields, quesItem),
-          onChanged: (value) {
-            if (itemMap.containsKey(itemName.toString())) {
-              itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-            }
-                      // updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-          },
-        );
-      case 'Select':
-        return DynamicCustomTextFieldInt(
-          focusNode: _foocusNode[quesItem.fieldname],
-          titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          keyboardtype: TextInputType.number,
-          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
-          maxlength: quesItem.length,
-          readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(itemFields, quesItem)
-              : true,
-          initialvalue: itemFields[quesItem.fieldname!],
-          onChanged: (value) {
-            print('Entered text: $value');
-            if (value != null) {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-              }
-            } else {
-              if (itemMap.containsKey(itemName.toString())) {
-                itemMap[itemName.toString()]!.remove(quesItem.fieldname);
-              }
-              setState(() {});
-            }
-          },
-        );
-      case 'Small Text':
-        return DynamicCustomTextFieldNew(
-          focusNode: _foocusNode[quesItem.fieldname],
-          titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
-          maxlength: quesItem.length,
-          readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(itemFields, quesItem)
-              : true,
-          initialvalue: itemFields[quesItem.fieldname!],
-          onChanged: (value) {
-            print('Entered text: $value');
-            if (itemMap.containsKey(itemName.toString())) {
-              itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-            }
-          
-            // updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-          },
-        );
-      case 'Data':
-        return DynamicCustomTextFieldNew(
-          focusNode: _foocusNode[quesItem.fieldname],
-          titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isRequred: logic!.dependeOnMendotory(itemFields, quesItem),
-          initialvalue: itemFields[quesItem.fieldname!],
-          keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
-          maxlength: quesItem.length,
-          readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(itemFields, quesItem)
-              : true,
-          hintText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          isVisible: logic!.callDependingLogic(itemFields, quesItem),
-          onChanged: (value) {
-            if (itemMap.containsKey(itemName.toString())) {
-              itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-            }
-          
-            // updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
-          },
-        );
-      case 'Date':
-        return CustomDatepickerDynamic(
-          focusNode: _foocusNode[quesItem.fieldname],
-          initialvalue: itemFields[quesItem.fieldname],
-          fieldName: quesItem.fieldname,
-          readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(itemFields, quesItem)
-              : true,
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : logic!.dependeOnMendotory(itemFields, quesItem),
-          isVisible: logic!.callDependingLogic(itemFields, quesItem),
-          calenderValidate: logic!.calenderValidation(itemFields, quesItem),
-          onChanged: (value) {
-            // myMap[quesItem.fieldname!] = value;
-            // var logData = logic!
-            //     .callDateDiffrenceLogic( myMap, quesItem);
-            // if (logData.isNotEmpty) {
-            //   if (logData.keys.length > 0) {
-            //     // var item =myMap[logData.keys.first];
-            //     // if(item==null||logData.values.first!=item) {
-            //     myMap.addEntries(
-            //         [MapEntry(logData.keys.first, logData.values.first)]);
-            //     setState(() {});
-            //     // }
-            //   }
-            // }
-            if (itemMap.containsKey(itemName.toString())) {
-              setState(() {
-                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-              });
-            }
-                    },
-          titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-        );
-
-      case 'Float':
-        // if (quesItem.fieldname == "quantity_required") {
-        //   itemMap['$itemName'] = {'${quesItem.fieldname}': quatRequired};
-        // }
-        return DynamicCustomTextFieldFloat(
-          focusNode: _foocusNode[quesItem.fieldname],
-          titleText:
-              Global.returnTrLable(translats, quesItem.label!.trim(), lng),
-          keyboardtype: TextInputType.number,
-          isRequred: quesItem.reqd == 1
-              ? quesItem.reqd
-              : quesItem.fieldname == 'usage' || quesItem.fieldname == 'wastage'
-                  ? 1
-                  : logic!.dependeOnMendotory(itemFields, quesItem),
-          // maxlength: quesItem.length,
-
-          fieldName:
-              (quesItem.fieldname == 'usage' || quesItem.fieldname == 'wastage')
-                  ? 'weight'
-                  : quesItem.fieldname!,
-          initialvalue: itemFields[quesItem.fieldname],
-          readable: role == CustomText.crecheSupervisor
-              ? logic!.callReadableLogic(itemFields, quesItem)
-              : true,
-          isVisible: logic!.callDependingLogic(itemFields, quesItem),
-          onChanged: (value) {
-            print('Entered text: $value');
-            if (value != null) {
-              // myMap[quesItem.fieldname!] = value;
-              if (itemMap.containsKey(itemName.toString())) {
-                // setState(() {
-                itemMap[itemName.toString()]![quesItem.fieldname!] = value;
-                // });
-              }
-
-              if (quesItem.fieldname == 'wastage' ||
-                  quesItem.fieldname == 'usage') {
-                // var validationMessge = logic!
-                //     .validationMessge( itemFields, quesItem);
-                // if (!Global.validString(validationMessge)) {
-                // if (quesItem.fieldname == 'wastage') {
-                var logData =
-                    logic!.callAutoGeneratedValue(itemFields, quesItem);
-                if (logData.isNotEmpty) {
-                  if (logData.keys.length > 0) {
-                    itemMap[itemName.toString()]![logData.keys.first
-                        .toString()
-                        .trim()] = logData.values.first;
-
-                    // setState(() {});
-                  }
-                }
-                // }
-                // } else {
-                // Validate().singleButtonPopup(
-                //     Global.returnTrLable(translats, validationMessge, lng),
-                //     Global.returnTrLable(translats, CustomText.ok, lng),
-                //     false,
-                //     context);
-                // }
-              }
-            } else {
-              if (itemMap.containsKey(itemName.toString())) {
-                // setState(() {
-                itemMap[itemName.toString()]!.remove(quesItem.fieldname);
-                // });
-              }
-              if (quesItem.fieldname == 'wastage' ||
-                  quesItem.fieldname == 'usage') {
-                var logData =
-                    logic!.callAutoGeneratedValue(itemFields, quesItem);
-                if (logData.isNotEmpty) {
-                  if (logData.keys.length > 0) {
-                    itemMap[itemName.toString()]![logData.keys.first
-                        .toString()
-                        .trim()] = logData.values.first;
-                  }
-                }
-              }
-            }
-          },
-        );
-      default:
-        return SizedBox();
-    }
-  }
 
   double? generateClosing(
       double? opening, double? req, double? usage, double? wastage) {
@@ -826,24 +517,14 @@ class _StockDetailsState extends State<StockDetails> {
       logics.addAll(data);
       logic = DependingLogic(translats, logics, lng);
     });
-    for (var elements in allItems) {
-      _foocusNode.addEntries([MapEntry(elements.fieldname!, FocusNode())]);
-    }
-    _scrollController.addListener(() {
-      if (_scrollController.position.isScrollingNotifier.value) {
-        _foocusNode.forEach((_, focusNode) => focusNode.unfocus());
-      }
-    });
 
-    // setState(() {
-    //   _isLoading = false;
-    // });
+
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _foocusNode.forEach((_, focusnode) => focusnode.dispose());
+    resetFocusNodes();
     super.dispose();
   }
 
@@ -975,9 +656,13 @@ class _StockDetailsState extends State<StockDetails> {
     } else {
       filtered_stock_items_list = stock_item_list;
     }
+    resetFocusNodes();
+    initFocusNodes(stock_item_list);
+
     setState(() {});
     print('cLength: ${filtered_stock_items_list.length}');
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1070,7 +755,7 @@ class _StockDetailsState extends State<StockDetails> {
                       // Divider(),
                       Flexible(
                           fit: FlexFit.loose,
-                          child: (stock_item_list.isNotEmpty)
+                          child: (filtered_stock_items_list.isNotEmpty)
                               ? itemCard(
                                   List<Map<String, dynamic>>.from(
                                       filtered_stock_items_list),
@@ -1114,4 +799,54 @@ class _StockDetailsState extends State<StockDetails> {
                 )),
     );
   }
+
+  void initFocusNodes( List<dynamic> items) {
+
+
+    // 3. Reload with new entries
+    for (int i = 0; i < items.length; i++) {
+      final nodeWastage = FocusNode();
+      final nodeUsase = FocusNode();
+      final nodeClosing = FocusNode();
+
+      // Optional: add listener
+      nodeWastage.addListener(() {
+        if (!nodeWastage.hasFocus) {
+          print("Wastage field $i lost focus");
+          setState(() {});
+        }
+      });
+      nodeUsase.addListener(() {
+        if (!nodeUsase.hasFocus) {
+          setState(() {});
+        }
+      });
+
+      nodeClosing.addListener(() {
+        if (!nodeClosing.hasFocus) {
+          print("Closes field $i lost focus");
+          setState(() {});
+        }
+      });
+
+      _foocusNodeWastage.addEntries([MapEntry('$i@Wastage', nodeWastage)]);
+      _foocusNodeUsase.addEntries([MapEntry('$i@Usase', nodeUsase)]);
+      _foocusNodeClosing.addEntries([MapEntry('$i@Closing', nodeClosing)]);
+    }
+
+  }
+  void resetFocusNodes() {
+
+
+    _foocusNodeWastage.values.forEach((node) => node.dispose());
+    _foocusNodeUsase.values.forEach((node) => node.dispose());
+    _foocusNodeClosing.values.forEach((node) => node.dispose());
+
+    // 2. Clear maps
+    _foocusNodeWastage.clear();
+    _foocusNodeUsase.clear();
+    _foocusNodeClosing.clear();
+
+  }
+
 }

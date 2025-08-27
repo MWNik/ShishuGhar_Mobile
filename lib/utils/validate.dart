@@ -824,6 +824,7 @@ class Validate {
 
   }
 
+
   Future<String?> callMinDate(String? validateDate,int days) async {
     String? minDate;
     var now = DateTime.now();
@@ -877,6 +878,22 @@ class Validate {
 
     // Convert to UTF-8 String
     return utf8.decode(decompressed);
+  }
+
+  String getOneMonthPreviousDate(String originalDate) {
+    DateTime currentDate=stringToDate(originalDate);
+    // If the current month is January (month == 1),
+    // then the previous month will be December of the previous year.
+    if (currentDate.month == 1) {
+      var dateTime= stringToDate('${currentDate.year - 1}-12-${currentDate.day}');
+      return Global.splitData(dateTime.toString(), ' ')[0];
+    } else {
+      // Otherwise, simply subtract 1 from the current month.
+      // return DateTime(currentDate.year, currentDate.month - 1, currentDate.day);
+      var dateTime= stringToDate('${currentDate.year}-${currentDate.month - 1}-${currentDate.day}');
+      return Global.splitData(dateTime.toString(), ' ')[0];
+      // return stringToDate('${currentDate.year}-${currentDate.month - 1}-${currentDate.day}').toString();
+    }
   }
 
 }

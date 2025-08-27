@@ -20,6 +20,7 @@ class CustomDatepickerDynamic extends StatefulWidget {
   final Color? color;
   void Function(String)? onChanged;
   final double? width;
+  final double? height;
   final int? isRequred;
   final bool? isVisible;
   final bool? readable;
@@ -28,6 +29,7 @@ class CustomDatepickerDynamic extends StatefulWidget {
   CustomDatepickerDynamic(
       {this.hintText,
         this.width,
+        this.height,
         this.titleText,
         this.hintStyle,
         this.initialvalue,
@@ -133,7 +135,7 @@ class _CustomDatepickerState extends State<CustomDatepickerDynamic> {
               height: 3.h,
             ):SizedBox(),
             Container(
-              height: 35.h,
+              height: widget.height ?? 35.h,
               width: widget.width,
               alignment: Alignment.center,
               decoration: BoxDecoration(

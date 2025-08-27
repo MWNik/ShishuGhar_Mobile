@@ -290,6 +290,7 @@ class CustomText {
   static String newAndConfrom = "New and confirm password must be same";
   static String requiredColon = "required:";
   static String required = "Required";
+  static String requiredQuantity = "Required Quantity";
   static String masterData = "Master data";
   static String uploadData = 'Upload data';
   static String valueColon = "value:";
@@ -539,6 +540,7 @@ class CustomText {
   static String noREmovedItem = "No removed item";
   static String mismatched = "Mismatch";
   static String received = "Received";
+  static String receivedDate = "Received Date";
   static String plsFillLessOrEqual = "Please enter amount less than or equal";
   static String supplied = "Supplied";
   static String opening = "Opening";
@@ -667,4 +669,5 @@ class CustomText {
   static String gettingLocationWithAccuracy = "Getting location with accuracy";
   static String Phase = "Phase";
   static String LocationIsNotAvailableInYourCreche = "Location is not available in your creche please updated first";
+  static String category = "Category";
 }

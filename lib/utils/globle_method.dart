@@ -77,6 +77,14 @@ class Global {
     }
   }
 
+  static String? validToStringNullable(String? value) {
+    if(validString(value)){
+      return value;
+    }else{
+      return null;
+    }
+  }
+
   static String convertToTwoDigit(int number) {
     return number.toString().padLeft(2, '0');
   }
@@ -141,6 +149,22 @@ class Global {
     } on Exception {
       return 0;
     }
+  }
+
+  static double? stringToDoubleNullable(String? value) {
+    try {
+      if (Global.validString(value))
+        return double.parse(value!);
+      else
+        return null;
+    } on Exception {
+      return null;
+    }
+  }
+
+  static double presentPercent(int present, int total) {
+    if (total <= 0) return 0;           // avoid divide-by-zero
+    return (present / total) * 100;     // e.g., 15/20 * 100 = 75.0
   }
 
   static int getbackDaysByMonth(String? date,int month) {

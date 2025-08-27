@@ -25,7 +25,7 @@ class HeightWeightBoysGirlsHelper {
 
   Future<List<TabHeightforageBoysModel>> callHeightForAgeBoys35() async {
     List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery('select * from tabHeightforAgeBoys where age_in_days>34');
+        await DatabaseHelper.database!.rawQuery('select * from tabHeightforAgeBoys where age_in_days>34 and age_in_days<1201');
 
     List<TabHeightforageBoysModel> tabHeightforageBoys = [];
 
@@ -52,7 +52,7 @@ class HeightWeightBoysGirlsHelper {
   }
   Future<List<TabHeightforageGirlsModel>> callHeightForAgeGirls35() async {
     List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery('select * from tabHeightforAgeGirls where age_in_days>34');
+        await DatabaseHelper.database!.rawQuery('select * from tabHeightforAgeGirls where age_in_days>34 and age_in_days<1201');
 
     List<TabHeightforageGirlsModel> tabHeightforAgeGirls = [];
 
@@ -79,7 +79,7 @@ class HeightWeightBoysGirlsHelper {
   }
   Future<List<TabWeightforageBoysModel>> callWeightforAgeBoys35() async {
     List<Map<String, dynamic>> result =
-        await DatabaseHelper.database!.rawQuery('select * from tabWeightforAgeBoys where age_in_days>34');
+        await DatabaseHelper.database!.rawQuery('select * from tabWeightforAgeBoys where age_in_days>34 and age_in_days<1201');
 
     List<TabWeightforageBoysModel> tabWeightforAgeBoys = [];
 
@@ -124,7 +124,7 @@ class HeightWeightBoysGirlsHelper {
 
   Future<List<TabWeightforageGirlsModel>> callWeightforAgeGirls35() async {
     List<Map<String, dynamic>> result =
-    await DatabaseHelper.database!.rawQuery('select * from tabWeightforAgeGirls where age_in_days>34');
+    await DatabaseHelper.database!.rawQuery('select * from tabWeightforAgeGirls where age_in_days>34 and age_in_days<1201');
 
     List<TabWeightforageGirlsModel> tabWeightforAgeGirls = [];
 

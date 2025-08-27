@@ -421,6 +421,23 @@ Future<ChildGrowthMetaResponseModel?> callMaxAnthroResponce(
     return items;
   }
 
+  Future<List<ChildGrowthMetaResponseModel>> lastAntroDataByCmGuid(
+      String selectedDate, String cmGUID) async {
+
+    var query =
+        'SELECT * FROM child_anthormentry_responce WHERE strftime(?, measurement_date) = ? AND creche_id = (select creche_id from child_anthormentry_responce where cgmguid=?) and responces NOTNULL ORDER BY measurement_date DESC limit 1';
+
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery(query, ['%Y-%m', selectedDate,cmGUID]);
+
+    List<ChildGrowthMetaResponseModel> items = [];
+    result.forEach((itemMap) {
+      items.add(ChildGrowthMetaResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<Map<String, dynamic>>> excuteIsNotSubmitedDate() async {
     return await DatabaseHelper.database!.rawQuery(
       '''SELECT * FROM ( SELECT    creche_id,    MIN(max_month) AS min_of_max_months  FROM ( SELECT  creche_id,    MAX(strftime('%Y-%m', date(measurement_date))) AS max_month FROM  child_anthormentry_responce GROUP BY creche_id ) WHERE max_month < strftime('%Y-%m', 'now')) AS date_records LEFT JOIN tab_creche_response AS creche  ON date_records.creche_id = creche.name''',

@@ -50,7 +50,7 @@ class _ChildReferralListingScreenState
   var applicableDate = Validate().stringToDate("2024-12-31");
   var now = DateTime.parse(Validate().currentDate());
   BackdatedConfigirationModel? backdatedConfigirationModel;
-
+  bool isLoading=true;
 
   @override
   void initState() {
@@ -111,14 +111,20 @@ class _ChildReferralListingScreenState
     // Create a new map from the sorted entries
     Map<String, dynamic> sortedMap = Map.fromEntries(sortedEntries);
     Map<String, dynamic> childWith = {};
-    sortedMap.forEach((key, value) {
+    var entries = sortedMap.entries.toList();
+    // sortedMap.forEach((key, value) async {
+    for (int i = 0; i < entries.length; i++) {
+      var key = entries[i].key;
+      var value = entries[i].value;
       List<dynamic> childItem = value as List<dynamic>;
-      childItem.forEach((element) {
+      for (int i = 0; i < childItem.length; i++) {
+        var element = childItem[i];
+        var gfReco =
+        await checkSUWCondition(element['childenrollguid'], key, element);
         if (Global.stringToDouble(
                     element['weight_for_height'].toString()) ==
                 1 ||
-            // Global.stringToDouble(element['weight_for_height'].toString()) ==
-            //     2 ||
+            Global.validString(gfReco) ||
             Global.stringToInt(
                     element['any_medical_major_illness'].toString()) ==
                 1 ||
@@ -128,11 +134,37 @@ class _ChildReferralListingScreenState
             growthData['childenrollguid'] = element['childenrollguid'];
             growthData['cgmguid'] = element['cgmguid'];
             growthData['measurement_taken_date'] = element['measurement_taken_date'];
-            childWith[key] = growthData;
+            var category = '';
+            if (Global.stringToInt(
+                element['any_medical_major_illness'].toString()) ==
+                1) {
+              category = Global.validString(category)
+                  ? '$category,Major Illness'
+                  : 'Major Illness';
+              // growthData['category'] = 'Major Illness';
+            }
+            if (Global.stringToDouble(element['weight_for_age'].toString()) ==
+                1 ||
+                Global.stringToDouble(
+                    element['weight_for_height'].toString()) ==
+                    1) {
+              // growthData['category'] = 'SAM';
+              category = Global.validString(category) ? '$category,SAM' : 'SAM';
+            }
+            if (Global.validString(gfReco)) {
+              category = Global.validString(category)
+                  ? '$category,$gfReco'
+                  : '$gfReco';
+            }
+            growthData['category'] = category;
+            if(category!='GF1'){
+              childWith[key] = growthData;
+            }
+
           }
         }
-      });
-    });
+      };
+    };
     childWith.forEach((key, value) {
       var enrolChilGUID = value['childenrollguid'];
       childrenIdList.add(enrolChilGUID);
@@ -161,10 +193,12 @@ class _ChildReferralListingScreenState
     });
 
     }
+    isLoading=false;
     setState(() {});
   }
 
   Future<void> fetchAllAnthroRecords() async {
+    isLoading=true;
     childAnthro = await ChildGrowthResponseHelper().allAnthormentryDisableOCT();
     crecheData = await CrecheDataHelper().getCrecheResponce();
     if (childAnthro.length > 0) {
@@ -190,7 +224,9 @@ class _ChildReferralListingScreenState
           padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
           child: Column(children: [
             Expanded(
-              child: (growthGuidByDate.keys.toList().length > 0)
+              child:   isLoading?Center(
+              child: CircularProgressIndicator(),
+        ):(growthGuidByDate.keys.toList().length > 0)
                   ? ListView.builder(
                       itemCount: growthGuidByDate.keys.toList().length,
                       shrinkWrap: true,
@@ -337,6 +373,11 @@ class _ChildReferralListingScreenState
                                             strutStyle: StrutStyle(height: 1.2),
                                             style: Styles.black104,
                                           ),
+                                          Text(
+                                            '${Global.returnTrLable(translats, CustomText.category, lng).trim()} : ',
+                                            strutStyle: StrutStyle(height: 1.2),
+                                            style: Styles.black104,
+                                          ),
                                         ],
                                       ),
                                       SizedBox(width: 10),
@@ -394,6 +435,15 @@ class _ChildReferralListingScreenState
                                                   StrutStyle(height: 1.2),
                                               overflow: TextOverflow.ellipsis,
                                             ),
+                                            Text(
+                                              callDataByKey(
+                                                  growthGuidByDate.keys
+                                                      .toList()[index],
+                                                  'category'),
+                                              style: Styles.red185,
+                                              strutStyle: StrutStyle(height: 1.2),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -441,6 +491,8 @@ class _ChildReferralListingScreenState
     var measurement_taken_date = growthData['measurement_taken_date'];
     if('measurement_taken_date'==valueKey){
       returnValue = measurement_taken_date;
+    }else  if ('category' == valueKey) {
+      returnValue = growthData['category'];
     }else if (valueKey != 'cgmguid') {
       var reffItems = enrolledChildrenList
           .where((element) => element.ChildEnrollGUID == enrolledGUID)
@@ -453,4 +505,73 @@ class _ChildReferralListingScreenState
 
     return returnValue;
   }
+
+  Future<String?> checkSUWCondition(String enrolChildGuid,
+      String measurement_date, Map<String, dynamic> growhthDetails)
+  async {
+    String? genratedValue;
+    String lastMonthDate = Validate().getOneMonthPreviousDate(measurement_date);
+    var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
+    var lastAntroRecord = await ChildGrowthResponseHelper()
+        .lastAntroDataByCmGuid(lastMonthYear, growhthDetails['cgmguid']);
+    print('rgggg check $measurement_date $lastMonthYear');
+
+    String secoundLast = Validate().getOneMonthPreviousDate(lastMonthDate);
+    var secoundLastMonthYear = Validate().dateToMonthYear(secoundLast);
+    var secondLastAntroRecord = await ChildGrowthResponseHelper()
+        .lastAntroDataByCmGuid(secoundLastMonthYear, growhthDetails['cgmguid']);
+    print('rgggg check2 $measurement_date $secoundLast $secoundLastMonthYear');
+
+    Map<String, dynamic> lastGrowhthDetails = {};
+    if (lastAntroRecord.length > 0) {
+      Map<String, dynamic> lastGrowthRec =
+      jsonDecode(lastAntroRecord.first.responces!);
+      var lastdChild = lastGrowthRec['anthropromatic_details'];
+      if (lastdChild != null) {
+        var child = lastdChild
+            .where((element) => element['childenrollguid'] == enrolChildGuid
+            &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+            .toList();
+        if (child.length > 0) {
+          lastGrowhthDetails = child.first;
+        }
+      }
+    }
+
+    Map<String, dynamic> secondlastGrowhthDetails = {};
+    if (secondLastAntroRecord.length > 0) {
+      Map<String, dynamic> secondlastGrowthRec =
+      jsonDecode(secondLastAntroRecord.first.responces!);
+      var lastdChild = secondlastGrowthRec['anthropromatic_details'];
+      if (lastdChild != null) {
+        var child = lastdChild
+            .where((element) => element['childenrollguid'] == enrolChildGuid
+            &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+            .toList();
+        if (child.length > 0) {
+          secondlastGrowhthDetails = child.first;
+        }
+      }
+    }
+
+    if (lastGrowhthDetails.isNotEmpty &&
+        (Global.stringToDouble(growhthDetails['weight'].toString()) <=
+            Global.stringToDouble(lastGrowhthDetails['weight'].toString()))) {
+      genratedValue = 'GF1';
+
+      if (secondlastGrowhthDetails.isNotEmpty &&
+          (Global.stringToDouble(
+              growhthDetails['weight'].toString())<=
+              Global.stringToDouble(secondlastGrowhthDetails['weight'].toString()))) {
+        genratedValue = 'GF2';
+      }
+    }
+    // else if (secondlastGrowhthDetails.isNotEmpty && lastGrowhthDetails.isEmpty &&
+    //     (Global.stringToDouble(secondlastGrowhthDetails['weight'].toString()) <=
+    //         Global.stringToDouble(growhthDetails['weight'].toString()))) {
+    //   genratedValue = 'GF1';
+    // }
+    return genratedValue;
+  }
+
 }

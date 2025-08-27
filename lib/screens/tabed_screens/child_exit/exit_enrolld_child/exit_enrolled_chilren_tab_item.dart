@@ -135,6 +135,18 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
     'weight_for_age_zscore',
   ];
 
+  List<String> colorIndicatorForExitMeasure = [
+    'weight_for_age_exit',
+    'weight_for_height_exit',
+    'height_for_age_exit',
+  ];
+
+  List<String> zscoreIndicatorForExitMeasure = [
+    'height_for_age_zscore_exit',
+    'weight_for_age_zscore_exit',
+    'weight_for_height_zscore_exit',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -580,7 +592,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
         );
       case 'Data':
-        if (!zscoreIndicatorForMeasure.contains(quesItem.fieldname))
+        if (!zscoreIndicatorForMeasure.contains(quesItem.fieldname)
+    &&!zscoreIndicatorForExitMeasure.contains(quesItem.fieldname))
         return DynamicCustomTextFieldNew(
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
@@ -784,7 +797,10 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           },
         );
       case 'Float':
-        if (!colorIndicatorForMeasure.contains(quesItem.fieldname)&&!zscoreIndicatorForMeasure.contains(quesItem.fieldname))
+        if (!colorIndicatorForMeasure.contains(quesItem.fieldname)&&
+            !zscoreIndicatorForMeasure.contains(quesItem.fieldname)
+            &&!colorIndicatorForExitMeasure.contains(quesItem.fieldname)
+            &&!zscoreIndicatorForExitMeasure.contains(quesItem.fieldname))
         return DynamicCustomTextFieldFloat(
           hintText: Global.returnTrLable(translats, CustomText.typehere, lng),
           titleText:
@@ -821,7 +837,8 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
             }
           },
         );
-        else if (quesItem.fieldname == 'weight_for_age' &&
+        else if ((quesItem.fieldname == 'weight_for_age'||
+            quesItem.fieldname == 'weight_for_age_exit') &&
             myMap['measurement_taken'].toString() == '1') {
           return Container(
             padding: EdgeInsets.all(10),
@@ -832,7 +849,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: cWidgetRadiomColorPop(),
+              children: cWidgetRadiomColorPop(quesItem.fieldname!),
             ),
           );
         } else
@@ -1279,7 +1296,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
   //
   // }
 
-  List<Widget> cWidgetRadiomColorPop() {
+  List<Widget> cWidgetRadiomColorPop(String fieldName) {
     List<Widget> screenItems = [];
 
     var items = widget.screenItem[widget.tabBreakItem.name!];
@@ -1297,7 +1314,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           myMap['age_months'] = calucalteDate;
         }
       }
-
+    if(fieldName=='weight_for_age'){
       items = items
           .where(
               (element) => colorIndicatorForMeasure.contains(element.fieldname))
@@ -1372,7 +1389,99 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
           ],
         ));
       }
-      // }
+    }else if(fieldName=='weight_for_age_exit'){
+      var measurementDate =
+      Validate().stringToDateNull(myMap['date_of_exit']);
+      var childDob = Validate().stringToDateNull(myMap['child_dob']);
+
+      if (measurementDate != null && childDob != null) {
+        var calucalteDate =
+        Validate().calculateAgeInDaysEx(childDob, measurementDate);
+        var exitResponce={'age_months':calucalteDate,
+          'gender_id':myMap['gender_id'],
+          'height':myMap['height_exit'],
+          'weight':myMap['weight_exit'],
+          'measurement_equipment':myMap['measurement_equipment_exit'],
+        };
+
+        items = items
+            .where(
+                (element) => colorIndicatorForExitMeasure.contains(element.fieldname))
+            .toList();
+        for (int i = 0; i < items.length; i++) {
+          var fieldItem=items[i].fieldname=='weight_for_age_exit'?'weight_for_age':items[i].fieldname=='weight_for_height_exit'?'weight_for_height':items[i].fieldname=='height_for_age_exit'?'height_for_age':'';
+          int colorD = DependingLogic.AutoColorCreateByHeightWightNew(
+              tabHeightforageBoys,
+              tHeightforageGirls,
+              tabWeightforageBoys,
+              tabWeightforageGirls,
+              tabWeightToHeightBoys,
+              tabWeightToHeightGirls,
+              fieldItem,
+              myMap['gender_id'],myMap['date_of_exit'],
+              exitResponce);
+          String grothValue =
+          DependingLogic.AutoColorCreateByHeightWightStringNew(
+              tabHeightforageBoys,
+              tHeightforageGirls,
+              tabWeightforageBoys,
+              tabWeightforageGirls,
+              tabWeightToHeightBoys,
+              tabWeightToHeightGirls,
+              fieldItem,
+              myMap['gender_id'],myMap['date_of_exit'],
+              exitResponce);
+
+          Color itemC = Color(0xffAAAAAA);
+          String colorName = '';
+          if (colorD == 0) {
+            itemC = Color(0xffAAAAAA);
+            colorName = '';
+          } else if (colorD == 1) {
+            itemC = Color(0xffF35858);
+            colorName =
+            '(${Global.returnTrLable(translats, CustomText.Severe, lng)})';
+          } else if (colorD == 2) {
+            itemC = Color(0xffF4B81D);
+            colorName =
+            '(${Global.returnTrLable(translats, CustomText.Moderate, lng)})';
+          } else if (colorD == 3) {
+            itemC = Color(0xff8BF649);
+            colorName =
+            '(${Global.returnTrLable(translats, CustomText.Normal, lng)})';
+          }
+          myMap[items[i].fieldname!] = colorD;
+          screenItems.add(Column(
+            children: [
+              Container(
+                height: 25,
+                width: 25,
+                decoration: BoxDecoration(
+                  color: itemC,
+                  borderRadius: BorderRadius.circular(5.r),
+                ),
+              ),
+              Text(
+                Global.returnTrLable(translats, items[i].label!.trim(), lng),
+                style: Styles.black85,
+                strutStyle: StrutStyle(height: 1.2),
+              ),
+              Text(
+                colorName,
+                style: Styles.black12700,
+              ),
+              Global.validString(grothValue)
+                  ? Text(
+                '($grothValue)',
+                style: Styles.red85,
+              )
+                  : SizedBox(),
+            ],
+          ));
+        }
+      }
+    }
+
     }
     return screenItems;
   }

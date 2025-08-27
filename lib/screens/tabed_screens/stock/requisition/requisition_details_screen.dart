@@ -1033,8 +1033,6 @@ class _RequisitionDetailsState extends State<RequisitionDetails> {
                   : Container(
                       padding: EdgeInsets.symmetric(horizontal: 2),
                       child: Row(
-                        // crossAxisAlignment: CrossAxisAlignment.center,
-                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Flexible(
                             flex: 1,
