@@ -169,8 +169,14 @@ class _NotEnrolledChildrenListedScreenState
     if (selectedItem != null && maxAgeLimit != null && minAgeLimit != null) {
       filterData = filteredList.where((element) {
         var ViItem = Global.getItemValues(element['responces'], 'gender_id');
-        var ageItem =
-            int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        // var ageItem =
+        //     int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        var ageItem= Validate()
+            .calculateAgeInMonths(Validate().stringToDate(
+            Global.getItemValues(
+                element[
+                'responces'],
+                'child_dob')));
         return ViItem == selectedItem &&
             ageItem <= maxAgeLimit! &&
             ageItem >= minAgeLimit!;
@@ -187,24 +193,42 @@ class _NotEnrolledChildrenListedScreenState
         minAgeLimit != null) {
       filterData = filteredList.where((element) {
         // var ViItem = Global.getItemValues(element['responces'], 'gender_id');
-        var ageItem =
-            int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        // var ageItem =
+        //     int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        var ageItem= Validate()
+            .calculateAgeInMonths(Validate().stringToDate(
+            Global.getItemValues(
+                element[
+                'responces'],
+                'child_dob')));
         return ageItem <= maxAgeLimit! && ageItem >= minAgeLimit!;
       }).toList();
     } else if (maxAgeLimit != null &&
         selectedItem == null &&
         minAgeLimit == null) {
       filterData = filteredList.where((element) {
-        var ageItem =
-            int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        // var ageItem =
+        //     int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        var ageItem= Validate()
+            .calculateAgeInMonths(Validate().stringToDate(
+            Global.getItemValues(
+                element[
+                'responces'],
+                'child_dob')));
         return ageItem <= maxAgeLimit!;
       }).toList();
     } else if (minAgeLimit != null &&
         selectedItem == null &&
         maxAgeLimit == null) {
       filterData = filteredList.where((element) {
-        var ageItem =
-            int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        // var ageItem =
+        //     int.parse(Global.getItemValues(element['responces'], 'child_age'));
+        var ageItem= Validate()
+            .calculateAgeInMonths(Validate().stringToDate(
+            Global.getItemValues(
+                element[
+                'responces'],
+                'child_dob')));
         return ageItem >= minAgeLimit!;
       }).toList();
     } else {
