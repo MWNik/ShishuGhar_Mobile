@@ -22,8 +22,10 @@ import '../../../utils/validate.dart';
 import 'creche_monitering_checkList_ALM_tab_forAdd.dart';
 
 class AllcmcALMListingScreen extends StatefulWidget {
+  bool? isDraft;
   AllcmcALMListingScreen({
     super.key,
+    this.isDraft,
   });
 
   @override
@@ -43,10 +45,11 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
   List<CmcALMResponseModel> allList = [];
   BackdatedConfigirationModel? backdatedConfigirationModel;
   final TextEditingController _crecheSearchController = TextEditingController();
-
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
+    isOnlyUnsynched=widget.isDraft??false;
     initializeData();
   }
 
@@ -74,7 +77,7 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
         .callTranslateString(valueItems)
         .then((value) => translats = value);
     creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
-
+    isLoading=false;
     await fetchCmcCBMRecords();
   }
 
@@ -193,6 +196,10 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                                 element.values != null &&
                                     element.name != null &&
                                     element.values!
+                                        .toLowerCase()
+                                        .contains(
+                                        pattern.toLowerCase())||
+                                    element.name!
                                         .toLowerCase()
                                         .contains(
                                         pattern.toLowerCase())
@@ -345,7 +352,8 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
                 ],
               ),
               Expanded(
-                child: (filterData.length > 0)
+                child: isLoading? Center(
+                    child: CircularProgressIndicator()):(filterData.length > 0)
                     ? ListView.builder(
                         itemCount: filterData.length,
                         shrinkWrap: true,

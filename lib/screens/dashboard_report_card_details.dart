@@ -559,6 +559,10 @@ class _DashboardReportCardDetailState
                                                   element.values!
                                                       .toLowerCase()
                                                       .contains(
+                                                      pattern.toLowerCase())||
+                                                  element.name!
+                                                      .toLowerCase()
+                                                      .contains(
                                                       pattern.toLowerCase())
                                               ).toList();
                                               if(filItems.isEmpty||pattern.isEmpty){

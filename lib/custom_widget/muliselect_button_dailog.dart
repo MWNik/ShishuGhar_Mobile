@@ -1,47 +1,75 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shishughar/custom_widget/custom_text.dart';
 
 import '../model/dynamic_screen_model/options_model.dart';
 import '../style/styles.dart';
-import 'custom_btn.dart';
 
 class MultiSelectButtonDialog extends StatefulWidget {
   final List<OptionsModel> items;
   final List<OptionsModel> selectedItem;
-   String? title;
-   String? selectAll;
+  final String? title;
+  final String? selectAll;
   final String posButton;
   final String negButton;
 
-   MultiSelectButtonDialog({
+  const MultiSelectButtonDialog({
+    Key? key,
     required this.items,
-     this.selectAll,
-     this.title,
     required this.selectedItem,
+    this.title,
+    this.selectAll,
     required this.posButton,
     required this.negButton,
-  });
+  }) : super(key: key);
 
   @override
-  _MultiSelectButtonDialogState createState() => _MultiSelectButtonDialogState();
+  _MultiSelectButtonDialogState createState() =>
+      _MultiSelectButtonDialogState();
 }
 
 class _MultiSelectButtonDialogState extends State<MultiSelectButtonDialog> {
-  Map<String, bool> checkedItem = {};
+  final TextEditingController _searchController = TextEditingController();
+  late Map<String, bool> checkedItem;
+  late List<OptionsModel> _filteredItems;
   bool selectAll = false;
 
   @override
   void initState() {
     super.initState();
-    for (var item in widget.items) {
-      checkedItem[item.name!] =widget.selectedItem.any((element) => element.name == item.name);
-    }
+
+    // init checked items
+    checkedItem = {
+      for (var item in widget.items)
+        item.name!: widget.selectedItem.any((e) => e.name == item.name)
+    };
+
+    _filteredItems = widget.items;
+    selectAll = !checkedItem.containsValue(false);
+
+    _searchController.addListener(() {
+      filterSearchResults(_searchController.text);
+    });
+  }
+
+  void filterSearchResults(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredItems = widget.items;
+      } else {
+        _filteredItems = widget.items
+            .where((item) =>
+            (item.values ?? "").toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
   }
 
   void toggleSelectAll(bool? value) {
     setState(() {
       selectAll = value ?? false;
-      checkedItem.updateAll((key, _) => selectAll);
+      for (var item in widget.items) {
+        checkedItem[item.name!] = selectAll;
+      }
     });
   }
 
@@ -52,9 +80,10 @@ class _MultiSelectButtonDialogState extends State<MultiSelectButtonDialog> {
       contentPadding: EdgeInsets.zero,
       content: Container(
         width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * 0.5,
+        height: MediaQuery.of(context).size.height * 0.6,
         child: Column(
           children: [
+            // Title
             Container(
               height: 40,
               padding: EdgeInsets.all(5),
@@ -63,32 +92,44 @@ class _MultiSelectButtonDialogState extends State<MultiSelectButtonDialog> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
               ),
               child: Center(
-                child: Text(widget.title??CustomText.SHISHUGHAR, style: Styles.white126P),
+                child: Text(widget.title ?? "Select Items",
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
             ),
 
-            // Select All Checkbox
-            CheckboxListTile(
-              title: Text(widget.selectAll??"Select All"),
-              value: selectAll,
-              onChanged: toggleSelectAll,
+            // 🔎 Search box
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: TextField(
+                controller: _searchController,
+                decoration: const InputDecoration(
+                  hintText: "Search...",
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
             ),
 
-            // List of checkboxes
+            // Select All
+            _filteredItems.length>0?CheckboxListTile(
+              title: Text(widget.selectAll ?? "Select All"),
+              value: selectAll,
+              onChanged: toggleSelectAll,
+            ):SizedBox(),
+
+            // List
             Expanded(
               child: ListView.builder(
-                itemCount: widget.items.length,
-                shrinkWrap: true,
-                physics: BouncingScrollPhysics(),
+                itemCount: _filteredItems.length,
                 itemBuilder: (context, index) {
-                  var item = widget.items[index];
+                  var item = _filteredItems[index];
                   return CheckboxListTile(
                     title: Text(item.values ?? "-"),
                     value: checkedItem[item.name] ?? false,
                     onChanged: (newValue) {
                       setState(() {
                         checkedItem[item.name!] = newValue!;
-                        // update selectAll if all are now true
                         selectAll = !checkedItem.containsValue(false);
                       });
                     },
@@ -97,31 +138,31 @@ class _MultiSelectButtonDialogState extends State<MultiSelectButtonDialog> {
               ),
             ),
 
+            // Buttons
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
                 children: [
                   Expanded(
-                    child: CElevatedButton(
-                      text: widget.negButton,
-                      color: Color(0xffDB4B73),
-                      onPressed: () {
-                        Navigator.of(context).pop(null);
-                      },
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xffDB4B73)),
+                      onPressed: () => Navigator.pop(context, null),
+                      child: Text(widget.negButton,style:  Styles.white125),
                     ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
-                    child: CElevatedButton(
-                      text: widget.posButton,
-                      color: Color(0xff369A8D),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xff369A8D)),
                       onPressed: () {
-                        // Return only selected items
                         final selected = widget.items
                             .where((e) => checkedItem[e.name] == true)
                             .toList();
-                        Navigator.of(context).pop(selected);
+                        Navigator.pop(context, selected);
                       },
+                      child: Text(widget.posButton,style:  Styles.white125),
                     ),
                   ),
                 ],
@@ -133,4 +174,5 @@ class _MultiSelectButtonDialogState extends State<MultiSelectButtonDialog> {
     );
   }
 }
+
 

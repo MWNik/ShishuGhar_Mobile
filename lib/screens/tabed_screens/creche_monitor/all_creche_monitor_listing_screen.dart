@@ -21,8 +21,10 @@ import '../../../style/styles.dart';
 import 'creche_monitor_tab_forAdd.dart';
 
 class AllCrecheMonitorListingScreen extends StatefulWidget {
-  const AllCrecheMonitorListingScreen({
+  bool? isDraft;
+   AllCrecheMonitorListingScreen({
     super.key,
+    this.isDraft,
   });
 
   @override
@@ -42,14 +44,14 @@ class _CrecheMonitorListingScreenState
   bool isOnlyUnsynched = false;
   List<CrecheMonitorResponseModel> unsynchedList = [];
   List<CrecheMonitorResponseModel> allList = [];
-  bool isDraftAvailable = false;
   BackdatedConfigirationModel? backdatedConfigirationModel;
   final TextEditingController _crecheSearchController = TextEditingController();
-
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    isOnlyUnsynched=widget.isDraft??false;
     initializeData();
   }
 
@@ -76,8 +78,8 @@ class _CrecheMonitorListingScreenState
         .callTranslateString(valueItems)
         .then((value) => translatsLabel = value);
     creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
+    isLoading=false;
     await fetchCMCdata();
-
     setState(() {});
   }
 
@@ -205,6 +207,10 @@ class _CrecheMonitorListingScreenState
                     element.values != null &&
                         element.name != null &&
                         element.values!
+                            .toLowerCase()
+                            .contains(
+                            pattern.toLowerCase())||
+                        element.name!
                             .toLowerCase()
                             .contains(
                             pattern.toLowerCase())
@@ -358,7 +364,8 @@ class _CrecheMonitorListingScreenState
                 ],
               ),
               Expanded(
-                child: filterData.length > 0
+                child: isLoading? Center(
+                child: CircularProgressIndicator()): filterData.length > 0
                     ? ListView.builder(
                         itemCount: filterData.length,
                         // shrinkWrap: true,

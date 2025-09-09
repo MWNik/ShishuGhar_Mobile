@@ -138,7 +138,7 @@ class _WeightToHeightBoysGirlsScreenState
         var height=enrollChild['height'];
         if(Global.stringToDouble(height.toString())>0
             && Global.stringToDouble(weight.toString())>0) {
-          (height.toDouble() > length!.last) ? maxX = height.toDouble() : maxX = length!.last;
+          (Global.stringToDouble(height.toString()) > length!.last) ? maxX = Global.stringToDouble(height.toString()) : maxX = length!.last;
           (Global.stringToDouble(weight.toString()) > height_max!.last) ? maxY = Global.stringToDouble(weight.toString()) : maxY = height_max!.last;
           child!.add(Offset(height, weight));
         }
@@ -158,6 +158,7 @@ class _WeightToHeightBoysGirlsScreenState
         // (x < length!.first) ? minX = x : minX = length!.first;
 
         double y = (data['weight'] as num).toDouble();
+        (y > height_max!.last) ? maxY = x : maxY = height_max!.last;
 
         return Offset(x, y);
       }).toList());

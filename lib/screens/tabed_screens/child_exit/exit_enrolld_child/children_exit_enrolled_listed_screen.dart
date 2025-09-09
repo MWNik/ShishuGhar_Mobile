@@ -51,7 +51,7 @@ class _EnrolledChildrenListedScreenState
   bool isOnlyUnsynched = false;
   String? role;
   BackdatedConfigirationModel? backdatedConfigirationModel;
-
+  bool isLoading=true;
 
   @override
   void initState() {
@@ -109,6 +109,7 @@ class _EnrolledChildrenListedScreenState
     allList = childHHData;
     filterData = isOnlyUnsynched ? unsynchedList : allList;
     Searchcontroller.text = '';
+    isLoading=false;
     setState(() {});
   }
 
@@ -300,7 +301,8 @@ class _EnrolledChildrenListedScreenState
               ),
             ),
             Expanded(
-              child: (filterData.length > 0)
+              child: isLoading?Center(
+                  child: CircularProgressIndicator()):(filterData.length > 0)
                   ? ListView.builder(
                       itemCount: filterData.length,
                       shrinkWrap: true,

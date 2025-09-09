@@ -265,6 +265,31 @@ class CrecheDataHelper {
     return items;
   }
 
+  Future<List<Map<String, dynamic>>> getCrecheResponceWithCount() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        '''select * from (
+SELECT creches.*, 
+        childCount.child_count,LOWER(
+    SUBSTR(
+    creches.responces,
+    INSTR(creches.responces, ?) + LENGTH(?)
+    )
+    )as crecheId
+    FROM tab_creche_response creches
+    LEFT JOIN (
+    SELECT COUNT(creche_id) AS child_count,
+        creche_id
+    FROM enrollred_exit_child_responce
+    GROUP BY creche_id
+    ) AS childCount
+    ON creches.name = childCount.creche_id) as data
+    order by child_count DESC, crecheId asc
+    ''',[ 'creche_id":"','creche_id":"',]);
+
+
+    return result;
+  }
+
   Future<List<Map<String, dynamic>>> callCrechEnrolledByChildGUID(
       String ChildEnrollGUID) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(

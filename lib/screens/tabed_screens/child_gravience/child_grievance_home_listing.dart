@@ -10,8 +10,10 @@ import '../../../custom_widget/custom_text.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown_for_filter.dart';
 import '../../../database/helper/child_gravience/child_grievances_response_helper.dart';
+import '../../../database/helper/creche_helper/creche_data_helper.dart';
 import '../../../database/helper/dynamic_screen_helper/options_model_helper.dart';
 import '../../../database/helper/translation_language_helper.dart';
+import '../../../model/apimodel/creche_database_responce_model.dart';
 import '../../../model/apimodel/translation_language_api_model.dart';
 import '../../../model/dynamic_screen_model/child_grievances_response_model.dart';
 import '../../../model/dynamic_screen_model/options_model.dart';
@@ -38,6 +40,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String? selectedStatus;
   String? selectedCreche;
+  List<CresheDatabaseResponceModel> crecheData = [];
   List<OptionsModel> creches = [];
   bool isOnlyUnsynched = false;
   List<ChildGrievancesResponceModel> unsynchedList = [];
@@ -87,6 +90,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
     await TranslationDataHelper()
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
+    crecheData = await CrecheDataHelper().getCrecheResponce();
     await fetchChildgrievance();
     setState(() {});
   }
@@ -210,6 +214,10 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                               element.values != null &&
                                   element.name != null &&
                                   element.values!
+                                      .toLowerCase()
+                                      .contains(
+                                      pattern.toLowerCase())||
+                                  element.name!
                                       .toLowerCase()
                                       .contains(
                                       pattern.toLowerCase())
@@ -424,10 +432,17 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                                           strutStyle: StrutStyle(height: 1.2),
                                         ),
                                         Text(
+                                          '${Global.returnTrLable(translats, CustomText.Creche_Name, lng).trim()} : ',
+                                          strutStyle:
+                                          StrutStyle(height: 1.2),
+                                          style: Styles.black104,
+                                        ),
+                                        Text(
                                           '${Global.returnTrLable(translats, CustomText.Status, lng).trim()} : ',
                                           style: Styles.black104,
                                           strutStyle: StrutStyle(height: 1.2),
                                         ),
+
                                       ],
                                     ),
                                     SizedBox(width: 10),
@@ -464,6 +479,18 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                                             maxLines: 1,
                                             strutStyle: StrutStyle(height: 1.2),
                                             overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            callCrecheNameName(
+                                                Global.getItemValues(
+                                                    filtredGirevData[
+                                                    index].responces,
+                                                    'creche_id')),
+                                            strutStyle:
+                                            StrutStyle(height: 1.2),
+                                            style: Styles.cardBlue10,
+                                            overflow:
+                                            TextOverflow.ellipsis,
                                           ),
                                           Text(
                                             callGravienceStatus(
@@ -577,5 +604,16 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
   void dispose() {
     _controller.dispose(); // Clean up controller
     super.dispose();
+  }
+
+  String callCrecheNameName(String nameId) {
+    String returnValue = '';
+    var items = crecheData
+        .where((element) => element.name == Global.stringToInt(nameId))
+        .toList();
+    if (items.length > 0) {
+      returnValue = Global.getItemValues(items[0].responces!, 'creche_name');
+    }
+    return returnValue;
   }
 }

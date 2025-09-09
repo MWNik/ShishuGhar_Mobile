@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
@@ -18,6 +19,7 @@ import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
 
+import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 import '../../../database/helper/backdated_configiration_helper.dart';
 import '../../../model/databasemodel/backdated_configiration_model.dart';
 
@@ -48,18 +50,24 @@ class _ReferallCompletedListForCCState
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController Searchcontroller = TextEditingController();
   List<OptionsModel> creches = [];
-  String? selectedCreche;
+  OptionsModel? selectedCreche;
   bool isOnlyUnsyched = false;
   String? role;
   String? child_name;
   String? child_id;
   BackdatedConfigirationModel? backdatedConfigirationModel;
-
+  final TextEditingController _crecheSearchcontroller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     initializeData();
+  }
+
+  @override
+  void dispose() {
+    _crecheSearchcontroller.dispose();
+    super.dispose();
   }
 
   Future<void> initializeData() async {
@@ -119,7 +127,7 @@ class _ReferallCompletedListForCCState
   void cleaAllFilter() {
     filteredReferral = isOnlyUnsyched ? usynchedList : allList;
     selectedCreche = null;
-
+    _crecheSearchcontroller.text = '';
     setState(() {});
   }
 
@@ -129,7 +137,7 @@ class _ReferallCompletedListForCCState
       filteredReferral = filterList.where((element) {
         var creche_id =
             Global.getItemValues(element['enrolledResponce'], 'creche_id');
-        return creche_id.toString() == selectedCreche.toString();
+        return creche_id.toString() == selectedCreche!.name.toString();
       }).toList();
     } else {
       filteredReferral = filterList;
@@ -169,16 +177,27 @@ class _ReferallCompletedListForCCState
     Global.applyDisplayCutout(Color(0xff5979AA));
 
     return isLoading
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
+        ? Container(
+        color: Colors.white,
+        child: Center(child: CircularProgressIndicator()))
         : SafeArea(
+            child: PopScope(
+                canPop: false, // 👈 replaces returning false in WillPopScope
+                onPopInvokedWithResult: (didPop, result) {
+                  if (!didPop) {
+                    Navigator.pop(context, 'itemRefresh');
+                  }
+                },
           child: Scaffold(
               appBar: widget.isHomeScreen
                   ? CustomAppbar(
                       text:widget.title!=null?widget.title!:Global.returnTrLable(
                           translats, CustomText.FlaggedChilderen, lng),
-                      actions: [])
+                      actions: [],
+                  onTap: (){
+                    Navigator.pop(context, CustomText.itemRefresh);
+                  },
+              )
                   : AppBar(
                       toolbarHeight: 60,
                       backgroundColor: Color(0xff5979AA),
@@ -264,14 +283,132 @@ class _ReferallCompletedListForCCState
                               ),
                             ),
                             SizedBox(),
-                            DynamicCustomDropdownForFilterField(
+                            creches.length<=1? DynamicCustomDropdownField(
                               hintText: Global.returnTrLable(
                                   translats, CustomText.Creches, lng),
+                              titleText: Global.returnTrLable(
+                                  translats, CustomText.Creches, lng),
+                              isRequred: 0,
                               items: creches,
-                              selectedItem: selectedCreche,
+                              selectedItem:  selectedCreche != null? selectedCreche?.name:null,
                               onChanged: (value) {
-                                selectedCreche = value?.name;
+                                selectedCreche = value;
                               },
+                            )
+                                :Column(
+                              crossAxisAlignment: CrossAxisAlignment
+                                  .start,
+                              children: [
+                                Text(Global.returnTrLable(
+                                    translats, CustomText.Creches, lng),
+                                  style: Styles.black124,),
+                                SizedBox(
+                                  height: 5.h,
+                                ),
+                                Container(
+                                  height: 35.h,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Color(0xffACACAC)),
+                                    borderRadius: BorderRadius.circular(
+                                        10.r),
+                                  ),
+                                  child: TypeAheadField<OptionsModel>(
+                                    controller: _crecheSearchcontroller,
+                                    suggestionsCallback: (pattern) async {
+                                      try {
+                                        var filItems= creches.where((
+                                            element) =>
+                                        element.values != null &&
+                                            element.name != null &&
+                                            (element.values!
+                                                .toLowerCase()
+                                                .contains(
+                                                pattern.toLowerCase())||
+                                            element.name!
+                                                .toLowerCase()
+                                                .contains(
+                                                pattern.toLowerCase()))
+                                        ).toList();
+                                        if(filItems.isEmpty||pattern.isEmpty){
+                                          selectedCreche=null;
+                                          _crecheSearchcontroller.text='';
+                                        }
+                                        return filItems;
+                                      } catch (e) {
+                                        debugPrint('TypeAhead error: $e');
+                                        return [];
+                                      }
+                                    },
+                                    builder: (context, controller,
+                                        focusNode) {
+                                      return TextField(
+                                          controller: controller,
+                                          focusNode: focusNode,
+                                          style:  Styles.black124,
+                                          // autofocus: true,
+                                          decoration: InputDecoration(
+                                            hintText: Global.returnTrLable(
+                                                translats, CustomText.Search, lng),
+                                            contentPadding: EdgeInsets
+                                                .all(10),
+                                            border: InputBorder.none,
+                                            fillColor: Colors.white,
+                                            filled: true,
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors
+                                                      .transparent),
+                                              borderRadius: BorderRadius
+                                                  .circular(10),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors
+                                                      .transparent),
+                                              borderRadius: BorderRadius
+                                                  .circular(10),
+                                            ),
+                                            disabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors
+                                                      .transparent),
+                                              borderRadius: BorderRadius
+                                                  .circular(10),
+                                            ),
+                                          )
+                                      );
+                                    },
+                                    itemBuilder: (context, item) {
+                                      return ListTile(
+                                        title: Text(item.values!),
+                                        subtitle: Text(item.name!),
+                                      );
+                                    },
+                                    onSelected: (item) {
+                                      selectedCreche = item;
+                                      _crecheSearchcontroller.text = item.values ?? '';
+                                      print('itm $item');
+                                    },
+                                    offset: Offset(0, 12),
+                                    constraints: BoxConstraints(
+                                        maxHeight: 500),
+                                    hideOnUnfocus: true,
+                                    showOnFocus: true,
+                                    hideWithKeyboard: false,
+                                    loadingBuilder: (context) =>
+                                    const Text('Loading...'),
+                                    errorBuilder: (context,
+                                        error) => const Text('Error!'),
+                                    emptyBuilder: (context) =>
+                                    const Text('No items found!'),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10.h,
+                                ),
+                              ],
                             ),
                             SizedBox(
                               height: 10.h,
@@ -307,18 +444,6 @@ class _ReferallCompletedListForCCState
                                 ],
                               ),
                             ),
-                            // Padding(
-                            //   padding: EdgeInsets.only(top: 25),
-                            //   child: AnimatedRollingSwitch(
-                            //     isOnlyUnsynched: isOnlyUnsyched,
-                            //     onChange: (value) async {
-                            //       setState(() {
-                            //         isOnlyUnsyched = value;
-                            //       });
-                            //       await fetchCompletedReffral();
-                            //     },
-                            //   ),
-                            // )
                           ]),
                     )),
               ),
@@ -595,6 +720,6 @@ class _ReferallCompletedListForCCState
                 ]),
               ),
             ),
-        );
+        ));
   }
 }

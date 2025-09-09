@@ -408,6 +408,22 @@ class Global {
     return teCreches;
   }
 
+  static List<OptionsModel> callAllModelCreches(
+      List<CresheDatabaseResponceModel> creches, String lng)
+  {
+    List<OptionsModel> teCreches = [];
+    if (creches.length>0) {
+      creches.forEach((element) {
+        var item = OptionsModel();
+        item.name = "${element.name}";
+        item.flag = "tabCreche";
+        item.values = getItemValues(element.responces, 'creche_name');
+        teCreches.add(item);
+      });
+    }
+    return teCreches;
+  }
+
   static List<OptionsModel> callFiltersCrechesByState(
       List<CresheDatabaseResponceModel> creches, String lng, OptionsModel? parentItem)
   {
@@ -683,6 +699,13 @@ class Global {
       SystemUiMode.edgeToEdge,
       overlays: [SystemUiOverlay.top], // Ensure status bar is visible
     );
+  }
+
+
+  static Color getColorByData(int? countData){
+    if(validToInt(countData)>0){
+      return Colors.white;
+    }return Colors.grey.shade300;
   }
 
 

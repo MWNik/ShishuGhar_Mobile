@@ -157,6 +157,20 @@ class CrecheMonitorResponseHelper {
     }
   }
 
+  Future<List<CrecheMonitorResponseModel>> getCrecheResponseForDraft() async {
+    try {
+      final ListOfMap queryResult = await DatabaseHelper.database!
+          .rawQuery('SELECT * FROM $_table WHERE is_edited = 2');
+
+      return queryResult
+          .map((e) => CrecheMonitorResponseModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      debugPrint("getCrecheResponseForUpload() : $e");
+      return [];
+    }
+  }
+
   Future<List<CrecheMonitorResponseModel>>
       getVillageProfileforUploadDarftEdit() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(

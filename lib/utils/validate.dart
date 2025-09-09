@@ -55,6 +55,7 @@ class Validate {
   // static String crecheSelectedItem = 'crecheSelectedItem';
   static String sLanguage = 'sLanguage';
   static String villageIdES = 'villageIdES';
+  static String crecheIdES = 'crecheIdES';
   static String householdForm = 'HouseholdForm';
   static String chilAttendence = 'chilAttendence';
   static String chilAnthropomertry = 'chilAnthropomertry';

@@ -61,6 +61,7 @@ import '../database/helper/child_immunization/child_immunization_response_helper
 import '../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../database/helper/cmc_CC/creche_monitering_checklist_CC_response_helper.dart';
 import '../database/helper/creche_comite_meeting/creche_committie_response_helper.dart';
+import '../database/helper/creche_helper/creche_data_helper.dart';
 import '../database/helper/creche_monitoring/creche_monitoring_response_helper.dart';
 import '../database/helper/dynamic_screen_helper/house_hold_tab_responce.dart';
 import '../database/helper/enrolled_children/enrolled_children_responce_helper.dart';
@@ -68,38 +69,35 @@ import '../database/helper/enrolled_exit_child/enrolled_exit_child_responce_help
 import '../database/helper/follow_up/child_followUp_response_helper.dart';
 import '../database/helper/user_manual_fields_meta_helper.dart';
 import '../database/helper/village_profile/village_profile_response_helper.dart';
+import '../model/apimodel/creche_database_responce_model.dart';
 import '../model/dynamic_screen_model/options_model.dart';
 import '../utils/globle_method.dart';
 import 'login_screen.dart';
 
-class CoordinatorLocationScreen extends StatefulWidget {
+class CoordinatorLocationNewScreen extends StatefulWidget {
   final String role;
-  const CoordinatorLocationScreen({super.key, required this.role});
+
+  const CoordinatorLocationNewScreen({super.key, required this.role});
 
   @override
-  State<CoordinatorLocationScreen> createState() => _LocationScreenState();
+  State<CoordinatorLocationNewScreen> createState() => _LocationScreenState();
 }
 
-class _LocationScreenState extends State<CoordinatorLocationScreen> {
+class _LocationScreenState extends State<CoordinatorLocationNewScreen> {
   OptionsModel? selectedState;
   OptionsModel? selectedDistrict;
   OptionsModel? selectedBlock;
-  OptionsModel? selectedGramPanchayat;
-  // List<String> selectedVillage = [];
-  List<OptionsModel> selectedMVillage = [];
+  List<OptionsModel> selectedMCreches = [];
 
   List<OptionsModel> mstStates = [];
   List<OptionsModel> mstDistrict = [];
   List<OptionsModel> mstBlock = [];
-  List<OptionsModel> mstGP = [];
-  List<OptionsModel> mstVillages = [];
-  // List<String> villageList = [];
+  List<OptionsModel> mstCreches = [];
 
   List<TabState> states = [];
   List<TabDistrict> district = [];
   List<TabBlock> block = [];
-  List<TabGramPanchayat> gramPanchayat = [];
-  List<TabVillage> village = [];
+  List<CresheDatabaseResponceModel> creches = [];
 
   String? lng;
   List<Translation> locationControlls = [];
@@ -120,14 +118,13 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
     states = await StateDataHelper().getTabStateList();
     district = await DistrictDataHelper().getTabDistrictList();
     block = await BlockDataHelper().getTabBlockList();
-    gramPanchayat = await GramPanchayatDataHelper().getTabGramPanchayatList();
-    village = await VillageDataHelper().getTabVillageList();
+    creches = await CrecheDataHelper().getCrecheResponce();
     mstStates = Global.callSatates(states, lng!);
+    // mstCreches = await Global.callAllModelCreches(creches, lng!);
 
     String? sts = await Validate().readString(Validate.state);
     String? slds = await Validate().readString(Validate.district);
     String? blk = await Validate().readString(Validate.block);
-    String? gmp = await Validate().readString(Validate.gramPanchayat);
 
     if (sts != null) {
       var state =
@@ -142,9 +139,13 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
         }
         selectedState = OptionsModel(
             name: state.name.toString(), values: value, flag: 'tabState');
+        mstCreches =
+            Global.callFiltersCrechesByState(creches, lng!, selectedState);
       } else
         throw Exception("State is not available");
       mstDistrict = Global.callDistrict(district, lng!, selectedState);
+      mstCreches =
+          Global.callFiltersCrechesByState(creches, lng!, selectedState);
     }
 
     if (slds != null) {
@@ -161,9 +162,13 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
         }
         selectedDistrict = OptionsModel(
             name: disct.name.toString(), values: value, flag: 'tabDistrict');
+        mstCreches =
+            Global.callFiltersCrechesByDistric(creches, lng!, selectedDistrict);
       } else
         throw Exception("District not available");
       mstBlock = Global.callBlocks(block, lng!, selectedDistrict);
+      mstCreches =
+          Global.callFiltersCrechesByDistric(creches, lng!, selectedDistrict);
     }
 
     if (blk != null) {
@@ -179,71 +184,50 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
         }
         selectedBlock = OptionsModel(
             name: blks.name.toString(), values: value, flag: 'tabBlock');
+        mstCreches =
+            Global.callFiltersCrechesByBlock(creches, lng!, selectedBlock);
       } else
         throw Exception("Block not availaable");
-      mstGP = Global.callGramPanchyats(gramPanchayat, lng!, selectedBlock);
+      mstCreches =
+          Global.callFiltersCrechesByBlock(creches, lng!, selectedBlock);
     }
 
-    if (gmp != null) {
-      var gp = gramPanchayat
-          .where((element) => element.name.toString() == gmp)
-          .firstOrNull;
-      if (gp != null) {
-        var value = "${gp.value}";
-        if (lng == 'hi' && Global.validString(gp.gp_hi.toString())) {
-          value = gp.gp_hi.toString();
-        } else if (lng == 'od' && Global.validString(gp.gp_od.toString())) {
-          value = gp.gp_od.toString();
-        }
-        selectedGramPanchayat =
-            OptionsModel(name: gp.name.toString(), values: value, flag: 'taGp');
-      } else
-        throw Exception("Gram Panchayat not available");
-      // villageList = callFiltersVillages(village, lng!, selectedGramPanchayat);
-      mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
-      selectedMVillage.clear();
-      var selcVSaved = await Validate().readString(Validate.villageIdES);
-      mstVillages.forEach((element) {
-        if (selcVSaved != null) {
-          if (selcVSaved.contains(element.name.toString())) {
-            // var value = "${element.value}";
-            // if (lng == 'hi' &&
-            //     Global.validString(element.village_hi.toString())) {
-            //   value = element.village_hi.toString();
-            // } else if (lng == 'od' &&
-            //     Global.validString(element.village_od.toString())) {
-            //   value = element.village_od.toString();
-            // }
-            var item=OptionsModel(name:element.name.toString(),values: element.values,flag: element.flag);
-            selectedMVillage.add(item);
-          }
-        }
-      });
-    }
-
-    if (mstStates.length == 1 && mstVillages.length == 0) {
+    if (mstStates.length == 1 && mstCreches.length == 0) {
       selectedState = mstStates.first;
       mstDistrict = Global.callDistrict(district, lng!, selectedState);
+      mstCreches =
+          Global.callFiltersCrechesByState(creches, lng!, selectedState);
       if (mstDistrict.length == 1) {
         selectedDistrict = mstDistrict.first;
         mstBlock = Global.callBlocks(block, lng!, selectedDistrict);
+        mstCreches =
+            Global.callFiltersCrechesByDistric(creches, lng!, selectedDistrict);
         if (mstBlock.length == 1) {
           selectedBlock = mstBlock.first;
-          mstGP = Global.callGramPanchyats(gramPanchayat, lng!, selectedBlock);
-          if (mstGP.length == 1) {
-            selectedGramPanchayat = mstGP.first;
-            mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
-          }
+          mstCreches =
+              Global.callFiltersCrechesByBlock(creches, lng!, selectedBlock);
         }
       }
     }
 
+    selectedMCreches.clear();
+    var selcVSaved = await Validate().readString(Validate.crecheIdES);
+    mstCreches.forEach((element) {
+      if (selcVSaved != null) {
+        if (selcVSaved.contains(element.name.toString())) {
+          var item = OptionsModel(
+              name: element.name.toString(),
+              values: element.values,
+              flag: element.flag);
+          selectedMCreches.add(item);
+        }
+      }
+    });
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-
     Global.applyDisplayCutout(Color(0xff5979AA));
     return SafeArea(
       child: WillPopScope(
@@ -262,334 +246,350 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
             },
           ),
           body: (mstStates.length > 0)
-              ? SingleChildScrollView(
-                  child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 10.h),
-                            Text(
-                              (lng != null)
-                                  ? Global.returnTrLable(locationControlls,
-                                      CustomText.geoWiDownDwnload, lng!)
-                                  : '',
-                              style: Styles.red145,
-                            ),
-                            SizedBox(height: 10.h),
-                            DynamicCustomDropdownField(
-                              hintText: Global.returnTrLable(locationControlls,
-                                  CustomText.select_here, lng!),
-                              titleText: Global.returnTrLable(
-                                  locationControlls, CustomText.state, lng!),
-                              items: mstStates,
-                              isRequred: 1,
-                              selectedItem: selectedState != null
-                                  ? selectedState?.name
-                                  : null,
-                              onChanged: (value) async {
-                                selectedState = value;
-                                selectedDistrict = null;
-                                selectedBlock = null;
-                                selectedGramPanchayat = null;
-                                selectedMVillage = [];
-                                mstDistrict = Global.callDistrict(
-                                    district, lng!, selectedState);
-                                if (mstDistrict.length == 1) {
-                                  selectedDistrict = mstDistrict.first;
-                                  mstBlock = Global.callBlocks(
-                                      block, lng!, selectedDistrict);
-                                  if (mstBlock.length == 1) {
-                                    selectedBlock = mstBlock.first;
-                                    mstGP = Global.callGramPanchyats(
-                                        gramPanchayat, lng!, selectedBlock);
-                                    if (mstGP.length == 1) {
-                                      selectedGramPanchayat = mstGP.first;
-                                      mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
-                                    }
-                                  }
-                                }
-                                setState(() {
-                                  // Update districtList based on selectedState
-                                  // districtList = // data from database based on selectedState;
-                                });
-                              },
-                            ),
-                            DynamicCustomDropdownField(
-                              hintText: Global.returnTrLable(locationControlls,
-                                  CustomText.select_here, lng!),
-                              titleText: Global.returnTrLable(
-                                  locationControlls, CustomText.District, lng!),
-                              items: mstDistrict,
-                              isRequred: 1,
-                              selectedItem: selectedDistrict != null
-                                  ? selectedDistrict?.name
-                                  : null,
-                              onChanged: (value) async {
-                                selectedDistrict = value;
-                                selectedBlock = null;
-                                selectedGramPanchayat = null;
-                                selectedMVillage = [];
+              ? Column(
+            children: [
+              Expanded(child:
+              SingleChildScrollView(
+                child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 10.h),
+                          Text(
+                            (lng != null)
+                                ? Global.returnTrLable(locationControlls,
+                                CustomText.geoWiDownDwnload, lng!)
+                                : '',
+                            style: Styles.red145,
+                          ),
+                          SizedBox(height: 10.h),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(locationControlls,
+                                CustomText.select_here, lng!),
+                            titleText: Global.returnTrLable(
+                                locationControlls, CustomText.state, lng!),
+                            items: mstStates,
+                            isRequred: 1,
+                            selectedItem: selectedState != null
+                                ? selectedState?.name
+                                : null,
+                            onChanged: (value) async {
+                              selectedState = value;
+                              selectedDistrict = null;
+                              selectedBlock = null;
+                              selectedMCreches = [];
+                              mstCreches = [];
+                              mstDistrict = Global.callDistrict(
+                                  district, lng!, selectedState);
+                              // mstCreches = Global.callFiltersCrechesByState(
+                              //     creches, lng!, selectedState);
+                              if (mstDistrict.length == 1) {
+                                selectedDistrict = mstDistrict.first;
                                 mstBlock = Global.callBlocks(
                                     block, lng!, selectedDistrict);
+                                // mstCreches =
+                                //     Global.callFiltersCrechesByDistric(
+                                //         creches, lng!, selectedDistrict);
                                 if (mstBlock.length == 1) {
                                   selectedBlock = mstBlock.first;
-                                  mstGP = Global.callGramPanchyats(
-                                      gramPanchayat, lng!, selectedBlock);
-                                  if (mstGP.length == 1) {
-                                    selectedGramPanchayat = mstGP.first;
-                                    mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
-                                  }
+                                  mstCreches =
+                                      Global.callFiltersCrechesByBlock(
+                                          creches, lng!, selectedBlock);
                                 }
-                                setState(() {
-                                  // Update blockList based on selectedDistrict
-                                  // blockList = // data from database based on selectedDistrict;
-                                });
-                              },
-                            ),
-                            DynamicCustomDropdownField(
-                              hintText: Global.returnTrLable(locationControlls,
-                                  CustomText.select_here, lng!),
-                              titleText: Global.returnTrLable(
-                                  locationControlls, CustomText.Block, lng!),
-                              items: mstBlock,
-                              isRequred: 1,
-                              selectedItem: selectedBlock != null
-                                  ? selectedBlock?.name
-                                  : null,
-                              onChanged: (value) async {
-                                selectedBlock = value;
-                                selectedGramPanchayat = null;
-                                selectedMVillage = [];
-                                mstGP = Global.callGramPanchyats(
-                                    gramPanchayat, lng!, selectedBlock);
-                                if (mstGP.length == 1) {
-                                  selectedGramPanchayat = mstGP.first;
-                                  mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
-                                }
-                                setState(() {
-                                  // Update gramPanchayatList based on selectedBlock
-                                  // gramPanchayatList = // data from database based on selectedBlock;
-                                });
-                              },
-                            ),
-                            DynamicCustomDropdownField(
-                              isRequred: 1,
-                              titleText: Global.returnTrLable(locationControlls,
-                                  CustomText.GramPanchayat, lng!),
-                              items: mstGP,
-                              hintText: Global.returnTrLable(
-                                  locationControlls, CustomText.Selecthere, lng!),
-                              selectedItem: selectedGramPanchayat != null
-                                  ? selectedGramPanchayat?.name
-                                  : null,
-                              onChanged: (value) async {
-                                selectedGramPanchayat = value;
-                                selectedMVillage = [];
-                                mstVillages = Global.callFiltersVillages(village, lng!, selectedGramPanchayat);
-                                setState(() {
-                                  // Update villageList based on selectedGramPanchayat
-                                  // villageList = // data from database based on selectedGramPanchayat;
-                                });
-                              },
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                RichText(
-                                  text: TextSpan(
-                                    text: Global.returnTrLable(locationControlls,
-                                        CustomText.Village, lng!),
-                                    style: Styles.black124,
+                              }
+                              setState(() {
+                                // Update districtList based on selectedState
+                                // districtList = // data from database based on selectedState;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(locationControlls,
+                                CustomText.select_here, lng!),
+                            titleText: Global.returnTrLable(
+                                locationControlls, CustomText.District, lng!),
+                            items: mstDistrict,
+                            isRequred: 1,
+                            selectedItem: selectedDistrict != null
+                                ? selectedDistrict?.name
+                                : null,
+                            onChanged: (value) async {
+                              selectedDistrict = value;
+                              selectedBlock = null;
+                              selectedMCreches = [];
+                              mstCreches = [];
+                              mstBlock = Global.callBlocks(
+                                  block, lng!, selectedDistrict);
+                              // mstCreches = Global.callFiltersCrechesByDistric(
+                              //     creches, lng!, selectedDistrict);
+                              if (mstBlock.length == 1) {
+                                selectedBlock = mstBlock.first;
+                                mstCreches = Global.callFiltersCrechesByBlock(
+                                    creches, lng!, selectedBlock);
+                              }
+                              setState(() {
+                                // Update blockList based on selectedDistrict
+                                // blockList = // data from database based on selectedDistrict;
+                              });
+                            },
+                          ),
+                          DynamicCustomDropdownField(
+                            hintText: Global.returnTrLable(locationControlls,
+                                CustomText.select_here, lng!),
+                            titleText: Global.returnTrLable(
+                                locationControlls, CustomText.Block, lng!),
+                            items: mstBlock,
+                            isRequred: 1,
+                            selectedItem: selectedBlock != null
+                                ? selectedBlock?.name
+                                : null,
+                            onChanged: (value) async {
+                              selectedBlock = value;
+                              selectedMCreches = [];
+                              mstCreches = [];
+                              mstCreches = Global.callFiltersCrechesByBlock(
+                                  creches, lng!, selectedBlock);
+                              setState(() {});
+                            },
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  text: Global.returnTrLable(
+                                      locationControlls,
+                                      CustomText.creche,
+                                      lng!),
+                                  style: Styles.black124,
+                                  children: [
+                                    TextSpan(
+                                      text: '*',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 3.h,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  showMultiSelectDailog(mstCreches);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border:
+                                    Border.all(color: Color(0xffACACAC)),
+                                    borderRadius: BorderRadius.circular(10.r),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                     children: [
-                                      TextSpan(
-                                        text: '*',
-                                        style: TextStyle(color: Colors.red),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextButton(
+                                            onPressed: () {
+                                              showMultiSelectDailog(
+                                                  mstCreches);
+                                            },
+                                            child: Text(
+                                              Global.returnTrLable(
+                                                  locationControlls,
+                                                  CustomText.selectCreche,
+                                                  lng!),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: () {
+                                                showMultiSelectDailog(
+                                                    mstCreches);
+                                              },
+                                              icon: Icon(
+                                                Icons.arrow_drop_down,
+                                                color: Colors.black,
+                                              ))
+                                        ],
                                       ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 5, right: 5),
+                                        child: Wrap(
+                                          crossAxisAlignment:
+                                          WrapCrossAlignment.start,
+                                          spacing: 8.0, // space between items
+                                          runSpacing:
+                                          8.0, // space between lines
+                                          children:
+                                          selectedMCreches.map((item) {
+                                            return FilterChip(
+                                              label: Text(item.values!),
+                                              selected: selectedMCreches
+                                                  .contains(item),
+                                              onSelected: (isSelected) {
+                                                setState(() {
+                                                  isSelected
+                                                      ? selectedMCreches
+                                                      .add(item)
+                                                      : selectedMCreches
+                                                      .remove(item);
+                                                });
+                                              },
+                                            );
+                                          }).toList(),
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 3.h,
-                                ),
-                                GestureDetector(
-                                  onTap: (){
-                                    showMultiSelectDailog(mstVillages);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Color(0xffACACAC)),
-                                      borderRadius: BorderRadius.circular(10.r),
-                                    ),
-                                    child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            TextButton(
-                                              onPressed: (){
-                                                showMultiSelectDailog(mstVillages);
-                                              },
-                                              child: Text(
-                                                Global.returnTrLable(locationControlls,CustomText.SelectVillage,lng!),overflow: TextOverflow.ellipsis,),
-                                            ),
-                                            IconButton(onPressed: (){
-                                              showMultiSelectDailog(mstVillages);
-                                            }, icon: Icon(Icons.arrow_drop_down,color: Colors.black,))
-                                          ],
-                                        ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 5,right: 5),
-                                      child: Wrap(
-                                        crossAxisAlignment: WrapCrossAlignment.start,
-                                        spacing: 8.0, // space between items
-                                        runSpacing: 8.0, // space between lines
-                                        children: selectedMVillage.map((item) {
-                                          return FilterChip(
-                                            label: Text(item.values!),
-                                            selected: selectedMVillage.contains(item),
-                                            onSelected: (isSelected) {
-                                              setState(() {
-                                                isSelected
-                                                    ? selectedMVillage.add(item)
-                                                    : selectedMVillage.remove(item);
-                                              });
-                                            },
-                                          );
-                                        }).toList(),),
-                                    )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                // Container(
-                                //   decoration: BoxDecoration(
-                                //     border: Border.all(color: Color(0xffACACAC)),
-                                //     borderRadius: BorderRadius.circular(10.r),
-                                //   ),
-                                //     child: MultiSelectDialogField(
-                                //     initialValue: selectedVillage,
-                                //     dialogHeight: 150.h,
-                                //     decoration: BoxDecoration(
-                                //       shape: BoxShape.rectangle,
-                                //     ),
-                                //     title: Text(Global.returnTrLable(
-                                //         locationControlls,
-                                //         CustomText.Village,
-                                //         lng!)),
-                                //     buttonIcon: Icon(
-                                //       Icons.arrow_drop_down,
-                                //       color: Colors.grey.shade700,
-                                //     ),
-                                //     buttonText: Text(Global.returnTrLable(
-                                //         locationControlls,
-                                //         CustomText.SelectVillage,
-                                //         lng!)),
-                                //     items: villageList
-                                //         .map((e) =>
-                                //             MultiSelectItem(e, e.toString()))
-                                //         .toList(),
-                                //     listType: MultiSelectListType.LIST,
-                                //     confirmText: Text(Global.returnTrLable(
-                                //         locationControlls, CustomText.ok, lng!)),
-                                //     cancelText: Text(Global.returnTrLable(
-                                //         locationControlls,
-                                //         CustomText.Cancel,
-                                //         lng!)),
-                                //     onConfirm: (value) {
-                                //       setState(() {
-                                //         print(value);
-                                //         selectedVillage = value;
-                                //       });
-                                //     },
-                                //   ),
-                                // ),
-                                SizedBox(height: 30.h),
-                                CElevatedButton(
-                                  onPressed: () async {
-                                    if (selectedState == null) {
-                                      Validate().singleButtonPopup(
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.plSelect_state, lng!),
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.ok, lng!),
-                                          false,
-                                          context);
-                                    } else if (selectedDistrict == null) {
-                                      Validate().singleButtonPopup(
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.plSelect_district, lng!),
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.ok, lng!),
-                                          false,
-                                          context);
-                                    } else if (selectedBlock == null) {
-                                      Validate().singleButtonPopup(
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.plSelect_block, lng!),
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.ok, lng!),
-                                          false,
-                                          context);
-                                    } else if (selectedGramPanchayat == null) {
-                                      Validate().singleButtonPopup(
-                                          Global.returnTrLable(
-                                              locationControlls,
-                                              CustomText.plSelect_geamPanchayat,
-                                              lng!),
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.ok, lng!),
-                                          false,
-                                          context);
-                                    } else if (selectedMVillage.length == 0) {
-                                      Validate().singleButtonPopup(
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.plSelect_village, lng!),
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.ok, lng!),
-                                          false,
-                                          context);
-                                    } else if (selectedMVillage.length > 40) {
-                                      Validate().singleButtonPopup(
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.crcheMaxLimit, lng!),
-                                          Global.returnTrLable(locationControlls,
-                                              CustomText.ok, lng!),
-                                          false,
-                                          context);
-                                    } else {
-                                      Validate().saveString(
-                                          Validate.state, selectedState!.name!);
-                                      Validate().saveString(Validate.district,
-                                          selectedDistrict!.name!);
-                                      Validate().saveString(
-                                          Validate.block, selectedBlock!.name!);
-                                      Validate().saveString(
-                                          Validate.gramPanchayat,
-                                          selectedGramPanchayat!.name!);
-                                      String villagesss = '';
-                                      selectedMVillage.forEach((element) {
-                                        if (Global.validString(villagesss)) {
-                                          villagesss =
-                                          '$villagesss,${element.name}';
-                                        } else
-                                          villagesss = '${element.name}';
-                                      });
-                                      Validate().saveString(
-                                          Validate.villageIdES, villagesss);
-                                      totalApiCount = 19;
-                                      callVillageFilterDataCC(
-                                          context, villagesss);
-                                    }
-                                  },
-                                  text: Global.returnTrLable(locationControlls,
-                                      CustomText.downloadData, lng!),
-                                )
-                              ],
-                            ),
-                          ])),
-                )
+                              ),
+                              // Container(
+                              //   decoration: BoxDecoration(
+                              //     border: Border.all(color: Color(0xffACACAC)),
+                              //     borderRadius: BorderRadius.circular(10.r),
+                              //   ),
+                              //     child: MultiSelectDialogField(
+                              //     initialValue: selectedVillage,
+                              //     dialogHeight: 150.h,
+                              //     decoration: BoxDecoration(
+                              //       shape: BoxShape.rectangle,
+                              //     ),
+                              //     title: Text(Global.returnTrLable(
+                              //         locationControlls,
+                              //         CustomText.Village,
+                              //         lng!)),
+                              //     buttonIcon: Icon(
+                              //       Icons.arrow_drop_down,
+                              //       color: Colors.grey.shade700,
+                              //     ),
+                              //     buttonText: Text(Global.returnTrLable(
+                              //         locationControlls,
+                              //         CustomText.SelectVillage,
+                              //         lng!)),
+                              //     items: villageList
+                              //         .map((e) =>
+                              //             MultiSelectItem(e, e.toString()))
+                              //         .toList(),
+                              //     listType: MultiSelectListType.LIST,
+                              //     confirmText: Text(Global.returnTrLable(
+                              //         locationControlls, CustomText.ok, lng!)),
+                              //     cancelText: Text(Global.returnTrLable(
+                              //         locationControlls,
+                              //         CustomText.Cancel,
+                              //         lng!)),
+                              //     onConfirm: (value) {
+                              //       setState(() {
+                              //         print(value);
+                              //         selectedVillage = value;
+                              //       });
+                              //     },
+                              //   ),
+                              // ),
+                            ],
+                          ),
+
+                        ])),
+              )
+              ),
+              // SizedBox(height: 20.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w,vertical: 20),
+                child: CElevatedButton(
+                  onPressed: () async {
+                    if (selectedState == null) {
+                      Validate().singleButtonPopup(
+                          Global.returnTrLable(locationControlls,
+                              CustomText.plSelect_state, lng!),
+                          Global.returnTrLable(locationControlls,
+                              CustomText.ok, lng!),
+                          false,
+                          context);
+                    } else if (selectedDistrict == null) {
+                      Validate().singleButtonPopup(
+                          Global.returnTrLable(locationControlls,
+                              CustomText.plSelect_district, lng!),
+                          Global.returnTrLable(locationControlls,
+                              CustomText.ok, lng!),
+                          false,
+                          context);
+                    } else if (selectedBlock == null) {
+                      Validate().singleButtonPopup(
+                          Global.returnTrLable(locationControlls,
+                              CustomText.plSelect_block, lng!),
+                          Global.returnTrLable(locationControlls,
+                              CustomText.ok, lng!),
+                          false,
+                          context);
+                    } else if (selectedMCreches.length == 0) {
+                      Validate().singleButtonPopup(
+                          Global.returnTrLable(locationControlls,
+                              CustomText.plSelect_creche, lng!),
+                          Global.returnTrLable(locationControlls,
+                              CustomText.ok, lng!),
+                          false,
+                          context);
+                    // } else if (selectedMCreches.length > 40) {
+                    //   Validate().singleButtonPopup(
+                    //       Global.returnTrLable(locationControlls,
+                    //           CustomText.crcheMaxLimit, lng!),
+                    //       Global.returnTrLable(locationControlls,
+                    //           CustomText.ok, lng!),
+                    //       false,
+                    //       context);
+                    } else {
+                      if (selectedState != null) {
+                        Validate().saveString(
+                            Validate.state, selectedState!.name!);
+                      }
+                      if (selectedDistrict != null) {
+                        Validate().saveString(Validate.district,
+                            selectedDistrict!.name!);
+                      }
+                      if (selectedBlock != null) {
+                        Validate().saveString(
+                            Validate.block, selectedBlock!.name!);
+                      }
+
+                      String crechesId = '';
+                      selectedMCreches.forEach((element) {
+                        if (Global.validString(crechesId)) {
+                          crechesId = '$crechesId,${element.name}';
+                        } else
+                          crechesId = '${element.name}';
+                      });
+                      var selectedVillage =
+                      await VillageDataHelper()
+                          .getVillageByCrecheWithCrecheList(
+                          crechesId, creches);
+                      if (Global.validString(selectedVillage)) {
+                        Validate().saveString(
+                            Validate.crecheIdES, crechesId);
+                        totalApiCount = 19;
+                        callVillageFilterDataCC(
+                            context, selectedVillage!);
+                      } else {
+                        Validate().singleButtonPopup(
+                            Global.returnTrLable(locationControlls,
+                                CustomText.villageInCreche, lng!),
+                            Global.returnTrLable(locationControlls,
+                                CustomText.ok, lng!),
+                            false,
+                            context);
+                      }
+                    }
+                  },
+                  text: Global.returnTrLable(locationControlls,
+                      CustomText.downloadData, lng!),
+                ),
+              ),
+              // SizedBox(height: 20.h),
+            ],
+          )
               : SizedBox(),
         ),
       ),
@@ -2005,40 +2005,36 @@ class _LocationScreenState extends State<CoordinatorLocationScreen> {
     }
   }
 
-
-
   showMultiSelectDailog(List<OptionsModel> items) async {
-    if(selectedGramPanchayat==null){
+    if (items.length == 0) {
       Validate().singleButtonPopup(
-          Global.returnTrLable(locationControlls,
-              CustomText.plSelect_geamPanchayat, lng!),
+          Global.returnTrLable(
+              locationControlls, CustomText.pleaseSelectCrecheOrBlock, lng!),
           Global.returnTrLable(locationControlls, CustomText.ok, lng!),
           false,
           context);
-    }else {
+    } else {
       var selectedItems = await showDialog<List<OptionsModel>>(
         context: context,
-        builder: (context) =>
-            MultiSelectButtonDialog(
-              items: items,
-              selectAll: Global.returnTrLable(locationControlls,
-                  CustomText.selectAll, lng!),
-              title: Global.returnTrLable(locationControlls,
-                  CustomText.SelectVillage, lng!),
-              selectedItem: selectedMVillage,
-              posButton: Global.returnTrLable(locationControlls,
-                  CustomText.ok, lng!),
-              negButton: Global.returnTrLable(locationControlls,
-                  CustomText.Cancel, lng!),
-            ),
+        builder: (context) => MultiSelectButtonDialog(
+          items: items,
+          selectAll: Global.returnTrLable(
+              locationControlls, CustomText.selectAll, lng!),
+          title: Global.returnTrLable(
+              locationControlls, CustomText.selectCreche, lng!),
+          selectedItem: selectedMCreches,
+          posButton:
+              Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          negButton:
+              Global.returnTrLable(locationControlls, CustomText.Cancel, lng!),
+        ),
       );
       if (selectedItems != null) {
         setState(() {
-          selectedMVillage = selectedItems;
+          selectedMCreches = selectedItems;
           print('select $selectedItems');
         });
       }
     }
   }
 }
-

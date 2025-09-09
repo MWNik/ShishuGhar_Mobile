@@ -95,6 +95,7 @@ void callbackDispatcher() {
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   var dataBaseHelper = DatabaseHelper();
   await dataBaseHelper.openDb();
 

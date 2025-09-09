@@ -24,7 +24,8 @@ import '../../enrolled_child_details_screen_new.dart';
 
 class EnrolledExitChildrenListedScreen extends StatefulWidget {
   final int crecheId;
-  const EnrolledExitChildrenListedScreen({super.key, required this.crecheId,
+   bool? isDraft;
+   EnrolledExitChildrenListedScreen({super.key, required this.crecheId, this.isDraft,
     });
 
   @override
@@ -55,10 +56,13 @@ class _EnrolledChildrenListedScreenState
   int? minAgeLimit;
   bool isOnlyUnsynched = false;
   String? role;
+  bool isLoading = true;
+
 
   @override
   void initState() {
     super.initState();
+    isOnlyUnsynched=widget.isDraft??false;
     initializeData();
   }
 
@@ -118,6 +122,7 @@ class _EnrolledChildrenListedScreenState
     filterData = isOnlyUnsynched ? unsynchedList : allList;
 
     Searchcontroller.text = '';
+    isLoading=false;
     setState(() {});
   }
 
@@ -311,7 +316,8 @@ class _EnrolledChildrenListedScreenState
               ),
             ),
             Expanded(
-              child: (filterData.length > 0)
+              child: isLoading?Center(
+                  child: CircularProgressIndicator()):(filterData.length > 0)
                   ? ListView.builder(
                       itemCount: filterData.length,
                       shrinkWrap: true,

@@ -66,6 +66,7 @@ import '../api/house_hold_fields_api.dart';
 import '../api/master_api.dart';
 import '../api/modified_date_api.dart';
 import '../api/village_profile_meta_api.dart';
+import '../custom_widget/single_poup_dailog.dart';
 import '../database/database_helper.dart';
 import '../database/helper/anthromentory/child_growth_meta_fields_helper.dart';
 import '../database/helper/anthromentory/child_growth_response_helper.dart';
@@ -143,6 +144,7 @@ import '../utils/globle_method.dart';
 import '../utils/validate.dart';
 import 'change_password_screen.dart';
 import 'dashboardscreen_new.dart';
+import 'draft_data_screen.dart';
 import 'login_screen.dart';
 
 class HomeReplicaScreen extends StatefulWidget {
@@ -743,15 +745,31 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                           builder: (context) =>
                                               const LoginScreen()),
                                       (Route<dynamic> route) => false);
-                                } else
-                                  Validate().singleButtonPopup(
-                                      Global.returnTrLable(locationControlls,
-                                          CustomText.darftDataForLogoyt, lng!),
-                                      Global.returnTrLable(locationControlls,
-                                          CustomText.ok, lng!),
-                                      false,
-                                      context);
-                              }
+                                } else{
+                                  bool? shouldProceed = await showDialog(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    builder: (context) {
+                                      return SingleButtonPopupDialog(message: Global.returnTrLable(
+                                          locationControlls,
+                                          CustomText.darftDataForLogoyt,
+                                          lng!), button: Global.returnTrLable(locationControlls,
+                                          CustomText.ok, lng!));
+                                    },
+                                  );
+                                if (shouldProceed == true) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) => DarftDataScreen(
+                                      )));
+                                }
+                                  // Validate().singleButtonPopup(
+                                  //     Global.returnTrLable(locationControlls,
+                                  //         CustomText.darftDataForLogoyt, lng!),
+                                  //     Global.returnTrLable(locationControlls,
+                                  //         CustomText.ok, lng!),
+                                  //     false,
+                                  //     context);
+                              }}
                               ;
                             }),
                         Divider(

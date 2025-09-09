@@ -49,6 +49,7 @@ import '../api/master_api.dart';
 import '../api/user_manual_pdf_api.dart';
 import '../api/village_profile_meta_api.dart';
 import '../custom_widget/double_button_dailog.dart';
+import '../custom_widget/single_poup_dailog.dart' show SingleButtonPopupDialog;
 import '../database/helper/anthromentory/child_growth_response_helper.dart';
 import '../database/helper/backdated_configiration_helper.dart';
 import '../database/helper/block_data_helper.dart';
@@ -101,7 +102,9 @@ import '../model/databasemodel/tabstate_model.dart';
 import '../model/dynamic_screen_model/house_hold_tab_responce_model.dart';
 import '../utils/validate.dart';
 import 'coordinator_location_screen.dart';
+import 'coordinator_location_screen_new.dart';
 import 'dashboardscreen_new.dart';
+import 'draft_data_screen.dart';
 import 'login_screen.dart';
 
 class SynchronizationScreenNew extends StatefulWidget {
@@ -225,15 +228,31 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                   totalApiCount = 19;
                                   callVillageFilterData(context);
                                 } else {
-                                  Validate().singleButtonPopup(
-                                      Global.returnTrLable(
+                                  bool? shouldProceed = await showDialog(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    builder: (context) {
+                                      return SingleButtonPopupDialog(message: Global.returnTrLable(
                                           locationControlls,
                                           CustomText.darftDataForComplete,
-                                          lngtr!),
-                                      Global.returnTrLable(locationControlls,
-                                          CustomText.ok, lngtr!),
-                                      false,
-                                      context);
+                                          lngtr!), button: Global.returnTrLable(locationControlls,
+                                          CustomText.ok, lngtr!));
+                                    },
+                                  );
+                                  if (shouldProceed == true) {
+                                     Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (BuildContext context) => DarftDataScreen(
+                                        )));
+                                  }
+                                  // Validate().singleButtonPopup(
+                                  //     Global.returnTrLable(
+                                  //         locationControlls,
+                                  //         CustomText.darftDataForComplete,
+                                  //         lngtr!),
+                                  //     Global.returnTrLable(locationControlls,
+                                  //         CustomText.ok, lngtr!),
+                                  //     false,
+                                  //     context);
                                 }
                               } else
                                 Validate().singleButtonPopup(
@@ -275,7 +294,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            CoordinatorLocationScreen(
+                                            CoordinatorLocationNewScreen(
                                               role: role,
                                             )),
                                   );
@@ -283,15 +302,31 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                     await initializeData();
                                   }
                                 } else {
-                                  Validate().singleButtonPopup(
-                                      Global.returnTrLable(
+                                  bool? shouldProceed = await showDialog(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    builder: (context) {
+                                      return SingleButtonPopupDialog(message: Global.returnTrLable(
                                           locationControlls,
                                           CustomText.darftDataForComplete,
-                                          lngtr!),
-                                      Global.returnTrLable(locationControlls,
-                                          CustomText.ok, lngtr!),
-                                      false,
-                                      context);
+                                          lngtr!), button: Global.returnTrLable(locationControlls,
+                                          CustomText.ok, lngtr!));
+                                    },
+                                  );
+                                  if (shouldProceed == true) {
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (BuildContext context) => DarftDataScreen(
+                                        )));
+                                  }
+                                  // Validate().singleButtonPopup(
+                                  //     Global.returnTrLable(
+                                  //         locationControlls,
+                                  //         CustomText.darftDataForComplete,
+                                  //         lngtr!),
+                                  //     Global.returnTrLable(locationControlls,
+                                  //         CustomText.ok, lngtr!),
+                                  //     false,
+                                  //     context);
                                 }
                               } else
                                 Validate().singleButtonPopup(

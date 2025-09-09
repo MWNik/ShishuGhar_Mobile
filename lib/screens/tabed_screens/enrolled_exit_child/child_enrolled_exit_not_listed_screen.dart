@@ -66,6 +66,7 @@ class _NotEnrolledChildrenListedScreenState
   String? role;
   List<Map<String, dynamic>> allList = [];
   BackdatedConfigirationModel? backdatedConfigirationModel;
+  bool isLoading = true;
 
 
   @override
@@ -160,7 +161,7 @@ class _NotEnrolledChildrenListedScreenState
     filterData = isOnlyUnsynched ? unsynchedList : allList;
     Searchcontroller.text = '';
     selectedItem = null;
-
+     isLoading = false;
     setState(() {});
   }
 
@@ -474,7 +475,8 @@ class _NotEnrolledChildrenListedScreenState
               height: 4.h,
             ),
             Expanded(
-              child: (filterData.length > 0)
+              child: isLoading?Center(
+                  child: CircularProgressIndicator()):(filterData.length > 0)
                   ? ListView.builder(
                       itemCount: filterData.length,
                       shrinkWrap: true,

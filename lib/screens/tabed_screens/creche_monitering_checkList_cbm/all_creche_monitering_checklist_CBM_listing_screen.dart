@@ -22,7 +22,8 @@ import '../../../utils/validate.dart';
 import 'creche_monitering_checklist_CBM_tab_forAdd.dart';
 
 class AllcmcCBMListingScreen extends StatefulWidget {
-  AllcmcCBMListingScreen({super.key});
+  bool? isDraft;
+  AllcmcCBMListingScreen({super.key,this.isDraft});
 
   @override
   State<AllcmcCBMListingScreen> createState() => _cmcCBMListingScreenState();
@@ -41,11 +42,12 @@ class _cmcCBMListingScreenState extends State<AllcmcCBMListingScreen> {
   List<CmcCBMResponseModel> allList = [];
   BackdatedConfigirationModel? backdatedConfigirationModel;
   final TextEditingController _crecheSearchController = TextEditingController();
-
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    isOnlyUnsynched=widget.isDraft??false;
     initializeData();
   }
 
@@ -76,7 +78,7 @@ class _cmcCBMListingScreenState extends State<AllcmcCBMListingScreen> {
         .callTranslateString(valueItems)
         .then((value) => translats.addAll(value));
     creches = await OptionsModelHelper().callCrechInOptionAll('Creche');
-
+    isLoading=false;
     await fetchCmcCBMRecords();
   }
 
@@ -195,6 +197,10 @@ class _cmcCBMListingScreenState extends State<AllcmcCBMListingScreen> {
                                 element.values != null &&
                                     element.name != null &&
                                     element.values!
+                                        .toLowerCase()
+                                        .contains(
+                                        pattern.toLowerCase())||
+                                    element.name!
                                         .toLowerCase()
                                         .contains(
                                         pattern.toLowerCase())
@@ -347,7 +353,8 @@ class _cmcCBMListingScreenState extends State<AllcmcCBMListingScreen> {
                 ],
               ),
               Expanded(
-                child: (filterData.length > 0)
+                child: isLoading? Center(
+                    child: CircularProgressIndicator()):(filterData.length > 0)
                     ? ListView.builder(
                         itemCount: filterData.length,
                         shrinkWrap: true,

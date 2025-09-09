@@ -11,7 +11,6 @@ class MainActivity: FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // Safely handle the nullable binaryMessenger
         flutterEngine?.dartExecutor?.binaryMessenger?.let { binaryMessenger ->
             MethodChannel(binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->

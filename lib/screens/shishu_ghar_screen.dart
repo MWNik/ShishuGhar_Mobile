@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
@@ -35,6 +34,7 @@ import '../model/dynamic_screen_model/options_model.dart';
 
 class ShiShuGharScreen extends StatefulWidget {
   final int type;
+
   ShiShuGharScreen({super.key, required this.type});
 
   _ShiShuGharScreenState createState() => _ShiShuGharScreenState();
@@ -42,8 +42,8 @@ class ShiShuGharScreen extends StatefulWidget {
 
 class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
   TextEditingController Searchcontroller = TextEditingController();
-  List<CresheDatabaseResponceModel> crecheData = [];
-  List<CresheDatabaseResponceModel> filteredCrecheData = [];
+  List<Map<String, dynamic>> crecheData = [];
+  List<Map<String, dynamic>> filteredCrecheData = [];
   List<Translation> translatsLabel = [];
   String lng = 'en';
   String role = '';
@@ -67,6 +67,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
   List<TabBlock> block = [];
   List<TabGramPanchayat> gramPanchayat = [];
   List<TabVillage> villages = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -116,8 +117,9 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
   }
 
   Future<void> fetchCrecheDataList() async {
-    crecheData = await CrecheDataHelper().getCrecheResponce();
+    crecheData = await CrecheDataHelper().getCrecheResponceWithCount();
     filteredCrecheData = crecheData;
+    isLoading = false;
     setState(() {});
   }
 
@@ -142,8 +144,9 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
               Padding(
                 padding: const EdgeInsets.only(right: 15),
                 child: InkWell(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => ShishuGHarNavigation())),
+                  onTap: () =>
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ShishuGHarNavigation())),
                   child: Icon(
                     Icons.place_rounded,
                     size: 15.sp,
@@ -184,7 +187,8 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                                 Spacer(),
                                 InkWell(
                                     onTap: () async {
-                                      _scaffoldKey.currentState!.closeEndDrawer();
+                                      _scaffoldKey.currentState!
+                                          .closeEndDrawer();
                                     },
                                     child: Image.asset(
                                       'assets/cross.png',
@@ -196,7 +200,8 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                           ),
                           SizedBox(),
                           DynamicCustomDropdownField(
-                            hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng),
+                            hintText: Global.returnTrLable(
+                                translatsLabel, CustomText.select_here, lng),
                             titleText: Global.returnTrLable(
                                 translatsLabel, CustomText.state, lng),
                             items: mstStates,
@@ -234,7 +239,8 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                             },
                           ),
                           DynamicCustomDropdownField(
-                            hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng),
+                            hintText: Global.returnTrLable(
+                                translatsLabel, CustomText.select_here, lng),
                             titleText: Global.returnTrLable(
                                 translatsLabel, CustomText.District, lng),
                             items: mstDistrict,
@@ -248,7 +254,8 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                               selectedGramPanchayat = null;
                               selectedVillage = null;
                               mstBlock =
-                                  Global.callBlocks(block, lng, selectedDistrict);
+                                  Global.callBlocks(
+                                      block, lng, selectedDistrict);
                               if (mstBlock.length == 1) {
                                 selectedBlock = mstBlock.first;
                                 mstGP = Global.callGramPanchyats(
@@ -266,7 +273,8 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                             },
                           ),
                           DynamicCustomDropdownField(
-                            hintText: Global.returnTrLable(translatsLabel, CustomText.select_here, lng),
+                            hintText: Global.returnTrLable(
+                                translatsLabel, CustomText.select_here, lng),
                             titleText: Global.returnTrLable(
                                 translatsLabel, CustomText.Block, lng),
                             items: mstBlock,
@@ -402,260 +410,273 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
               SizedBox(
                 height: 10.h,
               ),
-              (filteredCrecheData.length > 0)
+              isLoading ? Expanded(
+                  child: Center(
+                      child: CircularProgressIndicator())) : (filteredCrecheData
+                  .length > 0)
                   ? Expanded(
-                      child: ListView.builder(
-                          itemCount: filteredCrecheData.length,
-                          shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
-                          scrollDirection: Axis.vertical,
-                          itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
-                              onTap: () async {
-                                if (widget.type == 1) {
-                                  var refStatus = await Navigator.of(context)
-                                      .push(MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              ChildGrievancesListing(
-                                                  crecheName:
-                                                      Global.getItemValues(
-                                                          filteredCrecheData[
-                                                                  index]
-                                                              .responces!,
-                                                          'creche_name'),
-                                                  creche_id:
-                                                      filteredCrecheData[index]
-                                                          .name
-                                                          .toString())));
-                                  if (refStatus == 'itemRefresh') {
-                                    await fetchCrecheDataList();
-                                  }
-                                } else if (widget.type == 0) {
-                                  // Validate().saveString(Validate.villageId,
-                                  //     Global.getItemValues(
-                                  //         filteredCrecheData[index].responces!,
-                                  //         'village_id'));
-                                  var refStatus = await Navigator.of(context)
-                                      .push(MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              ShishuGharDetailsBottomBar(
-                                                crecheId:
-                                                    filteredCrecheData[index]
-                                                        .name!,
+                child: ListView.builder(
+                    itemCount: filteredCrecheData.length,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () async {
+                          if (widget.type == 1) {
+                            var refStatus = await Navigator.of(context)
+                                .push(MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    ChildGrievancesListing(
+                                        crecheName:
+                                        Global.getItemValues(
+                                            filteredCrecheData[
+                                            index]
+                                            ['responces']!,
+                                            'creche_name'),
+                                        creche_id:
+                                        filteredCrecheData[index]
+                                        ['name']
+                                            .toString())));
+                            if (refStatus == 'itemRefresh') {
+                              await fetchCrecheDataList();
+                            }
+                          } else if (widget.type == 0) {
+                            // Validate().saveString(Validate.villageId,
+                            //     Global.getItemValues(
+                            //         filteredCrecheData[index]['responces']!,
+                            //         'village_id'));
+                            var refStatus = await Navigator.of(context)
+                                .push(MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    ShishuGharDetailsBottomBar(
+                                      crecheId:
+                                      filteredCrecheData[index]
+                                      ['name']!,
 
-                                                index: 2,
-                                                crecheName: Global.getItemValues(
-                                                    filteredCrecheData[index]
-                                                        .responces!,
-                                                    'creche_name'),
-                                                crecheCode: Global.getItemValues(
-                                                    filteredCrecheData[index]
-                                                        .responces!,
-                                                    'creche_id'),
-                                                isUpdateImage: Global.validString(
-                                                    Global.getItemValues(
-                                                        crecheData[index]
-                                                            .responces!,
-                                                        'image')),
-                                              )));
-                                  if (refStatus == 'itemRefresh') {
-                                    await fetchCrecheDataList();
-                                  }
-                                } else if (widget.type == 2) {
-                                  String refStatus = '';
-                                  // Validate().saveString(Validate.villageId,
-                                  //     Global.getItemValues(
-                                  //         filteredCrecheData[index].responces!,
-                                  //         'village_id'));
-                                  if (role == 'Creche Supervisor') {
-                                    refStatus = await Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                CrecheMonitorListingScreen(
-                                                    crecheId:
-                                                        filteredCrecheData[index]
-                                                            .name
-                                                            .toString(),
-                                                    crecheName:
-                                                        Global.getItemValues(
-                                                            filteredCrecheData[
-                                                                    index]
-                                                                .responces!,
-                                                            'creche_name'))));
-                                  } else if (role == 'Cluster Coordinator') {
-                                    refStatus = await Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                cmcCCListingScreen(
-                                                    creche_id:
-                                                        filteredCrecheData[index]
-                                                            .name
-                                                            .toString(),
-                                                    crecheName:
-                                                        Global.getItemValues(
-                                                            filteredCrecheData[
-                                                                    index]
-                                                                .responces!,
-                                                            'creche_name'))));
-                                  } else if (role ==
-                                      'Accounts and Logistics Manager') {
-                                    refStatus = await Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                cmcALMListingScreen(
-                                                    creche_id:
-                                                        filteredCrecheData[index]
-                                                            .name
-                                                            .toString(),
-                                                    crecheName:
-                                                        Global.getItemValues(
-                                                            filteredCrecheData[
-                                                                    index]
-                                                                .responces!,
-                                                            'creche_name'))));
-                                  } else if (role ==
-                                      'Capacity and Building Manager') {
-                                    refStatus = await Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                cmcCBMListingScreen(
-                                                    creche_id:
-                                                        filteredCrecheData[index]
-                                                            .name
-                                                            .toString(),
-                                                    crecheName:
-                                                        Global.getItemValues(
-                                                            filteredCrecheData[
-                                                                    index]
-                                                                .responces!,
-                                                            'creche_name'))));
-                                  }
-                                  if (refStatus == 'itemRefresh') {
-                                    await fetchCrecheDataList();
-                                  }
-                                }
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 5.h),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(0xff5A5A5A).withOpacity(
-                                              0.2), // Shadow color with opacity
-                                          offset: Offset(0,
-                                              3), // Horizontal and vertical offset
-                                          blurRadius: 6, // Blur radius
-                                          spreadRadius: 0, // Spread radius
-                                        ),
-                                      ],
-                                      color: Colors.white,
-                                      border:
-                                          Border.all(color: Color(0xffE7F0FF)),
-                                      borderRadius: BorderRadius.circular(10.r)),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w, vertical: 8.h),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      index: 2,
+                                      crecheName: Global.getItemValues(
+                                          filteredCrecheData[index]
+                                          ['responces']!,
+                                          'creche_name'),
+                                      crecheCode: Global.getItemValues(
+                                          filteredCrecheData[index]
+                                          ['responces']!,
+                                          'creche_id'),
+                                      isUpdateImage: Global.validString(
+                                          Global.getItemValues(
+                                              crecheData[index]
+                                              ['responces']!,
+                                              'image')),
+                                    )));
+                            if (refStatus == 'itemRefresh') {
+                              await fetchCrecheDataList();
+                            }
+                          } else if (widget.type == 2) {
+                            String refStatus = '';
+                            // Validate().saveString(Validate.villageId,
+                            //     Global.getItemValues(
+                            //         filteredCrecheData[index]['responces']!,
+                            //         'village_id'));
+                            if (role == 'Creche Supervisor') {
+                              refStatus = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          CrecheMonitorListingScreen(
+                                              crecheId:
+                                              filteredCrecheData[index]
+                                              ['name']
+                                                  .toString(),
+                                              crecheName:
+                                              Global.getItemValues(
+                                                  filteredCrecheData[
+                                                  index]
+                                                  ['responces']!,
+                                                  'creche_name'))));
+                            } else if (role == 'Cluster Coordinator') {
+                              refStatus = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          cmcCCListingScreen(
+                                              creche_id:
+                                              filteredCrecheData[index]
+                                              ['name']
+                                                  .toString(),
+                                              crecheName:
+                                              Global.getItemValues(
+                                                  filteredCrecheData[
+                                                  index]['responces'],
+                                                  'creche_name'))));
+                            } else if (role ==
+                                'Accounts and Logistics Manager') {
+                              refStatus = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          cmcALMListingScreen(
+                                              creche_id:
+                                              filteredCrecheData[index]
+                                              ['name']
+                                                  .toString(),
+                                              crecheName:
+                                              Global.getItemValues(
+                                                  filteredCrecheData[
+                                                  index]
+                                                  ['responces'],
+                                                  'creche_name'))));
+                            } else if (role ==
+                                'Capacity and Building Manager') {
+                              refStatus = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          cmcCBMListingScreen(
+                                              creche_id:
+                                              filteredCrecheData[index]
+                                              ['name']
+                                                  .toString(),
+                                              crecheName:
+                                              Global.getItemValues(
+                                                  filteredCrecheData[
+                                                  index]
+                                                  ['responces'],
+                                                  'creche_name'))));
+                            }
+                            if (refStatus == 'itemRefresh') {
+                              await fetchCrecheDataList();
+                            }
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.h),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xff5A5A5A).withOpacity(
+                                        0.2), // Shadow color with opacity
+                                    offset: Offset(0,
+                                        3), // Horizontal and vertical offset
+                                    blurRadius: 6, // Blur radius
+                                    spreadRadius: 0, // Spread radius
+                                  ),
+                                ],
+                                color: Global.getColorByData(
+                                    filteredCrecheData[index]['child_count']),
+                                border:
+                                Border.all(color: Color(0xffE7F0FF)),
+                                borderRadius: BorderRadius.circular(10.r)),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w, vertical: 8.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${Global.returnTrLable(
+                                            translatsLabel, CustomText.CrecheId,
+                                            lng).trim()} :',
+                                        style: Styles.black104,
+                                      ),
+                                      Text(
+                                        '${Global
+                                            .returnTrLable(translatsLabel,
+                                            CustomText.Creche_Name, lng)
+                                            .trim()} :',
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1.3),
+                                      ),
+                                      Text(
+                                        '${Global.returnTrLable(
+                                            translatsLabel, CustomText.Village,
+                                            lng).trim()} :',
+                                        style: Styles.black104,
+                                        strutStyle: StrutStyle(height: 1.3),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 10),
+                                  SizedBox(
+                                    height:
+                                    MediaQuery
+                                        .of(context)
+                                        .size
+                                        .height *
+                                        0.06,
+                                    width: 2,
+                                    child: VerticalDivider(
+                                      color: Color(0xffE6E6E6),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.start,
                                       children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '${Global.returnTrLable(translatsLabel, CustomText.CrecheId, lng).trim()} :',
-                                              style: Styles.black104,
-                                            ),
-                                            Text(
-                                              '${Global.returnTrLable(translatsLabel, CustomText.Creche_Name, lng).trim()} :',
-                                              style: Styles.black104,
-                                              strutStyle: StrutStyle(height: 1.3),
-                                            ),
-                                            Text(
-                                              '${Global.returnTrLable(translatsLabel, CustomText.Village, lng).trim()} :',
-                                              style: Styles.black104,
-                                              strutStyle: StrutStyle(height: 1.3),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(width: 10),
-                                        SizedBox(
-                                          height:
-                                              MediaQuery.of(context).size.height *
-                                                  0.06,
-                                          width: 2,
-                                          child: VerticalDivider(
-                                            color: Color(0xffE6E6E6),
-                                          ),
-                                        ),
-                                        SizedBox(width: 10),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  Global.getItemValues(
-                                                      filteredCrecheData[index]
-                                                          .responces!,
-                                                      'creche_id'),
-                                                  style: Styles.cardBlue10,
-                                                  overflow:
-                                                      TextOverflow.ellipsis),
-                                              Text(
-                                                  Global.getItemValues(
-                                                      filteredCrecheData[index]
-                                                          .responces!,
-                                                      'creche_name'),
-                                                  style: Styles.cardBlue10,
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.3),
-                                                  overflow:
-                                                      TextOverflow.ellipsis),
-                                              Text(
-                                                  callVillageName(
-                                                      filteredCrecheData[index]
-                                                          .responces!),
-                                                  style: Styles.cardBlue10,
-                                                  strutStyle:
-                                                      StrutStyle(height: 1.3),
-                                                  overflow:
-                                                      TextOverflow.ellipsis),
-                                            ],
-                                          ),
-                                        ),
-                                        (filteredCrecheData[index].is_edited ==
-                                                    0 &&
+                                        Text(
+                                            Global.getItemValues(
                                                 filteredCrecheData[index]
-                                                        .is_uploaded ==
-                                                    1)
-                                            ? Image.asset(
-                                                "assets/sync.png",
-                                                scale: 1.5,
-                                              )
-                                            : Image.asset(
-                                                "assets/sync_gray.png",
-                                                scale: 1.5,
-                                              )
+                                                ['responces']!,
+                                                'creche_id'),
+                                            style: Styles.cardBlue10,
+                                            overflow:
+                                            TextOverflow.ellipsis),
+                                        Text(
+                                            Global.getItemValues(
+                                                filteredCrecheData[index]
+                                                ['responces']!,
+                                                'creche_name'),
+                                            style: Styles.cardBlue10,
+                                            strutStyle:
+                                            StrutStyle(height: 1.3),
+                                            overflow:
+                                            TextOverflow.ellipsis),
+                                        Text(
+                                            callVillageName(
+                                                filteredCrecheData[index]
+                                                ['responces']!),
+                                            style: Styles.cardBlue10,
+                                            strutStyle:
+                                            StrutStyle(height: 1.3),
+                                            overflow:
+                                            TextOverflow.ellipsis),
                                       ],
                                     ),
                                   ),
-                                ),
+                                  (filteredCrecheData[index]['is_edited'] ==
+                                      0 &&
+                                      filteredCrecheData[index]['is_uploaded']
+                                          ==
+                                          1)
+                                      ? Image.asset(
+                                    "assets/sync.png",
+                                    scale: 1.5,
+                                  )
+                                      : Image.asset(
+                                    "assets/sync_gray.png",
+                                    scale: 1.5,
+                                  )
+                                ],
                               ),
-                            );
-                          }),
-                    )
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+              )
                   : Expanded(
-                      child: Center(
-                          child: Text(Global.returnTrLable(translatsLabel,
-                              CustomText.NorecordAvailable, lng)))),
+                  child: Center(
+                      child: Text(Global.returnTrLable(translatsLabel,
+                          CustomText.NorecordAvailable, lng)))),
               SizedBox(
                 height: 10.h,
               ),
@@ -670,12 +691,12 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
     if (entry.length > 0) {
       filteredCrecheData = crecheData
           .where((element) =>
-              (Global.getItemValues(element.responces!, 'creche_id'))
-                  .toLowerCase()
-                  .startsWith(entry.toLowerCase()) ||
-              (Global.getItemValues(element.responces!, 'creche_name'))
-                  .toLowerCase()
-                  .startsWith(entry.toLowerCase()))
+      (Global.getItemValues(element['responces']!, 'creche_id'))
+          .toLowerCase()
+          .startsWith(entry.toLowerCase()) ||
+          (Global.getItemValues(element['responces']!, 'creche_name'))
+              .toLowerCase()
+              .startsWith(entry.toLowerCase()))
           .toList();
     } else {
       filteredCrecheData = crecheData;
@@ -688,8 +709,8 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
     String returnValue = '';
     var items = villages
         .where((element) =>
-            element.name ==
-            int.parse(Global.getItemValues(crecheItem, 'village_id')))
+    element.name ==
+        int.parse(Global.getItemValues(crecheItem, 'village_id')))
         .toList();
     if (items.length > 0) {
       returnValue = items[0].value!;
@@ -699,15 +720,21 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
 
   void cleaAllFilter() {
     filteredCrecheData = crecheData;
+    selectedState = null;
+    selectedDistrict = null;
+    selectedBlock = null;
     selectedVillage = null;
     selectedGramPanchayat = null;
     Searchcontroller.text = '';
-    setState(() {});
+    mstStates=[];
+    mstDistrict=[];
+    mstBlock=[];
+    mstGP=[];
+    villages=[];
+    fetchStateList();
   }
 
-  filteredgetData(
-    BuildContext mContext,
-  ) async {
+  filteredgetData(BuildContext mContext,) async {
     // if (selectedState == null) {
     //   Validate().singleButtonPopup(
     //       Global.returnTrLable(translatsLabel, CustomText.plSelect_state, lng!),
@@ -715,91 +742,108 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
     //       false,
     //       context);
     // } else if (selectedDistrict == null) {
-    //   Validate().singleButtonPopup(
-    //       Global.returnTrLable(translatsLabel, CustomText.plSelect_district, lng!),
-    //       Global.returnTrLable(translatsLabel, CustomText.ok, lng!),
-    //       false,
-    //       context);
-    // } else if (selectedBlock == null) {
-    //   Validate().singleButtonPopup(
-    //       Global.returnTrLable(translatsLabel, CustomText.plSelect_block, lng!),
-    //       Global.returnTrLable(translatsLabel, CustomText.ok, lng!),
-    //       false,
-    //       context);
-    // } else if (selectedGramPanchayat == null) {
-    //   Validate().singleButtonPopup(
-    //       Global.returnTrLable(translatsLabel, CustomText.plSelect_geamPanchayat, lng!),
-    //       Global.returnTrLable(translatsLabel, CustomText.ok, lng!),
-    //       false,
-    //       context);
-    // } else if (selectedVillage == null) {
-    //   Validate().singleButtonPopup(
-    //       Global.returnTrLable(translatsLabel, CustomText.plSelect_village, lng!),
-    //       Global.returnTrLable(translatsLabel, CustomText.ok, lng!),
-    //       false,
-    //       context);
-    // } else {
-    //   var villageId = villages.where((element) =>
-    //   element.value!.toLowerCase() == selectedVillage!.toLowerCase())
-    //       .toList();
-    //   if (villageId.length > 0) {
+      //   Validate().singleButtonPopup(
+      //       Global.returnTrLable(translatsLabel, CustomText.plSelect_district, lng!),
+      //       Global.returnTrLable(translatsLabel, CustomText.ok, lng!),
+      //       false,
+      //       context);
+      // } else if (selectedBlock == null) {
+      //   Validate().singleButtonPopup(
+      //       Global.returnTrLable(translatsLabel, CustomText.plSelect_block, lng!),
+      //       Global.returnTrLable(translatsLabel, CustomText.ok, lng!),
+      //       false,
+      //       context);
+      // } else if (selectedGramPanchayat == null) {
+      //   Validate().singleButtonPopup(
+      //       Global.returnTrLable(translatsLabel, CustomText.plSelect_geamPanchayat, lng!),
+      //       Global.returnTrLable(translatsLabel, CustomText.ok, lng!),
+      //       false,
+      //       context);
+      // } else if (selectedVillage == null) {
+      //   Validate().singleButtonPopup(
+      //       Global.returnTrLable(translatsLabel, CustomText.plSelect_village, lng!),
+      //       Global.returnTrLable(translatsLabel, CustomText.ok, lng!),
+      //       false,
+      //       context);
+      // } else {
+      //   var villageId = villages.where((element) =>
+      //   element.value!.toLowerCase() == selectedVillage!.toLowerCase())
+      //       .toList();
+      //   if (villageId.length > 0) {
 
-    //     filteredCrecheData = crecheData.where((item) {
-    //       var viItem = Global.getItemValues(item.responces!, 'village_id');
-    //       return viItem.toString() == villageId[0].name.toString();
-    //     }).toList();
+      //     filteredCrecheData = crecheData.where((item) {
+      //       var viItem = Global.getItemValues(item.responces!, 'village_id');
+      //       return viItem.toString() == villageId[0].name.toString();
+      //     }).toList();
 
-    //   }
-    // }
-    if (selectedGramPanchayat != null && selectedVillage != null) {
-      filteredCrecheData = crecheData.where((item) {
-        var viItem = Global.getItemValues(item.responces!, 'village_id');
-        var grItem = Global.getItemValues(item.responces!, 'gp_id');
-        return viItem.toString() == selectedVillage?.name.toString() &&
-            grItem.toString() == selectedGramPanchayat?.name.toString();
-      }).toList();
-    } else if (selectedGramPanchayat != null) {
-      filteredCrecheData = crecheData.where((item) {
-        var grItem = Global.getItemValues(item.responces!, 'gp_id');
-        return grItem.toString() == selectedGramPanchayat?.name.toString();
-      }).toList();
-    } else if (selectedVillage != null) {
-      filteredCrecheData = crecheData.where((item) {
-        var viItem = Global.getItemValues(item.responces!, 'village_id');
-        return viItem.toString() == selectedVillage?.name.toString();
-      }).toList();
+      //   }
+      // }
+      if (selectedState != null && selectedDistrict == null) {
+        filteredCrecheData = crecheData.where((item) {
+          var stateId = Global.getItemValues(
+              item['responces'], 'state_id');
+          return stateId.toString() == selectedState?.name.toString();
+        }).toList();
+      } else if (selectedDistrict != null && selectedBlock == null) {
+        filteredCrecheData = crecheData.where((item) {
+          var districtId = Global.getItemValues(
+              item['responces'], 'district_id');
+          return districtId.toString() == selectedDistrict?.name.toString();
+        }).toList();
+      } else if (selectedBlock != null && selectedGramPanchayat == null) {
+        filteredCrecheData = crecheData.where((item) {
+          var blockId = Global.getItemValues(item['responces'], 'block_id');
+          return blockId.toString() == selectedBlock?.name.toString();
+        }).toList();
+      } else if (selectedGramPanchayat != null && selectedVillage != null) {
+        filteredCrecheData = crecheData.where((item) {
+          var viItem = Global.getItemValues(item['responces'], 'village_id');
+          var grItem = Global.getItemValues(item['responces'], 'gp_id');
+          return viItem.toString() == selectedVillage?.name.toString() &&
+              grItem.toString() == selectedGramPanchayat?.name.toString();
+        }).toList();
+      } else if (selectedGramPanchayat != null) {
+        filteredCrecheData = crecheData.where((item) {
+          var grItem = Global.getItemValues(item['responces'], 'gp_id');
+          return grItem.toString() == selectedGramPanchayat?.name.toString();
+        }).toList();
+      } else if (selectedVillage != null) {
+        filteredCrecheData = crecheData.where((item) {
+          var viItem = Global.getItemValues(item['responces'], 'village_id');
+          return viItem.toString() == selectedVillage?.name.toString();
+        }).toList();
+      }
+
+      setState(() {});
     }
 
-    setState(() {});
+    Future<void> fetchStateList() async {
+      states = await StateDataHelper().getTabStateList();
+      district = await DistrictDataHelper().getTabDistrictList();
+      block = await BlockDataHelper().getTabBlockList();
+      gramPanchayat = await GramPanchayatDataHelper().getTabGramPanchayatList();
+      villages = await VillageDataHelper().getTabVillageList();
+
+      mstStates = Global.callSatates(states, lng);
+
+      if (mstStates.length == 1) {
+        selectedState = mstStates.first;
+        mstDistrict = Global.callDistrict(district, lng, selectedState);
+      }
+      if (mstDistrict.length == 1) {
+        selectedDistrict = mstDistrict.first;
+        mstBlock = Global.callBlocks(block, lng, selectedDistrict);
+      }
+      if (mstBlock.length == 1) {
+        selectedBlock = mstBlock.first;
+        mstGP = Global.callGramPanchyats(gramPanchayat, lng, selectedBlock);
+      }
+      if (mstGP.length == 1) {
+        selectedGramPanchayat = mstGP.first;
+        mstVillage =
+            Global.callFiltersVillages(villages, lng, selectedGramPanchayat);
+      }
+
+      setState(() {});
+    }
   }
-
-  Future<void> fetchStateList() async {
-    states = await StateDataHelper().getTabStateList();
-    district = await DistrictDataHelper().getTabDistrictList();
-    block = await BlockDataHelper().getTabBlockList();
-    gramPanchayat = await GramPanchayatDataHelper().getTabGramPanchayatList();
-    villages = await VillageDataHelper().getTabVillageList();
-
-    mstStates = Global.callSatates(states, lng);
-
-    if (mstStates.length == 1) {
-      selectedState = mstStates.first;
-      mstDistrict = Global.callDistrict(district, lng, selectedState);
-    }
-    if (mstDistrict.length == 1) {
-      selectedDistrict = mstDistrict.first;
-      mstBlock = Global.callBlocks(block, lng, selectedDistrict);
-    }
-    if (mstBlock.length == 1) {
-      selectedBlock = mstBlock.first;
-      mstGP = Global.callGramPanchyats(gramPanchayat, lng, selectedBlock);
-    }
-    if (mstGP.length == 1) {
-      selectedGramPanchayat = mstGP.first;
-      mstVillage =
-          Global.callFiltersVillages(villages, lng, selectedGramPanchayat);
-    }
-
-    setState(() {});
-  }
-}

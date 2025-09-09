@@ -36,7 +36,7 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
   String lng = 'en';
   bool isOnlyUnsyched = false;
   BackdatedConfigirationModel? backdatedConfigirationModel;
-
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -77,7 +77,7 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
         .then((value) => translats.addAll(value));
 
     await fetchCmcCCRecords();
-
+    isLoading=false;
     setState(() {});
   }
 
@@ -148,7 +148,8 @@ class _cmcCCListingScreenState extends State<cmcCCListingScreen> {
               ],
             ),
             Expanded(
-              child: (filterCCdata.length > 0)
+              child: isLoading? Center(
+                  child: CircularProgressIndicator()):(filterCCdata.length > 0)
                   ? ListView.builder(
                       itemCount: filterCCdata.length,
                       shrinkWrap: true,

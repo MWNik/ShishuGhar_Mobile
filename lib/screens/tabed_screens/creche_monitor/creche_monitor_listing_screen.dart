@@ -40,6 +40,8 @@ class _CrecheMonitorListingScreenState
   List<Translation> translats = [];
   bool isOnlyUnsynched = false;
   BackdatedConfigirationModel? backdatedConfigirationModel;
+  bool isLoading = true;
+
 
   @override
   void initState() {
@@ -71,7 +73,7 @@ class _CrecheMonitorListingScreenState
         .then((value) => translats.addAll(value));
     print(widget.crecheId);
     await fetchCmcData();
-
+    isLoading=false;
     setState(() {});
   }
 
@@ -155,7 +157,8 @@ class _CrecheMonitorListingScreenState
               ),
             ),
             Expanded(
-              child: filterData.length > 0
+              child: isLoading? Center(
+                  child: CircularProgressIndicator()): filterData.length > 0
                   ? ListView.builder(
                       itemCount: filterData.length,
                       shrinkWrap: true,

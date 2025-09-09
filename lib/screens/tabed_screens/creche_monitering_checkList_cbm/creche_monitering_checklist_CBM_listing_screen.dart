@@ -35,7 +35,7 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
   List<CmcCBMResponseModel> usynchedList = [];
   List<CmcCBMResponseModel> allList = [];
   BackdatedConfigirationModel? backdatedConfigirationModel;
-
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -76,6 +76,7 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
         .then((value) => translats.addAll(value));
 
     await fetchCmcCBMRecords();
+    isLoading=false;
     setState(() {});
   }
 
@@ -148,7 +149,8 @@ class _cmcCBMListingScreenState extends State<cmcCBMListingScreen> {
               ],
             ),
             Expanded(
-              child: (cmcCBMData.length > 0)
+              child: isLoading? Center(
+                  child: CircularProgressIndicator()):(cmcCBMData.length > 0)
                   ? ListView.builder(
                       itemCount: cmcCBMData.length,
                       shrinkWrap: true,

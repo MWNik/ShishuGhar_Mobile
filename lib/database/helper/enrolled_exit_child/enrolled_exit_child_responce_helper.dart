@@ -148,6 +148,18 @@ class EnrolledExitChilrenResponceHelper {
     return items;
   }
 
+  Future<List<EnrolledExitChildResponceModel>> callChildrenForDraft() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from enrollred_exit_child_responce where is_edited=2');
+    List<EnrolledExitChildResponceModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(EnrolledExitChildResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<EnrolledExitChildResponceModel>>
       callChildrenForUploadDarftEdited() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(

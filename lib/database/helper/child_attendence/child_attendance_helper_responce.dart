@@ -80,6 +80,20 @@ class ChildAttendanceResponceHelper {
   }
 
   Future<List<ChildAttendanceResponceModel>>
+  callChildAttendencesAllForDarft() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery('select * from child_attendance_responce where is_edited=2');
+
+    List<ChildAttendanceResponceModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(ChildAttendanceResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
+  Future<List<ChildAttendanceResponceModel>>
       callChildAttendencesAllForUpoadEditDarft() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'select * from child_attendance_responce where is_edited=1 or is_edited=2');

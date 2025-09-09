@@ -87,6 +87,19 @@ class CmcALMTabResponseHelper {
 
     return items;
   }
+
+  Future<List<CmcALMResponseModel>> getAlmForDraft() async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from tabCreche_Monitering_Checklist_ALM_response where is_edited=2');
+    List<CmcALMResponseModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(CmcALMResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<CmcALMResponseModel>> getAlmForUploadDarftEdited() async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
         'select * from tabCreche_Monitering_Checklist_ALM_response where is_edited=1 or is_edited=2');

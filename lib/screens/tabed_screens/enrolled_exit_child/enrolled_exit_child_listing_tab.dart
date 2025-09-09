@@ -12,12 +12,13 @@ import 'children_enrolled_exit_listed_screen.dart';
 class EnrolledExitChildListingTab extends StatefulWidget {
   final int creCheId;
   final String village_id;
+  bool? isDraft;
 
-
-  const EnrolledExitChildListingTab({
+   EnrolledExitChildListingTab({
     super.key,
     required this.creCheId,
     required this.village_id,
+     this.isDraft,
 
   });
 
@@ -178,7 +179,7 @@ class _EnrolledChildrenListingTabState
         ));
       } else
         tabItem
-            .add(EnrolledExitChildrenListedScreen(crecheId: widget.creCheId,
+            .add(EnrolledExitChildrenListedScreen(crecheId: widget.creCheId,isDraft: widget.isDraft,
         ));
     }
     return tabItem;

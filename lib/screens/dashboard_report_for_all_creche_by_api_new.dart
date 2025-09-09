@@ -553,7 +553,8 @@ class _DashboardReportSupeByApiState
                                         onChanged: (value) {
                                           selectedCreche = value;
                                         },
-                                      ):Column(
+                                      )
+                                          :Column(
                                         crossAxisAlignment: CrossAxisAlignment
                                             .start,
                                         children: [
@@ -582,6 +583,10 @@ class _DashboardReportSupeByApiState
                                                   element.values != null &&
                                                       element.name != null &&
                                                       element.values!
+                                                          .toLowerCase()
+                                                          .contains(
+                                                          pattern.toLowerCase())||
+                                                      element.name!
                                                           .toLowerCase()
                                                           .contains(
                                                           pattern.toLowerCase())

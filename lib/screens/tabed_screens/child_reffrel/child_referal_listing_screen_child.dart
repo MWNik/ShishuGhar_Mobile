@@ -25,6 +25,7 @@ import 'child_refferal_tab_screen.dart';
 class ChildReferralSpecificChildListingScreen extends StatefulWidget {
   String tabTitle;
   String? enrolledChildGUID;
+
   ChildReferralSpecificChildListingScreen(
       {super.key, required this.tabTitle, this.enrolledChildGUID});
 
@@ -50,7 +51,7 @@ class _ChildReferralListingScreenState
   var applicableDate = Validate().stringToDate("2024-12-31");
   var now = DateTime.parse(Validate().currentDate());
   BackdatedConfigirationModel? backdatedConfigirationModel;
-  bool isLoading=true;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -61,7 +62,8 @@ class _ChildReferralListingScreenState
   Future<void> initializeData() async {
     var date = await Validate().readString(Validate.date);
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
-    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.ChildReffrel);
+    backdatedConfigirationModel = await BackdatedConfigirationHelper()
+        .excuteBackdatedConfigirationModel(CustomText.ChildReffrel);
     translats.clear();
     var lngtr = await Validate().readString(Validate.sLanguage);
     if (lngtr != null) {
@@ -94,111 +96,118 @@ class _ChildReferralListingScreenState
   Future<void> allChildWithlatestSpecifChild(
       List<ChildGrowthMetaResponseModel> childAnthro) async {
     if (childAnthro.isNotEmpty) {
-    Map<String, dynamic> allAnthroWithChild = {};
-    childAnthro.forEach((element) {
-      allAnthroWithChild[
-              Global.getItemValues(element.responces!, 'measurement_date')] =
-          jsonDecode(element.responces!)['anthropromatic_details'];
-    });
-    DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+      Map<String, dynamic> allAnthroWithChild = {};
+      childAnthro.forEach((element) {
+        allAnthroWithChild[
+                Global.getItemValues(element.responces!, 'measurement_date')] =
+            jsonDecode(element.responces!)['anthropromatic_details'];
+      });
+      DateFormat dateFormat = DateFormat('yyyy-MM-dd');
 
-    // Sort the entries by date keys
-    List<MapEntry<String, dynamic>> sortedEntries = allAnthroWithChild.entries
-        .toList()
-      ..sort((e1, e2) =>
-          dateFormat.parse(e1.key).compareTo(dateFormat.parse(e2.key)));
+      // Sort the entries by date keys
+      List<MapEntry<String, dynamic>> sortedEntries = allAnthroWithChild.entries
+          .toList()
+        ..sort((e1, e2) =>
+            dateFormat.parse(e1.key).compareTo(dateFormat.parse(e2.key)));
 
-    // Create a new map from the sorted entries
-    Map<String, dynamic> sortedMap = Map.fromEntries(sortedEntries);
-    Map<String, dynamic> childWith = {};
-    var entries = sortedMap.entries.toList();
-    // sortedMap.forEach((key, value) async {
-    for (int i = 0; i < entries.length; i++) {
-      var key = entries[i].key;
-      var value = entries[i].value;
-      List<dynamic> childItem = value as List<dynamic>;
-      for (int i = 0; i < childItem.length; i++) {
-        var element = childItem[i];
-        var gfReco =
-        await checkSUWCondition(element['childenrollguid'], key, element);
-        if (Global.stringToDouble(
-                    element['weight_for_height'].toString()) ==
-                1 ||
-            Global.validString(gfReco) ||
-            Global.stringToInt(
-                    element['any_medical_major_illness'].toString()) ==
-                1 ||
-            Global.stringToDouble(element['weight_for_age'].toString()) == 1) {
-          if (widget.enrolledChildGUID == element['childenrollguid']) {
-            Map<String, dynamic> growthData = {};
-            growthData['childenrollguid'] = element['childenrollguid'];
-            growthData['cgmguid'] = element['cgmguid'];
-            growthData['measurement_taken_date'] = element['measurement_taken_date'];
-            var category = '';
-            if (Global.stringToInt(
-                element['any_medical_major_illness'].toString()) ==
-                1) {
-              category = Global.validString(category)
-                  ? '$category,Major Illness'
-                  : 'Major Illness';
-              // growthData['category'] = 'Major Illness';
-            }
-            if (Global.stringToDouble(element['weight_for_age'].toString()) ==
-                1 ||
-                Global.stringToDouble(
-                    element['weight_for_height'].toString()) ==
+      // Create a new map from the sorted entries
+      Map<String, dynamic> sortedMap = Map.fromEntries(sortedEntries);
+      Map<String, dynamic> childWith = {};
+      var entries = sortedMap.entries.toList();
+      // sortedMap.forEach((key, value) async {
+      for (int i = 0; i < entries.length; i++) {
+        var key = entries[i].key;
+        var value = entries[i].value;
+        List<dynamic> childItem = value as List<dynamic>;
+        for (int i = 0; i < childItem.length; i++) {
+          var element = childItem[i];
+          if (Global.stringToInt(
+                  element['do_you_have_height_weight'].toString()) ==
+              1) {
+            var gfReco = await checkSUWCondition(
+                element['childenrollguid'], key, element);
+            if (Global.stringToDouble(
+                        element['weight_for_height'].toString()) ==
+                    1 ||
+                Global.validString(gfReco) ||
+                Global.stringToInt(
+                        element['any_medical_major_illness'].toString()) ==
+                    1 ||
+                Global.stringToDouble(element['weight_for_age'].toString()) ==
                     1) {
-              // growthData['category'] = 'SAM';
-              category = Global.validString(category) ? '$category,SAM' : 'SAM';
+              if (widget.enrolledChildGUID == element['childenrollguid']) {
+                Map<String, dynamic> growthData = {};
+                growthData['childenrollguid'] = element['childenrollguid'];
+                growthData['cgmguid'] = element['cgmguid'];
+                growthData['measurement_taken_date'] =
+                    element['measurement_taken_date'];
+                var category = '';
+                if (Global.stringToInt(
+                        element['any_medical_major_illness'].toString()) ==
+                    1) {
+                  category = Global.validString(category)
+                      ? '$category,Major Illness'
+                      : 'Major Illness';
+                  // growthData['category'] = 'Major Illness';
+                }
+                if (Global.stringToDouble(
+                            element['weight_for_age'].toString()) ==
+                        1 ||
+                    Global.stringToDouble(
+                            element['weight_for_height'].toString()) ==
+                        1) {
+                  // growthData['category'] = 'SAM';
+                  category =
+                      Global.validString(category) ? '$category,SAM' : 'SAM';
+                }
+                if (Global.validString(gfReco)) {
+                  category = Global.validString(category)
+                      ? '$category,$gfReco'
+                      : '$gfReco';
+                }
+                growthData['category'] = category;
+                if (category != 'GF1') {
+                  childWith[key] = growthData;
+                }
+              }
             }
-            if (Global.validString(gfReco)) {
-              category = Global.validString(category)
-                  ? '$category,$gfReco'
-                  : '$gfReco';
-            }
-            growthData['category'] = category;
-            if(category!='GF1'){
-              childWith[key] = growthData;
-            }
-
           }
         }
-      };
-    };
-    childWith.forEach((key, value) {
-      var enrolChilGUID = value['childenrollguid'];
-      childrenIdList.add(enrolChilGUID);
-      growthGuidByDate[key] = value;
-    });
-    print("final child $childWith");
-    enrolledChildrenList = await EnrolledExitChilrenResponceHelper()
-        .callEnrollChildrenforByMultiEnrollGuid(childrenIdList);
-
-    reffrelChildrenList =
-        await ChildReferralTabResponseHelper().callAllReffrals();
-    List<String> tempFoeRemove = [];
-    growthGuidByDate.forEach((key, value) {
-      var enrolledGUID = value['childenrollguid'];
-      var cgmguid = value['cgmguid'];
-      var filterItem = reffrelChildrenList
-          .where((element) => (element.childenrolledguid == enrolledGUID &&
-              element.cgmguid == cgmguid))
-          .toList();
-      if (filterItem.length > 0) {
-        tempFoeRemove.add(key);
       }
-    });
-    tempFoeRemove.forEach((element) {
-      growthGuidByDate.remove(element);
-    });
+      ;
+      childWith.forEach((key, value) {
+        var enrolChilGUID = value['childenrollguid'];
+        childrenIdList.add(enrolChilGUID);
+        growthGuidByDate[key] = value;
+      });
+      print("final child $childWith");
+      enrolledChildrenList = await EnrolledExitChilrenResponceHelper()
+          .callEnrollChildrenforByMultiEnrollGuid(childrenIdList);
 
+      reffrelChildrenList =
+          await ChildReferralTabResponseHelper().callAllReffrals();
+      List<String> tempFoeRemove = [];
+      growthGuidByDate.forEach((key, value) {
+        var enrolledGUID = value['childenrollguid'];
+        var cgmguid = value['cgmguid'];
+        var filterItem = reffrelChildrenList
+            .where((element) => (element.childenrolledguid == enrolledGUID &&
+                element.cgmguid == cgmguid))
+            .toList();
+        if (filterItem.length > 0) {
+          tempFoeRemove.add(key);
+        }
+      });
+      tempFoeRemove.forEach((element) {
+        growthGuidByDate.remove(element);
+      });
     }
-    isLoading=false;
+    isLoading = false;
     setState(() {});
   }
 
   Future<void> fetchAllAnthroRecords() async {
-    isLoading=true;
+    isLoading = true;
     childAnthro = await ChildGrowthResponseHelper().allAnthormentryDisableOCT();
     crecheData = await CrecheDataHelper().getCrecheResponce();
     if (childAnthro.length > 0) {
@@ -224,247 +233,272 @@ class _ChildReferralListingScreenState
           padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 10.h),
           child: Column(children: [
             Expanded(
-              child:   isLoading?Center(
-              child: CircularProgressIndicator(),
-        ):(growthGuidByDate.keys.toList().length > 0)
-                  ? ListView.builder(
-                      itemCount: growthGuidByDate.keys.toList().length,
-                      shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () async {
-                            var childId = Global.stringToInt(callDataByKey(
-                                growthGuidByDate.keys.toList()[index], 'name'));
-                            var childIdGen =
-                                '${callDataByKey(growthGuidByDate.keys.toList()[index], 'child_id')}';
-                            var childName =
-                                '${callDataByKey(growthGuidByDate.keys.toList()[index], 'child_name')}';
+              child: isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : (growthGuidByDate.keys.toList().length > 0)
+                      ? ListView.builder(
+                          itemCount: growthGuidByDate.keys.toList().length,
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (BuildContext context, int index) {
+                            return GestureDetector(
+                              onTap: () async {
+                                var childId = Global.stringToInt(callDataByKey(
+                                    growthGuidByDate.keys.toList()[index],
+                                    'name'));
+                                var childIdGen =
+                                    '${callDataByKey(growthGuidByDate.keys.toList()[index], 'child_id')}';
+                                var childName =
+                                    '${callDataByKey(growthGuidByDate.keys.toList()[index], 'child_name')}';
 
-                            var creche_id = Global.stringToInt(callDataByKey(
-                                growthGuidByDate.keys.toList()[index],
-                                'creche_id'));
-                            List<String> keyParts = growthGuidByDate.keys
-                                .toList()[index]
-                                .toString()
-                                .split('#!');
+                                var creche_id = Global.stringToInt(
+                                    callDataByKey(
+                                        growthGuidByDate.keys.toList()[index],
+                                        'creche_id'));
+                                List<String> keyParts = growthGuidByDate.keys
+                                    .toList()[index]
+                                    .toString()
+                                    .split('#!');
 
-                            if(Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0){
-                              var backDate = now.isBefore(applicableDate)
-                                  ? DateTime(1992)
-                                  : DateTime.parse(Validate().currentDate())
-                                  .subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!));
-                              if (backDate.isAfter(DateTime.parse(keyParts[0]))) {
-                                minDate = backDate;
-                              } else {
-                                minDate = DateTime.parse(keyParts[0]);
-                              }
-                              if (minDate != null) {
-                                List<int> parts = Validate()
-                                    .currentDate()
-                                    .split('-')
-                                    .map(int.parse)
-                                    .toList();
-                                if (DateTime(minDate!.year, minDate!.month)
-                                    .isBefore(DateTime(parts[0], parts[1]))) {
-                                  minDate = DateTime(parts[0], parts[1], 1);
+                                if (Global.validToInt(
+                                        backdatedConfigirationModel
+                                            ?.back_dated_data_entry_allowed) >
+                                    0) {
+                                  var backDate = now.isBefore(applicableDate)
+                                      ? DateTime(1992)
+                                      : DateTime.parse(Validate().currentDate())
+                                          .subtract(Duration(
+                                              days: backdatedConfigirationModel!
+                                                  .back_dated_data_entry_allowed!));
+                                  if (backDate
+                                      .isAfter(DateTime.parse(keyParts[0]))) {
+                                    minDate = backDate;
+                                  } else {
+                                    minDate = DateTime.parse(keyParts[0]);
+                                  }
+                                  if (minDate != null) {
+                                    List<int> parts = Validate()
+                                        .currentDate()
+                                        .split('-')
+                                        .map(int.parse)
+                                        .toList();
+                                    if (DateTime(minDate!.year, minDate!.month)
+                                        .isBefore(
+                                            DateTime(parts[0], parts[1]))) {
+                                      minDate = DateTime(parts[0], parts[1], 1);
+                                    }
+                                  }
                                 }
-                              }
-                            }
 
+                                var child_referral_guid = '';
+                                if (!Global.validString(child_referral_guid)) {
+                                  child_referral_guid = Validate().randomGuid();
+                                  var refStatus = await Navigator.of(context)
+                                      .push(MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              ChildReferralTabScreen(
+                                                tabTitle: widget.tabTitle,
+                                                GrowthMonitoringGUID:
+                                                    callDataByKey(
+                                                        growthGuidByDate.keys
+                                                            .toList()[index],
+                                                        'cgmguid'),
+                                                enrolChildGuid: callDataByKey(
+                                                    growthGuidByDate.keys
+                                                        .toList()[index],
+                                                    'childenrollguid'),
+                                                creche_id: creche_id,
+                                                ChildDOB: callDataByKey(
+                                                    growthGuidByDate.keys
+                                                        .toList()[index],
+                                                    'child_dob'),
+                                                enrollDate: callDataByKey(
+                                                    growthGuidByDate.keys
+                                                        .toList()[index],
+                                                    'date_of_enrollment'),
+                                                child_id: childId,
+                                                child_referral_guid:
+                                                    child_referral_guid,
+                                                childName: childName,
+                                                childId: childIdGen,
+                                                scheduleDate: callDataByKey(
+                                                    growthGuidByDate.keys
+                                                        .toList()[index],
+                                                    'measurement_taken_date'),
+                                                minDate: minDate!,
+                                                isDischarge: false,
+                                                isEditableForDischage: true,
+                                                isEditable: true,
+                                              )));
 
-                            var child_referral_guid = '';
-                            if (!Global.validString(child_referral_guid)) {
-                              child_referral_guid = Validate().randomGuid();
-                              var refStatus = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          ChildReferralTabScreen(
-                                            tabTitle: widget.tabTitle,
-                                            GrowthMonitoringGUID: callDataByKey(
-                                                growthGuidByDate.keys
-                                                    .toList()[index],
-                                                'cgmguid'),
-                                            enrolChildGuid: callDataByKey(
-                                                growthGuidByDate.keys
-                                                    .toList()[index],
-                                                'childenrollguid'),
-                                            creche_id: creche_id,
-                                            ChildDOB: callDataByKey(
-                                                growthGuidByDate.keys
-                                                    .toList()[index],
-                                                'child_dob'),
-                                            enrollDate: callDataByKey(
-                                                growthGuidByDate.keys
-                                                    .toList()[index],
-                                                'date_of_enrollment'),
-                                            child_id: childId,
-                                            child_referral_guid:
-                                                child_referral_guid,
-                                            childName: childName,
-                                            childId: childIdGen,
-                                            scheduleDate: callDataByKey(
-                                                growthGuidByDate.keys
-                                                    .toList()[index],
-                                                'measurement_taken_date'),
-                                            minDate: minDate!,
-                                            isDischarge: false,
-                                            isEditableForDischage: true,
-                                            isEditable: true,
-                                          )));
+                                  if (refStatus == 'itemRefresh') {
+                                    await fetchAllAnthroRecords();
+                                  }
 
-                              if (refStatus == 'itemRefresh') {
-                                await fetchAllAnthroRecords();
-                              }
-
-                              if (refStatus == 'itemRefresh') {
-                                await fetchAllAnthroRecords();
-                              }
-                            }
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5.h),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xff5A5A5A).withOpacity(
-                                          0.2), // Shadow color with opacity
-                                      offset: Offset(0,
-                                          3), // Horizontal and vertical offset
-                                      blurRadius: 6, // Blur radius
-                                      spreadRadius: 0, // Spread radius
-                                    ),
-                                  ],
-                                  color: Colors.white,
-                                  border: Border.all(color: Color(0xffE7F0FF)),
-                                  borderRadius: BorderRadius.circular(10.r)),
+                                  if (refStatus == 'itemRefresh') {
+                                    await fetchAllAnthroRecords();
+                                  }
+                                }
+                              },
                               child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w, vertical: 8.h),
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                padding: EdgeInsets.symmetric(vertical: 5.h),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xff5A5A5A).withOpacity(
+                                              0.2), // Shadow color with opacity
+                                          offset: Offset(0,
+                                              3), // Horizontal and vertical offset
+                                          blurRadius: 6, // Blur radius
+                                          spreadRadius: 0, // Spread radius
+                                        ),
+                                      ],
+                                      color: Colors.white,
+                                      border:
+                                          Border.all(color: Color(0xffE7F0FF)),
+                                      borderRadius:
+                                          BorderRadius.circular(10.r)),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10.w, vertical: 8.h),
+                                    child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
-                                            style: Styles.black104,
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${Global.returnTrLable(translats, CustomText.ChildName, lng).trim()} : ',
+                                                style: Styles.black104,
+                                              ),
+                                              Text(
+                                                '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
+                                                style: Styles.black104,
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                              ),
+                                              Text(
+                                                '${Global.returnTrLable(translats, CustomText.Creche_Name, lng).trim()} : ',
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                                style: Styles.black104,
+                                              ),
+                                              Text(
+                                                '${Global.returnTrLable(translats, CustomText.schduleDate, lng).trim()} : ',
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                                style: Styles.black104,
+                                              ),
+                                              Text(
+                                                '${Global.returnTrLable(translats, CustomText.category, lng).trim()} : ',
+                                                strutStyle:
+                                                    StrutStyle(height: 1.2),
+                                                style: Styles.black104,
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.ChildId, lng).trim()} : ',
-                                            style: Styles.black104,
-                                            strutStyle: StrutStyle(height: 1.2),
-                                          ),
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.Creche_Name, lng).trim()} : ',
-                                            strutStyle: StrutStyle(height: 1.2),
-                                            style: Styles.black104,
-                                          ),
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.schduleDate, lng).trim()} : ',
-                                            strutStyle: StrutStyle(height: 1.2),
-                                            style: Styles.black104,
-                                          ),
-                                          Text(
-                                            '${Global.returnTrLable(translats, CustomText.category, lng).trim()} : ',
-                                            strutStyle: StrutStyle(height: 1.2),
-                                            style: Styles.black104,
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(width: 10),
-                                      SizedBox(
-                                        height: 30.h,
-                                        width: 2,
-                                        child: VerticalDivider(
-                                          color: Color(0xffE6E6E6),
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              callDataByKey(
-                                                  growthGuidByDate.keys
-                                                      .toList()[index],
-                                                  'child_name'),
-                                              style: Styles.cardBlue10,
-                                              overflow: TextOverflow.ellipsis,
+                                          SizedBox(width: 10),
+                                          SizedBox(
+                                            height: 30.h,
+                                            width: 2,
+                                            child: VerticalDivider(
+                                              color: Color(0xffE6E6E6),
                                             ),
-                                            Text(
-                                              callDataByKey(
-                                                  growthGuidByDate.keys
-                                                      .toList()[index],
-                                                  'child_id'),
-                                              style: Styles.cardBlue10,
-                                              strutStyle:
-                                                  StrutStyle(height: 1.2),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            Text(
-                                              callCrecheNameName(callDataByKey(
-                                                  growthGuidByDate.keys
-                                                      .toList()[index],
-                                                  'creche_id')),
-                                              style: Styles.cardBlue10,
-                                              strutStyle:
-                                                  StrutStyle(height: 1.2),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            Text(
-                                              Validate().displeDateFormate(
+                                          ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
                                                   callDataByKey(
                                                       growthGuidByDate.keys
                                                           .toList()[index],
-                                                      'measurement_taken_date')),
-                                              style: Styles.cardBlue10,
-                                              strutStyle:
-                                                  StrutStyle(height: 1.2),
-                                              overflow: TextOverflow.ellipsis,
+                                                      'child_name'),
+                                                  style: Styles.cardBlue10,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                Text(
+                                                  callDataByKey(
+                                                      growthGuidByDate.keys
+                                                          .toList()[index],
+                                                      'child_id'),
+                                                  style: Styles.cardBlue10,
+                                                  strutStyle:
+                                                      StrutStyle(height: 1.2),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                Text(
+                                                  callCrecheNameName(
+                                                      callDataByKey(
+                                                          growthGuidByDate.keys
+                                                              .toList()[index],
+                                                          'creche_id')),
+                                                  style: Styles.cardBlue10,
+                                                  strutStyle:
+                                                      StrutStyle(height: 1.2),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                Text(
+                                                  Validate().displeDateFormate(
+                                                      callDataByKey(
+                                                          growthGuidByDate.keys
+                                                              .toList()[index],
+                                                          'measurement_taken_date')),
+                                                  style: Styles.cardBlue10,
+                                                  strutStyle:
+                                                      StrutStyle(height: 1.2),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                Text(
+                                                  callDataByKey(
+                                                      growthGuidByDate.keys
+                                                          .toList()[index],
+                                                      'category'),
+                                                  style: Styles.red185,
+                                                  strutStyle:
+                                                      StrutStyle(height: 1.2),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ],
                                             ),
-                                            Text(
-                                              callDataByKey(
-                                                  growthGuidByDate.keys
-                                                      .toList()[index],
-                                                  'category'),
-                                              style: Styles.red185,
-                                              strutStyle: StrutStyle(height: 1.2),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(width: 5),
-                                      Column(
-                                        children: [
-                                          SizedBox(
-                                            height: 30.h,
                                           ),
-                                        ],
-                                      )
-                                    ]),
+                                          SizedBox(width: 5),
+                                          Column(
+                                            children: [
+                                              SizedBox(
+                                                height: 30.h,
+                                              ),
+                                            ],
+                                          )
+                                        ]),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      })
-                  : Center(
-                      child: Text(Global.returnTrLable(
-                          translats, CustomText.NorecordAvailable, lng)),
-                    ),
+                            );
+                          })
+                      : Center(
+                          child: Text(Global.returnTrLable(
+                              translats, CustomText.NorecordAvailable, lng)),
+                        ),
             )
           ]),
         ),
@@ -489,11 +523,11 @@ class _ChildReferralListingScreenState
     var enrolledGUID = growthData['childenrollguid'];
     var cgmguid = growthData['cgmguid'];
     var measurement_taken_date = growthData['measurement_taken_date'];
-    if('measurement_taken_date'==valueKey){
+    if ('measurement_taken_date' == valueKey) {
       returnValue = measurement_taken_date;
-    }else  if ('category' == valueKey) {
+    } else if ('category' == valueKey) {
       returnValue = growthData['category'];
-    }else if (valueKey != 'cgmguid') {
+    } else if (valueKey != 'cgmguid') {
       var reffItems = enrolledChildrenList
           .where((element) => element.ChildEnrollGUID == enrolledGUID)
           .toList();
@@ -507,8 +541,7 @@ class _ChildReferralListingScreenState
   }
 
   Future<String?> checkSUWCondition(String enrolChildGuid,
-      String measurement_date, Map<String, dynamic> growhthDetails)
-  async {
+      String measurement_date, Map<String, dynamic> growhthDetails) async {
     String? genratedValue;
     String lastMonthDate = Validate().getOneMonthPreviousDate(measurement_date);
     var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
@@ -525,12 +558,15 @@ class _ChildReferralListingScreenState
     Map<String, dynamic> lastGrowhthDetails = {};
     if (lastAntroRecord.length > 0) {
       Map<String, dynamic> lastGrowthRec =
-      jsonDecode(lastAntroRecord.first.responces!);
+          jsonDecode(lastAntroRecord.first.responces!);
       var lastdChild = lastGrowthRec['anthropromatic_details'];
       if (lastdChild != null) {
         var child = lastdChild
-            .where((element) => element['childenrollguid'] == enrolChildGuid
-            &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+            .where((element) =>
+                element['childenrollguid'] == enrolChildGuid &&
+                (Global.stringToInt(
+                        element['do_you_have_height_weight'].toString()) ==
+                    1))
             .toList();
         if (child.length > 0) {
           lastGrowhthDetails = child.first;
@@ -541,12 +577,15 @@ class _ChildReferralListingScreenState
     Map<String, dynamic> secondlastGrowhthDetails = {};
     if (secondLastAntroRecord.length > 0) {
       Map<String, dynamic> secondlastGrowthRec =
-      jsonDecode(secondLastAntroRecord.first.responces!);
+          jsonDecode(secondLastAntroRecord.first.responces!);
       var lastdChild = secondlastGrowthRec['anthropromatic_details'];
       if (lastdChild != null) {
         var child = lastdChild
-            .where((element) => element['childenrollguid'] == enrolChildGuid
-            &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+            .where((element) =>
+                element['childenrollguid'] == enrolChildGuid &&
+                (Global.stringToInt(
+                        element['do_you_have_height_weight'].toString()) ==
+                    1))
             .toList();
         if (child.length > 0) {
           secondlastGrowhthDetails = child.first;
@@ -560,9 +599,9 @@ class _ChildReferralListingScreenState
       genratedValue = 'GF1';
 
       if (secondlastGrowhthDetails.isNotEmpty &&
-          (Global.stringToDouble(
-              growhthDetails['weight'].toString())<=
-              Global.stringToDouble(secondlastGrowhthDetails['weight'].toString()))) {
+          (Global.stringToDouble(growhthDetails['weight'].toString()) <=
+              Global.stringToDouble(
+                  secondlastGrowhthDetails['weight'].toString()))) {
         genratedValue = 'GF2';
       }
     }
@@ -573,5 +612,4 @@ class _ChildReferralListingScreenState
     // }
     return genratedValue;
   }
-
 }

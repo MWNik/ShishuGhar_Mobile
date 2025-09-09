@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:shishughar/custom_widget/custom_appbar.dart';
 import 'package:shishughar/custom_widget/custom_btn.dart';
 import 'package:shishughar/custom_widget/custom_text.dart';
@@ -18,6 +19,8 @@ import 'package:shishughar/screens/tabed_screens/child_follow_up/child_followUp_
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/validate.dart';
+
+import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_dropdown.dart';
 
 class FollowCompletedListForCC extends StatefulWidget {
   String? enrollGuid;
@@ -39,7 +42,7 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
   List<Translation> translats = [];
   String lng = 'en';
   List<CresheDatabaseResponceModel> crecheData = [];
-  String? selectedCreche;
+  OptionsModel? selectedCreche;
   bool isLoading = true;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<OptionsModel> creches = [];
@@ -48,11 +51,18 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
   String? child_name;
   String? child_id;
   String? role;
+  final TextEditingController _crecheSearchcontroller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     initializeData();
+  }
+
+  @override
+  void dispose() {
+    _crecheSearchcontroller.dispose();
+    super.dispose();
   }
 
   Future<void> initializeData() async {
@@ -115,7 +125,7 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
   void cleaAllFilter() {
     filteredFollowUp = isOnlyUnsyched ? usynchedList : allList;
     selectedCreche = null;
-
+    _crecheSearchcontroller.text = '';
     setState(() {});
   }
 
@@ -127,7 +137,7 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
       filteredFollowUp = filterList.where((item) {
         var creche_id =
             Global.getItemValues(item['enrResponces']!, 'creche_id');
-        return creche_id.toString() == selectedCreche.toString();
+        return creche_id.toString() == selectedCreche!.name.toString();
       }).toList();
     } else
       filteredFollowUp = filterList;
@@ -188,6 +198,9 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
                       text: Global.returnTrLable(
                           translats, CustomText.fllowUp, lng),
                       actions: [],
+                onTap: (){
+                  Navigator.pop(context, CustomText.itemRefresh);
+                },
                     )
                   : AppBar(
                       toolbarHeight: 60,
@@ -270,14 +283,132 @@ class _FollowCompletedListForCCState extends State<FollowCompletedListForCC> {
                         ),
                       ),
                       SizedBox(),
-                      DynamicCustomDropdownForFilterField(
+                      creches.length<=1? DynamicCustomDropdownField(
                         hintText: Global.returnTrLable(
                             translats, CustomText.Creches, lng),
+                        titleText: Global.returnTrLable(
+                            translats, CustomText.Creches, lng),
+                        isRequred: 0,
                         items: creches,
-                        selectedItem: selectedCreche,
+                        selectedItem:  selectedCreche != null? selectedCreche?.name:null,
                         onChanged: (value) {
-                          selectedCreche = value?.name;
+                          selectedCreche = value;
                         },
+                      )
+                          :Column(
+                        crossAxisAlignment: CrossAxisAlignment
+                            .start,
+                        children: [
+                          Text(Global.returnTrLable(
+                              translats, CustomText.Creches, lng),
+                            style: Styles.black124,),
+                          SizedBox(
+                            height: 5.h,
+                          ),
+                          Container(
+                            height: 35.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                  color: Color(0xffACACAC)),
+                              borderRadius: BorderRadius.circular(
+                                  10.r),
+                            ),
+                            child: TypeAheadField<OptionsModel>(
+                              controller: _crecheSearchcontroller,
+                              suggestionsCallback: (pattern) async {
+                                try {
+                                  var filItems= creches.where((
+                                      element) =>
+                                  element.values != null &&
+                                      element.name != null &&
+                                      (element.values!
+                                          .toLowerCase()
+                                          .contains(
+                                          pattern.toLowerCase())||
+                                          element.name!
+                                              .toLowerCase()
+                                              .contains(
+                                              pattern.toLowerCase()))
+                                  ).toList();
+                                  if(filItems.isEmpty||pattern.isEmpty){
+                                    selectedCreche=null;
+                                    _crecheSearchcontroller.text='';
+                                  }
+                                  return filItems;
+                                } catch (e) {
+                                  debugPrint('TypeAhead error: $e');
+                                  return [];
+                                }
+                              },
+                              builder: (context, controller,
+                                  focusNode) {
+                                return TextField(
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    style:  Styles.black124,
+                                    // autofocus: true,
+                                    decoration: InputDecoration(
+                                      hintText: Global.returnTrLable(
+                                          translats, CustomText.Search, lng),
+                                      contentPadding: EdgeInsets
+                                          .all(10),
+                                      border: InputBorder.none,
+                                      fillColor: Colors.white,
+                                      filled: true,
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors
+                                                .transparent),
+                                        borderRadius: BorderRadius
+                                            .circular(10),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors
+                                                .transparent),
+                                        borderRadius: BorderRadius
+                                            .circular(10),
+                                      ),
+                                      disabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors
+                                                .transparent),
+                                        borderRadius: BorderRadius
+                                            .circular(10),
+                                      ),
+                                    )
+                                );
+                              },
+                              itemBuilder: (context, item) {
+                                return ListTile(
+                                  title: Text(item.values!),
+                                  subtitle: Text(item.name!),
+                                );
+                              },
+                              onSelected: (item) {
+                                selectedCreche = item;
+                                _crecheSearchcontroller.text = item.values ?? '';
+                                print('itm $item');
+                              },
+                              offset: Offset(0, 12),
+                              constraints: BoxConstraints(
+                                  maxHeight: 500),
+                              hideOnUnfocus: true,
+                              showOnFocus: true,
+                              hideWithKeyboard: false,
+                              loadingBuilder: (context) =>
+                              const Text('Loading...'),
+                              errorBuilder: (context,
+                                  error) => const Text('Error!'),
+                              emptyBuilder: (context) =>
+                              const Text('No items found!'),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10.h,
+                          ),
+                        ],
                       ),
                       SizedBox(height: 10.h),
                       Padding(

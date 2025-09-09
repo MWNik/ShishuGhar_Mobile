@@ -4,7 +4,6 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -13,9 +12,9 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.shishughar.creche"
-    compileSdk flutter.compileSdkVersion
+    compileSdkVersion 35  // ✅ use only this
     ndkVersion flutter.ndkVersion
-    compileSdkVersion 35
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -33,7 +32,7 @@ android {
     defaultConfig {
         applicationId "com.shishughar.creche"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdkVersion 35   // ✅ also explicitly set to 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -53,9 +52,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     packagingOptions {
         jniLibs {
-            useLegacyPackaging = false  // Force new alignment
+            useLegacyPackaging = false
         }
     }
 }
@@ -63,8 +63,9 @@ android {
 flutter {
     source '../..'
 }
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7"
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4' // ✅ REQUIRED
-}
 
+dependencies {
+    implementation "androidx.core:core-ktx:1.13.1"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+}

@@ -104,7 +104,9 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
   Widget build(BuildContext context) {
     Global.applyDisplayCutout(Color(0xff5979AA));
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+          color: Colors.white,
+          child: Center(child: CircularProgressIndicator()));
     } else {
       return SafeArea(
         child: WillPopScope(

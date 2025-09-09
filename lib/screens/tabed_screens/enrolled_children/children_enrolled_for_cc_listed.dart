@@ -52,6 +52,7 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
   int? maxAgeLimit;
   int? minAgeLimit;
   bool isOnlyUnsyched = false;
+  bool isLoading = true;
   List<Map<String, dynamic>> usynchedList = [];
   List<Map<String, dynamic>> allList = [];
   final TextEditingController _crecheSearchController = TextEditingController();
@@ -99,6 +100,7 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
         .then((value) => translats.addAll(value));
     villageValue();
     await fetchChildHHDataList();
+    isLoading = false;
     setState(() {});
   }
 
@@ -244,6 +246,10 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
                                 element.values != null &&
                                     element.name != null &&
                                     element.values!
+                                        .toLowerCase()
+                                        .contains(
+                                        pattern.toLowerCase())||
+                                    element.name!
                                         .toLowerCase()
                                         .contains(
                                         pattern.toLowerCase())
@@ -409,7 +415,8 @@ class _EnrolledChildrenListedScreenState extends State<EnrolledChildrenForCC> {
                 ],
               ),
               Expanded(
-                child: (filterData.length > 0)
+                child: isLoading ?Center(
+                    child: CircularProgressIndicator()):(filterData.length > 0)
                     ? ListView.builder(
                         itemCount: filterData.length,
                         shrinkWrap: true,

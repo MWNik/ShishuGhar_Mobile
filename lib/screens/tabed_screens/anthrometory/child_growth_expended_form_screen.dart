@@ -40,6 +40,7 @@ import '../../../style/styles.dart';
 import '../../../utils/custom_three_color_circle_image.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
+import '../../child_growth_child_chart/weight_for_age_boys_girls_screen.dart';
 import '../house_hold/depending_logic.dart';
 
 class ChildGrowthExpendedFormScreen extends StatefulWidget {
@@ -782,17 +783,46 @@ class _ChildGrowthExpendedFormState
                         ),
                         Column(
                          children: [
-                           (Global.stringToInt(cWidgetDatamap['do_you_have_height_weight'].toString()) == 1  && role == CustomText.clusterCoordinator)?
-                           GestureDetector(
-                             onTap: (){
-                               _reEnterDailog(context,
-                                   filterdData[i].ChildEnrollGUID!);
-                             },
-                             child: Icon(Icons.add_circle_outline,
-                             color:Color(0xff5979AA)),
+                           // (Global.stringToInt(cWidgetDatamap['do_you_have_height_weight'].toString()) == 1  && role == CustomText.clusterCoordinator)?
+                           Row(
+                             children: [
+                               (Global.stringToInt(cWidgetDatamap['do_you_have_height_weight'].toString()) == 1  && role == CustomText.clusterCoordinator)?
+                               GestureDetector(
+                                 onTap: (){
+                                   _reEnterDailog(context,
+                                       filterdData[i].ChildEnrollGUID!);
+                                 },
+                                 child: Icon(Icons.add_circle_outline,
+                                     color:Color(0xff5979AA)),
+                               )
+                                   :SizedBox()
+                               ,SizedBox(width: 5),
+                               GestureDetector(
+                                 onTap: (){
+                                   Navigator.of(context).push(MaterialPageRoute(
+                                       builder: (BuildContext context) => WeightforAgeBoysGirlsScreen(
+                                         childenrollguid:  filterdData[i].ChildEnrollGUID!,
+                                         crechId: widget.creche_nameId,
+                                         childId:
+                                         '${Global.getItemValues(filterdData[i].responces, 'child_id')}',
+                                         childName:
+                                         '${Global.getItemValues(filterdData[i].responces, 'child_name')}',
+                                         gender_id: Global.stringToInt(
+                                           Global.getItemValues( filterdData[i].responces, 'gender_id'),
+                                         ),
+                                         // date_of_birth:Global.stringToDate(Global.getItemValues(enrolledItem!.responces!, 'child_dob'))!
+                                       )));
+                                 },
+                                 child: Image.asset(
+                                     "assets/growthChart.png",
+                                     scale: 8,
+                                     color:Color(0xff5979AA)),
+                               )
+                             ],
                            )
-                               :SizedBox(),
-                           SizedBox(height: 10),
+
+                           ,
+                           SizedBox(height: 5),
                            Padding(
                              padding: EdgeInsets.symmetric(horizontal: 5),
                              child: expends == i
@@ -805,7 +835,6 @@ class _ChildGrowthExpendedFormState
                                scale: 2.2,
                              ),
                            ),
-
                          ],
                         )
                       ],

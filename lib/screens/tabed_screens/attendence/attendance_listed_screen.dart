@@ -25,9 +25,10 @@ import 'attendance_form_screen_tab.dart';
 class AttendanceListedScreen extends StatefulWidget {
   final int? creche_nameId;
   final String? creche_name;
+   bool? isDraft;
 
-  const AttendanceListedScreen(
-      {super.key, required this.creche_nameId, required this.creche_name});
+   AttendanceListedScreen(
+      {super.key, required this.creche_nameId, required this.creche_name,  this.isDraft});
 
   @override
   State<AttendanceListedScreen> createState() => _AttendanceListState();
@@ -59,6 +60,7 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
   @override
   void initState() {
     super.initState();
+    isOnlyUnsynched=widget.isDraft??false;
     initializeData();
   }
 
@@ -142,6 +144,12 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
   Widget build(BuildContext context) {
     Global.applyDisplayCutout(Color(0xff5979AA));
     return SafeArea(
+        child: WillPopScope(
+          onWillPop: () async {
+            Navigator.pop(context, 'itemRefresh');
+            return true;
+          },
+
       child: Scaffold(
         floatingActionButton: role == CustomText.crecheSupervisor.trim()
             ? (currentDateAttendece
@@ -178,7 +186,7 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
         appBar: CustomAppbar(
           text: Global.returnTrLable(translats, CustomText.AttenList, lng),
           subTitle: widget.creche_name,
-          onTap: () => Navigator.pop(context),
+          onTap: () => Navigator.pop(context, 'itemRefresh'),
           actions: [
             IconButton(onPressed: () async {
               isCalenderView=isCalenderView?false:true;
@@ -546,7 +554,7 @@ class _AttendanceListState extends State<AttendanceListedScreen> {
           ]),
         ),
       ),
-    );
+    ));
   }
 
   filterDataQu(String entry) {

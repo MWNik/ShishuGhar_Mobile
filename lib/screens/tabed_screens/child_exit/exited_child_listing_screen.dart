@@ -55,7 +55,7 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
   String? selectedReason;
   String? role;
   BackdatedConfigirationModel? backdatedConfigirationModel;
-  
+  bool isLoading=true;
   
 
   Future<void> initializeData() async {
@@ -110,6 +110,7 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
     filterExitData = isOnlyUnsynched ? unsynchedList : allList;
     Searchcontroller.text = '';
     await fetchChildDetail();
+    isLoading=false;
     setState(() {});
   }
 
@@ -320,7 +321,8 @@ class _ExitedChildListingScreenState extends State<ExitedChildListingScreen> {
               ),
             ),
             Expanded(
-              child: (filterExitData.length > 0)
+              child: isLoading?Center(
+                  child: CircularProgressIndicator()):(filterExitData.length > 0)
                   ? ListView.builder(
                       itemCount: filterExitData.length,
                       shrinkWrap: true,

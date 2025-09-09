@@ -237,6 +237,10 @@ class _ChildReferralListingScreenState
     crecheData = await CrecheDataHelper().getCrecheResponce();
     if (childAnthro.length > 0) {
       allChildWithlatest(childAnthro);
+    }else  {
+      isLoading=false;
+      setState(() {
+      });
     }
   }
 
@@ -349,7 +353,12 @@ class _ChildReferralListingScreenState
                                           element.name != null &&
                                           element.values!
                                               .toLowerCase()
-                                              .contains(pattern.toLowerCase()))
+                                              .contains(pattern.toLowerCase())
+                                              ||
+                                              element.name!
+                                                  .toLowerCase()
+                                                  .contains(
+                                                  pattern.toLowerCase()))
                                       .toList();
 
                                   if (items.isEmpty || pattern.isEmpty) {

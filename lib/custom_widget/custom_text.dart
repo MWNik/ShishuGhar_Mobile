@@ -670,4 +670,13 @@ class CustomText {
   static String Phase = "Phase";
   static String LocationIsNotAvailableInYourCreche = "Location is not available in your creche please updated first";
   static String category = "Category";
+  static String selectCreche = "Select creche";
+  static String pleaseSelectCrecheOrBlock = "Creche is not available please check your geography or contact to admin";
+  static String villageInCreche = "Village is not available in creche";
+  static String crcheMaxLimit = "The maximum number of creches that can be selected is 40";
+
+  static String darftData= 'Draft data';
+  static String recordsForDraft= 'Records in draft';
+  static String recordForDraft= 'Record in draft';
+  static String dataNotFoundYet= 'Data is not available in draft please upload your sync data.';
 }

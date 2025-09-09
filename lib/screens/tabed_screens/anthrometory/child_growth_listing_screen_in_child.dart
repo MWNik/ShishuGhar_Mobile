@@ -25,6 +25,7 @@ import '../../../model/dynamic_screen_model/options_model.dart';
 import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
+import '../../child_growth_child_chart/weight_for_age_boys_girls_screen.dart';
 import '../house_hold/depending_logic.dart';
 
 class ChildGrowthListingScreenInChild extends StatefulWidget {
@@ -203,6 +204,28 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
           subTitle1: widget.childName,
           subTitle2: widget.childId,
           onTap: () => Navigator.pop(context),
+          actions: [
+            GestureDetector(
+              onTap: (){
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (BuildContext context) => WeightforAgeBoysGirlsScreen(
+                      childenrollguid:  widget.childEnrollment,
+                      crechId: widget.creche_nameId,
+                      childId:widget.childId,
+                      childName:widget.childName,
+                      gender_id: Global.stringToInt(widget.gender),
+                      // date_of_birth:Global.stringToDate(Global.getItemValues(enrolledItem!.responces!, 'child_dob'))!
+                    )));
+              },
+              child: Padding(
+                padding: EdgeInsets.all(8),
+                child: Image.asset(
+                  "assets/growthChart.png",
+                  scale: 6,
+                    color:Colors.white),
+              ),
+            )
+          ],
         ),
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
