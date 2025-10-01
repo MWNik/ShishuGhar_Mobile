@@ -708,5 +708,149 @@ class Global {
     }return Colors.grey.shade300;
   }
 
+  static String getDateByMonthYear(int year, int month) {
+    // Create a DateTime for the 0th day of the *next* month
+    DateTime lastDay = DateTime(year, month + 1, 0);
+    var formatter = new DateFormat('yyyy-MM-dd');
+    return formatter.format(lastDay);
+  }
+
+  static String getFirstDayDateByDate(String date) {
+    var dateTime=Validate().stringToDate(date);
+    DateTime lastDay = DateTime(dateTime.year, dateTime.month, 1);
+    var formatter = new DateFormat('yyyy-MM-dd');
+    return formatter.format(lastDay);
+  }
+
+  static String getMonthYearByDate(String date) {
+    var dateTime=Validate().stringToDate(date);
+    DateTime lastDay = DateTime(dateTime.year, dateTime.month, 1);
+    var formatter = new DateFormat('yyyy-MM');
+    return formatter.format(lastDay);
+  }
+
+  static String getMonthYearCurrentDayByDate(String date) {
+    var dateTime=Validate().stringToDate(date);
+    DateTime lastDay = DateTime(dateTime.year, dateTime.month, DateTime.now().day);
+    var formatter = new DateFormat('yyyy-MM');
+    return formatter.format(lastDay);
+  }
+
+  static Map<String, Color> cardColors = {
+    'NoOfCreches': Color(0xffe8e8e8),
+    'CurrentActiveChildren': Color(0xffe8e8e8),
+    'NoOfCrechesSubmittedAttendance': Color(0xffe8e8e8),
+    'NoOfCrechesNotSubmittedAttendance': Color(0xffe8e8e8),
+
+    'AvgNoOfDaysCrecheOpened': Color(0xffcfe5fc),
+    'AvgAttendancePerDay': Color(0xffcfe5fc),
+    'MaximumAttendanceInDay': Color(0xffcfe5fc),
+    'AnthroDataSubmitted': Color(0xffcfe5fc),
+    'AnthroDataNotSubmitted': Color(0xffcfe5fc),
+    'AvgNoDaysAttendanceSubmitted': Color(0xffcfe5fc),
+
+    'CurrentEligibleChildren': Color(0xffebfced),
+    'ChildrenEnrolledThisMonth': Color(0xffebfced),
+    'ChildrenExitedThisMonth': Color(0xffebfced),
+    'CumulativeExitChildren': Color(0xffebfced),
+    'RedFlagChildren': Color(0xffebfced),
+
+    'ChildrenMeasurementTaken': Color(0xfffce9cf),
+    'ModeratelyUnderweight': Color(0xfffce9cf),
+    'ModeratelyWasted': Color(0xfffce9cf),
+    'Growthfaltering1': Color(0xfffce9cf),
+    'ModeratelyStunted': Color(0xfffce9cf),
+
+    'ChildrenMeasurementNotTaken': Color(0xfffcd9d9),
+    'SeverelyUnderweight': Color(0xfffcd9d9),
+    'SeverelyWasted': Color(0xfffcd9d9),
+    'Growthfaltering2': Color(0xfffcd9d9),
+    'SeverelyStunted': Color(0xfffcd9d9),
+  };
+
+  static Map<String, Color> cardBorderColors = {
+    'NoOfCreches': Color(0xffa8a8a8),
+    'CurrentActiveChildren': Color(0xffa8a8a8),
+    'NoOfCrechesSubmittedAttendance': Color(0xffa8a8a8),
+    'NoOfCrechesNotSubmittedAttendance': Color(0xffa8a8a8),
+
+    'AvgNoOfDaysCrecheOpened': Color(0xff7ebefa),
+    'AvgAttendancePerDay': Color(0xff7ebefa),
+    'MaximumAttendanceInDay': Color(0xff7ebefa),
+    'AnthroDataSubmitted': Color(0xff7ebefa),
+    'AnthroDataNotSubmitted': Color(0xff7ebefa),
+    'AvgNoDaysAttendanceSubmitted': Color(0xff7ebefa),
+
+    'CurrentEligibleChildren': Color(0xffa9f8ac),
+    'ChildrenEnrolledThisMonth': Color(0xffa9f8ac),
+    'ChildrenExitedThisMonth': Color(0xffa9f8ac),
+    'CumulativeExitChildren': Color(0xffa9f8ac),
+    'RedFlagChildren': Color(0xffa9f8ac),
+
+    'ChildrenMeasurementTaken': Color(0xfff3cf9e),
+    'ModeratelyUnderweight': Color(0xfff3cf9e),
+    'ModeratelyWasted': Color(0xfff3cf9e),
+    'Growthfaltering1': Color(0xfff3cf9e),
+    'ModeratelyStunted': Color(0xfff3cf9e),
+
+    'ChildrenMeasurementNotTaken': Color(0xffff9090),
+    'SeverelyUnderweight': Color(0xffff9090),
+    'SeverelyWasted': Color(0xffff9090),
+    'Growthfaltering2': Color(0xffff9090),
+    'SeverelyStunted': Color(0xffff9090),
+  };
+
+  static Color getCardColor(String cardId) {
+    return cardColors[cardId] ?? const Color(0xffe8e8e8); // default fallback
+  }
+
+  static Color getCardBorderColor(String cardId) {
+    return cardBorderColors[cardId] ?? const Color(0xffe8e8e8); // default fallback
+  }
+
+  static String languageWise(
+       String lng, String? en, String? hi,String? od,)
+  {
+    String itemValue=Global.validToString(en);
+    if (lng == 'hi' && Global.validString(hi)) {
+      itemValue=hi!;
+    } else if (lng == 'od' &&
+        Global.validString(od)) {
+      itemValue=od!;
+    }
+    return itemValue;
+  }
+
+
+  static String subtractMonths(String date, int monthsBack) {
+    // Target month/year
+    DateTime inputDate = Validate().stringToDate(date);
+    int newYear = inputDate.year;
+    int newMonth = inputDate.month - monthsBack;
+
+    // Adjust year if month underflows
+    while (newMonth <= 0) {
+      newMonth += 12;
+      newYear -= 1;
+    }
+
+    // Find the last day of that month
+    int lastDayOfMonth = DateTime(newYear, newMonth + 1, 0).day;
+
+    // Clamp day to avoid invalid dates
+    int newDay = inputDate.day > lastDayOfMonth ? lastDayOfMonth : inputDate.day;
+
+    return Validate().dateToString(DateTime(newYear, newMonth, newDay))!;
+  }
+
+  static bool isCurrentMonth(String date){
+    DateTime inputDate = Validate().stringToDate(date);
+    DateTime currenDate = DateTime.now();
+    if(inputDate.year==currenDate.year&&inputDate.month==currenDate.month){
+      return true;
+    }else return false;
+
+  }
+
 
 }

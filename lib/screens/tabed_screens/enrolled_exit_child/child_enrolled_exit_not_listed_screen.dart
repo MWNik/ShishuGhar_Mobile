@@ -152,7 +152,10 @@ class _NotEnrolledChildrenListedScreenState
     childHHData = childHHData.where((element) {
       var isdobavail =
           Global.getItemValues(element['responces'], 'is_dob_available');
-      return Global.stringToInt(isdobavail.toString()) == 1;
+      var childStatus =
+      Global.getItemValues(element['responces'], 'child_status');
+      return (Global.stringToInt(isdobavail.toString()) == 1
+      &&!Global.validString(childStatus));
     }).toList();
 
     allList = childHHData;

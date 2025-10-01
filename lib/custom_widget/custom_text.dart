@@ -102,6 +102,7 @@ class CustomText {
   static String FamilyMember = "No. of Family Member";
   static String Male = "Male";
   static String Female = "Female";
+  static String other = "Other";
   static String Filter = "Filter";
   static String Transgender = "Transgender";
   static String PrimaryOccupation = "Primary Occupation";
@@ -314,6 +315,7 @@ class CustomText {
   static String startDateMsg = "Start date should be before end date.";
   static String error = "Error";
   static String pleaseWait = "Please wait..";
+  static String loading = "Loading..";
   static String uploadingPleaseWait = "Uploading please wait";
   static String pleaseSelectStartDate = "Please select start date";
   static String token_expired = "Token expired. Please logout & login again.";
@@ -380,7 +382,7 @@ class CustomText {
   static String EventDetails = "Event Details";
   static String Grievance = "Grievance";
   static String IssueSubmit = "Issue Submit";
-  static String ChildDetails = "Child Details";
+  static String ChildDetails = "Child Detail";
   static String DateofEnrollement = "Date of Enrollment";
   static String ChildHealth = "Child Health";
   static String ChildEvents = "Child Event";
@@ -472,7 +474,6 @@ class CustomText {
   static String actionTaken = "Action Taken";
   static String boy = "Boy";
   static String girl = "Girl";
-  static String other = "Other";
   static String visitNoteAlrdyExists =
       "A Visit Note already exists for the selected Date";
   static String enrollExitChild = "Child Enrollment and Exit";
@@ -679,4 +680,62 @@ class CustomText {
   static String recordsForDraft= 'Records in draft';
   static String recordForDraft= 'Record in draft';
   static String dataNotFoundYet= 'Data is not available in draft please upload your sync data.';
+
+    //Dashboard Reports//
+
+  static String NoOfCreches='No. of creches';
+  static String CurrentActiveChildren='Current active children';
+  static String SubCurrentActiveChildren='of current eligible children';
+  static String NoOfCrechesSubmittedAttendance='No. of creches submitted attendance (All Days)';
+  static String NoOfCrechesNotSubmittedAttendance='No. of creches not submitted attendance (All Days)';
+  static String AvgNoOfDaysCrecheOpened='Avg. no. of days creche opened';
+  static String CurrentEligibleChildren='Current eligible children';
+  static String ChildrenMeasurementTaken='Children measurement taken';
+  static String SubChildrenMeasurementTaken='of active children';
+  static String ChildrenMeasurementNotTaken='Children measurement not taken';
+  static String AvgAttendancePerDay='Avg. attendance per day';
+  static String ChildrenEnrolledThisMonth='Children enrolled this month';
+  static String ModeratelyUnderweight='Moderately underweight';
+  static String SubModeratelyUnderweight='of children measurement taken';
+  static String SeverelyUnderweight='Severely underweight';
+  static String SubSeverelyUnderweight='of children measurement taken';
+  static String MaximumAttendanceInDay='Maximum attendance in a day';
+  static String ChildrenExitedThisMonth='Children exited this month';
+  static String SubChildrenExitedThisMonth='of active children';
+  static String ModeratelyWasted='Moderately wasted';
+  static String SubModeratelyWasted='of children measurement taken';
+  static String SeverelyWasted='Severely wasted';
+  static String AvgNoDaysAttendanceSubmitted='Avg. no. of days attendance submitted';
+  static String CumulativeEnrolledChildren='Cumulative enrolled children';
+  static String ModeratelyStunted='Moderately stunted';
+  static String SubModeratelyStunted='of children measurement take';
+  static String  SeverelyStunted='Severely stunted';
+  static String  SubSeverelyStunted='of children measurement taken';
+  static String  AnthroDataSubmitted='Anthro data submitted';
+  static String  CumulativeExitChildren='Cumulative exit children';
+  static String  SubCumulativeExitChildren='of cumulative enrolled children';
+  static String  Growthfaltering1='Growth faltering 1';
+  static String  SubGrowthfaltering1='of active children';
+  static String  Growthfaltering2='Growth faltering 2';
+  static String  SubGrowthfaltering2='of active children';
+  static String   AnthroDataNotSubmitted='Anthro data not submitted';
+  static String   RedFlagChildren='Red flag children';
+  static String   SubRedFlagChildren='of active children';
+  static String   childEligbleButNotEnrollrd='Child is eligible not enrolled';
+
+  static String   openingDate='Opening Date';
+  static String   dateOfEnrollment='Date Of Enrollment';
+  static String   currentAge='Current Age (In Months)';
+  static String   IsEnrolled='Is Enrolled';
+  static String   WeightForAgeZScore='Weight for Age (Z-Score)';
+  static String   WeightForHeightZScore='Weight for Height (Z-Score)';
+  static String   HeightForAgeZScore='Height for Age (Z-Score)';
+  static String   SAM='SAM';
+  static String   SUW='SUW';
+  static String   GF1='GF1';
+  static String   GF2='GF2';
+  static String   childrenAtRisk='Children at risk';
+
+
+
 }

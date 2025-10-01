@@ -82,6 +82,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
       CustomText.ChildGrievances,
       CustomText.clear,
       CustomText.Filter,
+      CustomText.CrecheName,
       CustomText.Creches
     ];
 
@@ -432,7 +433,7 @@ class _GrievanceHomeListingState extends State<GrievanceHomeListing> {
                                           strutStyle: StrutStyle(height: 1.2),
                                         ),
                                         Text(
-                                          '${Global.returnTrLable(translats, CustomText.Creche_Name, lng).trim()} : ',
+                                          '${Global.returnTrLable(translats, CustomText.CrecheName, lng).trim()} : ',
                                           strutStyle:
                                           StrutStyle(height: 1.2),
                                           style: Styles.black104,

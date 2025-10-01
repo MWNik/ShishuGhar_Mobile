@@ -117,7 +117,7 @@ class _HouseholdScreenState
                                 children: [
                                   Text(
                                     Global.returnTrLable(
-                                        translats, 'Children Detail', lng),
+                                        translats, CustomText.ChildDetails, lng),
                                     style: Styles.white145,
                                   ),
                                   Text(
@@ -274,9 +274,14 @@ class _HouseholdScreenState
   widgetTypeWidget(int index, HouseHoldFielItemdModel quesItem) {
     switch (quesItem.fieldtype) {
       case 'Link':
+
         List<OptionsModel> items = options
             .where((element) => element.flag == 'tab${quesItem.options}')
             .toList();
+        if(quesItem.fieldname=='child_status'){
+          items.insert(0,OptionsModel(name:'-1',values:CustomText.select_here,
+              flag: 'tab${quesItem.options}'));
+        }
         return DynamicCustomDropdownField(
           hintText:
               Global.returnTrLable(translats, CustomText.select_here, lng),
@@ -297,6 +302,9 @@ class _HouseholdScreenState
               myMap[quesItem.fieldname!] = value.name!;
             else
               myMap.remove(quesItem.fieldname);
+            if(quesItem.fieldname=='child_status'&&Global.validToString(value?.name)=='-1'){
+              myMap.remove(quesItem.fieldname);
+            }
             setState(() {});
           },
         );
@@ -834,6 +842,7 @@ class _HouseholdScreenState
       CustomText.Save,
       CustomText.hhHeadName,
       CustomText.dataSaveSuc,
+      CustomText.ChildDetails,
       'Do you want to Save?',
       'Yes',
       'No',

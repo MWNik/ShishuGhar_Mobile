@@ -148,17 +148,16 @@ class _ChildReferralListingScreenState
                   category = Global.validString(category)
                       ? '$category,Major Illness'
                       : 'Major Illness';
-                  // growthData['category'] = 'Major Illness';
                 }
                 if (Global.stringToDouble(
-                            element['weight_for_age'].toString()) ==
-                        1 ||
-                    Global.stringToDouble(
                             element['weight_for_height'].toString()) ==
                         1) {
-                  // growthData['category'] = 'SAM';
                   category =
                       Global.validString(category) ? '$category,SAM' : 'SAM';
+                }
+                if (Global.stringToDouble(element['weight_for_age'].toString()) == 1 ) {
+                  category =
+                  Global.validString(category) ? '$category,SUW' : 'SUW';
                 }
                 if (Global.validString(gfReco)) {
                   category = Global.validString(category)
@@ -599,7 +598,7 @@ class _ChildReferralListingScreenState
       genratedValue = 'GF1';
 
       if (secondlastGrowhthDetails.isNotEmpty &&
-          (Global.stringToDouble(growhthDetails['weight'].toString()) <=
+          (Global.stringToDouble(lastGrowhthDetails['weight'].toString()) <=
               Global.stringToDouble(
                   secondlastGrowhthDetails['weight'].toString()))) {
         genratedValue = 'GF2';

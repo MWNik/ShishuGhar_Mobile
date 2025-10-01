@@ -366,8 +366,8 @@ class Validate {
 
   String displeDateFormate(String? inputDate) {
     String result = '';
-    if (inputDate != null) {
-      DateTime originalFormat = DateFormat('yyyy-MM-dd').parse(inputDate);
+    if (Global.validString(inputDate)) {
+      DateTime originalFormat = DateFormat('yyyy-MM-dd').parse(inputDate!);
       String newFormat = DateFormat('dd-MMM-yyyy').format(originalFormat);
       result = newFormat;
     }
@@ -376,8 +376,8 @@ class Validate {
 
   String displeDateFormateMonthYear(String? inputDate) {
     String result = '';
-    if (inputDate != null) {
-      DateTime originalFormat = DateFormat('yyyy-MM').parse(inputDate);
+    if (Global.validString(inputDate)) {
+      DateTime originalFormat = DateFormat('yyyy-MM').parse(inputDate!);
       String newFormat = DateFormat('MMM-yyyy').format(originalFormat);
       result = newFormat;
     }
@@ -425,6 +425,17 @@ class Validate {
     return dateTime;
   }
 
+  String? dateToString(DateTime inputDate) {
+    String? dateTime;
+    try {
+      DateFormat originalFormat = DateFormat('yyyy-MM-dd');
+      dateTime = originalFormat.format(inputDate);
+    } catch (e) {
+      print(e);
+    }
+    return dateTime;
+  }
+
   // String convertDate(String inputDate) {
   //   // DateFormat originalFormat = DateFormat('yyyy-MM-dd');
   //   // DateFormat newFormat = DateFormat('dd-MM-yyyy');
@@ -461,9 +472,6 @@ class Validate {
     final now = DateTime.now();
     int ageInMonths =
         (now.year - birthDate.year) * 12 + now.month - birthDate.month;
-    // if (now.day > birthDate.day) {
-    //   ageInMonths++;
-    // }
     return ageInMonths;
   }
 
@@ -895,6 +903,22 @@ class Validate {
       return Global.splitData(dateTime.toString(), ' ')[0];
       // return stringToDate('${currentDate.year}-${currentDate.month - 1}-${currentDate.day}').toString();
     }
+  }
+
+
+   List<String> getMonthsListFormatted(DateTime startDate) {
+    final List<String> monthsList = [];
+    final DateTime current = DateTime.now();
+    final DateTime currentMonth = DateTime(current.year, current.month, 1);
+
+    DateTime month = DateTime(startDate.year, startDate.month, 1);
+
+    while (month.isBefore(currentMonth) || month.isAtSameMomentAs(currentMonth)) {
+      monthsList.add(DateFormat('yyyy-MM').format(month));
+      month = DateTime(month.year, month.month + 1, 1);
+    }
+
+    return monthsList;
   }
 
 }

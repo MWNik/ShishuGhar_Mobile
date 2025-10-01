@@ -604,8 +604,10 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
                 // }
               }
             }
-            if(quesItem.fieldname == 'measurement_date' || quesItem.fieldname == 'child_dob'){
+            if(quesItem.fieldname == 'measurement_date' ||
+                quesItem.fieldname == 'child_dob'){
               chekMeasumentEqupment();
+
             }
             setState(() {});
           },
@@ -1075,8 +1077,11 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
             myMap['${item.fieldname}_zscore'] =zscroreValue;
 
           });
+          List<String> months = Validate().getMonthsListFormatted(Validate().stringToDate(myMap['measurement_date']));
+          for (int i = 0; i < months.length; i++) {
+            await callUpdateAnthroRecord(myMap['measurement_date'],newChild,months[i]);
+          }
 
-          await callUpdateAnthroRecord(myMap['date_of_enrollment'],newChild);
         }
 
 
@@ -1468,63 +1473,77 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     return screenItems;
   }
 
-  Future<void> callUpdateAnthroRecord(String enrollmentDate,Map<String, dynamic> itemStrodeColor) async {
-    var dateMonthYear = Validate().dateToMonthYear(enrollmentDate);
-    if (dateMonthYear.length > 0) {
-      var lastRecord = await ChildGrowthResponseHelper()
-          .anthroDataForEnrolledAdd(dateMonthYear, widget.crecheId);
-      if (lastRecord.length > 0) {
-        if (lastRecord.first.responces != null) {
-          Map<String, dynamic> responseData = jsonDecode(
-              lastRecord.first.responces!);
-          var childs = responseData['anthropromatic_details'];
-          if (childs != null) {
-            List<Map<String, dynamic>> children = List<
-                Map<String, dynamic>>.from(
-                responseData['anthropromatic_details']);
-            var childItem = children
-                .where((element) =>
-            element['childenrollguid'] == widget.EnrolledChilGUID)
-                .toList();
-            if (childItem.length == 0) {
-              Map<String, dynamic> newChild = itemStrodeColor;
-              newChild['do_you_have_height_weight'] =
-              myMap['measurement_taken'];
-              newChild['dob_when_measurement_taken'] = myMap['child_dob'];
-              newChild['measurement_equipment'] =
-              myMap['measurement_equipment'];
-              newChild['measurement_taken_date'] = myMap['measurement_date'];
-              newChild['s_flag'] = '0';
-              newChild['thr'] = '0';
-              newChild['vhsnd'] = '1';
-              newChild['awc'] = '0';
-              newChild['any_medical_major_illness'] = '0';
-              newChild['childenrollguid'] = widget.EnrolledChilGUID;
-              newChild['chhguid'] = widget.cHHGuid;
-              newChild['cgmguid'] = lastRecord.first.cgmguid;
-              print("print $newChild");
-              children.add(newChild);
+  Future<void> callUpdateAnthroRecord(String enrollmentDate,
+      Map<String, dynamic> itemStrodeColor,String growthDate) async {
 
-              responseData['anthropromatic_details'] = children;
-              var measurementDate = responseData['measurement_date'];
-              var responcesJs = jsonEncode(responseData);
-              var name = responseData['name'];
-              print("responcesJs $responcesJs");
-              await ChildGrowthResponseHelper().insertUpdate(
-                  lastRecord.first.cgmguid!,
-                  measurementDate,
-                  name as int?,
-                  widget.crecheId,
-                  responcesJs,
-                  responseData['created_by'],
-                  responseData['created_on'],
-                  Validate().currentDateTime(),
-                  userName);
+      var dateMonthYear = Validate().dateToMonthYear(enrollmentDate);
+      if (growthDate.length > 0) {
+        var lastRecord = await ChildGrowthResponseHelper()
+            .anthroDataForEnrolledAdd(growthDate, widget.crecheId);
+        if (lastRecord.length > 0) {
+          if (lastRecord.first.responces != null) {
+            Map<String, dynamic> responseData = jsonDecode(
+                lastRecord.first.responces!);
+            var childs = responseData['anthropromatic_details'];
+            if (childs != null) {
+              List<Map<String, dynamic>> children = List<
+                  Map<String, dynamic>>.from(
+                  responseData['anthropromatic_details']);
+              var childItem = children
+                  .where((element) =>
+              element['childenrollguid'] == widget.EnrolledChilGUID)
+                  .toList();
+              if (childItem.length == 0) {
+                Map<String, dynamic> newChild = itemStrodeColor;
+                if(dateMonthYear==growthDate) {
+                  newChild['do_you_have_height_weight'] =
+                  myMap['measurement_taken'];
+                  newChild['dob_when_measurement_taken'] = myMap['child_dob'];
+                  newChild['measurement_equipment'] =
+                  myMap['measurement_equipment'];
+                  newChild['measurement_taken_date'] =
+                  myMap['measurement_date'];
+                  newChild['s_flag'] = '0';
+                  newChild['thr'] = '0';
+                  newChild['vhsnd'] = '1';
+                  newChild['awc'] = '0';
+                  newChild['any_medical_major_illness'] = '0';
+                  newChild['childenrollguid'] = widget.EnrolledChilGUID;
+                  newChild['chhguid'] = widget.cHHGuid;
+                  newChild['cgmguid'] = lastRecord.first.cgmguid;
+                  print("print $newChild");
+                }else{
+                  newChild={};
+                  newChild['do_you_have_height_weight'] = 0;
+                  newChild['measurement_reason'] = '4';
+                  newChild['dob_when_measurement_taken'] = myMap['child_dob'];
+                  newChild['childenrollguid'] = widget.EnrolledChilGUID;
+                  newChild['chhguid'] = widget.cHHGuid;
+                  newChild['cgmguid'] = lastRecord.first.cgmguid;
+                }
+                children.add(newChild);
+
+                responseData['anthropromatic_details'] = children;
+                var measurementDate = responseData['measurement_date'];
+                var responcesJs = jsonEncode(responseData);
+                var name = responseData['name'];
+                print("responcesJs $responcesJs");
+                await ChildGrowthResponseHelper().insertUpdate(
+                    lastRecord.first.cgmguid!,
+                    measurementDate,
+                    name as int?,
+                    widget.crecheId,
+                    responcesJs,
+                    responseData['created_by'],
+                    responseData['created_on'],
+                    Validate().currentDateTime(),
+                    userName);
+              }
             }
           }
         }
-      }
     }
+
   }
 
   Future<void> updateAnthroRecordsByChild() async{
@@ -1587,8 +1606,6 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
                 growthChild['${item.fieldname}_zscore']=zscroreValue;
 
               });
-
-              print('updated-> ${growthChild}');
               children.add(growthChild);
               responseData['anthropromatic_details'] = children;
               var measurementDate = responseData['measurement_date'];
@@ -1614,6 +1631,9 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
     var measurement_taken = myMap['measurement_taken'];
     if(measurement_taken!=null){
       if(measurement_taken.toString()=='1'){
+        if(myMap['measurement_date']==null&&myMap['date_of_enrollment']!=null){
+          myMap['measurement_date']=myMap['date_of_enrollment'];
+        }
         if(myMap['child_dob']!=null&&myMap['measurement_date']!=null){
           var child_dob = Validate().stringToDateNull(myMap['child_dob']);
           var mesurmentDate = Validate().stringToDateNull(myMap['measurement_date']);

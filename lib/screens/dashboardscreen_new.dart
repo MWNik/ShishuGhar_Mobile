@@ -10,6 +10,7 @@ import 'package:shishughar/screens/tabed_screens/attendence/attendance_listed_sc
 import 'package:shishughar/screens/tabed_screens/child_follow_up/follow_up_tab_screen_all_child.dart';
 import 'package:shishughar/screens/tabed_screens/child_reffrel/reffral_tab_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creshe/cereche_listed_screen.dart';
+import 'package:shishughar/screens/tabed_screens/dashboard_report/dash_report.dart';
 import 'package:shishughar/screens/tabed_screens/enrolled_children/children_enrolled_for_cc_listed.dart';
 
 import '../database/helper/translation_language_helper.dart';
@@ -169,9 +170,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } else if (_currentIndex == 1) {
       refreshStatus = await Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => EnrolledChildrenForCC()));
+
     } else if (_currentIndex == 2) {
       refreshStatus =  await Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => DashboardReportSupeByApiScreenNew()));
+          // builder: (BuildContext context) => DashboardReportSupeByApiScreenNew()));
+          builder: (BuildContext context) => DashReport()));
     } else if (_currentIndex == 3) {
       if (HomeReplicaScreen.scaffoldKey != null) {
         HomeReplicaScreen.scaffoldKey!.currentState?.openDrawer();

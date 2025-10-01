@@ -64,6 +64,7 @@ class _StockCalenderListingScreenState
     await OptionsModelHelper()
         .getMstCommonOptions('Months', lng)
         .then((value) => monthList.addAll(value));
+
     await fetchStockData();
   }
 

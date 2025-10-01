@@ -85,6 +85,7 @@ class _RequisitionCalenderListingScreenState
     calenderList.clear();
     DateTime now = DateTime.now();
     if (requisitionData.isEmpty && role == CustomText.crecheSupervisor) {
+
       print("Month: ${now.month} , Year; ${now.year}");
       var monthYear = MonthYearModel(
         month: now.month,
@@ -93,6 +94,10 @@ class _RequisitionCalenderListingScreenState
         is_uploaded: 0,
       );
       calenderList.add(monthYear);
+      List<MonthYearModel> missingList = findMissingMonths(calenderList);
+      if (missingList.isNotEmpty) {
+        calenderList.addAll(missingList);
+      }
     } else if (requisitionData.isNotEmpty) {
       requisitionData.forEach((element) {
         var month = element.month;

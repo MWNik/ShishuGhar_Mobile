@@ -28,6 +28,7 @@ import 'package:shishughar/model/databasemodel/tabVillage_model.dart';
 import 'package:shishughar/model/databasemodel/tabstate_model.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/validate.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../api/cashBook_expenses_api.dart';
 import '../api/cashbook_receipt_api.dart';
@@ -108,8 +109,15 @@ class _LocationScreenState extends State<CoordinatorLocationNewScreen> {
   @override
   void initState() {
     super.initState();
-
+    WakelockPlus.enable();
     fetchStateList();
+  }
+
+  @override
+  void dispose() {
+    // Disable wakelock when leaving this screen
+    WakelockPlus.disable();
+    super.dispose();
   }
 
   Future<void> fetchStateList() async {

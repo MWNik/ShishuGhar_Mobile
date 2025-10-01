@@ -59,7 +59,7 @@ class _ReffralTabScreenState extends State<ReffralTabScreen>
       return SafeArea(
         child: WillPopScope(
           onWillPop: () async {
-            Navigator.pop(context, 'itemRefersh');
+            Navigator.pop(context, 'itemRefresh');
             return false;
           },
           child: Scaffold(

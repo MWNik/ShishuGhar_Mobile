@@ -22,6 +22,7 @@ import 'package:shishughar/screens/pendingSyncScreen.dart';
 import 'package:shishughar/style/styles.dart';
 import 'package:shishughar/utils/doctype_update.dart';
 import 'package:shishughar/utils/globle_method.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../api/cashBook_expenses_api.dart';
 import '../api/cashbook_receipt_api.dart';
@@ -1004,10 +1005,18 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Global.applyDisplayCutout(const Color(0xff5979AA));
     });
     initializeData();
+  }
+
+  @override
+  void dispose() {
+    // Disable wakelock when leaving this screen
+    WakelockPlus.disable();
+    super.dispose();
   }
 
   Future initMasterData(MasterDataModel master) async {
@@ -1388,7 +1397,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
     }
   }
 
-  callChildAttendanceDownloadData(BuildContext mContext) async {
+  callChildAttendanceDownloadData(BuildContext mContext) async {  
     downloadedApi = 2;
     var network = await Validate().checkNetworkConnection();
     if (network) {
