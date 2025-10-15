@@ -12,7 +12,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.shishughar.creche"
-    compileSdkVersion 35  // ✅ use only this
+    compileSdkVersion 36  // ✅ use only this
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -32,7 +32,7 @@ android {
     defaultConfig {
         applicationId "com.shishughar.creche"
         minSdk = flutter.minSdkVersion
-        targetSdkVersion 35   // ✅ also explicitly set to 35
+        targetSdkVersion 36   // ✅ also explicitly set to 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

@@ -386,7 +386,8 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       CustomText.DontHaveChildrenForAttender,
       CustomText.DontHaveChildrenForAnthropometry,
       CustomText.ok,
-      CustomText.nointernetconnectionavailable
+      CustomText.nointernetconnectionavailable,
+      CustomText.ChildIsNotEnrolledInthisCreche
     ];
 
     await TranslationDataHelper()
@@ -400,11 +401,18 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
     if (i == 0) {
       // if (role == CustomText.crecheSupervisor.trim() ||
       //     role == CustomText.clusterCoordinator.trim()) {
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => EnrolledExitChildListingTab(
-              creCheId: widget.crecheId,
-              village_id:
-                  Global.getItemValues(responce!.responces!, 'village_id'))));
+      if(Global.getItemValues(responce!.responces!, 'creche_status_id')=='3'){
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => EnrolledExitChildListingTab(
+                creCheId: widget.crecheId,
+                village_id:
+                Global.getItemValues(responce!.responces!, 'village_id'))));
+      }else Validate().singleButtonPopup(
+          Global.returnTrLable(locationControlls,
+              CustomText.ChildIsNotEnrolledInthisCreche, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          false,
+          context);
       // }
     } else if (i == 1) {
       Navigator.of(context).push(MaterialPageRoute(

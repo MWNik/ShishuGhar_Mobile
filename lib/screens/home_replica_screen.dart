@@ -177,7 +177,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   List<Translation> locationControlls = [];
   String appVersionName = '';
   bool shouldDownloadFirst = false;
-  Map<String, int> itemCount={};
+  Map<String, int> itemCount = {};
 
   @override
   Widget build(BuildContext context) {
@@ -265,10 +265,10 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
               ),
             ),
             Visibility(
-              visible:false,
+              visible: false,
               child: Stack(
                 children: [
-                    SizedBox(
+                  SizedBox(
                     height: 40,
                     width: 40,
                     child: Image.asset(
@@ -372,7 +372,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                     maxLines: 2,
                                   ),
                                   Text(
-                                      "${Global.returnTrLable(locationControlls, role, lng??"en")}",
+                                      "${Global.returnTrLable(locationControlls, role, lng ?? "en")}",
                                       style: Styles.roleLabe),
                                 ],
                               )
@@ -418,7 +418,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                           title: Text(
                             lng != null
                                 ? Global.returnTrLable(locationControlls,
-                                CustomText.villageProfile, lng!)
+                                    CustomText.villageProfile, lng!)
                                 : '',
                             style: Styles.black125,
                           ),
@@ -428,8 +428,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => VillageProfileListingScreen(
-                                    )));
+                                    builder: (context) =>
+                                        VillageProfileListingScreen()));
                             // _showLanguageDialog(context);
                           },
                         ),
@@ -446,7 +446,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                           title: Text(
                             lng != null
                                 ? Global.returnTrLable(locationControlls,
-                                CustomText.Grievance, lng!)
+                                    CustomText.Grievance, lng!)
                                 : '',
                             style: Styles.black125,
                           ),
@@ -456,8 +456,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => GrievanceHomeListing(
-                                    )));
+                                    builder: (context) =>
+                                        GrievanceHomeListing()));
                             // _showLanguageDialog(context);
                           },
                         ),
@@ -806,23 +806,28 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                           builder: (context) =>
                                               const LoginScreen()),
                                       (Route<dynamic> route) => false);
-                                } else{
+                                } else {
                                   bool? shouldProceed = await showDialog(
                                     context: context,
                                     barrierDismissible: true,
                                     builder: (context) {
-                                      return SingleButtonPopupDialog(message: Global.returnTrLable(
-                                          locationControlls,
-                                          CustomText.darftDataForLogoyt,
-                                          lng!), button: Global.returnTrLable(locationControlls,
-                                          CustomText.ok, lng!));
+                                      return SingleButtonPopupDialog(
+                                          message: Global.returnTrLable(
+                                              locationControlls,
+                                              CustomText.darftDataForLogoyt,
+                                              lng!),
+                                          button: Global.returnTrLable(
+                                              locationControlls,
+                                              CustomText.ok,
+                                              lng!));
                                     },
                                   );
-                                if (shouldProceed == true) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (BuildContext context) => DarftDataScreen(
-                                      )));
-                                }
+                                  if (shouldProceed == true) {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                DarftDataScreen()));
+                                  }
                                   // Validate().singleButtonPopup(
                                   //     Global.returnTrLable(locationControlls,
                                   //         CustomText.darftDataForLogoyt, lng!),
@@ -830,7 +835,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                   //         CustomText.ok, lng!),
                                   //     false,
                                   //     context);
-                              }}
+                                }
+                              }
                               ;
                             }),
                         Divider(
@@ -1209,8 +1215,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<void> callCreshDataApi(
-      String userName, String password, String token, bool only)
-  async {
+      String userName, String password, String token, bool only) async {
     if (only) showLoaderDialog(context);
     var cresheData = await HouseHoldFieldsApiService()
         .syncCrecheData(userName, password, token);
@@ -1227,8 +1232,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       } else {
         Navigator.pop(context);
       }
-    }
-    else if (cresheData.statusCode == 401) {
+    } else if (cresheData.statusCode == 401) {
       Navigator.pop(context);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.remove(Validate.Password);
@@ -1242,8 +1246,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           MaterialPageRoute(
             builder: (mContext) => LoginScreen(),
           ));
-    }
-    else {
+    } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(cresheData.body, 'message'),
@@ -1254,8 +1257,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<void> callEnrooledChildrenDataApi(
-      String userName, String password, String token, bool only)
-  async {
+      String userName, String password, String token, bool only) async {
     if (only) showLoaderDialog(context);
     var child_data = await ChildEnrolledDataMetaApi()
         .callChildHHMeta(userName, password, token);
@@ -1298,8 +1300,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<void> callEnrolledExitMetaApi(
-      String userName, String password, String token, bool only)
-  async {
+      String userName, String password, String token, bool only) async {
     if (only) showLoaderDialog(context);
     var child_data = await ChildEnrolledExitApi()
         .callChildEnrolledExitMetaApi(userName, password, token);
@@ -1339,8 +1340,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<void> callApiLogicData(
-      String userName, String password, String token, bool only)
-  async {
+      String userName, String password, String token, bool only) async {
     var logisResponce =
         await FormLogicApiService().fetchLogicData(userName, password, token);
 
@@ -1378,7 +1378,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       List<TabFormsLogic>? formLogicList = formLogicApiModel.tabFormsLogic;
       print("Insert formlogic data into the database");
       await FormLogicDataHelper().insertFormLogic(formLogicList);
-        }
+    }
   }
 
   @override
@@ -1394,7 +1394,6 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   //   print('zScore $zScore  $days');
   //
   // }
-
 
   Future<void> callInsertHouseHoldFields(HouseHoldFieldModel items) async {
     await DatabaseHelper.database!.delete('tabhouseholdfield');
@@ -1442,18 +1441,21 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     await _getAppVersionName();
     await locationData();
     await pendingDataForVerify();
-    var tabHeightforageBoys = await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
-    if(tabHeightforageBoys.isNotEmpty){
-      if(tabHeightforageBoys.first.l==null&&tabHeightforageBoys.first.m==null&&tabHeightforageBoys.first.s==null){
+    var tabHeightforageBoys =
+        await HeightWeightBoysGirlsHelper().callHeightForAgeBoys();
+    if (tabHeightforageBoys.isNotEmpty) {
+      if (tabHeightforageBoys.first.l == null &&
+          tabHeightforageBoys.first.m == null &&
+          tabHeightforageBoys.first.s == null) {
         await callBackdatedConfigirationData();
-      }else {
+      } else {
         if (householdForm != null) {
           await callModifiedFieldData();
         } else {
           await callFieldData(false);
         }
       }
-    }else {
+    } else {
       await callBackdatedConfigirationData();
     }
 
@@ -1471,7 +1473,9 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       if (response.statusCode == 401) {
         await handleUnauthorized();
-      }else { countDataExcution();}
+      } else {
+        countDataExcution();
+      }
     }
   }
 
@@ -1755,7 +1759,6 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     setState(() {});
   }
 
-
   Future<void> pendingDataForVerify() async {
     if (role == CustomText.crecheSupervisor) {
       syncCount = await callCountForUpload();
@@ -1840,9 +1843,6 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<void> onclick(int i, String imsgeItem, String lng) async {
-
-
-
     String? refStatus;
     if (i == 0) {
       // if (role == CustomText.crecheSupervisor.trim() ||
@@ -1858,16 +1858,13 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => ShiShuGharScreen(type: 0)));
       // }
-    }
-    else if (i == 1) {
+    } else if (i == 1) {
       if (role == CustomText.crecheSupervisor.trim()) {
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => ReffralTabScreen(
                   tabTitle: Global.returnTrLable(
                       locationControlls, CustomText.FlaggedChilderen, lng),
                 )));
-
-
       }
       //  else if (role == CustomText.clusterCoordinator.trim()) {
       else {
@@ -1876,8 +1873,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
               ReferallCompletedListForCC(isHomeScreen: true),
         ));
       }
-    }
-    else if (i > 1&&i < 12) {
+    } else if (i > 1 && i < 12) {
       if (shouldDownloadFirst) {
         Validate().singleButtonPopup(
             Global.returnTrLable(
@@ -1885,25 +1881,23 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
             Global.returnTrLable(locationControlls, CustomText.ok, lng),
             false,
             context);
-      }
-      else{
-
+      } else {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) => DashReportCardDetailForHomeScreen(
-              title: Global.returnTrLable(
-                  locationControlls,text[i],lng),
-              query_type: getQueryTitle(i),
-              month:  getMonthList(DateTime.now().year)[(DateTime.now().month)-1],
-              year: '${DateTime.now().year}',
-              selectedCrecheStatus: OptionsModel(
-                name: '3',
-                values:'3',
-                flag: null, // Set flag to null
-              ),
-            )));
+            builder: (BuildContext context) =>
+                DashReportCardDetailForHomeScreen(
+                  title: Global.returnTrLable(locationControlls, text[i], lng),
+                  query_type: getQueryTitle(i),
+                  month: getMonthList(
+                      DateTime.now().year)[(DateTime.now().month) - 1],
+                  year: '${DateTime.now().year}',
+                  selectedCrecheStatus: OptionsModel(
+                    name: '3',
+                    values: '3',
+                    flag: null, // Set flag to null
+                  ),
+                )));
       }
-    }
-    else if (i == 12) {
+    } else if (i == 12) {
       if (role == CustomText.crecheSupervisor.trim()) {
         refStatus = await Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => FollowUpTabScreenAllChild(
@@ -1921,8 +1915,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
             builder: (BuildContext context) =>
                 FollowCompletedListForCC(isHomeScreen: true)));
       }
-    }
-    else if (i == 13) {
+    } else if (i == 13) {
       if (shouldDownloadFirst) {
         Validate().singleButtonPopup(
             Global.returnTrLable(
@@ -2754,7 +2747,6 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
             false,
             context);
       }
-
     } else if (response.statusCode == 401) {
       Navigator.pop(context);
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -2953,8 +2945,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         await callCashBookReceiptMetaApi(userName, password, token);
       } else
         Navigator.pop(context);
-    }
-    else if (responce.statusCode == 401) {
+    } else if (responce.statusCode == 401) {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
@@ -2962,8 +2953,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           Global.returnTrLable(locationControlls, CustomText.ok, lng!),
           false,
           context);
-    }
-    else {
+    } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
@@ -3119,22 +3109,21 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     return 0;
   }
 
-
-  Future<void> callBackdatedConfigirationData()
-  async {
+  Future<void> callBackdatedConfigirationData() async {
     var network = await Validate().checkNetworkConnection();
     if (network) {
       var userName = (await Validate().readString(Validate.userName))!;
       var password = (await Validate().readString(Validate.Password))!;
       var token = (await Validate().readString(Validate.appToken))!;
       showLoaderDialog(context);
-      var logisResponce =
-      await MasterApiService().backdatedConfigiration(userName, password, token);
+      var logisResponce = await MasterApiService()
+          .backdatedConfigiration(userName, password, token);
       if (logisResponce.statusCode == 200) {
         Map<String, dynamic> responseData = json.decode(logisResponce.body);
-        await initBackdatedConfigirationData(BackdatedConfigirationModelApiModel.fromJson(responseData));
+        await initBackdatedConfigirationData(
+            BackdatedConfigirationModelApiModel.fromJson(responseData));
         await callMasterData(userName, password, token);
-      }else if (logisResponce.statusCode == 401) {
+      } else if (logisResponce.statusCode == 401) {
         await handleUnauthorized();
       } else {
         Navigator.pop(context);
@@ -3145,27 +3134,28 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
             context);
       }
     }
-
   }
 
-  Future<void> initBackdatedConfigirationData(BackdatedConfigirationModelApiModel? item) async {
+  Future<void> initBackdatedConfigirationData(
+      BackdatedConfigirationModelApiModel? item) async {
     if (item != null) {
-      List<BackdatedConfigirationModel>? items = item.backdatedConfigirationModel;
+      List<BackdatedConfigirationModel>? items =
+          item.backdatedConfigirationModel;
       if (items.isNotEmpty) {
-        await BackdatedConfigirationHelper().insertBackdatedConfigirationModel(items);
+        await BackdatedConfigirationHelper()
+            .insertBackdatedConfigirationModel(items);
       }
     }
   }
 
-  Future<void> callMasterData( String userName,
-      String password, String token)
-  async {
+  Future<void> callMasterData(
+      String userName, String password, String token) async {
     var msterDataResponse =
-    await MasterApiService().fetchmasterData(userName, password, token);
+        await MasterApiService().fetchmasterData(userName, password, token);
 
     if (msterDataResponse.statusCode == 200) {
       MasterDataModel masterDataApiModel =
-      MasterDataModel.fromJson(json.decode(msterDataResponse.body));
+          MasterDataModel.fromJson(json.decode(msterDataResponse.body));
       await initMasterData(masterDataApiModel);
       Navigator.pop(context);
       var householdForm = await Validate().readString(Validate.householdForm);
@@ -3214,241 +3204,239 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       await HeightWeightBoysGirlsHelper()
           .insertWeightToHeightGirls(master.tabWeightToHeightGirls!);
     }
+  }
 
-    }
-
-
-    Widget homeScreenCardItem(int i){
-      return InkWell(
-        onTap: () async {
-          onclick(i, image[i], lng!);
-        },
-        child: Container(
-          decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0xff5A5A5A).withOpacity(
-                      0.1), // Shadow color with opacity
-                  offset: Offset(
-                      0, 1), // Horizontal and vertical offset
-                  blurRadius: 5, // Blur radius
-                  spreadRadius: 0, // Spread radius
-                ),
-              ],
-              color: Color(0xffF2F7FF),
-              borderRadius: BorderRadius.circular(5.r),
-              border: Border.all(
-                color: Color(0xffE7F0FF),
-              )),
-          height: 168.h,
-          width: 146.w,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Visibility(
-                      visible: true,
-                      child: Stack(
-                        children: [
-                          SizedBox(
-                            height: 40,
-                            width: 60,
-                            child: Image.asset(
-                              height: 30,
-                              width: 30,
-                              image[i],
-                              filterQuality: FilterQuality.high,
-                              // scale: image[i] == 'assets/creche_profile/flagged_children_new.png' ||
-                              //     image[i] == 'assets/creche_profile/child_followUp_new.png' ||
-                              //     image[i] == 'assets/village_ic.png'
-                              //     ? 0.9
-                              //     : 3.8,
-                              color: image[i] == 'assets/creche_profile/flagged_children_new.png'
-                                  ? null
-                                  : Color(0xff5979AA),
-                            ),
+  Widget homeScreenCardItem(int i) {
+    return InkWell(
+      onTap: () async {
+        onclick(i, image[i], lng!);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Color(0xff5A5A5A)
+                    .withOpacity(0.1), // Shadow color with opacity
+                offset: Offset(0, 1), // Horizontal and vertical offset
+                blurRadius: 5, // Blur radius
+                spreadRadius: 0, // Spread radius
+              ),
+            ],
+            color: Color(0xffF2F7FF),
+            borderRadius: BorderRadius.circular(5.r),
+            border: Border.all(
+              color: Color(0xffE7F0FF),
+            )),
+        height: 168.h,
+        width: 146.w,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Visibility(
+                    visible: true,
+                    child: Stack(
+                      children: [
+                        SizedBox(
+                          height: 40,
+                          width: 60,
+                          child: Image.asset(
+                            height: 30,
+                            width: 30,
+                            image[i],
+                            filterQuality: FilterQuality.high,
+                            // scale: image[i] == 'assets/creche_profile/flagged_children_new.png' ||
+                            //     image[i] == 'assets/creche_profile/child_followUp_new.png' ||
+                            //     image[i] == 'assets/village_ic.png'
+                            //     ? 0.9
+                            //     : 3.8,
+                            color: image[i] ==
+                                    'assets/creche_profile/flagged_children_new.png'
+                                ? null
+                                : Color(0xff5979AA),
                           ),
-                          // if (image[i] == 'assets/shishughar.png'||
-                          //     image[i]=='assets/creche_profile/flagged_children_new.png'||
-                          //     image[i]=='assets/creche_profile/child_followUp_new.png')
-                          if(getCount(image[i])>0)
+                        ),
+                        // if (image[i] == 'assets/shishughar.png'||
+                        //     image[i]=='assets/creche_profile/flagged_children_new.png'||
+                        //     image[i]=='assets/creche_profile/child_followUp_new.png')
+                        if (getCount(image[i]) > 0)
                           Positioned(
-                              left: 30,
-                              bottom: 10,
-                              child: Container(
-                                alignment: Alignment.center,
-                                height: 25,  // Smaller badge size
-                                width: 25,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xffF26BA3),
-                                  border: Border.all(color: Colors.white, width: 1.5),
-                                ),
-                                child: Text(
-                                  "${getCount(image[i])}",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                            left: 30,
+                            bottom: 10,
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: 25,
+                              // Smaller badge size
+                              width: 25,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color(0xffF26BA3),
+                                border:
+                                    Border.all(color: Colors.white, width: 1.5),
+                              ),
+                              child: Text(
+                                "${getCount(image[i])}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-                        ],
-                      ),
+                          ),
+                      ],
                     ),
-                    SizedBox(
-                      height: 15.h,
+                  ),
+                  SizedBox(
+                    height: 15.h,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 7),
+                    child: Text(
+                      Global.returnTrLable(locationControlls, text[i], lng!),
+                      style: Styles.listlablefont,
+                      textAlign: TextAlign.center,
                     ),
-                    Padding(
-                      padding:
-                      EdgeInsets.symmetric(horizontal: 7),
-                      child: Text(
-                        Global.returnTrLable(
-                            locationControlls, text[i], lng!),
-                        style: Styles.listlablefont,
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
+  }
 
+  countDataExcution() async {
+    itemCount = {
+      'assets/shishughar.png': 0,
+      'assets/creche_profile/flagged_children_new.png': 0,
+      'assets/creche_profile/child_followUp_new.png': 0,
+      'assets/creche_profile/creche_profile_new.png': 0,
+      'assets/creche_profile/attendance.png': 0,
+      'assets/creche_profile/anatomy.png': 0,
+      'assets/creche_profile/enrolled_child_new.png': 0,
+      'assets/creche_profile/health_detail_new.png': 0,
+    };
 
-    countDataExcution() async {
-      itemCount={
-        'assets/shishughar.png':0,
-        'assets/creche_profile/flagged_children_new.png':0,
-        'assets/creche_profile/child_followUp_new.png':0,
-        'assets/creche_profile/creche_profile_new.png':0,
-        'assets/creche_profile/attendance.png':0,
-        'assets/creche_profile/anatomy.png':0,
-        'assets/creche_profile/enrolled_child_new.png':0,
-        'assets/creche_profile/health_detail_new.png':0,
-      };
-
-      showLoaderDialog(context);
-      final results = await Future.wait([
+    showLoaderDialog(context);
+    final results = await Future.wait([
       DashboardReportHelper().excuteCrecheCount(
-          crecheStatus: '3',
-          filterDate: Global.initCurrentDate()),
-        DashboardReportHelper().excuteNoOfCrecheNotSubmitedAttendence(
-            crecheStatus: '3',
-            filterDate: Global.initCurrentDate()),
-        DashboardReportHelper().excuteAnthroDataNotSubmitted(
-            crecheStatus: '3',
-            filterDate: Global.initCurrentDate()),
-        DashboardReportHelper().excuteChildrenMeasermentNotTaken(
-            crecheStatus: '3',
-            filterDate: Global.initCurrentDate()),
-        DashboardReportHelper().excuteChildrenMeasermentTaken(
-            crecheStatus: '3',
-            filterDate: Global.initCurrentDate()),
-        ChildGrowthResponseHelper().allAnthormentry(),
-        DashboardReportHelper().excuteCurrentActiveChildren(
-            crecheStatus: '3',
-            filterDate: Global.initCurrentDate()),
-        DashboardReportHelper().excuteCurrentEligibleButNotEnrlolledChild(
-            crecheStatus: '3',
-            filterDate: Global.initCurrentDate())
-      ]);
-      itemCount['assets/shishughar.png'] = results[0].length;
-        itemCount['assets/creche_profile/attendance.png'] = results[1].length;
-        itemCount['assets/creche_profile/anatomy.png'] = results[2].length;
-        itemCount['assets/creche_profile/health_detail_new.png'] = results[3].length;
-        itemCount['assets/creche_profile/creche_profile_new.png'] = results[6].length;
-        itemCount['assets/creche_profile/enrolled_child_new.png'] = results[7].length;
-        itemCount['assets/ic_sync_n.png'] = syncCount;
-        var allAnthoItem=results[5] as List<ChildGrowthMetaResponseModel>;
-        var mesumentTaken=results[4] as List<Map<String, dynamic>>;
+          crecheStatus: '3', filterDate: Global.initCurrentDate()),
+      DashboardReportHelper().excuteNoOfCrecheNotSubmitedAttendence(
+          crecheStatus: '3', filterDate: Global.initCurrentDate()),
+      DashboardReportHelper().excuteAnthroDataNotSubmitted(
+          crecheStatus: '3', filterDate: Global.initCurrentDate()),
+      DashboardReportHelper().excuteChildrenMeasermentNotTaken(
+          crecheStatus: '3', filterDate: Global.initCurrentDate()),
+      DashboardReportHelper().excuteChildrenMeasermentTaken(
+          crecheStatus: '3', filterDate: Global.initCurrentDate()),
+      ChildGrowthResponseHelper().allAnthormentry(),
+      DashboardReportHelper().excuteCurrentActiveChildren(
+          crecheStatus: '3', filterDate: Global.initCurrentDate()),
+      DashboardReportHelper().excuteCurrentEligibleButNotEnrlolledChild(
+          crecheStatus: '3', filterDate: Global.initCurrentDate())
+    ]);
+    itemCount['assets/shishughar.png'] = results[0].length;
+    itemCount['assets/creche_profile/attendance.png'] = results[1].length;
+    itemCount['assets/creche_profile/anatomy.png'] = results[2].length;
+    itemCount['assets/creche_profile/health_detail_new.png'] =
+        results[3].length;
+    itemCount['assets/creche_profile/creche_profile_new.png'] =
+        results[6].length;
+    itemCount['assets/creche_profile/enrolled_child_new.png'] =
+        results[7].length;
+    itemCount['assets/ic_sync_n.png'] = syncCount;
+    var allAnthoItem = results[5] as List<ChildGrowthMetaResponseModel>;
+    var mesumentTaken = results[4] as List<Map<String, dynamic>>;
 
-      callAnthoItemsCount(mesumentTaken,allAnthoItem);
+    callAnthoItemsCount(mesumentTaken, allAnthoItem);
+  }
 
-    }
-
-    callAnthoItemsCount(List<Map<String, dynamic>> childrenMeasurementTaken,
-        List<ChildGrowthMetaResponseModel> allAntroData) async {
-      final results = await Future.wait([
-       DashboardReportHelper().excuteGF1AllAnthro(
+  callAnthoItemsCount(List<Map<String, dynamic>> childrenMeasurementTaken,
+      List<ChildGrowthMetaResponseModel> allAntroData) async {
+    final results = await Future.wait([
+      DashboardReportHelper().excuteGF1AllAnthro(
           childrenMeasurementTaken: childrenMeasurementTaken,
           allAntroData: allAntroData),
-        DashboardReportHelper().excuteGF2MeasurementTakenAllAnthro(
-            childrenMeasurementTaken: childrenMeasurementTaken,
-            allAntroData: allAntroData),
-        DashboardReportHelper().excuteRedFlagMeasurmentTakenAllAnthro(
-            childrenMeasurementTaken: childrenMeasurementTaken,
-            allAntroData: allAntroData),
-        DashboardReportHelper().excuteChildrenAtRiskMeasurmentTakenAllAnthro(
-            childrenMeasurementTaken: childrenMeasurementTaken,
-            allAntroData: allAntroData) ,
-        DashboardReportHelper().excuteSeverelyStunted(
-            crecheStatus: '3',
-            filterDate: Global.initCurrentDate()),
-        DashboardReportHelper().excuteSeverUnderWeight(
-            crecheStatus: '3',
-            filterDate: Global.initCurrentDate()) ,
+      DashboardReportHelper().excuteGF2MeasurementTakenAllAnthro(
+          childrenMeasurementTaken: childrenMeasurementTaken,
+          allAntroData: allAntroData),
+      DashboardReportHelper().excuteRedFlagMeasurmentTakenAllAnthro(
+          childrenMeasurementTaken: childrenMeasurementTaken,
+          allAntroData: allAntroData),
+      DashboardReportHelper().excuteChildrenAtRiskMeasurmentTakenAllAnthro(
+          childrenMeasurementTaken: childrenMeasurementTaken,
+          allAntroData: allAntroData),
+      DashboardReportHelper().excuteSeverelyStunted(
+          crecheStatus: '3', filterDate: Global.initCurrentDate()),
+      DashboardReportHelper().excuteSeverUnderWeight(
+          crecheStatus: '3', filterDate: Global.initCurrentDate()),
+    ]);
+    itemCount['assets/creche_profile/gf_1.png'] = results[0].length;
+    itemCount['assets/creche_profile/gf_2.png'] = results[1].length;
+    itemCount['assets/creche_profile/flagged_children_new.png'] =
+        results[2].length;
+    itemCount['assets/creche_profile/child_at_risk.png'] = results[3].length;
+    itemCount['assets/creche_profile/sam.png'] = results[4].length;
+    itemCount['assets/creche_profile/suw.png'] = results[5].length;
 
-      ]);
-      itemCount['assets/creche_profile/gf_1.png'] = results[0].length;
-      itemCount['assets/creche_profile/gf_2.png'] = results[1].length;
-      itemCount['assets/creche_profile/flagged_children_new.png'] = results[2].length;
-      itemCount['assets/creche_profile/child_at_risk.png'] = results[3].length;
-      itemCount['assets/creche_profile/sam.png'] = results[4].length;
-      itemCount['assets/creche_profile/suw.png'] = results[5].length;
-      Navigator.pop(context);
-      setState(() {});
+    // if (results[2].length > 0) {
+    //   var submitedId = '';
+    //   for (int i = 0; i < results[2].length; i++) {
+    //     if (Global.validString(submitedId)) {
+    //       submitedId = "$submitedId,'${results[2][i]['childenrollguid']}'";
+    //     } else
+    //       submitedId = "'${results[2][i]['childenrollguid']}'";
+    //   }
+    //   if(Global.validString(submitedId)){
+    //    var redFlagItems = await DashboardReportHelper().excuteGetChildrenByGUIDES(
+    //         childIdes: submitedId);
+    //    itemCount['assets/creche_profile/flagged_children_new.png'] =
+    //        redFlagItems.length;
+    //   }
+    // }
 
-    }
+    Navigator.pop(context);
+    setState(() {});
+  }
 
-   int  getCount(String key){
-      if(itemCount.containsKey(key)){
-        return itemCount[key]??0;
-      }else return 0;
-    }
+  int getCount(String key) {
+    if (itemCount.containsKey(key)) {
+      return itemCount[key] ?? 0;
+    } else
+      return 0;
+  }
 
-   String getQueryTitle(int i){
-    String queryTitle='';
-    if(image[i]=='assets/creche_profile/attendance.png'){
-      queryTitle='NoOfCrechesNotSubmittedAttendance';
-    }
-    else if(image[i]=='assets/creche_profile/anatomy.png'){
-      queryTitle='AnthroDataNotSubmitted';
-    }
-    else if(image[i]=='assets/creche_profile/health_detail_new.png'){
-      queryTitle='ChildrenMeasurementNotTaken';
-    }
-    else if(image[i]=='assets/creche_profile/creche_profile_new.png'){
-      queryTitle='CurrentActiveChildren';
-    }
-    else if(image[i]=='assets/creche_profile/enrolled_child_new.png'){
-      queryTitle='NotEligbleButNotEnrolled';
-    }
-    else if(image[i]=='assets/creche_profile/gf_1.png'){
-      queryTitle='Growthfaltering1';
-    }
-    else if(image[i]=='assets/creche_profile/gf_2.png'){
-      queryTitle='Growthfaltering2';
-    }
-    else if(image[i]=='assets/creche_profile/child_at_risk.png'){
-      queryTitle='childrenAtRisk';
-    }
-    else if(image[i]=='assets/creche_profile/sam.png'){
-      queryTitle='SeverelyStunted';
-    }
-    else if(image[i]=='assets/creche_profile/suw.png'){
-      queryTitle='SeverelyUnderweight';
+  String getQueryTitle(int i) {
+    String queryTitle = '';
+    if (image[i] == 'assets/creche_profile/attendance.png') {
+      queryTitle = 'NoOfCrechesNotSubmittedAttendance';
+    } else if (image[i] == 'assets/creche_profile/anatomy.png') {
+      queryTitle = 'AnthroDataNotSubmitted';
+    } else if (image[i] == 'assets/creche_profile/health_detail_new.png') {
+      queryTitle = 'ChildrenMeasurementNotTaken';
+    } else if (image[i] == 'assets/creche_profile/creche_profile_new.png') {
+      queryTitle = 'CurrentActiveChildren';
+    } else if (image[i] == 'assets/creche_profile/enrolled_child_new.png') {
+      queryTitle = 'NotEligbleButNotEnrolled';
+    } else if (image[i] == 'assets/creche_profile/gf_1.png') {
+      queryTitle = 'Growthfaltering1';
+    } else if (image[i] == 'assets/creche_profile/gf_2.png') {
+      queryTitle = 'Growthfaltering2';
+    } else if (image[i] == 'assets/creche_profile/child_at_risk.png') {
+      queryTitle = 'childrenAtRisk';
+    } else if (image[i] == 'assets/creche_profile/sam.png') {
+      queryTitle = 'SeverelyStunted';
+    } else if (image[i] == 'assets/creche_profile/suw.png') {
+      queryTitle = 'SeverelyUnderweight';
     }
     return queryTitle;
-   }
+  }
 
   List<OptionsModel> getMonthList(int year) {
     DateTime now = DateTime.now();
@@ -3471,7 +3459,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     ];
     return List.generate(
       monthLimit,
-          (index) => OptionsModel(
+      (index) => OptionsModel(
         name: (index + 1).toString(), // Month name
         values: months[index], // Month number (1-12)
         flag: null, // Set flag to null
@@ -3480,5 +3468,4 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     // If the input year is the current year, return only past & current months
     // return (year == currentYear) ? months.sublist(0, currentMonth) : months;
   }
-
 }

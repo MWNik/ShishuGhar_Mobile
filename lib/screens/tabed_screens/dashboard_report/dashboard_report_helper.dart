@@ -28,7 +28,7 @@ class DashboardReportHelper {
   async {
     print('current date ${filterDate}');
     var db=await databaseHelper.openDb();
-   String whereColue= crecheWhereCondition(  stateId,  districtId,
+   String whereColue= crecheWhereCondition(stateId,  districtId,
        blockId,  gpId, villageId, crecheId,  phase,
        partnerId,  crecheStatus,filterDate,1);
     var query=crecheDataQuery();
@@ -267,7 +267,7 @@ FROM (
             ) + 1 AS INTEGER
         ) AS elgdays
 
-    FROM tab_creche_response
+    FROM  ${eligbleCrecheQuery()} 
 ) creche
 LEFT JOIN (
     SELECT COUNT(*) AS atteneDays, creche_id 
@@ -474,7 +474,7 @@ FROM (
             ) + 1 AS INTEGER
         ) AS elgdays
 
-    FROM tab_creche_response
+    FROM  ${eligbleCrecheQuery()} 
 ) creche
 LEFT JOIN (
     SELECT COUNT(*) AS atteneDays, creche_id 
@@ -742,7 +742,7 @@ LEFT JOIN (
             ) - 1
         ) ELSE NULL END AS phase ,responces as crecheData
 
-    FROM tab_creche_response 
+    FROM  ${eligbleCrecheQuery()}  
 )  creche  
 on creche.name=childAttence.creche_id) ''';
 
@@ -1249,7 +1249,7 @@ on childAttendence.creche_id=creche.name''';
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response ) creche ON creche.name = childAttendence.creche_id
+    FROM  ${eligbleCrecheQuery()}  ) creche ON creche.name = childAttendence.creche_id
 ''';
     var no_days_creche_opened ='''SELECT  * from (Select *, CASE 
         WHEN INSTR(responces, 'is_shishu_ghar_is_closed_for_the_day":') > 0 
@@ -1386,7 +1386,7 @@ on childAttendence.creche_id=creche.name''';
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response ) creche ON creche.name = childAttendence.creche_id
+    FROM  ${eligbleCrecheQuery()}  ) creche ON creche.name = childAttendence.creche_id
 ''';
     var betWeen ="and childAttendence. date_of_attendance BETWEEN $startDate and $enrollMentDate";
 
@@ -1557,7 +1557,7 @@ on childAttendence.creche_id=creche.name''';
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response ) creche ON creche.name = childAttendence.creche_id
+    FROM  ${eligbleCrecheQuery()}  ) creche ON creche.name = childAttendence.creche_id
 ''';
     var betWeen ="and childAttendence. date_of_attendance BETWEEN $startDate and $enrollMentDate";
 
@@ -1759,7 +1759,7 @@ left join (
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response 
+    FROM  ${eligbleCrecheQuery()}  
 ) creche  on creche.name=anthro.creche_id
     ''';
 
@@ -1797,6 +1797,8 @@ left join (
 
     return result;
   }
+
+
 
   Future<List<Map<String, dynamic>>> excuteChildrenMeasermentNotTaken({
     String? stateId, String? districtId,
@@ -1980,7 +1982,7 @@ left join (
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response 
+    FROM  ${eligbleCrecheQuery()}  
 ) creche  on creche.name=anthro.creche_id) 
     ''';
 
@@ -2143,7 +2145,7 @@ left join (
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response 
+    FROM  ${eligbleCrecheQuery()}  
 ) creche  on creche.name=anthro.creche_id) 
     ''';
 
@@ -2305,7 +2307,7 @@ left join (
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response 
+    FROM  ${eligbleCrecheQuery()}  
 ) creche  on creche.name=anthro.creche_id) 
     ''';
 
@@ -2467,7 +2469,7 @@ left join (
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response 
+    FROM  ${eligbleCrecheQuery()}  
 ) creche  on creche.name=anthro.creche_id) 
     ''';
 
@@ -2630,7 +2632,7 @@ left join (
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response 
+    FROM  ${eligbleCrecheQuery()}  
 ) creche  on creche.name=anthro.creche_id) 
     ''';
 
@@ -2792,7 +2794,7 @@ left join (
             ) - 1
         ) ELSE NULL END AS phase
 
-    FROM tab_creche_response 
+    FROM  ${eligbleCrecheQuery()}  
 ) creche  on creche.name=anthro.creche_id) 
     ''';
 
@@ -3481,7 +3483,7 @@ FROM (
             ) - 1
         ) ELSE NULL END AS phase,responces as crecheData
 
-    FROM tab_creche_response 
+    FROM ${eligbleCrecheQuery()}  
 ) ''';
   }
 
@@ -3607,7 +3609,7 @@ FROM (
             ) - 1
         ) ELSE NULL END AS phase ,responces as crecheData
 
-    FROM tab_creche_response 
+    FROM ${eligbleCrecheQuery()} 
 ) ''';
   }
 
@@ -3680,6 +3682,11 @@ FROM (
     return whereCluse;
   }
 
+  String eligbleCrecheQuery()
+  {
+    return '(select * from tab_creche_response where name in (select DISTINCT(creche_id) from house_hold_responce))';
+  }
+
   String crecheWhereWithJoinCondition( String? stateId, String? districtId,
       String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
       String? partnerId, String? crecheStatus, String? filterDate)
@@ -3741,6 +3748,9 @@ FROM (
     }
     return whereCluse;
   }
+
+
+
 
 
 }

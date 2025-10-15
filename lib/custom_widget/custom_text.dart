@@ -362,6 +362,7 @@ class CustomText {
   static String DontHaveChildrenForAttender = 'Please enroll child first';
   static String DontHaveChildrenForAnthropometry = 'Please enroll child first';
   static String ChildEnrollsuccess = "Child enrolled successfully";
+  static String ChildIsNotEnrolledInthisCreche = "We can not enrolling new children because the creche is not Active/ Operational";
   static String zScrore = "Z - Score";
   // static String Attendance = "Attendance";
 
