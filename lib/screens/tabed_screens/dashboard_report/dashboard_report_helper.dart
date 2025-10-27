@@ -771,7 +771,7 @@ on creche.name=childAttence.creche_id) ''';
     if(finalDate){
       finalDateValue=Validate().currentDate();
     }
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
+    String whereColue= crecheWhereWithForEligbleJoinCondition( stateId,  districtId,
         blockId,  gpId, villageId, crecheId,  phase,
         partnerId,  crecheStatus,finalDateValue);
     var crecheQuery=crecheDataQuery();
@@ -3742,6 +3742,68 @@ FROM (
       }else whereCluse="where creche.phase='$phase'";
     }
     if(Global.validString(filterDate)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.creche_opening_date <='$filterDate'";
+      }else whereCluse="where creche.creche_opening_date <= '$filterDate'";
+    }
+    return whereCluse;
+  }
+
+  String crecheWhereWithForEligbleJoinCondition( String? stateId, String? districtId,
+      String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+      String? partnerId, String? crecheStatus, String? filterDate)
+  {
+    String whereCluse='';
+    if(Global.validString(stateId)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.state_id='$stateId'";
+      }else whereCluse="where creche.state_id='$stateId'";
+    }
+    if(Global.validString(districtId)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.district_id='$districtId'";
+      }else whereCluse="where creche.district_id='$districtId'";
+    }
+    if(Global.validString(blockId)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.block_id='$blockId'";
+      }else whereCluse="where creche.block_id='$blockId'";
+    }
+    if(Global.validString(gpId)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.gp_id='$gpId'";
+      }else whereCluse="where creche.gp_id='$gpId'";
+    }
+    if(Global.validString(villageId)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.village_id='$villageId'";
+      }else whereCluse="where creche.village_id='$villageId'";
+    }
+
+    if(Global.validString(crecheStatus)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.creche_status_id='$crecheStatus'";
+      }else whereCluse="where creche.creche_status_id='$crecheStatus'";
+    }
+
+    if(Global.validString(crecheId)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.name='$crecheId'";
+      }else whereCluse="where creche.name='$crecheId'";
+    }
+
+    if(Global.validString(partnerId)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.partner_id='$partnerId'";
+      }else whereCluse="where creche.partner_id='$partnerId'";
+    }
+
+    if(Global.validString(phase)){
+      if(Global.validString(whereCluse)){
+        whereCluse="$whereCluse and creche.phase='$phase'";
+      }else whereCluse="where creche.phase='$phase'";
+    }
+    if(Global.validString(filterDate)&&crecheStatus!='1'){
       if(Global.validString(whereCluse)){
         whereCluse="$whereCluse and creche.creche_opening_date <='$filterDate'";
       }else whereCluse="where creche.creche_opening_date <= '$filterDate'";

@@ -3297,6 +3297,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 7),
                     child: Text(
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                       Global.returnTrLable(locationControlls, text[i], lng!),
                       style: Styles.listlablefont,
                       textAlign: TextAlign.center,
