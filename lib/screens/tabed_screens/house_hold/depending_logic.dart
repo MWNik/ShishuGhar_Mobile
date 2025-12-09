@@ -1493,7 +1493,8 @@ class DependingLogic {
             }
           }
 
-        } else if (gender == '2' || gender == '3') {
+        }
+        else if (gender == '2' || gender == '3') {
           var filtredItem = tabWeightforageGirls
               .where((element) =>
           Global.retrunValidNum(element.age_in_days) == age)
@@ -1715,7 +1716,8 @@ class DependingLogic {
               growthValue = "$zScore";
             }
           }
-        } else if (gender == '2' || gender == '3') {
+        }
+        else if (gender == '2' || gender == '3') {
           var filtredItem = tabWeightforageGirls
               .where((element) =>
           Global.retrunValidNum(element.age_in_days) == age)
@@ -1878,7 +1880,8 @@ class DependingLogic {
           if(measurement_equipment == '1'){
             height =  Global.stringToDouble(height.toString()) + 0.7;
           }
-        }else  if (age > 730){
+        }
+        else  if (age > 730){
           preHeight=24;
           if(measurement_equipment == '2'){
             height =  Global.stringToDouble(height.toString()) - 0.7;

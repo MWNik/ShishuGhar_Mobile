@@ -101,7 +101,6 @@ class _CustomDropdownFieldState extends State<DynamicCustomDropdownField> {
                       ? widget.items.firstWhere((item) => item.name == widget.selectedItem)
                       : null),
                   onChanged: isDropdownEnabled ? widget.onChanged : null,
-                  // enabled: isDropdownEnabled,
                   borderRadius: BorderRadius.circular(10.r),
                   decoration: InputDecoration(
                       border: OutlineInputBorder(

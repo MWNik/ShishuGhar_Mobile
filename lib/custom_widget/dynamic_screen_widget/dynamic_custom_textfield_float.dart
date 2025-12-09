@@ -143,7 +143,7 @@ class _CustomTextFieldState extends State<DynamicCustomTextFieldFloat> {
                         widget.fieldName == 'height_on_referral')
                     ? <TextInputFormatter>[
                         FilteringTextInputFormatter.allow(RegExp(
-                            r'^\d{0,3}(?:\.\d{0,2})?')), // Allow only digits and up to 2 decimal places
+                            r'^\d{0,3}(?:\.\d{0,1})?')), // Allow only digits and up to 2 decimal places
                       ]
                     : (widget.fieldName == 'weight' ||
                             widget.fieldName == 'weight_on_referral')
