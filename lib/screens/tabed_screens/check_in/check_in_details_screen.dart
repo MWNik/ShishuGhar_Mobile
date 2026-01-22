@@ -531,12 +531,14 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
           setState(() {
             myMap[quesItem.fieldname!] = lats;
           });
-        } else if (quesItem.fieldname == 'longitude') {
+        }
+        else if (quesItem.fieldname == 'longitude') {
           initialValue = langs ?? '';
           setState(() {
             myMap[quesItem.fieldname!] = langs;
           });
-        } else if (quesItem.fieldname == 'checkin_location') {
+        }
+        else if (quesItem.fieldname == 'checkin_location') {
           initialValue = address ?? '';
           setState(() {
             myMap[quesItem.fieldname!] = address;
@@ -1558,8 +1560,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         if (locations.length > 1) {
           double targetLat = Global.stringToDouble(locations[0]);
           double targetLng = Global.stringToDouble(locations[1]);
-          int maxAllowedDistance =
-              await Validate().readInt(Validate.max_allow_range) ?? 50;
+          // int maxAllowedDistance =
+          //     await Validate().readInt(Validate.max_allow_range) ?? 50;
+          int maxAllowedDistance = 50000;
           if (locations[0].length > 3 && locations[1].length > 3) {
             showDialog(
               context: context,

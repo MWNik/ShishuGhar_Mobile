@@ -65,6 +65,20 @@ class ImageFileTabHelper {
     return items;
   }
 
+  Future<List<ImageFileTabResponceModel>> getImageByDoctypeIdWithField(
+      String doctype_guid, String doctype, String imageFieldName) async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from tab_image_file where doctype=? and doctype_guid=? and field_name=?',
+        [doctype, doctype_guid,imageFieldName]);
+    List<ImageFileTabResponceModel> items = [];
+
+    result.forEach((itemMap) {
+      items.add(ImageFileTabResponceModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<ImageFileTabResponceModel>> getImageByDoctypeIdAndImbeNotNull(
       String doctype_guid, String doctype) async {
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
@@ -82,12 +96,14 @@ class ImageFileTabHelper {
   Future<void> updateImageOnlyItem(ImageFileTabResponceModel items) async {
     var doctype_guid = items.doctype_guid;
     var doctype = items.doctype;
+    var image_name = items.image_name;
 
     // var attachedField = item['attached_to_field'];
 
     await DatabaseHelper.database!.rawQuery(
         'UPDATE tab_image_file SET image_name = ?  , is_edited=1 where  doctype=? and doctype_guid=? ',
         [
+          image_name,
           doctype,
           doctype_guid,
         ]);

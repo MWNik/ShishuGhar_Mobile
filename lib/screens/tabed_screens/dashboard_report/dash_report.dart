@@ -28,6 +28,7 @@ import '../../../style/styles.dart';
 import '../../../utils/globle_method.dart';
 import '../../../utils/validate.dart';
 import '../../dashboard_report_card_details.dart';
+import '../../dashboard_report_for_all_creche_by_api_new.dart';
 import 'dash_report_card_details.dart';
 import 'dashboard_report_helper.dart';
 
@@ -122,6 +123,7 @@ class _DashReportState extends State<DashReport> {
   bool isGf1 = true;
   bool isGf2 = true;
   bool isRedFlagChildren = true;
+  bool isSwitched=false;
 
   final excludedKeys = [
     'AvgAttendancePerDay',
@@ -261,7 +263,28 @@ class _DashReportState extends State<DashReport> {
             onTap: () {
               Navigator.pop(context, 'itemRefresh');
             },
+            actions: [
+              Switch(
+                value: isSwitched,
+                onChanged: (value) {
+                  setState(() {
+                    isSwitched = value;
+                  });
+
+                  if (value) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>  DashboardReportSupeByApiScreenNew(),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
+
+
           endDrawer: Drawer(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(

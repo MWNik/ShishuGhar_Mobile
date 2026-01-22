@@ -4,6 +4,7 @@ class PartnerStockModel {
   String? items;
   String? odia;
   String? hindi;
+  String? kannada;
   String? stock_type;
   String? partner_id;
   String? item_required_per_child_per_months;
@@ -13,6 +14,7 @@ class PartnerStockModel {
   PartnerStockModel({
     this.name,
     this.hindi,
+    this.kannada,
     this.is_active,
     this.items,
     this.odia,
@@ -27,6 +29,7 @@ class PartnerStockModel {
         name: json["name"],
         hindi: json["hindi"],
         odia: json["odia"],
+        kannada: json["kannada"],
         item_required_per_child_per_months:
             json["item_required_per_child_per_months"].toString(),
         items: json["items"],
@@ -41,6 +44,7 @@ class PartnerStockModel {
         "items": items,
         "odia": odia,
         "hindi": hindi,
+        "kannada": kannada,
         "partner_id": partner_id,
         "stock_type": stock_type,
         "item_required_per_child_per_months":

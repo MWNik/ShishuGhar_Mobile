@@ -3,6 +3,7 @@ class MasterStockModel {
   String? stock;
   String? odia;
   String? hindi;
+  String? kannada;
   int? is_active;
   int? seq_id;
 
@@ -11,6 +12,7 @@ class MasterStockModel {
     this.hindi,
     this.is_active,
     this.odia,
+    this.kannada,
     this.seq_id,
     this.stock
   });
@@ -20,6 +22,7 @@ class MasterStockModel {
     stock: json["stock"],
     odia: json["odia"],
     hindi: json["hindi"],
+      kannada: json["kannada"],
     is_active: json["is_active"],
     seq_id: json['seq_id']
   );
@@ -29,6 +32,7 @@ class MasterStockModel {
     "stock": stock,
     "odia": odia,
     "hindi": hindi,
+    "kannada": kannada,
     "is_active": is_active,
     "seq_id": seq_id
   };

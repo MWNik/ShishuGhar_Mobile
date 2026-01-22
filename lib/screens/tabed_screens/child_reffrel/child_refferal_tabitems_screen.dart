@@ -213,7 +213,7 @@ class _ChildFollowUpTabItemSCreenState
                       ),
                     ),
                     SizedBox(width: 10),
-                    role == 'Creche Supervisor'
+                    role == CustomText.crecheSupervisor
                         ? widget.tabIndex == (widget.totalTab - 1)
                             ? SizedBox()
                             : Expanded(
@@ -231,7 +231,7 @@ class _ChildFollowUpTabItemSCreenState
                         : SizedBox(),
                     // ]
                     // ),
-                    role == 'Creche Supervisor'
+                    role == CustomText.crecheSupervisor
                         ? widget.tabIndex == (widget.totalTab - 1)
                             ? SizedBox()
                             : SizedBox(width: 10)

@@ -137,10 +137,10 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
                             translats, CustomText.back, lng),
                       ),
                     ),
-                    role == 'Creche Supervisor'
+                    role == CustomText.crecheSupervisor
                         ? SizedBox(width: 10)
                         : SizedBox(),
-                    role == 'Creche Supervisor'
+                    role == CustomText.crecheSupervisor
                         ? Expanded(
                             child: CElevatedButton(
                               color: Color(0xff5979AA),
@@ -202,7 +202,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
-          readable: role == 'Creche Supervisor'
+          readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           items: updateLocationDropDown(quesItem),
@@ -231,7 +231,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
               : logic!.dependeOnMendotory(myMap, quesItem),
           calenderValidate: logic!.calenderValidation(myMap, quesItem),
           readable: nameId == null
-              ? role == 'Creche Supervisor'
+              ? role == CustomText.crecheSupervisor
                   ? logic!.callReadableLogic(myMap, quesItem)
                   : true
               : true,
@@ -267,7 +267,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
           keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          readable: role == 'Creche Supervisor'
+          readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           hintText:
@@ -310,7 +310,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          readable: role == 'Creche Supervisor'
+          readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           titleText:
@@ -341,7 +341,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
       //   return DynamicCustomCheckboxWithLabel(
       //     label: Global.returnTrLable(translats, quesItem.label!.trim(), lng),
       //     initialValue: myMap[quesItem.fieldname!],
-      //     readable: role=='Creche Supervisor'?logic!.callReadableLogic( myMap, quesItem):true,
+      //     readable: role==CustomText.crecheSupervisor?logic!.callReadableLogic( myMap, quesItem):true,
       //     isVisible:
       //         logic!.callDependingLogic( myMap, quesItem),
       //     onChanged: (value) {
@@ -361,7 +361,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
-          readable: role == 'Creche Supervisor'
+          readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           isVisible: logic!.callDependingLogic(myMap, quesItem),
@@ -381,7 +381,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: role == 'Creche Supervisor'
+          readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           titleText:
@@ -405,7 +405,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
           maxlength: quesItem.length,
-          readable: role == 'Creche Supervisor'
+          readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           initialvalue: myMap[quesItem.fieldname!],
@@ -518,7 +518,7 @@ class _HouseholdScreenFromTabState extends State<AddHouseholdScreenFromTab> {
   }
 
   nextTab(int type) async {
-    if (role == 'Creche Supervisor') {
+    if (role == CustomText.crecheSupervisor) {
       if (type == 1) {
         var checVali = await checkValidation();
         if (checVali) {

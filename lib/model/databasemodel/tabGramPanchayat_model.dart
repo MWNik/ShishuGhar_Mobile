@@ -6,6 +6,7 @@ class TabGramPanchayat {
   String? value;
   String? gp_od;
   String? gp_hi;
+  String? gp_kn;
   dynamic gpCode;
 
   TabGramPanchayat({
@@ -17,6 +18,7 @@ class TabGramPanchayat {
     this.gpCode,
      this.gp_od,
      this.gp_hi,
+     this.gp_kn,
   });
 
   factory TabGramPanchayat.fromJson(Map<String, dynamic> json) =>
@@ -29,6 +31,7 @@ class TabGramPanchayat {
         gpCode: json["gp_code"],
         gp_od: json["gp_od"],
         gp_hi: json["gp_hi"],
+        gp_kn: json["gp_kn"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -40,5 +43,6 @@ class TabGramPanchayat {
         "gp_code": gpCode,
         "gp_od": gp_od,
         "gp_hi": gp_hi,
+        "gp_kn": gp_kn,
       };
 }

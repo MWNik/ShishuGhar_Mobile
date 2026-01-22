@@ -5,6 +5,7 @@ class TabDistrict {
   String? value;
   String? district_od;
   String? district_hi;
+  String? district_kn;
 
   TabDistrict({
     this.name,
@@ -13,6 +14,7 @@ class TabDistrict {
     this.value,
     this.district_od,
     this.district_hi,
+    this.district_kn,
   });
 
   factory TabDistrict.fromJson(Map<String, dynamic> json) => TabDistrict(
@@ -22,6 +24,7 @@ class TabDistrict {
         value: json["value"],
     district_od: json["district_od"],
     district_hi: json["district_hi"],
+    district_kn: json["district_kn"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -31,5 +34,6 @@ class TabDistrict {
         "value": value,
         "district_od": district_od,
         "district_hi": district_hi,
+        "district_kn": district_kn,
       };
 }

@@ -221,7 +221,7 @@ class _CmcCCTabItemSCreenForAddState extends State<CmcCCTabItemSCreenForAdd> {
                         ),
                         // Row(children: [
                         SizedBox(width: 10),
-                        // _role == 'Creche Supervisor'
+                        // _role == CustomText.crecheSupervisor
                         //     ?
                         widget.tabIndex == (widget.totalTab - 1)
                             ? SizedBox()
@@ -237,7 +237,7 @@ class _CmcCCTabItemSCreenForAddState extends State<CmcCCTabItemSCreenForAdd> {
                         // : SizedBox(),
                         // ]
                         // ),
-                        // _role == 'Creche Supervisor'
+                        // _role == CustomText.crecheSupervisor
                         //     ?
                         widget.tabIndex == (widget.totalTab - 1)
                             ? SizedBox()
@@ -376,15 +376,15 @@ class _CmcCCTabItemSCreenForAddState extends State<CmcCCTabItemSCreenForAdd> {
     List<TabBlock> filteredBlockList = [];
     filteredBlockList = allBlockRecords
         .where((element) =>
-            Global.stringToInt(element.districtId.toString()) ==
-            Global.stringToInt(districtId))
+    Global.stringToInt(element.districtId.toString()) ==
+        Global.stringToInt(districtId))
         .toList();
     List<OptionsModel> blockOptionsList = [];
     filteredBlockList.forEach((element) {
       var item = OptionsModel(
           name: element.name.toString(),
           flag: 'tabBlock',
-          values: element.value);
+          values: Global.languageWise(_language, element.value, element.block_hi, element.block_od, element.block_kn));
       blockOptionsList.add(item);
     });
     return blockOptionsList;
@@ -394,15 +394,15 @@ class _CmcCCTabItemSCreenForAddState extends State<CmcCCTabItemSCreenForAdd> {
     List<TabGramPanchayat> filteredGp = [];
     filteredGp = allGpRecords
         .where((element) =>
-            Global.stringToInt(element.blockId.toString()) ==
-            Global.stringToInt(blockId))
+    Global.stringToInt(element.blockId.toString()) ==
+        Global.stringToInt(blockId))
         .toList();
     List<OptionsModel> GpOptionsList = [];
     filteredGp.forEach((element) {
       var item = OptionsModel(
           name: element.name.toString(),
           flag: 'tabGram Panchayat',
-          values: element.value);
+          values: Global.languageWise(_language, element.value, element.gp_hi, element.gp_od, element.gp_kn));
       GpOptionsList.add(item);
     });
     return GpOptionsList;
@@ -412,15 +412,15 @@ class _CmcCCTabItemSCreenForAddState extends State<CmcCCTabItemSCreenForAdd> {
     List<TabVillage> filteredVillage = [];
     filteredVillage = allVillageRecords
         .where((element) =>
-            Global.stringToInt(element.gpId.toString()) ==
-            Global.stringToInt(GpId))
+    Global.stringToInt(element.gpId.toString()) ==
+        Global.stringToInt(GpId))
         .toList();
     List<OptionsModel> VillageOptionList = [];
     filteredVillage.forEach((element) {
       var item = OptionsModel(
         name: element.name.toString(),
         flag: 'tabVillage',
-        values: element.value,
+        values: Global.languageWise(_language, element.value, element.village_hi, element.village_od, element.village_kn),
       );
       VillageOptionList.add(item);
     });
@@ -431,15 +431,15 @@ class _CmcCCTabItemSCreenForAddState extends State<CmcCCTabItemSCreenForAdd> {
     List<TabDistrict> filteredDistricList = [];
     filteredDistricList = allDistrictRecord
         .where((element) =>
-            Global.stringToInt(element.stateId.toString()) ==
-            Global.stringToInt(state_id))
+    Global.stringToInt(element.stateId.toString()) ==
+        Global.stringToInt(state_id))
         .toList();
     List<OptionsModel> DistrictOptions = [];
     filteredDistricList.forEach((element) {
       var item = OptionsModel(
         name: element.name.toString(),
         flag: 'tabDistrict',
-        values: element.value,
+        values: Global.languageWise(_language, element.value, element.district_hi, element.district_od, element.district_kn),
       );
       DistrictOptions.add(item);
     });

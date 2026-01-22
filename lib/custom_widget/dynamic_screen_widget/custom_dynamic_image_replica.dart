@@ -37,6 +37,7 @@ class CustomImageDynamicReplica extends StatefulWidget {
   final bool? isDelitable;
   final String docType;
   List<Translation> translats;
+  bool? isVisible;
   String lng;
 
   CustomImageDynamicReplica({
@@ -56,6 +57,7 @@ class CustomImageDynamicReplica extends StatefulWidget {
     this.isRequred,
     this.onChanged,
     this.readable,
+    this.isVisible,
     required this.isDelitable,
     required this.docType,
     required this.onDelete,
@@ -107,73 +109,76 @@ class _CustomImageDynamicReplicaState extends State<CustomImageDynamicReplica> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        RichText(
-          text: TextSpan(
-            text: widget.titleText ?? '',
-            style: Styles.black124,
-            children: (widget.isRequred == 1)
-                ? [
-                    TextSpan(
-                      text: '*',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ]
-                : [],
-          ),
-        ),
-        SizedBox(height: 2),
-        Column(
-          children: [
-            GestureDetector(
-              onTap: () async {
-                if (widget.readable == false &&
-                    !Global.validString(widget.assetPath)) {
-                  openDailogBox(context, CustomText.SelectOneoption,
-                      CustomText.Camera, CustomText.Gallery);
-                }
-              },
-              child: _buildImageWidget(),
+    return Visibility(
+      visible: widget.isVisible != null ? widget.isVisible! : true,
+      child: Column(
+        children: [
+          RichText(
+            text: TextSpan(
+              text: widget.titleText ?? '',
+              style: Styles.black124,
+              children: (widget.isRequred == 1)
+                  ? [
+                      TextSpan(
+                        text: '*',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ]
+                  : [],
             ),
-            Visibility(
-              
-                visible: widget.isDelitable == true &&
-                        Global.validString(widget.assetPath)
-                    ? true
-                    : false,
-                child: Column(
-                  children: [
-                    SizedBox(height: 5),
-                    Container(
-                      height: MediaQuery.of(context).size.height *
-                          0.04, // Adjust height as needed
-                      width: MediaQuery.of(context).size.width *
-                          0.1, // Adjust width as needed
+          ),
+          SizedBox(height: 2),
+          Column(
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  if (widget.readable == false &&
+                      !Global.validString(widget.assetPath)) {
+                    openDailogBox(context, CustomText.SelectOneoption,
+                        CustomText.Camera, CustomText.Gallery);
+                  }
+                },
+                child: _buildImageWidget(),
+              ),
+              Visibility(
 
-                      child: ElevatedButton(
-                          onPressed: () async {
-                            await clearImagePath();
-                            // initImage(widget.assetPath);
-                            widget.onDelete!(true);
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red, // Background color
-                              // onPrimary: Colors.white, // Text color
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              padding: EdgeInsets.zero),
-                          child: Icon(
-                            Icons.delete,
-                            size: 20,
-                          )),
-                    ),
-                  ],
-                ))
-          ],
-        ),
-      ],
+                  visible: widget.isDelitable == true &&
+                          Global.validString(widget.assetPath)
+                      ? true
+                      : false,
+                  child: Column(
+                    children: [
+                      SizedBox(height: 5),
+                      Container(
+                        height: MediaQuery.of(context).size.height *
+                            0.04, // Adjust height as needed
+                        width: MediaQuery.of(context).size.width *
+                            0.1, // Adjust width as needed
+
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              await clearImagePath();
+                              // initImage(widget.assetPath);
+                              widget.onDelete!(true);
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red, // Background color
+                                // onPrimary: Colors.white, // Text color
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                padding: EdgeInsets.zero),
+                            child: Icon(
+                              Icons.delete,
+                              size: 20,
+                            )),
+                      ),
+                    ],
+                  ))
+            ],
+          ),
+        ],
+      ),
     );
   }
 

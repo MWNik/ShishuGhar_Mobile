@@ -8,6 +8,7 @@ class TabVillage {
   String? value;
   String? village_od;
   String? village_hi;
+  String? village_kn;
 
   TabVillage({
     this.name,
@@ -19,6 +20,7 @@ class TabVillage {
     this.value,
     this.village_od,
     this.village_hi,
+    this.village_kn,
   });
 
   factory TabVillage.fromJson(Map<String, dynamic> json) => TabVillage(
@@ -31,6 +33,7 @@ class TabVillage {
         value: json["value"],
     village_od: json["village_od"],
     village_hi: json["village_hi"],
+    village_kn: json["village_kn"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -43,5 +46,6 @@ class TabVillage {
         "value": value,
         "village_od": village_od,
         "village_hi": village_hi,
+        "village_kn": village_kn,
       };
 }

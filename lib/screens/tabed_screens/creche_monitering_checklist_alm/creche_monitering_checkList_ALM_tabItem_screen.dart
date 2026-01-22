@@ -197,7 +197,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
                         ),
                         // Row(children: [
                         SizedBox(width: 10),
-                        // _role == 'Creche Supervisor'
+                        // _role == CustomText.crecheSupervisor
                         //     ?
                         widget.tabIndex == (widget.totalTab - 1)
                             ? SizedBox()
@@ -213,7 +213,7 @@ class _CmcALMTabItemSCreenState extends State<CmcALMTabItemSCreen> {
                         // : SizedBox(),
                         // ]
                         // ),
-                        // _role == 'Creche Supervisor'
+                        // _role == CustomText.crecheSupervisor
                         //     ?
                         widget.tabIndex == (widget.totalTab - 1)
                             ? SizedBox()

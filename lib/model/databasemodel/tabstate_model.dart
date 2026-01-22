@@ -4,6 +4,7 @@ class TabState {
   String? value;
   String? state_od;
   String? state_hi;
+  String? state_kn;
 
   TabState({
     this.name,
@@ -11,6 +12,7 @@ class TabState {
     this.value,
     this.state_od,
     this.state_hi,
+    this.state_kn,
   });
 
   factory TabState.fromJson(Map<String, dynamic> json) => TabState(
@@ -19,6 +21,7 @@ class TabState {
         value: json["value"],
     state_od: json["state_od"],
     state_hi: json["state_hi"],
+    state_kn: json["state_kn"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -27,5 +30,6 @@ class TabState {
         "value": value,
         "state_od": state_od,
         "state_hi": state_hi,
+        "state_kn": state_kn,
       };
 }

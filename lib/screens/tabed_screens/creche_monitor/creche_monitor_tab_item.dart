@@ -716,7 +716,7 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
                   ),
                   // Row(children: [
                   SizedBox(width: 10),
-                  // _role == 'Creche Supervisor'
+                  // _role == CustomText.crecheSupervisor
                   //     ?
                   widget.tabIndex == (widget.totalTab - 1)
                       ? SizedBox()
@@ -732,7 +732,7 @@ class _CrecheMonitorTabItemState extends State<CrecheMonitorTabItem> {
                   // : SizedBox(),
                   // ]
                   // ),
-                  // _role == 'Creche Supervisor'
+                  // _role == CustomText.crecheSupervisor
                   //     ?
                   widget.tabIndex == (widget.totalTab - 1)
                       ? SizedBox()

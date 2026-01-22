@@ -311,6 +311,8 @@ class Global {
             retuValue = trs[0].odia!;
           } else if (lang == "en") {
             retuValue = trs[0].english!;
+          } else if (lang == "kn") {
+            retuValue = trs[0].kannada!;
           }
         } else {
           retuValue = key;
@@ -513,6 +515,9 @@ class Global {
         } else if (lng == 'od' &&
             Global.validString(element.village_od.toString())) {
           value = element.village_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(element.village_kn.toString())) {
+          value = element.village_kn.toString();
         }
         item.values = value;
         teVillage.add(item);
@@ -539,6 +544,9 @@ class Global {
         } else if (lng == 'od' &&
             Global.validString(element.gp_od.toString())) {
           value = element.gp_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(element.gp_kn.toString())) {
+          value = element.gp_kn.toString();
         }
         item.values = value;
         teGramP.add(item);
@@ -565,6 +573,9 @@ class Global {
         } else if (lng == 'od' &&
             Global.validString(element.block_od.toString())) {
           value = element.block_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(element.block_kn.toString())) {
+          value = element.block_kn.toString();
         }
         item.values = value;
         teBlock.add(item);
@@ -591,6 +602,9 @@ class Global {
         } else if (lng == 'od' &&
             Global.validString(element.district_od.toString())) {
           value = element.district_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(element.district_kn.toString())) {
+          value = element.district_kn.toString();
         }
         item.values = value;
         teDistrict.add(item);
@@ -617,6 +631,9 @@ class Global {
         } else if (lng == 'od' &&
             Global.validString(element.district_od.toString())) {
           value = element.district_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(element.district_kn.toString())) {
+          value = element.district_kn.toString();
         }
         item.values = value;
         teDistrict.add(item);
@@ -639,6 +656,9 @@ class Global {
         } else if (lng == 'od' &&
             Global.validString(element.state_od.toString())) {
           value = element.state_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(element.state_kn.toString())) {
+          value = element.state_kn.toString();
         }
         item.values = value;
         teStates.add(item);
@@ -661,6 +681,9 @@ class Global {
         } else if (lng == 'od' &&
             Global.validString(element.state_od.toString())) {
           value = element.state_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(element.state_kn.toString())) {
+          value = element.state_kn.toString();
         }
         item.values = value;
         teStates.add(item);
@@ -809,7 +832,7 @@ class Global {
   }
 
   static String languageWise(
-       String lng, String? en, String? hi,String? od,)
+       String lng, String? en, String? hi,String? od,String? kn,)
   {
     String itemValue=Global.validToString(en);
     if (lng == 'hi' && Global.validString(hi)) {
@@ -817,6 +840,9 @@ class Global {
     } else if (lng == 'od' &&
         Global.validString(od)) {
       itemValue=od!;
+    } else if (lng == 'kn' &&
+        Global.validString(kn)) {
+      itemValue=kn!;
     }
     return itemValue;
   }

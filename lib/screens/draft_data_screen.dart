@@ -288,7 +288,7 @@ class _DarftDataScreenState extends State<DarftDataScreen> {
 
   Future callGetDraftData() async{
     syncInfo={};
-    if (userRole == 'Creche Supervisor') {
+    if (userRole == CustomText.crecheSupervisor) {
     var chilAttendence =
     await ChildAttendanceResponceHelper().callChildAttendencesAllForDarft();
     var creCheMonitoring =
@@ -331,7 +331,7 @@ class _DarftDataScreenState extends State<DarftDataScreen> {
       };
     }
     }
-    else if (userRole == 'Cluster Coordinator') {
+    else if (userRole == CustomText.clusterCoordinator) {
       var cmcCCData = await CmcCCTabResponseHelper().getCcForDarft();
       if(cmcCCData.length>0){
         syncInfo['VisitNotes']={
@@ -341,7 +341,7 @@ class _DarftDataScreenState extends State<DarftDataScreen> {
         };
       }
     }
-    else if (userRole == 'Accounts and Logistics Manager') {
+    else if (userRole == CustomText.alm) {
       var cmcALMData = await CmcALMTabResponseHelper().getAlmForDraft();
       if(cmcALMData.length>0){
         syncInfo['VisitNotes']={
@@ -352,7 +352,7 @@ class _DarftDataScreenState extends State<DarftDataScreen> {
         };
       }
     }
-    else if (userRole == 'Capacity and Building Manager') {
+    else if (userRole == CustomText.cbm) {
       var cmcCBMData = await CmcCBMTabResponseHelper().getCBMForDraft();
       if(cmcCBMData.length>0){
         syncInfo['VisitNotes']={
@@ -393,7 +393,7 @@ class _DarftDataScreenState extends State<DarftDataScreen> {
 
     onClickItems(key) async {
       String refreshStatus = '';
-      if(key=='hhProfile'&& userRole == 'Creche Supervisor'){
+      if(key=='hhProfile'&& userRole == CustomText.crecheSupervisor){
         List<HouseHoldTabResponceMosdel> data=syncInfo[key]['items'] as List<HouseHoldTabResponceMosdel>;
         HouseHoldTabResponceMosdel item=data.first;
         if(item.creche_id!=null){
@@ -403,7 +403,7 @@ class _DarftDataScreenState extends State<DarftDataScreen> {
               )));
         }
       }
-      else if(key=='enrollExitChild'&& userRole == 'Creche Supervisor'){
+      else if(key=='enrollExitChild'&& userRole == CustomText.crecheSupervisor){
         List<EnrolledExitChildResponceModel> data=syncInfo[key]['items'] as List<EnrolledExitChildResponceModel>;
         EnrolledExitChildResponceModel item=data.first;
         if(item.creche_id!=null){
@@ -414,7 +414,7 @@ class _DarftDataScreenState extends State<DarftDataScreen> {
                   Global.getItemValues(item.responces!, 'village_id'))));
         }
       }
-      else if(key=='childAttendence'&& userRole == 'Creche Supervisor'){
+      else if(key=='childAttendence'&& userRole == CustomText.crecheSupervisor){
         List<ChildAttendanceResponceModel> data=syncInfo[key]['items'] as List<ChildAttendanceResponceModel>;
         ChildAttendanceResponceModel item=data.first;
         if(item.creche_id!=null){
@@ -425,22 +425,22 @@ class _DarftDataScreenState extends State<DarftDataScreen> {
               )));
         }
       }
-      else if(key=='VisitNotes'&& userRole == 'Creche Supervisor'){
+      else if(key=='VisitNotes'&& userRole == CustomText.crecheSupervisor){
           refreshStatus = await  Navigator.of(context).push(MaterialPageRoute(
               builder: (BuildContext context) => AllCrecheMonitorListingScreen(isDraft: true,
               )));
       }
-      else if(key=='VisitNotes'&& userRole == 'Cluster Coordinator'){
+      else if(key=='VisitNotes'&& userRole == CustomText.clusterCoordinator){
         refreshStatus = await  Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => AllcmcCCListingScreen(isDraft: true,
             )));
       }
-      else if(key=='VisitNotes'&& userRole == 'Accounts and Logistics Manager'){
+      else if(key=='VisitNotes'&& userRole == CustomText.alm){
         refreshStatus = await  Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => AllcmcALMListingScreen(isDraft: true,
             )));
       }
-      else if(key=='VisitNotes'&& userRole == 'Capacity and Building Manager'){
+      else if(key=='VisitNotes'&& userRole == CustomText.cbm){
         List<CrecheMonitorResponseModel> data=syncInfo[key] as List<CrecheMonitorResponseModel>;
         CrecheMonitorResponseModel item=data.first;
         if(item.creche_id!=null){

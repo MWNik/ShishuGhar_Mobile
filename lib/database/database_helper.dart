@@ -27,7 +27,7 @@ class DatabaseHelper {
       print("Opening existing database");
     }
     database = await openDatabase(path,
-        version: 6,
+        version: 7,
         onUpgrade: (db, oldVersion, newVersion) =>
             upgradeVersion(db, oldVersion, newVersion));
 
@@ -165,6 +165,67 @@ class DatabaseHelper {
 	                                            "district_od"	TEXT,
                                              	"district_hi"	TEXT
                                               );''');
+        } catch (e) {
+          print("$e");
+        }
+      }
+      if (oldVersion == 6 && newVersion > 6) {
+        try {
+          await db.execute('''CREATE TABLE "tabCreche_Monitering_CheckList_SM" (
+	"name"	TEXT,
+	"idx"	INTEGER,
+	"fieldtype"	TEXT,
+	"fieldname"	TEXT,
+	"reqd"	INTEGER,
+	"label"	TEXT,
+	"options"	TEXT,
+	"parent"	TEXT,
+	"hidden"	INTEGER,
+	"length"	INTEGER,
+	"depends_on"	TEXT,
+	"mandatory_depends_on"	TEXT,
+	"read_only_depends_on"	TEXT,
+	"ismultiselect"	INTEGER,
+	"multiselectlink"	TEXT
+);''');
+
+          await db.execute('''CREATE TABLE "tabCreche_Monitering_Checklist_SM_response" (
+	"smguid"	TEXT,
+	"name"	INTEGER,
+	"responces"	TEXT,
+	"is_edited"	INTEGER,
+	"is_deleted"	INTEGER,
+	"created_at"	TEXT,
+	"created_by"	TEXT,
+	"update_at"	TEXT,
+	"updated_by"	TEXT,
+	"is_uploaded"	INTEGER,
+	"creche_id"	INTEGER,
+	PRIMARY KEY("smguid")
+);''');
+
+          await db.execute(
+              'ALTER TABLE translation_language ADD COLUMN value_kn TEXT');
+          await db.execute(
+              'ALTER TABLE mstCommon ADD COLUMN kannada TEXT');
+          await db.execute(
+              'ALTER TABLE tabNativState ADD COLUMN state_kn TEXT');
+          await db.execute(
+              'ALTER TABLE tabNativeDistrict ADD COLUMN district_kn TEXT');
+          await db.execute(
+              'ALTER TABLE tabState ADD COLUMN state_kn TEXT');
+          await db.execute(
+              'ALTER TABLE tabDistrict ADD COLUMN district_kn TEXT');
+          await db.execute(
+              'ALTER TABLE tabBlock ADD COLUMN block_kn TEXT');
+          await db.execute(
+              'ALTER TABLE tabGramPanchayat ADD COLUMN gp_kn TEXT');
+          await db.execute(
+              'ALTER TABLE tabVillage ADD COLUMN village_kn TEXT');
+          await db.execute(
+              'ALTER TABLE tabPartner_Stock ADD COLUMN kannada TEXT');
+          await db.execute(
+              'ALTER TABLE tabMaster_Stock ADD COLUMN kannada TEXT');
         } catch (e) {
           print("$e");
         }
@@ -343,8 +404,10 @@ class DatabaseHelper {
     await database!.delete('mstCommon');
     await database!.delete('tabCreche_Monitering_CheckList_ALM');
     await database!.delete('tabCreche_Monitering_CheckList_CMB');
+    await database!.delete('tabCreche_Monitering_CheckList_SM');
     await database!.delete('tabCreche_Monitering_Checklist_ALM_response');
     await database!.delete('tabCreche_Monitering_Checklist_CBM_response');
+    await database!.delete('tabCreche_Monitering_Checklist_SM_response');
     await database!.delete('tab_cashbook_expences_fields');
     await database!.delete('tab_cashbook_expences_response');
     await database!.delete('tab_cashbook_receipt_response');

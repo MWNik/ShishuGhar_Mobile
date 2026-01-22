@@ -281,7 +281,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
                         ),
                         // Row(children: [
                         SizedBox(width: 10),
-                        role == 'Creche Supervisor'
+                        role == CustomText.crecheSupervisor
                             ? widget.tabIndex == (widget.totalTab - 1)
                                 ?
                                 //  Expanded(
@@ -311,7 +311,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
                             : SizedBox(),
                         // ]
                         // ),
-                        role == 'Creche Supervisor'
+                        role == CustomText.crecheSupervisor
                             ? widget.tabIndex == (widget.totalTab - 1)
                                 ? (widget.isEditable == true
                                     ? SizedBox(width: 10)
@@ -393,7 +393,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
                   //       ),
                   //       // Row(children: [
                   //       SizedBox(width: 10),
-                  //       role == 'Creche Supervisor'
+                  //       role == CustomText.crecheSupervisor
                   //           ? widget.tabIndex == (widget.totalTab - 1)
                   //               ?
                   //               //  Expanded(
@@ -423,7 +423,7 @@ class _EnrolledChilrenTabItemState extends State<ExitEnrolledChildTabItem> {
                   //           : SizedBox(),
                   //       // ]
                   //       // ),
-                  //       role == 'Creche Supervisor'
+                  //       role == CustomText.crecheSupervisor
                   //           ? widget.tabIndex == (widget.totalTab - 1)
                   //               ? (widget.isEditable == true?SizedBox(width: 10):SizedBox())
                   //               : (widget.isEditable == true

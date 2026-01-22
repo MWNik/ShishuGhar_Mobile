@@ -20,6 +20,7 @@ import 'package:http/src/response.dart';
 import '../custom_widget/custom_radio_btn.dart';
 import '../custom_widget/custom_textfield.dart';
 import '../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.dart';
+import '../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import '../database/helper/backdated_configiration_helper.dart';
 import '../database/helper/block_data_helper.dart';
 import '../database/helper/creche_helper/creche_data_helper.dart';
@@ -34,6 +35,7 @@ import '../model/databasemodel/tabDistrict_model.dart';
 import '../model/databasemodel/tabGramPanchayat_model.dart';
 import '../model/databasemodel/tabVillage_model.dart';
 import '../model/databasemodel/tabstate_model.dart';
+import '../model/dynamic_screen_model/house_hold_children_model.dart';
 import '../model/dynamic_screen_model/options_model.dart';
 import '../utils/globle_method.dart';
 import '../utils/validate.dart';
@@ -51,6 +53,7 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
   TextEditingController Searchcontroller = TextEditingController();
 
   List<HouseHoldTabResponceMosdel> hhdata = [];
+  List<HouseHoldChildrenModel> childHHData = [];
 
   String hhGuid = Validate().randomGuid();
   String? village;
@@ -92,6 +95,8 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
   String? crecheOpeningDate;
   String? crecheClosingDate;
   String GeneralFilter = 'General Filter';
+  int? maxAgeLimit;
+  int? minAgeLimit;
 
   String? _selectedItem;
   List<OptionsModel> statusListItem = [];
@@ -251,15 +256,19 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
     hhdata.clear();
     var allData = await HouseHoldTabResponceHelper()
         .getHouseHoldItemsMapByCreche(widget.crecheId);
+    childHHData = await HouseHoldTabResponceHelper()
+        .getAllChildByHHCreche(widget.crecheId);
     if (role == 'CRP') {
       hhdata = allData
           .where((element) =>
               getItemValues(element.responces!, 'gp_id') ==
               panchayatId.toString())
           .toList();
-    } else if (role == 'Cluster Coordinator') {
+    }
+    else if (role == CustomText.clusterCoordinator) {
       hhdata = allData;
-    } else
+    }
+    else
       hhdata = allData;
     unsynchedList = hhdata
         .where((element) =>
@@ -277,13 +286,14 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
       panchayatIdList = await _fetchSpecificElement(filterData, 'gp_id');
       villageIdList = await _fetchSpecificElement(filterData, 'village_id');
     }
+
     await fetchStateList();
 
     await setWidgetText();
     statushhdata = await OptionsModelHelper()
         .getMstCommonOptions('Verfication Status', lng!);
     villagesItemms = await VillageDataHelper().getTabVillageList();
-    if (role == 'Cluster Coordinator') {
+    if (role == CustomText.clusterCoordinator) {
       statusListItem = statushhdata
           .where((element) =>
               (element.name == '3') ||
@@ -308,7 +318,7 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
       child: SafeArea(
         child: Scaffold(
           key: _scaffoldKey,
-          floatingActionButton: (role == 'Creche Supervisor')
+          floatingActionButton: (role == CustomText.crecheSupervisor)
               ? InkWell(
                   onTap: () async {
                     // if (crechedOpeningDate()) {
@@ -398,9 +408,9 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
                                       )),
                                 ],
                               ),
-                              (role == 'Cluster Coordinator' ||
+                              (role == CustomText.clusterCoordinator ||
                                       role == 'CRP' ||
-                                      role == 'Creche Supervisor')
+                                      role == CustomText.crecheSupervisor)
                                   ? Row(
                                       children: [
                                         Expanded(
@@ -476,6 +486,34 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
         
                                     validateDates();
                                   },
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: DynamicCustomTextFieldInt(
+                                        // width: MediaQuery.of(context).size.width * 0.36,
+                                        initialvalue: minAgeLimit,
+                                        hintText: Global.returnTrLable(
+                                            hhlistingControlls, CustomText.minAgeInMonthEn, lng!),
+                                        // isRequred: 1,
+                                        onChanged: (value) {
+                                          minAgeLimit = value;
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: DynamicCustomTextFieldInt(
+                                        // width: MediaQuery.of(context).size.width * 0.36,
+                                        initialvalue: maxAgeLimit,
+                                        hintText: Global.returnTrLable(
+                                            hhlistingControlls, CustomText.maxAgeInMonthEn, lng!),
+                                        onChanged: (value) {
+                                          maxAgeLimit = value;
+                                        },
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ] else ...[
                                 DynamicCustomDropdownField(
@@ -1025,6 +1063,8 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
     selectedGramPanchayat = null;
     calEndDate = null;
     calStartDate = null;
+    maxAgeLimit = null;
+    minAgeLimit = null;
     filterData = isOnlyUnsynched ? unsynchedList : allList;
     _selectedItem = null;
     setState(() {});
@@ -1196,6 +1236,8 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
       CustomText.delete,
       CustomText.crecheOpeningDateMsg,
       CustomText.crecheClosingDateMsg,
+      CustomText.minAgeInMonthEn,
+      CustomText.maxAgeInMonthEn,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -1250,6 +1292,9 @@ class _LineholdlistedScreenState extends State<LineholdlistedScreen> {
 
         return true;
       }).toList();
+      filterData=await HouseHoldTabResponceHelper().filterChildAge(minAgeLimit,
+          maxAgeLimit, filterData,childHHData);
+
     }
     // else {
     //   return await showDialog(

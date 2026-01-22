@@ -147,7 +147,7 @@ class _EnrolledChilrenTabState extends State<ExitEnrolledChilrenTab>
               ],
             ),
             // actions: [
-            //   (role == 'Cluster Coordinator')
+            //   (role == CustomText.clusterCoordinator)
             //       ? GestureDetector(
             //           onTap: () async {
             //             await updateVerificationStatus(context);

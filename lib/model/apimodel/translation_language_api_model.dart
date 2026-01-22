@@ -37,12 +37,14 @@ class Translation {
   String? english;
   String? hindi;
   String? odia;
+  String? kannada;
 
   Translation({
     this.name,
     this.english,
     this.hindi,
     this.odia,
+    this.kannada,
   });
 
   factory Translation.fromJson(Map<String, dynamic> json) => Translation(
@@ -50,6 +52,7 @@ class Translation {
         english: json["english"],
         hindi: json["hindi"],
         odia: json["odia"],
+    kannada: json["kannada"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -57,5 +60,6 @@ class Translation {
         "value_en": english,
         "value_hi": hindi,
         "value_od": odia,
+        "value_kn": kannada,
       };
 }

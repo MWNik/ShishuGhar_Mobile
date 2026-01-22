@@ -4,7 +4,9 @@ import '../../../model/apimodel/house_hold_field_item_model_api.dart';
 import '../../model/dynamic_screen_model/user_manual_responses_model.dart';
 
 class UserManualFieldsHelper {
+
   DatabaseHelper databaseHelper = DatabaseHelper();
+
   Future<void> insertUserManualMeta(
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     databaseHelper.openDb();

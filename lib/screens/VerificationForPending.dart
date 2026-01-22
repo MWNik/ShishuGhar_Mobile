@@ -250,7 +250,7 @@ class _VerficationForPendingState extends State<VerficationForPending> {
     statushhdata =
     await OptionsModelHelper().getMstCommonOptions('Verfication Status',lng!);
     villagesItemms = await VillageDataHelper().getTabVillageList();
-    if (role == 'Cluster Coordinator') {
+    if (role == CustomText.clusterCoordinator) {
       statusListItem = statushhdata
           .where((element) =>
       (element.name == '3') ||
@@ -276,7 +276,7 @@ class _VerficationForPendingState extends State<VerficationForPending> {
           key: _scaffoldKey,
           appBar: CustomAppbar(
             actions: [
-              (role == 'Creche Supervisor')
+              (role == CustomText.crecheSupervisor)
                   ? InkWell(
                 onTap: () {
                 },
@@ -343,9 +343,9 @@ class _VerficationForPendingState extends State<VerficationForPending> {
                                 )),
                           ],
                         ),
-                        (role == 'Cluster Coordinator' ||
+                        (role == CustomText.clusterCoordinator ||
                             role == 'CRP' ||
-                            role == 'Creche Supervisor')
+                            role == CustomText.crecheSupervisor)
                             ? Row(
                           children: [
                             Expanded(
@@ -632,7 +632,7 @@ class _VerficationForPendingState extends State<VerficationForPending> {
                         //                     ),
                         //                     child: Column(
                         //                       children: [
-                        //                         (role == 'Cluster Coordinator' || role == 'CRP')?Row(
+                        //                         (role == CustomText.clusterCoordinator || role == 'CRP')?Row(
                         //                           children: [
                         //                             Expanded(
                         //                               child: CustomRadioButton(

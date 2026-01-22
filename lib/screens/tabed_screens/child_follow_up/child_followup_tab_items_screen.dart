@@ -202,7 +202,7 @@ class _ChildFollowupTabItemsScreenState
                       ),
                     ),
                     SizedBox(width: 10),
-                    role == 'Creche Supervisor'
+                    role == CustomText.crecheSupervisor
                         ? widget.tabIndex == (widget.totalTab - 1)
                             ? SizedBox()
                             : Expanded(
@@ -220,7 +220,7 @@ class _ChildFollowupTabItemsScreenState
                         : SizedBox(),
                     // ]
                     // ),
-                    role == 'Creche Supervisor'
+                    role == CustomText.crecheSupervisor
                         ? widget.tabIndex == (widget.totalTab - 1)
                             ? SizedBox()
                             : SizedBox(width: 10)
@@ -275,7 +275,7 @@ class _ChildFollowupTabItemsScreenState
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
-          readable: role == 'Creche Supervisor' ? false : true,
+          readable: role == CustomText.crecheSupervisor ? false : true,
           hintText: quesItem.fieldname == 'recoverd'
               ? Global.returnTrLable(translats, CustomText.Selecthere, lng)
               : Global.returnTrLable(translats, CustomText.Selecthere, lng),
@@ -301,7 +301,7 @@ class _ChildFollowupTabItemsScreenState
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(myMap, quesItem),
-          readable: role == 'Creche Supervisor'
+          readable: role == CustomText.crecheSupervisor
               ? logic!.callReadableLogic(myMap, quesItem)
               : true,
           calenderValidate: logic!.calenderValidation(myMap, quesItem),

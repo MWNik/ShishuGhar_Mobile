@@ -89,7 +89,7 @@
 //
 //    setOnClick(int index)  {
 //      // if (_currentIndex == 1) {
-//      //   if (role == 'Creche Supervisor') {
+//      //   if (role == CustomText.crecheSupervisor) {
 //      //     Navigator.pushReplacement(
 //      //         context,
 //      //         MaterialPageRoute(
@@ -175,7 +175,7 @@
 //       ),
 //       label: Global.returnTrLable(dashboardControlls, 'More', lng!),
 //     ));
-//     // if (role == 'Creche Supervisor') {
+//     // if (role == CustomText.crecheSupervisor) {
 //     //   bottomItem.add(BottomNavigationBarItem(
 //     //     icon: Padding(
 //     //       padding: EdgeInsets.only(bottom: 5.h),

@@ -45,6 +45,7 @@ import '../api/child_referral_download_api.dart';
 import '../api/creche_checkIn_api.dart';
 import '../api/creche_committie_download_api.dart';
 import '../api/creche_monitering_checklist_cc_api.dart';
+import '../api/creche_monitering_checklist_sm_api.dart';
 import '../api/download_data_api.dart';
 import '../api/user_manual_pdf_api.dart';
 import '../api/village_profile_meta_api.dart';
@@ -61,6 +62,7 @@ import '../database/helper/child_health/child_health_response_helper.dart';
 import '../database/helper/child_immunization/child_immunization_response_helper.dart';
 import '../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../database/helper/cmc_CC/creche_monitering_checklist_CC_response_helper.dart';
+import '../database/helper/cmc_SM/creche_monitering_checklist_SM_response_helper.dart';
 import '../database/helper/creche_comite_meeting/creche_committie_response_helper.dart';
 import '../database/helper/creche_helper/creche_data_helper.dart';
 import '../database/helper/creche_monitoring/creche_monitoring_response_helper.dart';
@@ -1080,6 +1082,9 @@ class _LocationScreenState extends State<CoordinatorLocationNewScreen> {
         else if (widget.role == CustomText.cbm)
           await callCMCCBMchecklist(
               mContext, villagesss, userName, password, token);
+        else if (widget.role == CustomText.safetyManager)
+          await callSMchecklist(
+              mContext, villagesss, userName, password, token);
         else
           await callFollowUpDownloadApiCC(
               mContext, villagesss, userName, password, token);
@@ -1822,7 +1827,8 @@ class _LocationScreenState extends State<CoordinatorLocationNewScreen> {
   }
 
   callCMCCBMchecklist(BuildContext mContext, String villagesss, String userName,
-      String password, String token) async {
+      String password, String token) async
+  {
     var network = await Validate().checkNetworkConnection();
     if (network) {
       downloadedApi = 10;
@@ -1877,6 +1883,69 @@ class _LocationScreenState extends State<CoordinatorLocationNewScreen> {
       Map<String, dynamic> resultMap = jsonDecode(value.body);
       print(" responce $resultMap");
       await CmcCBMTabResponseHelper().crecheCBMDownloadData(resultMap);
+    } catch (e) {
+      print("THE PROBLEM IS HERE: ${e.toString()}");
+    }
+  }
+
+
+  callSMchecklist(BuildContext mContext, String villagesss, String userName,
+      String password, String token) async
+  {
+    var network = await Validate().checkNetworkConnection();
+    if (network) {
+      downloadedApi = 10;
+      loadingText = ((downloadedApi / totalApiCount) * 100).toInt();
+      showLoaderDialog(context);
+
+      var response = await CrecheMonetringCheckListSMApi()
+          .cmcSMDownloadApi(userName, password, token);
+      if (response.statusCode == 200) {
+        await updateSMchecklist(response);
+        Navigator.pop(mContext);
+        Validate().saveString(
+            Validate.dataDownloadDateTime, Validate().currentDateTime());
+        await initializeData();
+
+        await callFollowUpDownloadApiCC(
+            mContext, villagesss, userName, password, token);
+      } else if (response.statusCode == 401) {
+        Navigator.pop(mContext);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.remove(Validate.Password);
+        ScaffoldMessenger.of(mContext).showSnackBar(
+          SnackBar(
+              content: Text(Global.returnTrLable(
+                  locationControlls, CustomText.token_expired, lng!))),
+        );
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (mContext) => LoginScreen(),
+            ));
+      } else {
+        Navigator.pop(mContext);
+        Validate().singleButtonPopup(
+            Global.errorBodyToString(response.body, 'message'),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+            false,
+            mContext);
+      }
+    } else {
+      Validate().singleButtonPopup(
+          Global.returnTrLable(locationControlls,
+              CustomText.nointernetconnectionavailable, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          false,
+          mContext);
+    }
+  }
+
+  Future<void> updateSMchecklist(Response value) async {
+    try {
+      Map<String, dynamic> resultMap = jsonDecode(value.body);
+      print(" responce $resultMap");
+      await CmcSMTabResponseHelper().crecheSMDownloadData(resultMap);
     } catch (e) {
       print("THE PROBLEM IS HERE: ${e.toString()}");
     }

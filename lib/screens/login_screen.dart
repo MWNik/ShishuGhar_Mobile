@@ -68,7 +68,6 @@ class LoginScreen extends StatefulWidget {
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
-
 }
 
 class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
@@ -122,312 +121,258 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     return SafeArea(
       child: WillPopScope(
         onWillPop: () async {
-          final timegap = DateTime.now().difference(pre_backpress);
-          final cantExit = timegap >= Duration(seconds: 2);
-          pre_backpress = DateTime.now();
-          if (cantExit) {
-            final message = 'Press back button again to exit';
-            Toast.show(message, duration: 3, backgroundColor: Colors.black);
+            final timegap = DateTime.now().difference(pre_backpress);
+            final cantExit = timegap >= Duration(seconds: 2);
+            pre_backpress = DateTime.now();
+            if (cantExit) {
+              final message = 'Press back button again to exit';
+              Toast.show(message, duration: 3, backgroundColor: Colors.black);
 
-            return false;
-          } else {
-            // Fluttertoast.cancel();
-            return true;
-          }
-        },
+              return false;
+            } else {
+              // Fluttertoast.cancel();
+              return true;
+            }
+          },
         child: Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            automaticallyImplyLeading: true,
-            toolbarHeight: 0,
-            systemOverlayStyle:
-                SystemUiOverlayStyle(statusBarColor: Color(0xffDFDFDF)),
-          ),
-          resizeToAvoidBottomInset: false,
-          body: SingleChildScrollView(
-            reverse: true,
-            child: Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: SafeArea(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/toploginImage.png",
+          resizeToAvoidBottomInset: true,
+          body: Column(
+            children: [
+
+              /// 🔹 FIXED TOP IMAGE
+              Image.asset(
+                "assets/toploginImage.png",
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+
+              /// 🔹 SCROLLABLE CENTER CONTENT
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.05),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                      SizedBox(height: MediaQuery.of(context).size.height*0.05),
+
+                  Image.asset(
+                    "assets/loginlogo.png",
+                    height: MediaQuery.of(context).size.width*0.5,
+                    width: MediaQuery.of(context).size.height*0.5,
+                  ),
+
+                  SizedBox(height: MediaQuery.of(context).size.height*0.001),
+
+                  Text(CustomText.SHISHUGHAR, style: Styles.blue207P),
+
+                  Divider(
+                    thickness: 1.5,
+                    indent: 70.w,
+                    endIndent: 70.w,
+                    color: const Color(0xffDFDFDF),
+                  ),
+
+                  Text(CustomText.hindiSHISHUGHAR, style: Styles.blue207P),
+
+                  SizedBox(height: MediaQuery.of(context).size.height*0.001),
+
+                  Text(
+                    CustomText.SishuGharManagementSystem,
+                    style: Styles.black127P,
+                    textAlign: TextAlign.center,
+                  ),
+
+                  SizedBox(height:MediaQuery.of(context).size.height*0.01),
+
+                  /// 🔹 LANGUAGE RADIO
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.1),
+                    child: Row(
+                      children: [
+                        CustomRadioButton(
+                          value: 'English',
+                          groupValue: selectedlanguages,
+                          onChanged: (value) {
+                            Validate().saveString(Validate.sLanguage, 'en');
+                            setState(() => selectedlanguages = value!);
+                          },
+                          label: CustomText.English,
+                        ),
+                        Spacer(),
+                        CustomRadioButton(
+                          value: 'Hindi',
+                          groupValue: selectedlanguages,
+                          onChanged: (value) {
+                            Validate().saveString(Validate.sLanguage, 'hi');
+                            setState(() => selectedlanguages = value!);
+                          },
+                          label: CustomText.Hindi,
+                        ),
+                        Spacer(),
+                        CustomRadioButton(
+                          value: 'Odiya',
+                          groupValue: selectedlanguages,
+                          onChanged: (value) {
+                            Validate().saveString(Validate.sLanguage, 'od');
+                            setState(() {
+                              selectedlanguages = value!;
+                            });
+                          },
+                          label: CustomText.Odiya,
+                        ),
+                        Spacer(),
+                        CustomRadioButton(
+                          value: 'kannada',
+                          groupValue: selectedlanguages,
+                          onChanged: (value) {
+                            Validate().saveString(Validate.sLanguage, 'kn');
+                            setState(() {
+                              selectedlanguages = value!;
+                            });
+                          },
+                          label: CustomText.Kannad,
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: Container(
-                          child: Column(
+                  ),
+
+                  SizedBox(height: MediaQuery.of(context).size.height*0.01),
+
+                  /// 🔹 USERNAME
+                  CustomTextFieldRow(
+                    controller: mobileController,
+                    hintText: CustomText.Email,
+                    prefixIcon:
+                    Image.asset("assets/mobile.png", scale: 3.2),
+                  ),
+
+                  SizedBox(height: MediaQuery.of(context).size.height*0.015),
+
+                  /// 🔹 PASSWORD
+                  CustomTextFieldRow(
+                    controller: passwordcontroller,
+                    hintText: CustomText.Password,
+                    obscureText: _isPasswordVisible,
+                    prefixIcon: Image.asset("assets/key.png", scale: 3.2),
+                    suffixIcon: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                      child: Icon(
+                        _isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height:MediaQuery.of(context).size.height*0.01),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.w),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
                             children: [
-                              (_keyboardVisible)
-                                  ? Flexible(
-                                      child: SizedBox(
-                                          height: 181.h,
-                                          width: 280.w,
-                                          child: Image.asset(
-                                              "assets/loginlogo.png")),
-                                    )
-                                  : SizedBox(
-                                      height: 181.h,
-                                      width: 280.w,
-                                      child: Image.asset("assets/loginlogo.png")),
-                              Flexible(
-                                child: Text(
-                                  CustomText.SHISHUGHAR,
-                                  style: Styles.blue207P,
-                                ),
-                              ),
-                              Flexible(
-                                child: Divider(
-                                  thickness: 1.5,
-                                  indent: 70.w,
-                                  endIndent: 70.w,
-                                  color: Color(0xffDFDFDF),
-                                ),
-                              ),
-                              Flexible(
-                                child: Text(
-                                  CustomText.hindiSHISHUGHAR,
-                                  style: Styles.blue207P,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10.h,
-                              ),
-                              Flexible(
-                                child: Text(
-                                  CustomText.SishuGharManagementSystem,
-                                  style: Styles.black127P,
-                                ),
-                              ),
-                              Flexible(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 50.w, vertical: 10.h),
-                                  child: Row(
-                                    children: [
-                                      CustomRadioButton(
-                                        value: 'English',
-                                        groupValue: selectedlanguages,
-                                        onChanged: (value) {
-                                          Validate().saveString(
-                                              Validate.sLanguage, 'en');
-                                          setState(() {
-                                            selectedlanguages = value!;
-                                          });
-                                        },
-                                        label: CustomText.English,
-                                      ),
-                                      Spacer(),
-                                      CustomRadioButton(
-                                        value: 'Hindi',
-                                        groupValue: selectedlanguages,
-                                        onChanged: (value) {
-                                          Validate().saveString(
-                                              Validate.sLanguage, 'hi');
-                                          setState(() {
-                                            selectedlanguages = value!;
-                                          });
-                                        },
-                                        label: CustomText.Hindi,
-                                      ),
-                                      Spacer(),
-                                      CustomRadioButton(
-                                        value: 'Odiya',
-                                        groupValue: selectedlanguages,
-                                        onChanged: (value) {
-                                          Validate().saveString(
-                                              Validate.sLanguage, 'od');
-                                          setState(() {
-                                            selectedlanguages = value!;
-                                          });
-                                        },
-                                        label: CustomText.Odiya,
-                                      ),
-                                    ],
+                              InkWell(
+                                onTap: () {},
+                                child: Visibility(
+                                  visible: false,
+                                  // Set this to false to hide the Text widget
+                                  child: Text(
+                                    CustomText.LoginwithOTP,
+                                    style: Styles.black105P,
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: (_keyboardVisible) ? 15.w : 7.w),
-                                child: CustomTextFieldRow(
-                                  focusNode: _focusNode,
-                                  controller: mobileController,
-                                  keyboardtype: TextInputType.text,
-                                  enabled: savedUsername == null ? true : false,
-                                  // maxlength: 20,
-                                  hintText: CustomText.Email,
-                                  prefixIcon: Image.asset(
-                                    "assets/mobile.png",
-                                    scale: 3.2,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 15.h,
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: (_keyboardVisible) ? 15.w : 7.w),
-                                child: CustomTextFieldRow(
-                                  maxlength: 20,
-                                  focusNode: _focusNode2,
-                                  controller: passwordcontroller,
-                                  hintText: CustomText.Password,
-                                  prefixIcon: Image.asset(
-                                    "assets/key.png",
-                                    scale: 3.2,
-                                  ),
-                                  suffixIcon: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        _isPasswordVisible = !_isPasswordVisible;
-                                      });
-                                    },
-                                    child: Icon(
-                                      _isPasswordVisible == true
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                      color: Colors.grey,
-                                      size: 20.sp,
-                                    ),
-                                  ),
-                                  obscureText: _isPasswordVisible,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5.h,
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    InkWell(
-                                      onTap: () {},
-                                      child: Visibility(
-                                        visible: false,
-                                        // Set this to false to hide the Text widget
-                                        child: Text(
-                                          CustomText.LoginwithOTP,
-                                          style: Styles.black105P,
-                                        ),
-                                      ),
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ResetPaswordScreen(),
-                                            ));
-                                      },
-                                      child: Text(
-                                        CustomText.ForgotPassword,
-                                        style: Styles.blue105P,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: (_keyboardVisible) ? 10.h : 30.h,
-                              ),
-                              CElevatedButton(
-                                onPressed: () async {
-                                  var network =
-                                      await Validate().checkNetworkConnection();
-                                  if (network) {
-                                    if (mobileController.text.isEmpty) {
-                                      Validate().singleButtonPopup(
-                                          'User name required',
-                                          'ok',
-                                          false,
-                                          context);
-                                    } else if (passwordcontroller.text.isEmpty) {
-                                      Validate().singleButtonPopup(
-                                          'Password required',
-                                          'ok',
-                                          false,
-                                          context);
-                                    } else {
-                                      if (_focusNode.hasFocus) {
-                                        _focusNode.unfocus();
-                                      }
-                                      if (_focusNode2.hasFocus) {
-                                        _focusNode2.unfocus();
-                                      }
-                                      await newLoginFlow(mobileController.text,
-                                          passwordcontroller.text, context);
-                                    }
-                                  } else {
-                                    Validate().singleButtonPopup(
-                                        CustomText.nointernetconnectionavailable,
-                                        CustomText.ok,
-                                        false,
-                                        context);
-                                  }
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ResetPaswordScreen(),
+                                      ));
                                 },
-                                text: CustomText.LogIn,
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Center(
-                                child: GestureDetector(
-                                  onTap: () async {
-                                    await Validate().createDbBackup();
-                                  },
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: CustomText.Version,
-                                      style: Styles.black124,
-                                      children: <TextSpan>[
-                                        TextSpan(
-                                            text: " $appVersionName",
-                                            style: Styles.black126P),
-                                        Constants.baseUrl ==
-                                                'https://uat.shishughar.in/api/'
-                                            ? TextSpan(
-                                                text: "  (UAT)",
-                                                style: Styles.red125)
-                                            : Constants.baseUrl ==
-                                                    'https://shishughar.in/api/'
-                                                ? TextSpan(
-                                                    text: "",
-                                                    style: Styles.red125)
-                                                : TextSpan(
-                                                    text: "  (DEV)",
-                                                    style: Styles.red125),
-                                      ],
-                                    ),
-                                  ),
+                                child: Text(
+                                  CustomText.ForgotPassword,
+                                  style: Styles.blue105P,
                                 ),
                               ),
-                              Padding(
-                                  padding: EdgeInsets.only(
-                                      bottom: (_keyboardVisible) ? 15.h : 7.h)),
                             ],
                           ),
                         ),
-                      ),
-                    ),
-                    // Padding(
-                    //   padding: EdgeInsets.only(
-                    //       bottom: MediaQuery.of(context).viewInsets.bottom),
-                    // ),
-                    Image.asset("assets/bottomloginImage.png"),
-                  ],
+                        SizedBox(height: MediaQuery.of(context).size.height*0.02),
+                  /// 🔹 LOGIN BUTTON
+                        CElevatedButton(
+                          onPressed: () async {
+                            var network =
+                            await Validate().checkNetworkConnection();
+                            if (network) {
+                              if (mobileController.text.isEmpty) {
+                                Validate().singleButtonPopup(
+                                    'User name required',
+                                    'ok',
+                                    false,
+                                    context);
+                              }
+                              else if (passwordcontroller.text.isEmpty) {
+                                Validate().singleButtonPopup(
+                                    'Password required',
+                                    'ok',
+                                    false,
+                                    context);
+                              }
+                              else {
+                                if (_focusNode.hasFocus) {
+                                  _focusNode.unfocus();
+                                }
+                                if (_focusNode2.hasFocus) {
+                                  _focusNode2.unfocus();
+                                }
+                                await newLoginFlow(mobileController.text,
+                                    passwordcontroller.text, context);
+                              }
+                            } else {
+                              Validate().singleButtonPopup(
+                                  CustomText.nointernetconnectionavailable,
+                                  CustomText.ok,
+                                  false,
+                                  context);
+                            }
+                          },
+                          text: CustomText.LogIn,
+                        ),
+
+                  SizedBox(height: MediaQuery.of(context).size.height*0.03),
+                  Center(child: GestureDetector(onTap: ()
+                  async {
+                    await Validate().createDbBackup();
+                  },
+                    child: RichText(text: TextSpan(text: CustomText.Version,
+                      style: Styles.black124,
+                      children: <TextSpan>[
+                        TextSpan(
+                            text: " $appVersionName", style: Styles.black126P),
+                        Constants.baseUrl == 'https://uat.shishughar.in/api/'
+                            ? TextSpan(text: " (UAT)", style: Styles.red125)
+                            : Constants.baseUrl == 'https://shishughar.in/api/'
+                            ? TextSpan(text: "", style: Styles.red125)
+                            : TextSpan(text: " (DEV)", style: Styles.red125),
+                      ],),),),)
+                    ],
+                  ),
                 ),
               ),
-            ),
+
+              /// 🔹 FIXED BOTTOM IMAGE
+              Image.asset(
+                "assets/bottomloginImage.png",
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ],
           ),
         ),
       ),
@@ -530,7 +475,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     if (master.tabPartnerStock != null) {
       await PartnerStockHelper().insert(master.tabPartnerStock!);
     }
-    }
+  }
 
   Future<void> initLoginAuth(BuildContext mContext, LoginApiModel loginApiModel,
       String enterdUserName, String userName, String password) async {
@@ -564,13 +509,13 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     Validate().saveString(Validate.role, userRole);
     Validate().saveString(Validate.mobile_no, loginApiModel.auth!.mobile_no!);
     await AuthLoginDataHelper().insert(tabusermodel);
-  
+
     ////master other data
     var masterOtherDataResponse = await MasterApiService()
         .fetchmasterOtherData(userName, password, token);
     if (masterOtherDataResponse.statusCode == 200) {
       MstCommonModel mstCommonModel =
-          MstCommonModel.fromJson(json.decode(masterOtherDataResponse.body));
+      MstCommonModel.fromJson(json.decode(masterOtherDataResponse.body));
 
       await MstCommonHelper().insertMstCommonData(mstCommonModel.tabCommon!);
       await callApiLogicData(mContext, userName, password, token, userRole);
@@ -587,11 +532,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   Future<void> callApiLogicData(BuildContext mContext, String userName,
       String password, String token, String userRole) async {
     var logisResponce =
-        await FormLogicApiService().fetchLogicData(userName, password, token);
+    await FormLogicApiService().fetchLogicData(userName, password, token);
     if (logisResponce.statusCode == 200) {
       Map<String, dynamic> responseData = json.decode(logisResponce.body);
       await initFormLogic(FormLogicApiModel.fromJson(responseData));
-      await callBackdatedConfigirationData(mContext, userName, password, token, userRole);
+      await callBackdatedConfigirationData(
+          mContext, userName, password, token, userRole);
     } else {
       Navigator.pop(mContext);
       Validate().singleButtonPopup(
@@ -602,14 +548,14 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> callBackdatedConfigirationData(BuildContext mContext, String userName,
-      String password, String token, String userRole)
-  async {
-    var logisResponce =
-    await MasterApiService().backdatedConfigiration(userName, password, token);
+  Future<void> callBackdatedConfigirationData(BuildContext mContext,
+      String userName, String password, String token, String userRole) async {
+    var logisResponce = await MasterApiService()
+        .backdatedConfigiration(userName, password, token);
     if (logisResponce.statusCode == 200) {
       Map<String, dynamic> responseData = json.decode(logisResponce.body);
-      await initBackdatedConfigirationData(BackdatedConfigirationModelApiModel.fromJson(responseData));
+      await initBackdatedConfigirationData(
+          BackdatedConfigirationModelApiModel.fromJson(responseData));
       await callMasterData(mContext, userName, password, token, userRole);
     } else {
       Navigator.pop(mContext);
@@ -622,14 +568,13 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   }
 
   Future<void> callMasterData(BuildContext mContext, String userName,
-      String password, String token, String userRole)
-  async {
+      String password, String token, String userRole) async {
     var msterDataResponse =
-        await MasterApiService().fetchmasterData(userName, password, token);
+    await MasterApiService().fetchmasterData(userName, password, token);
 
     if (msterDataResponse.statusCode == 200) {
       MasterDataModel masterDataApiModel =
-          MasterDataModel.fromJson(json.decode(msterDataResponse.body));
+      MasterDataModel.fromJson(json.decode(msterDataResponse.body));
       await initMasterData(masterDataApiModel);
       if (userRole == CustomText.crecheSupervisor)
         await getCrecheData(mContext, userName, password, token, userRole);
@@ -658,14 +603,17 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       List<TabFormsLogic>? formLogicList = formLogicApiModel.tabFormsLogic;
       print("Insert formlogic data into the database");
       await FormLogicDataHelper().insertFormLogic(formLogicList);
-        }
+    }
   }
 
-  Future<void> initBackdatedConfigirationData(BackdatedConfigirationModelApiModel? item) async {
+  Future<void> initBackdatedConfigirationData(
+      BackdatedConfigirationModelApiModel? item) async {
     if (item != null) {
-      List<BackdatedConfigirationModel>? items = item.backdatedConfigirationModel;
+      List<BackdatedConfigirationModel>? items =
+          item.backdatedConfigirationModel;
       if (items.isNotEmpty) {
-        await BackdatedConfigirationHelper().insertBackdatedConfigirationModel(items);
+        await BackdatedConfigirationHelper()
+            .insertBackdatedConfigirationModel(items);
       }
     }
   }
@@ -784,8 +732,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     }
   }
 
-  callVillageProfiledataCC(
-      BuildContext mContext,
+  callVillageProfiledataCC(BuildContext mContext,
       String userName,
       String password,
       String appToken,
@@ -849,8 +796,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> callApiTranslateData(
-      LoginApiModel loginApiModel,
+  Future<void> callApiTranslateData(LoginApiModel loginApiModel,
       String deviceId,
       BuildContext mContext,
       String userName,
@@ -858,18 +804,27 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       String token,
       String enterdUserName) async {
     var translateResponce =
-        await TranslationService().translateApi(userName, password, token);
+    await TranslationService().translateApi(userName, password, token);
     if (translateResponce.statusCode == 200) {
       Map<String, dynamic> responseData = json.decode(translateResponce.body);
       List<Translation>? translationList =
-          TranslationModel.fromJson(responseData).translation;
+          TranslationModel
+              .fromJson(responseData)
+              .translation;
       if (loginApiModel.auth!.isDeviceChanged == 1) {
         Navigator.pop(mContext);
         bool shouldProceed =
-            await LoginToNewDevice(mContext, deviceId, translationList);
+        await LoginToNewDevice(mContext, deviceId, translationList);
         if (shouldProceed) {
-          await deviceChangeApiCall(mContext, deviceId, loginApiModel, userName,
-              password, token, enterdUserName, translationList);
+          await deviceChangeApiCall(
+              mContext,
+              deviceId,
+              loginApiModel,
+              userName,
+              password,
+              token,
+              enterdUserName,
+              translationList);
         }
       } else {
         var userName = await Validate().readString(Validate.loginName);
@@ -880,9 +835,10 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           Navigator.pushReplacement(
               mContext,
               MaterialPageRoute(
-                builder: (context) => DashboardScreen(
-                  index: 0,
-                ),
+                builder: (context) =>
+                    DashboardScreen(
+                      index: 0,
+                    ),
               ));
         } else {
           await initTranslation(translationList);
@@ -900,8 +856,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future newLoginFlow(
-      String username, String pass, BuildContext mContext) async {
+  Future newLoginFlow(String username, String pass,
+      BuildContext mContext) async {
     showLoaderDialog(mContext);
     String? deviceId = await DeviceService.gteDeviceInfo();
 
@@ -909,7 +865,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         username, pass, Global.validToString(deviceId), appVersionName);
     if (loginResponse.statusCode == 200) {
       LoginApiModel loginApiModel =
-          LoginApiModel.fromJson(json.decode(loginResponse.body));
+      LoginApiModel.fromJson(json.decode(loginResponse.body));
       await setUpLogin(loginApiModel, username, pass,
           Global.validToString(deviceId), mContext);
     } else {
@@ -918,6 +874,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         lang = 'hi';
       } else if (selectedlanguages == 'Odiya') {
         lang = 'od';
+      } else if (selectedlanguages == 'kannada') {
+        lang = 'kn';
       }
       var errorString = Global.errorBodyToString(loginResponse.body, 'message');
       List<String> valueNames = [errorString, CustomText.ok];
@@ -926,7 +884,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           .callTranslateString(valueNames)
           .then((value) => translats.addAll(value));
       print(
-          "TRANSLATED ERROR STRING ====> ${Global.returnTrLable(translats, errorString, lang)}");
+          "TRANSLATED ERROR STRING ====> ${Global.returnTrLable(
+              translats, errorString, lang)}");
       Navigator.pop(mContext);
       Validate().singleButtonPopup(
           Global.returnTrLable(translats, errorString, lang),
@@ -946,20 +905,28 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         var oUserName = loginApiModel.auth!.username!;
         var backDateDataEntry = loginApiModel.auth!.backDateDataEntry!;
         var max_allow_range = loginApiModel.auth!.max_allow_range;
-         Validate().saveString(Validate.date, backDateDataEntry);
-         if(max_allow_range!=null){
-           Validate().saveInt(Validate.max_allow_range, max_allow_range);
-         }
+        Validate().saveString(Validate.date, backDateDataEntry);
+        if (max_allow_range != null) {
+          Validate().saveInt(Validate.max_allow_range, max_allow_range);
+        }
         if (selectedlanguages == 'English') {
           Validate().saveString(Validate.sLanguage, 'en');
         } else if (selectedlanguages == 'Hindi') {
           Validate().saveString(Validate.sLanguage, 'hi');
         } else if (selectedlanguages == 'Odiya') {
           Validate().saveString(Validate.sLanguage, 'od');
+        } else if (selectedlanguages == 'kannada') {
+          Validate().saveString(Validate.sLanguage, 'kn');
         }
 
-        await callApiTranslateData(loginApiModel, deviceId, mContext, oUserName,
-            pass, token, enterdUserName);
+        await callApiTranslateData(
+            loginApiModel,
+            deviceId,
+            mContext,
+            oUserName,
+            pass,
+            token,
+            enterdUserName);
       } else {
         Navigator.pop(mContext);
         Validate().singleButtonPopup(
@@ -972,8 +939,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> deviceChangeApiCall(
-      BuildContext mContext,
+  Future<void> deviceChangeApiCall(BuildContext mContext,
       String deviceId,
       LoginApiModel loginApiModel,
       String userName,
@@ -987,7 +953,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
     if (deviceChangeResponse.statusCode == 200) {
       DeviceChangeModel deviceChangeModel =
-          DeviceChangeModel.fromJson(json.decode(deviceChangeResponse.body));
+      DeviceChangeModel.fromJson(json.decode(deviceChangeResponse.body));
       if (deviceChangeModel.statusCode != null &&
           deviceChangeModel.statusCode!.statusCode == 200) {
         SharedPreferences pref = await SharedPreferences.getInstance();
@@ -999,6 +965,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           Validate().saveString(Validate.sLanguage, 'hi');
         } else if (selectedlanguages == 'Odiya') {
           Validate().saveString(Validate.sLanguage, 'od');
+        } else if (selectedlanguages == 'kannada') {
+          Validate().saveString(Validate.sLanguage, 'kn');
         }
 
         await initTranslation(translates);

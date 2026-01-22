@@ -11,6 +11,7 @@ import 'package:shishughar/screens/tabed_screens/child_exit/child_exit_listing_T
 import 'package:shishughar/screens/tabed_screens/creche_commite_meeting/creche_committe_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checkList_cbm/creche_monitering_checklist_CBM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_CC/creche_monitering_checklist_CC_listing_screen.dart';
+import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_SM/creche_monitering_checklist_SM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_alm/creche_monitering_checklist_ALM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitor/creche_monitor_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/enrolled_exit_child/enrolled_exit_child_listing_tab.dart';
@@ -475,18 +476,24 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
                   creche_id: widget.crecheId.toString(),
                   crecheName: crechName!,
                 )));
-      } else if (role == CustomText.alm.trim()) {
+      } else if (role == CustomText.alm) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => cmcALMListingScreen(
                   creche_id: widget.crecheId.toString(),
                   crecheName: crechName!,
                 )));
-      } else if (role == CustomText.cbm.trim()) {
+      } else if (role == CustomText.cbm) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) => cmcCBMListingScreen(
                   creche_id: widget.crecheId.toString(),
                   crecheName: crechName!,
                 )));
+      } else if (role == CustomText.safetyManager) {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => cmcSMListingScreen(
+              creche_id: widget.crecheId.toString(),
+              crecheName: crechName!,
+            )));
       }
     } else if (i == 6) {
       Navigator.of(context).push(MaterialPageRoute(

@@ -764,7 +764,7 @@ class _ExitEnrolledDetailsScreenState extends State<ExitEnrolledDetailsScreen> {
                     ],
                   ),
                   actions: [
-                    (role == 'Cluster Coordinator')
+                    (role == CustomText.clusterCoordinator)
                         ? GestureDetector(
                             onTap: () async {
                               await updateVerificationStatus(context);

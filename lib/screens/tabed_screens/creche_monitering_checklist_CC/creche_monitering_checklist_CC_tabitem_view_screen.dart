@@ -154,7 +154,7 @@ class _CmcCCTabItemViewSCreenState extends State<CmcCCTabItemViewSCreen> {
                         ),
                         // Row(children: [
                         SizedBox(width: 10),
-                        // _role == 'Creche Supervisor'
+                        // _role == CustomText.crecheSupervisor
                         //     ? widget.tabIndex == (widget.totalTab - 1)
                         //         ? SizedBox()
                         //         : Expanded(
@@ -169,7 +169,7 @@ class _CmcCCTabItemViewSCreenState extends State<CmcCCTabItemViewSCreen> {
                         //     : SizedBox(),
                         // // ]
                         // // ),
-                        // _role == 'Creche Supervisor'
+                        // _role == CustomText.crecheSupervisor
                         //     ? widget.tabIndex == (widget.totalTab - 1)
                         //         ? SizedBox()
                         //         : SizedBox(width: 10)

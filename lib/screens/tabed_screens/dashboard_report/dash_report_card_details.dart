@@ -4600,7 +4600,7 @@ class _DashReportCardDetailState extends State<DashReportCardDetailScreen> {
         .toList();
     if (items.isNotEmpty) {
       returnValue = Global.languageWise(
-          lng, items.first.value, items.first.gp_hi, items.first.gp_od);
+          lng, items.first.value, items.first.gp_hi, items.first.gp_od,items.first.gp_kn);
     }
     return returnValue;
   }
@@ -4612,7 +4612,7 @@ class _DashReportCardDetailState extends State<DashReportCardDetailScreen> {
         .toList();
     if (items.isNotEmpty) {
       returnValue = Global.languageWise(
-          lng, items.first.value, items.first.block_hi, items.first.block_od);
+          lng, items.first.value, items.first.block_hi, items.first.block_od,items.first.block_kn);
     }
     return returnValue;
   }
@@ -4624,7 +4624,7 @@ class _DashReportCardDetailState extends State<DashReportCardDetailScreen> {
         .toList();
     if (items.isNotEmpty) {
       returnValue = Global.languageWise(lng, items.first.value,
-          items.first.district_hi, items.first.district_od);
+          items.first.district_hi, items.first.district_od, items.first.district_kn);
     }
     return returnValue;
   }
@@ -4636,7 +4636,7 @@ class _DashReportCardDetailState extends State<DashReportCardDetailScreen> {
         .toList();
     if (items.isNotEmpty) {
       returnValue = Global.languageWise(
-          lng, items.first.value, items.first.state_hi, items.first.state_od);
+          lng, items.first.value, items.first.state_hi, items.first.state_od, items.first.state_kn);
     }
     return returnValue;
   }

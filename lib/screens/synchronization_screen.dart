@@ -198,7 +198,7 @@
 //                       return InkWell(
 //                         onTap: () async {
 //                           if (i == 0) {
-//                             if (role == 'Creche Supervisor') {
+//                             if (role == CustomText.crecheSupervisor) {
 //                               if (pendindTaskCount == 0) {
 //                                 var hhItems = await HouseHoldTabResponceHelper()
 //                                     .getHouseHoldItems();
@@ -342,7 +342,7 @@
 //                                         locationControlls, CustomText.ok, lngtr!),
 //                                     false,
 //                                     context);
-//                             } else if (role == 'Accounts and Logistics Manager') {
+//                             } else if (role == CustomText.alm) {
 //                               var visitNots = await CmcALMTabResponseHelper()
 //                                   .getAlmForUpload();
 //                               if (pendindTaskCount > 0) {
@@ -362,7 +362,7 @@
 //                                         locationControlls, CustomText.ok, lngtr!),
 //                                     false,
 //                                     context);
-//                             } else if (role == 'Capacity and Building Manager') {
+//                             } else if (role == CustomText.cbm) {
 //                               var visitNots = await CmcCBMTabResponseHelper()
 //                                   .getCBMForUpload();
 //                               if (pendindTaskCount > 0) {
@@ -976,11 +976,11 @@
 //           .displeDateFormateMobileDateTimeFormate(doctypeDownloadDate);
 //     }
 //
-//     if (role == 'Creche Supervisor') {
+//     if (role == CustomText.crecheSupervisor) {
 //       pendindTaskCount = await callCountForUpload();
-//     } else if (role == 'Cluster Coordinator') {
+//     } else if (role == CustomText.clusterCoordinator) {
 //       pendindTaskCount = await callCountForUploadCC();
-//     } else if (role == 'Accounts and Logistics Manager') {
+//     } else if (role == CustomText.alm) {
 //       var crecheCheckIn =
 //           await CheckInResponseHelper().callCrecheCheckInResponses();
 //
@@ -993,7 +993,7 @@
 //           crecheCheckIn.length +
 //           grievanceData.length +
 //           ImageFileData.length;
-//     } else if (role == 'Capacity and Building Manager') {
+//     } else if (role == CustomText.cbm) {
 //       var crecheCheckIn =
 //           await CheckInResponseHelper().callCrecheCheckInResponses();
 //

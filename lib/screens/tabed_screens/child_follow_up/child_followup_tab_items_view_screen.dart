@@ -193,7 +193,7 @@ class _ChildFollowupTabItemsViewScreenState
                       ),
                     ),
                     // SizedBox(width: 10),
-                    // role == 'Creche Supervisor'
+                    // role == CustomText.crecheSupervisor
                     //     ? widget.tabIndex == (widget.totalTab - 1)
                     //         ? SizedBox()
                     //         : Expanded(
@@ -211,7 +211,7 @@ class _ChildFollowupTabItemsViewScreenState
                     //     : SizedBox(),
                     // // ]
                     // // ),
-                    // role == 'Creche Supervisor'
+                    // role == CustomText.crecheSupervisor
                     //     ? widget.tabIndex == (widget.totalTab - 1)
                     //         ? SizedBox()
                     //         : SizedBox(width: 10)
@@ -266,7 +266,7 @@ class _ChildFollowupTabItemsViewScreenState
           titleText:
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd,
-          // readable: role == 'Creche Supervisor' ? false : true,
+          // readable: role == CustomText.crecheSupervisor ? false : true,
           readable: true,
           items: items,
           selectedItem: myMap[quesItem.fieldname],
@@ -315,7 +315,7 @@ class _ChildFollowupTabItemsViewScreenState
           maxlength: quesItem.length,
           maxline: (quesItem.length != 0) ? quesItem.length! % 35 : 1,
           keyboard: logic!.keyBoardLogic(quesItem.fieldname!),
-          // readable: role == 'Creche Supervisor'
+          // readable: role == CustomText.crecheSupervisor
           //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
@@ -336,7 +336,7 @@ class _ChildFollowupTabItemsViewScreenState
           isRequred: quesItem.reqd,
           maxlength: quesItem.length,
           initialvalue: myMap[quesItem.fieldname!],
-          // readable: role == 'Creche Supervisor'
+          // readable: role == CustomText.crecheSupervisor
           //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
@@ -378,7 +378,7 @@ class _ChildFollowupTabItemsViewScreenState
           initialValue: myMap[quesItem.fieldname],
           labelControlls: translats,
           lng: lng,
-          // readable: role == 'Creche Supervisor'
+          // readable: role == CustomText.crecheSupervisor
           //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
@@ -397,7 +397,7 @@ class _ChildFollowupTabItemsViewScreenState
           isRequred: quesItem.reqd,
           initialvalue: myMap[quesItem.fieldname!],
           maxlength: quesItem.length,
-          // readable: role == 'Creche Supervisor'
+          // readable: role == CustomText.crecheSupervisor
           //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
@@ -417,7 +417,7 @@ class _ChildFollowupTabItemsViewScreenState
           keyboardtype: TextInputType.number,
           isRequred: quesItem.reqd,
           maxlength: quesItem.length,
-          // readable: role == 'Creche Supervisor'
+          // readable: role == CustomText.crecheSupervisor
           //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,
@@ -440,7 +440,7 @@ class _ChildFollowupTabItemsViewScreenState
               Global.returnTrLable(translats, quesItem.label!.trim(), lng),
           isRequred: quesItem.reqd,
           maxlength: quesItem.length,
-          // readable: role == 'Creche Supervisor'
+          // readable: role == CustomText.crecheSupervisor
           //     ? logic!.callReadableLogic( myMap, quesItem)
           //     : true,
           readable: true,

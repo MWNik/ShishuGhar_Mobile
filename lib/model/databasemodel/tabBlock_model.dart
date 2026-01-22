@@ -6,6 +6,7 @@ class TabBlock {
   String? value;
   String? block_od;
   String? block_hi;
+  String? block_kn;
 
   TabBlock({
     this.name,
@@ -15,6 +16,7 @@ class TabBlock {
     this.value,
     this.block_od,
     this.block_hi,
+    this.block_kn,
   });
 
   factory TabBlock.fromJson(Map<String, dynamic> json) => TabBlock(
@@ -25,6 +27,7 @@ class TabBlock {
         value: json["value"],
     block_od: json["block_od"],
     block_hi: json["block_hi"],
+    block_kn: json["block_kn"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -35,5 +38,6 @@ class TabBlock {
         "value": value,
         "block_od": block_od,
         "block_hi": block_hi,
+        "block_kn": block_kn,
       };
 }

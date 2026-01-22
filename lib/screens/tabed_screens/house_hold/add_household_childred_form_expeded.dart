@@ -389,7 +389,7 @@ class _HouseholdScreenState
       //   return DynamicCustomCheckboxWithLabel(
       //     label: Global.returnTrLable(translats,quesItem.label,lng),
       //     initialValue: myMap[quesItem.fieldname!],
-      //     readable: role=='Creche Supervisor'?logic!.callReadableLogic( myMap, quesItem):true,
+      //     readable: role==CustomText.crecheSupervisor?logic!.callReadableLogic( myMap, quesItem):true,
       //     isVisible: logic!.callDependingLogic(myMap,quesItem),
       //     onChanged: (value) {
       //       print("checkVa $value");
@@ -593,7 +593,7 @@ class _HouseholdScreenState
   }
 
   nextTab(int type) async {
-    if (role == 'Creche Supervisor') {
+    if (role == CustomText.crecheSupervisor) {
       if (type == 1) {
         if (checkValidation()) {
           if (expandableList < (tabBreakItems.length - 1)) {

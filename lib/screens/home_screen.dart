@@ -467,7 +467,7 @@
 //               //   decoration: BoxDecoration(
 //               //       color: Color(0xff62ADA8),
 //               //       borderRadius: BorderRadius.circular(5.r)),
-//               //   child: (role == 'Creche Supervisor')
+//               //   child: (role == CustomText.crecheSupervisor)
 //               //       ? Padding(
 //               //           padding: EdgeInsets.symmetric(
 //               //               vertical: 10.h, horizontal: 10),
@@ -1181,7 +1181,7 @@
 //     role = await Validate().readString(Validate.role);
 //
 //
-//     if (role == 'Cluster Coordinator') {
+//     if (role == CustomText.clusterCoordinator) {
 //       image = [
 //         'assets/household.png',
 //         'assets/shishughar.png',
@@ -1318,7 +1318,7 @@
 //
 //   Future<void> pendingDataForVerify() async {
 //     var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItemsMap();
-//     if (role == 'Creche Supervisor') {
+//     if (role == CustomText.crecheSupervisor) {
 //       hhItems = hhItems
 //           .where((element) =>
 //       Global.getItemValues(element.responces!,
@@ -1434,7 +1434,7 @@
 //         await callInitBlock();
 //       }
 //     } else if (i == 2) {
-//       if (role == 'Cluster Coordinator') {
+//       if (role == CustomText.clusterCoordinator) {
 //         var refStatus=await Navigator.of(context).push(MaterialPageRoute(
 //             builder: (BuildContext context) => VerficationForPending()));
 //         if (refStatus == 'itemRefresh') {
@@ -1444,7 +1444,7 @@
 //     } else if (i == 3) {
 //
 //     } else if (i == 4) {
-//       if ((role == 'Creche Supervisor')) {
+//       if ((role == CustomText.crecheSupervisor)) {
 //         var refStatus=await Navigator.of(context).push(MaterialPageRoute(
 //             builder: (BuildContext context) => FollowUpChildListingScreen()));
 //         if (refStatus == 'itemRefresh') {
@@ -1452,7 +1452,7 @@
 //         }
 //       }
 //     } else if (i == 5) {
-//       if (!(role == 'Cluster Coordinator')) {
+//       if (!(role == CustomText.clusterCoordinator)) {
 //         var refStatus=await Navigator.of(context).push(MaterialPageRoute(
 //             builder: (BuildContext context) => ChildReferralListingScreen()));
 //         if (refStatus == 'itemRefresh') {
@@ -1460,7 +1460,7 @@
 //         }
 //       }
 //     } else if (i == 6) {
-//       // if (role == 'Cluster Coordinator') {
+//       // if (role == CustomText.clusterCoordinator) {
 //         var refStatus= await Navigator.of(context).push(MaterialPageRoute(
 //             builder: (BuildContext context) => SynchronizationScreen()));
 //         if (refStatus == 'itemRefresh') {

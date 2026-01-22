@@ -161,6 +161,8 @@ class OptionsModelHelper {
       } else if (lang == 'od' &&
           Global.validString(element['oidya'].toString())) {
         value = element['oidya'].toString();
+      } else if (lang == 'kn' && Global.validString(element['kannada'].toString())) {
+        value = element['kannada'].toString();
       }
       var item = new OptionsModel(
           name: element['name'].toString(),
@@ -190,6 +192,8 @@ class OptionsModelHelper {
       } else if (lang == 'od' &&
           Global.validString(element['oidya'].toString())) {
         value = element['oidya'].toString();
+      } else if (lang == 'kn' && Global.validString(element['kannada'].toString())) {
+        value = element['kannada'].toString();
       }
       var item = new OptionsModel(
           name: element['name'].toString(),
@@ -216,6 +220,8 @@ class OptionsModelHelper {
       } else if (lang == 'od' &&
           Global.validString(element['oidya'].toString())) {
         value = element['oidya'].toString();
+      } else if (lang == 'kn' && Global.validString(element['kannada'].toString())) {
+        value = element['kannada'].toString();
       }
       print(element);
       var item = new OptionsModel(
@@ -244,9 +250,10 @@ class OptionsModelHelper {
       var value = element['value'].toString();
       if (lang == 'hi' && Global.validString(element['hindi'].toString())) {
         value = element['hindi'].toString();
-      } else if (lang == 'od' &&
-          Global.validString(element['oidya'].toString())) {
+      } else if (lang == 'od' && Global.validString(element['oidya'].toString())) {
         value = element['oidya'].toString();
+      } else if (lang == 'kn' && Global.validString(element['kannada'].toString())) {
+        value = element['kannada'].toString();
       }
       print(element);
       var item = new OptionsModel(
@@ -275,6 +282,8 @@ class OptionsModelHelper {
       } else if (lang == 'od' &&
           Global.validString(element['oidya'].toString())) {
         value = element['oidya'].toString();
+      } else if (lang == 'kn' && Global.validString(element['kannada'].toString())) {
+        value = element['kannada'].toString();
       }
       print(element);
       var item = new OptionsModel(
@@ -303,6 +312,8 @@ class OptionsModelHelper {
       } else if (lang == 'od' &&
           Global.validString(element['oidya'].toString())) {
         value = element['oidya'].toString();
+      } else if (lang == 'kn' && Global.validString(element['kannada'].toString())) {
+        value = element['kannada'].toString();
       }
       print(element);
       var item = new OptionsModel(
@@ -334,6 +345,8 @@ class OptionsModelHelper {
       } else if (lang == 'od' &&
           Global.validString(element['oidya'].toString())) {
         value = element['oidya'].toString();
+      } else if (lang == 'kn' && Global.validString(element['kannada'].toString())) {
+        value = element['kannada'].toString();
       }
       var item = new OptionsModel(
           name: element['name'].toString(),
@@ -401,11 +414,13 @@ class OptionsModelHelper {
       partnetStock =
           await PartnerStockHelper().getNotAddedItems(creche_id, year, month);
     for (var elements in partnetStock) {
-      var value = elements.items.toString().trim();
-      if (lang == 'hi' && Global.validString(elements.hindi.toString())) {
-        value = elements.hindi.toString().trim();
-      } else if (lang == 'od' && Global.validString(elements.odia.toString())) {
-        value = elements.odia.toString().trim();
+      var value = elements.items;
+      if (lang == 'hi' && Global.validString(elements.hindi)) {
+        value = elements.hindi;
+      } else if (lang == 'od' && Global.validString(elements.odia)) {
+        value = elements.odia;
+      } else if (lang == 'kn' && Global.validString(elements.kannada)) {
+        value = elements.kannada;
       }
       var itemModel = new OptionsModel(
           name: elements.name.toString(), flag: tabName, values: value);
@@ -480,6 +495,9 @@ class OptionsModelHelper {
       } else if (lng == 'od' &&
           Global.validString(item['state_od'].toString())) {
         value = item['state_od'].toString();
+      } else if (lng == 'kn' &&
+          Global.validString(item['state_kn'].toString())) {
+        value = item['state_kn'].toString();
       } else
         value = item['value'].toString();
     } else if (tabName == 'District') {
@@ -488,6 +506,9 @@ class OptionsModelHelper {
       } else if (lng == 'od' &&
           Global.validString(item['district_od'].toString())) {
         value = item['district_od'].toString();
+      } else if (lng == 'kn' &&
+          Global.validString(item['district_kn'].toString())) {
+        value = item['district_kn'].toString();
       } else
         value = item['value'].toString();
     } else if (tabName == 'Block') {
@@ -496,6 +517,9 @@ class OptionsModelHelper {
       } else if (lng == 'od' &&
           Global.validString(item['block_od'].toString())) {
         value = item['block_od'].toString();
+      } else if (lng == 'kn' &&
+          Global.validString(item['block_kn'].toString())) {
+        value = item['block_kn'].toString();
       } else
         value = item['value'].toString();
     } else if (tabName == 'Gram Panchayat') {
@@ -503,6 +527,9 @@ class OptionsModelHelper {
         value = item['gp_hi'].toString();
       } else if (lng == 'od' && Global.validString(item['gp_od'].toString())) {
         value = item['gp_od'].toString();
+      } else if (lng == 'kn' &&
+          Global.validString(item['gp_kn'].toString())) {
+        value = item['gp_kn'].toString();
       } else
         value = item['value'].toString();
     } else if (tabName == 'Village') {
@@ -511,6 +538,9 @@ class OptionsModelHelper {
       } else if (lng == 'od' &&
           Global.validString(item['village_od'].toString())) {
         value = item['village_od'].toString();
+      } else if (lng == 'kn' &&
+          Global.validString(item['village_kn'].toString())) {
+        value = item['village_kn'].toString();
       } else
         value = item['value'].toString();
     }

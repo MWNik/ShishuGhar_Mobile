@@ -143,7 +143,60 @@ class HouseHoldTabResponceHelper {
     result.forEach((itemMap) {
       items.add(HouseHoldTabResponceMosdel.fromJson(itemMap));
     });
+
+
     return items;
+  }
+
+  Future<List<HouseHoldChildrenModel>> getAllChildByHHCreche(
+      int creche_id)
+  async {
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
+        'select * from house_hold_children where HHGUID in (select HHGUID from house_hold_responce where creche_id=?)',
+        [creche_id]);
+    List<HouseHoldChildrenModel> childHHData = [];
+    result.forEach((itemMap) {
+      childHHData.add(HouseHoldChildrenModel.fromJson(itemMap));
+    });
+
+    childHHData = childHHData.where((element) {
+      var isdobavail =
+      Global.getItemValues(element.responces, 'is_dob_available');
+      var childStatus =
+      Global.getItemValues(element.responces, 'child_status');
+      return (Global.stringToInt(isdobavail.toString()) == 1
+          &&!Global.validString(childStatus));
+    }).toList();
+
+    return childHHData;
+  }
+
+Future<List<HouseHoldTabResponceMosdel>> filterChildAge(
+      int? minAge,int? maxAge,List<HouseHoldTabResponceMosdel> hhItems,
+    List<HouseHoldChildrenModel> chhItems,)
+  async {
+    List<HouseHoldTabResponceMosdel> houseHoldItems=hhItems;
+    if(maxAge != null && minAge != null){
+     var  houseHChild = chhItems.where((element) {
+        var ageItem= Validate()
+            .calculateAgeInMonths(Validate().stringToDate(
+            Global.getItemValues(
+                element.responces,
+                'child_dob')));
+        return ageItem <= maxAge &&
+            ageItem >= minAge;
+      }).toList();
+
+     final hhGUIDs = houseHChild
+         .map((e) => e.HHGUID) // 🔁 replace with actual field name
+         .toSet();
+
+     houseHoldItems = hhItems
+         .where((e) => hhGUIDs.contains(e.HHGUID))
+         .toList();
+    }
+
+    return houseHoldItems;
   }
 
   Future<Map<String, dynamic>> getHHDataINMAP(String hhGuid) async {

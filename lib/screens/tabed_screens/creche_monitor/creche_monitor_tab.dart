@@ -424,7 +424,7 @@ class _CrecheMonitorTabState extends State<CrecheMonitorTab>
                 style: Styles.white145,
               ),
               actions: [
-                (_role == 'Cluster Coordinator')
+                (_role == CustomText.clusterCoordinator)
                     ? GestureDetector(
                         onTap: () async {
                           await updateVerificationStatus(context);

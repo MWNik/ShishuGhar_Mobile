@@ -84,6 +84,10 @@ import 'package:shishughar/utils/globle_method.dart';
 import 'package:shishughar/utils/secure_storage.dart';
 import 'package:shishughar/utils/validate.dart';
 
+import '../api/creche_monitering_checklist_sm_api.dart';
+import '../database/helper/cmc_SM/creche_monitering_checklist_SM_fields_helper.dart';
+import '../model/apimodel/checklist_sm_Meta_fields_model.dart';
+
 class DoctypeUpdate {
   List<Translation> locationControlls;
   String lng;
@@ -1152,12 +1156,14 @@ class DoctypeUpdate {
 
       // Validate().saveString(Validate.cashbookRecieptMetaUpdateDate,
       //     cashbookReceiptMetaFields.tab_cashbook_receipt!.modified!);
-      if (role == 'Cluster Coordinator') {
+      if (role == CustomText.clusterCoordinator) {
         await callCMCCCMetaApi(userName, password, token, context);
-      } else if (role == 'Creche Supervisor') {
+      } else if (role == CustomText.crecheSupervisor) {
         await crecheMonitoringApiMeta(userName, password, token, context);
-      } else if (role == 'Accounts and Logistics Manager') {
+      } else if (role == CustomText.alm) {
         await callCMCALMMetaApi(userName, password, token, context);
+      } else if (role == CustomText.safetyManager) {
+        await callSMMetaApi(userName, password, token, context);
       } else {
         await callCMCCBMMetaApi(userName, password, token, context);
       }
@@ -1293,7 +1299,8 @@ class DoctypeUpdate {
   }
 
   callCMCALMMetaApi(String userName, String password, String token,
-      BuildContext context) async {
+      BuildContext context)
+  async {
     downloadedApi = 27;
     updateLoadingText(dialogSetState);
     var responce = await CrecheMonetringCheckListALMApi()
@@ -1336,6 +1343,54 @@ class DoctypeUpdate {
     if (items.tabCreche_Monitoring_CheckList_ALM != null) {
       await CrecheMoniteringCheckListALMFieldsHelper()
           .insertcmcALMMeta(items.tabCreche_Monitoring_CheckList_ALM!.fields!);
+    }
+  }
+
+  callSMMetaApi(String userName, String password, String token,
+      BuildContext context)
+  async {
+    downloadedApi = 27;
+    updateLoadingText(dialogSetState);
+    var responce = await CrecheMonetringCheckListSMApi()
+        .smCheckListMetaApi(userName, password, token);
+    if (responce.statusCode == 200) {
+      CheckListSMMetaFieldsModel cmcCBMMEtaFields =
+      CheckListSMMetaFieldsModel.fromJson(jsonDecode(responce.body));
+
+      await callInsertcmcSMata(cmcCBMMEtaFields);
+      Navigator.pop(context);
+      Validate().saveString(
+          Validate.doctypeUpdateTimeStamp, DateTime.now().toString());
+
+      Validate().singleButtonPopup(
+          Global.returnTrLable(
+              locationControlls, CustomText.doctypeUpdated, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
+          false,
+          context);
+    } else if (responce.statusCode == 401) {
+      Navigator.pop(context);
+      Validate().singleButtonPopup(
+          Global.returnTrLable(
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
+          false,
+          context);
+    } else {
+      Navigator.pop(context);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(responce.body, 'message'),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
+          false,
+          context);
+    }
+  }
+
+  Future<void> callInsertcmcSMata(CheckListSMMetaFieldsModel items) async {
+    await DatabaseHelper.database!.delete('tabCreche_Monitering_CheckList_SM');
+    if (items.tabCreche_Monitoring_CheckList_SM != null) {
+      await CrecheMoniteringCheckListSMFieldsHelper()
+          .insertcmcSMMeta(items.tabCreche_Monitoring_CheckList_SM!.fields!);
     }
   }
 

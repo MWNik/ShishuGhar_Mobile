@@ -140,7 +140,7 @@ class _HHTabScreenState extends State<HHTabScreen>
               ),
               centerTitle: true,
               // actions: [
-              //   (role == 'Cluster Coordinator')
+              //   (role == CustomText.clusterCoordinator)
               //       ? GestureDetector(
               //           onTap: () async {
               //              await updateVerificationStatusRadio(context);

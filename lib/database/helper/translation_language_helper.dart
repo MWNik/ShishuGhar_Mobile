@@ -2,6 +2,8 @@ import 'package:shishughar/database/database_helper.dart';
 import 'package:shishughar/model/apimodel/translation_language_api_model.dart';
 import 'package:shishughar/utils/validate.dart';
 
+import '../../utils/globle_method.dart';
+
 class TranslationDataHelper {
   DatabaseHelper databaseHelper = DatabaseHelper();
 
@@ -48,8 +50,9 @@ class TranslationDataHelper {
       var item = new Translation(
           name: element['value_name'].toString(),
           english: element['value_en'].toString(),
-          hindi: element['value_hi'].toString(),
-          odia: element['value_od'].toString());
+        hindi:  Global.validString(element['value_hi'])?element['value_hi']:element['value_en'],
+        odia: Global.validString(element['value_od'])?element['value_od']:element['value_en'],
+        kannada: Global.validString(element['value_kn'])?element['value_kn']:element['value_en']);
       translationList.add(item);
     }
     return translationList;
@@ -67,8 +70,9 @@ class TranslationDataHelper {
       var item = new Translation(
           name: element['value_name'].toString(),
           english: element['value_en'].toString(),
-          hindi: element['value_hi'].toString(),
-          odia: element['value_od'].toString());
+        hindi:  Global.validString(element['value_hi'])?element['value_hi']:element['value_en'],
+        odia: Global.validString(element['value_od'])?element['value_od']:element['value_en'],
+        kannada: Global.validString(element['value_kn'])?element['value_kn']:element['value_en']);
       translationList.add(item);
     }
     return translationList;
@@ -84,6 +88,7 @@ class TranslationDataHelper {
           WHEN ? = 'en' THEN value_en
           WHEN ? = 'hi' THEN value_hi
           WHEN ? = 'od' THEN value_od
+          WHEN ? = 'kn' THEN value_kn
           ELSE value_en
       END AS translation
   FROM 
@@ -91,7 +96,7 @@ class TranslationDataHelper {
   WHERE 
       value_name = ?
   ''',
-      [languageId, languageId, languageId, valueName],
+      [languageId, languageId, languageId,languageId, valueName],
     );
     // await db.close();
     return result.isNotEmpty ? result.first['translation'] : valueName;
@@ -104,7 +109,7 @@ class TranslationDataHelper {
     String placeholders = List.filled(lowerCaseNames.length, '?').join(',');
 
     List<Map<String, dynamic>> result = await DatabaseHelper.database!.rawQuery(
-      'SELECT value_name, value_en, value_hi, value_od FROM translation_language WHERE LOWER(value_name) IN ($placeholders)',
+      'SELECT value_name, value_en, value_hi, value_od, value_kn FROM translation_language WHERE LOWER(value_name) IN ($placeholders)',
       lowerCaseNames,
     );
     print("endTime ${Validate().currentDateTime()}");
@@ -112,8 +117,9 @@ class TranslationDataHelper {
       return Translation(
         name: element['value_name'].toString(),
         english: element['value_en'].toString(),
-        hindi: element['value_hi'].toString(),
-        odia: element['value_od'].toString(),
+        hindi:  Global.validString(element['value_hi'])?element['value_hi']:element['value_en'],
+        odia: Global.validString(element['value_od'])?element['value_od']:element['value_en'],
+        kannada: Global.validString(element['value_kn'])?element['value_kn']:element['value_en'],
       );
     }).toList();
   }
@@ -149,8 +155,9 @@ class TranslationDataHelper {
       var item = new Translation(
           name: element['value_name'].toString(),
           english: element['value_en'].toString(),
-          hindi: element['value_hi'].toString(),
-          odia: element['value_od'].toString());
+          hindi:  Global.validString(element['value_hi'])?element['value_hi']:element['value_en'],
+          odia: Global.validString(element['value_od'])?element['value_od']:element['value_en'],
+          kannada: Global.validString(element['value_kn'])?element['value_kn']:element['value_en']);
       translationList.add(item);
     }
     return translationList;
@@ -166,8 +173,9 @@ class TranslationDataHelper {
       var item = new Translation(
           name: element['value_name'].toString(),
           english: element['value_en'].toString(),
-          hindi: element['value_hi'].toString(),
-          odia: element['value_od'].toString());
+        hindi:  Global.validString(element['value_hi'])?element['value_hi']:element['value_en'],
+        odia: Global.validString(element['value_od'])?element['value_od']:element['value_en'],
+        kannada: Global.validString(element['value_kn'])?element['value_kn']:element['value_en'],);
       translationList.add(item);
     }
     return translationList;

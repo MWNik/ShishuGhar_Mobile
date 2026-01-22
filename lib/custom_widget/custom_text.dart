@@ -13,6 +13,7 @@ class CustomText {
   static String AttenList = "Attendance List";
   static String amount = "Amount";
   static String Odiya = "ଓଡିଆ";
+  static String Kannad = "ಕನ್ನಡ";
   static String MobileNo = "Mobile No";
   static String DateOfExit = 'Date of Exit';
   static String ReasForExit = 'Reason for Exit';
@@ -496,6 +497,9 @@ class CustomText {
   static String clusterCoordinator = "Cluster Coordinator";
   static String alm = "Accounts and Logistics Manager";
   static String cbm = "Capacity and Building Manager";
+  static String partnerAdministrator = "Partner Administrator";
+  static String MISAdministrator = "MIS Manager";
+  static String safetyManager = "Safety Coordinator";
   static String uploading = "Uploading";
   static String noEnrolledChild = "No enrolled child available for this date";
   static String all = "All";

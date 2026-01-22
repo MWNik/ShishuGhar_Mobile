@@ -47,7 +47,7 @@ class _ChildrenListingScreenState extends State<ChildrenListingScreen> {
     relationChilddata =
         await optionHelper.getMstCommonOptions('Relation', lng!);
     var checkChil = await checkChildrenLimit(hhChilddata.length);
-    if (role == 'Creche Supervisor') {
+    if (role == CustomText.crecheSupervisor) {
       // if (!checkChil) {   for status child count > family under age 3 year in family tab
       var alredRecord = await HouseHoldTabResponceHelper()
           .getHouseHoldResponce(widget.hhGuid);

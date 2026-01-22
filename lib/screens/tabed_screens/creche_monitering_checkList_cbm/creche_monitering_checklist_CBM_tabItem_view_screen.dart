@@ -153,7 +153,7 @@ class _CmcCBMTabItemViewSCreenState extends State<CmcCBMTabItemViewSCreen> {
                         ),
                         // Row(children: [
                         SizedBox(width: 10),
-                        // _role == 'Creche Supervisor'
+                        // _role == CustomText.crecheSupervisor
                         //     ? widget.tabIndex == (widget.totalTab - 1)
                         //         ? SizedBox()
                         //         : Expanded(

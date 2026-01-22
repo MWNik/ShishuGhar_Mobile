@@ -33,6 +33,7 @@ import 'package:shishughar/screens/tabed_screens/child_reffrel/referral_complete
 import 'package:shishughar/screens/tabed_screens/child_reffrel/reffral_tab_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checkList_cbm/all_creche_monitering_checklist_CBM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_CC/all_creche_monitering_checklist_CC_listing_screen.dart';
+import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_SM/all_creche_monitering_checklist_SM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitering_checklist_alm/all_creche_monitering_checklist_ALM_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/creche_monitor/all_creche_monitor_listing_screen.dart';
 import 'package:shishughar/screens/tabed_screens/dashboard_report/dash_report_card_details_for_home.dart';
@@ -62,6 +63,7 @@ import '../api/creche_checkIn_api.dart';
 import '../api/creche_committie_meta_api.dart';
 import '../api/creche_monetering_checkList_cbm_api.dart';
 import '../api/creche_monitering_checklist_cc_api.dart';
+import '../api/creche_monitering_checklist_sm_api.dart';
 import '../api/creche_monitoring_api.dart';
 import '../api/form_logic_api.dart';
 import '../api/house_hold_fields_api.dart';
@@ -92,6 +94,8 @@ import '../database/helper/child_reffrel/child_refferal_fields_helper.dart';
 import '../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../database/helper/cmc_CC/creche_monitering_checklist_CC_fields_helper.dart';
 import '../database/helper/cmc_CC/creche_monitering_checklist_CC_response_helper.dart';
+import '../database/helper/cmc_SM/creche_monitering_checklist_SM_fields_helper.dart';
+import '../database/helper/cmc_SM/creche_monitering_checklist_SM_response_helper.dart';
 import '../database/helper/cmc_alm/creche_monitering_checkList_ALM_fields_helper.dart';
 import '../database/helper/cmc_alm/creche_monitering_checkList_ALM_response_helper.dart';
 import '../database/helper/cmc_cbm/creche_monitering_checklist_CBM_fields_helper.dart';
@@ -119,6 +123,7 @@ import '../database/helper/village_profile/village_profile_response_helper.dart'
 import '../model/apimodel/backdated_configiration_api_model.dart';
 import '../model/apimodel/cashbook_expenses_fields_meta_model.dart';
 import '../model/apimodel/checkin_fields_meta_model.dart';
+import '../model/apimodel/checklist_sm_Meta_fields_model.dart';
 import '../model/apimodel/child_Immunization_meta_fields_model.dart';
 import '../model/apimodel/child_attendance_field_model.dart';
 import '../model/apimodel/child_event_meta_fields_model.dart';
@@ -168,7 +173,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   bool isConnected = false;
   var village_txt = "";
   String? role;
-  String? lng;
+  String lng='en';
   var change_language_text = "";
   int syncCount = 0;
   int countVerifyForPending = 0;
@@ -210,10 +215,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           ),
           centerTitle: true,
           title: Text(
-            lng != null
-                ? Global.returnTrLable(
-                    locationControlls, CustomText.ShishuGharDetails, lng!)
-                : '',
+            Global.returnTrLable(
+                locationControlls, CustomText.ShishuGharDetails, lng),
             style: Styles.white145,
           ),
           actions: [
@@ -372,7 +375,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                     maxLines: 2,
                                   ),
                                   Text(
-                                      "${Global.returnTrLable(locationControlls, role, lng ?? "en")}",
+                                      "${Global.returnTrLable(locationControlls, role, lng)}",
                                       style: Styles.roleLabe),
                                 ],
                               )
@@ -387,10 +390,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                         ListTile(
                           leading: const Icon(Icons.person),
                           title: Text(
-                            lng != null
-                                ? Global.returnTrLable(locationControlls,
-                                    CustomText.MyProfile, lng!)
-                                : '',
+                            Global.returnTrLable(locationControlls,
+                                CustomText.MyProfile, lng),
                             style: Styles.black125,
                           ),
                           onTap: () {
@@ -416,10 +417,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                         ListTile(
                           leading: const Icon(Icons.holiday_village_outlined),
                           title: Text(
-                            lng != null
-                                ? Global.returnTrLable(locationControlls,
-                                    CustomText.villageProfile, lng!)
-                                : '',
+                            Global.returnTrLable(locationControlls,
+                                CustomText.villageProfile, lng),
                             style: Styles.black125,
                           ),
                           onTap: () {
@@ -444,10 +443,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                         ListTile(
                           leading: const Icon(Icons.info_rounded),
                           title: Text(
-                            lng != null
-                                ? Global.returnTrLable(locationControlls,
-                                    CustomText.Grievance, lng!)
-                                : '',
+                            Global.returnTrLable(locationControlls,
+                                CustomText.Grievance, lng),
                             style: Styles.black125,
                           ),
                           onTap: () {
@@ -472,10 +469,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                         ListTile(
                           leading: const Icon(Icons.lock),
                           title: Text(
-                            lng != null
-                                ? Global.returnTrLable(locationControlls,
-                                    CustomText.ChangePassword, lng!)
-                                : '',
+                            Global.returnTrLable(locationControlls,
+                                CustomText.ChangePassword, lng),
                             style: Styles.black125,
                           ),
                           onTap: () {
@@ -500,19 +495,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                         ExpansionTile(
                           leading: const Icon(Icons.language),
                           title: Text(
-                            lng != null
-                                ? Global.returnTrLable(locationControlls,
-                                    CustomText.languages, lng!)
-                                : '',
+                            Global.returnTrLable(locationControlls,
+                                CustomText.languages, lng),
                             style: Styles.black125,
                           ),
                           children: <Widget>[
                             ListTile(
                               title: Text(
-                                lng != null
-                                    ? Global.returnTrLable(locationControlls,
-                                        CustomText.English, lng!)
-                                    : '',
+                                Global.returnTrLable(locationControlls,
+                                    CustomText.English, lng),
                                 style: Styles.Grey10,
                               ),
                               onTap: () async {
@@ -530,10 +521,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             ),
                             ListTile(
                               title: Text(
-                                lng != null
-                                    ? Global.returnTrLable(locationControlls,
-                                        CustomText.Hindi, lng!)
-                                    : '',
+                                Global.returnTrLable(locationControlls,
+                                    CustomText.Hindi, lng),
                                 style: Styles.Grey10,
                               ),
                               onTap: () async {
@@ -551,16 +540,33 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             ),
                             ListTile(
                               title: Text(
-                                lng != null
-                                    ? Global.returnTrLable(locationControlls,
-                                        CustomText.Odiya, lng!)
-                                    : '',
+                                Global.returnTrLable(locationControlls,
+                                    CustomText.Odiya, lng),
                                 style: Styles.Grey10,
                               ),
                               onTap: () async {
                                 HomeReplicaScreen.scaffoldKey!.currentState
                                     ?.closeDrawer();
                                 Validate().saveString(Validate.sLanguage, 'od');
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DashboardScreen(
+                                            index: 0,
+                                          )),
+                                );
+                              },
+                            ),
+                            ListTile(
+                              title: Text(
+                                Global.returnTrLable(locationControlls,
+                                    CustomText.Kannad, lng),
+                                style: Styles.Grey10,
+                              ),
+                              onTap: () async {
+                                HomeReplicaScreen.scaffoldKey!.currentState
+                                    ?.closeDrawer();
+                                Validate().saveString(Validate.sLanguage, 'kn');
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
@@ -587,20 +593,16 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             scale: 1.5,
                           ),
                           title: Text(
-                            lng != null
-                                ? Global.returnTrLable(locationControlls,
-                                    CustomText.userMannual, lng!)
-                                : '',
+                            Global.returnTrLable(locationControlls,
+                                CustomText.userMannual, lng),
                             style: Styles.black125,
                           ),
                           onExpansionChanged: (value) {},
                           children: <Widget>[
                             ListTile(
                               title: Text(
-                                lng != null
-                                    ? Global.returnTrLable(locationControlls,
-                                        CustomText.English, lng!)
-                                    : '',
+                                Global.returnTrLable(locationControlls,
+                                    CustomText.English, lng),
                                 style: Styles.Grey10,
                               ),
                               onTap: () async {
@@ -618,10 +620,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             ),
                             ListTile(
                               title: Text(
-                                lng != null
-                                    ? Global.returnTrLable(locationControlls,
-                                        CustomText.Hindi, lng!)
-                                    : '',
+                                Global.returnTrLable(locationControlls,
+                                    CustomText.Hindi, lng),
                                 style: Styles.Grey10,
                               ),
                               onTap: () async {
@@ -639,10 +639,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             ),
                             ListTile(
                               title: Text(
-                                lng != null
-                                    ? Global.returnTrLable(locationControlls,
-                                        CustomText.Odiya, lng!)
-                                    : '',
+                                Global.returnTrLable(locationControlls,
+                                    CustomText.Odiya, lng),
                                 style: Styles.Grey10,
                               ),
                               onTap: () async {
@@ -655,6 +653,26 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                   await PDFDownloaderState()
                                       .downloadAndOpenPDF(url, context);
                                   Navigator.pop(context);
+                                }
+                              },
+                            ),
+                            ListTile(
+                              title: Text(
+                                Global.returnTrLable(locationControlls,
+                                    CustomText.Kannad, lng),
+                                style: Styles.Grey10,
+                              ),
+                              onTap: () async {
+                                List<UserManualResponsesModel> responce =
+                                    await UserManualFieldsHelper()
+                                        .getResponsebylang('Kannada');
+                                if (responce.isNotEmpty) {
+                                  String url = responce.first.url ?? '';
+                                  if(Global.validString(url)){
+                                  showLoaderDialog(context);
+                                  await PDFDownloaderState()
+                                      .downloadAndOpenPDF(url, context);
+                                  Navigator.pop(context);}
                                 }
                               },
                             ),
@@ -675,10 +693,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             scale: 1.5,
                           ),
                           title: Text(
-                            lng != null
-                                ? Global.returnTrLable(
-                                    locationControlls, CustomText.appInfo, lng!)
-                                : '',
+                            Global.returnTrLable(
+                                locationControlls, CustomText.appInfo, lng),
                             style: Styles.black125,
                           ),
                           onTap: () {
@@ -702,10 +718,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             scale: 5.5,
                           ),
                           title: Text(
-                            lng != null
-                                ? Global.returnTrLable(locationControlls,
-                                    CustomText.ticketSupport, lng!)
-                                : '',
+                            Global.returnTrLable(locationControlls,
+                                CustomText.ticketSupport, lng),
                             style: Styles.black125,
                           ),
                           onTap: () async {
@@ -720,9 +734,9 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                   Global.returnTrLable(
                                       locationControlls,
                                       CustomText.nointernetconnectionavailable,
-                                      lng!),
+                                      lng),
                                   Global.returnTrLable(
-                                      locationControlls, CustomText.ok, lng!),
+                                      locationControlls, CustomText.ok, lng),
                                   false,
                                   context);
                             }
@@ -744,10 +758,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                             scale: 1.5,
                           ),
                           title: Text(
-                            lng != null
-                                ? Global.returnTrLable(locationControlls,
-                                    CustomText.dbBackup, lng!)
-                                : '',
+                            Global.returnTrLable(locationControlls,
+                                CustomText.dbBackup, lng),
                             style: Styles.black125,
                           ),
                           onTap: () async {
@@ -772,19 +784,17 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                               scale: 3,
                             ),
                             title: Text(
-                              lng != null
-                                  ? Global.returnTrLable(locationControlls,
-                                      CustomText.Logout, lng!)
-                                  : '',
+                              Global.returnTrLable(locationControlls,
+                                  CustomText.Logout, lng),
                               style: Styles.red125,
                             ),
                             onTap: () async {
                               if (syncCount > 0) {
                                 Validate().singleButtonPopup(
                                     Global.returnTrLable(locationControlls,
-                                        CustomText.logoutPendingDataMsg, lng!),
+                                        CustomText.logoutPendingDataMsg, lng),
                                     Global.returnTrLable(
-                                        locationControlls, CustomText.ok, lng!),
+                                        locationControlls, CustomText.ok, lng),
                                     false,
                                     context);
                               } else {
@@ -815,11 +825,11 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                           message: Global.returnTrLable(
                                               locationControlls,
                                               CustomText.darftDataForLogoyt,
-                                              lng!),
+                                              lng),
                                           button: Global.returnTrLable(
                                               locationControlls,
                                               CustomText.ok,
-                                              lng!));
+                                              lng));
                                     },
                                   );
                                   if (shouldProceed == true) {
@@ -830,9 +840,9 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                                   }
                                   // Validate().singleButtonPopup(
                                   //     Global.returnTrLable(locationControlls,
-                                  //         CustomText.darftDataForLogoyt, lng!),
+                                  //         CustomText.darftDataForLogoyt, lng),
                                   //     Global.returnTrLable(locationControlls,
-                                  //         CustomText.ok, lng!),
+                                  //         CustomText.ok, lng),
                                   //     false,
                                   //     context);
                                 }
@@ -861,9 +871,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: lng != null
-                            ? '${Global.returnTrLable(locationControlls, CustomText.Version, lng!)}: '
-                            : '',
+                        text: '${Global.returnTrLable(locationControlls, CustomText.Version, lng)}: ',
                         style: Styles.black124,
                         children: <TextSpan>[
                           TextSpan(
@@ -960,7 +968,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                     return homeScreenCardItem(i);
                     // return InkWell(
                     //   onTap: () async {
-                    //     onclick(i, image[i], lng!);
+                    //     onclick(i, image[i], lng);
                     //   },
                     //   child: Container(
                     //     decoration: BoxDecoration(
@@ -1090,7 +1098,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                     //                     EdgeInsets.symmetric(horizontal: 7),
                     //                 child: Text(
                     //                   Global.returnTrLable(
-                    //                       locationControlls, text[i], lng!),
+                    //                       locationControlls, text[i], lng),
                     //                   style: Styles.listlablefont,
                     //                   textAlign: TextAlign.center,
                     //                 ),
@@ -1131,7 +1139,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                 const CircularProgressIndicator(),
                 SizedBox(height: 10.h),
                 Text(Global.returnTrLable(
-                    locationControlls, CustomText.loading, lng!)),
+                    locationControlls, CustomText.loading, lng)),
               ],
             ),
           ),
@@ -1176,7 +1184,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(Global.returnTrLable(
-                  locationControlls, CustomText.token_expired, lng!))),
+                  locationControlls, CustomText.token_expired, lng))),
         );
         Navigator.pushReplacement(
             context,
@@ -1187,15 +1195,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         Navigator.pop(context);
         Validate().singleButtonPopup(
             Global.errorBodyToString(response.body, 'message'),
-            Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng),
             false,
             context);
       }
     } else {
       Validate().singleButtonPopup(
           Global.returnTrLable(locationControlls,
-              CustomText.nointernetconnectionavailable, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              CustomText.nointernetconnectionavailable, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1239,7 +1247,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -1250,14 +1258,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(cresheData.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
   }
 
   Future<void> callEnrooledChildrenDataApi(
-      String userName, String password, String token, bool only) async {
+      String userName, String password, String token, bool only)
+  async {
     if (only) showLoaderDialog(context);
     var child_data = await ChildEnrolledDataMetaApi()
         .callChildHHMeta(userName, password, token);
@@ -1282,7 +1291,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -1293,14 +1302,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(child_data.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
   }
 
   Future<void> callEnrolledExitMetaApi(
-      String userName, String password, String token, bool only) async {
+      String userName, String password, String token, bool only)
+  async {
     if (only) showLoaderDialog(context);
     var child_data = await ChildEnrolledExitApi()
         .callChildEnrolledExitMetaApi(userName, password, token);
@@ -1322,7 +1332,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -1333,14 +1343,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(child_data.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
   }
 
   Future<void> callApiLogicData(
-      String userName, String password, String token, bool only) async {
+      String userName, String password, String token, bool only)
+  async {
     var logisResponce =
         await FormLogicApiService().fetchLogicData(userName, password, token);
 
@@ -1356,7 +1367,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -1367,7 +1378,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(logisResponce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -1541,7 +1552,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           content: Text(Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!))),
+              locationControlls, CustomText.token_expired, lng))),
     );
     Navigator.pushReplacement(
         context,
@@ -1553,7 +1564,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   void handleErrorResponse(var response) {
     Validate().singleButtonPopup(
         Global.errorBodyToString(response.body, 'message'),
-        Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+        Global.returnTrLable(locationControlls, CustomText.ok, lng),
         false,
         context);
   }
@@ -1596,10 +1607,10 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<void> locationData() async {
-    lng = await Validate().readString(Validate.sLanguage);
+    lng = await Validate().readString(Validate.sLanguage)??'en';
     role = await Validate().readString(Validate.role);
 
-    if (role == 'Cluster Coordinator') {
+    if (role == CustomText.clusterCoordinator) {
       image = [
         // 'assets/verifydata.png',
         'assets/shishughar.png',
@@ -1762,9 +1773,11 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   Future<void> pendingDataForVerify() async {
     if (role == CustomText.crecheSupervisor) {
       syncCount = await callCountForUpload();
-    } else if (role == CustomText.clusterCoordinator) {
+    }
+    else if (role == CustomText.clusterCoordinator) {
       syncCount = await callCountForUploadCC();
-    } else if (role == CustomText.alm) {
+    }
+    else if (role == CustomText.alm) {
       var crecheCheckIn =
           await CheckInResponseHelper().callCrecheCheckInResponses();
       var grievanceData = await ChildGrievancesTabResponceHelper()
@@ -1775,7 +1788,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           crecheCheckIn.length +
           grievanceData.length +
           ImageFileData.length;
-    } else if (role == CustomText.cbm) {
+    }
+    else if (role == CustomText.cbm) {
       var crecheCheckIn =
           await CheckInResponseHelper().callCrecheCheckInResponses();
       var grievanceData = await ChildGrievancesTabResponceHelper()
@@ -1787,7 +1801,35 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           crecheCheckIn.length +
           grievanceData.length +
           ImageFileData.length;
-    } else {
+    }
+    else if (role == CustomText.partnerAdministrator) {
+      var crecheCheckIn =
+          await CheckInResponseHelper().callCrecheCheckInResponses();
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+
+      syncCount =
+          crecheCheckIn.length +
+          ImageFileData.length;
+    }
+    else if (role == CustomText.MISAdministrator) {
+      var crecheCheckIn =
+      await CheckInResponseHelper().callCrecheCheckInResponses();
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+
+      syncCount =
+          crecheCheckIn.length +
+              ImageFileData.length;
+    }
+    else if (role == CustomText.safetyManager) {
+      var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+      var visitNots = await CmcSMTabResponseHelper().getSMForUpload();
+
+      syncCount =
+          crecheCheckIn.length +
+              ImageFileData.length+visitNots.length;
+    }
+    else {
       var grievanceData = await ChildGrievancesTabResponceHelper()
           .getChildGrievanceForUploadDarft();
       syncCount = grievanceData.length;
@@ -1924,19 +1966,22 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
             false,
             context);
       } else {
-        if (role == CustomText.clusterCoordinator.trim()) {
+        if (role == CustomText.clusterCoordinator) {
           refStatus = await Navigator.of(context).push(MaterialPageRoute(
               builder: (BuildContext context) => AllcmcCCListingScreen()));
-        } else if (role == CustomText.crecheSupervisor.trim()) {
+        } else if (role == CustomText.crecheSupervisor) {
           refStatus = await Navigator.of(context).push(MaterialPageRoute(
               builder: (BuildContext context) =>
                   AllCrecheMonitorListingScreen()));
-        } else if (role == CustomText.alm.trim()) {
+        } else if (role == CustomText.alm) {
           refStatus = await Navigator.of(context).push(MaterialPageRoute(
               builder: (BuildContext context) => AllcmcALMListingScreen()));
-        } else if (role == CustomText.cbm.trim()) {
+        } else if (role == CustomText.cbm) {
           refStatus = await Navigator.of(context).push(MaterialPageRoute(
               builder: (BuildContext context) => AllcmcCBMListingScreen()));
+        } else if (role == CustomText.safetyManager) {
+          refStatus = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => AllcmcSMListingScreen()));
         }
       }
     }
@@ -1995,7 +2040,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2006,7 +2051,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2050,7 +2095,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2061,7 +2106,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2105,7 +2150,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2116,7 +2161,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2153,7 +2198,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2164,7 +2209,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2207,7 +2252,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2218,7 +2263,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2256,7 +2301,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2267,7 +2312,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2305,7 +2350,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2316,7 +2361,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2355,7 +2400,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2366,7 +2411,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2425,7 +2470,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2436,7 +2481,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2476,7 +2521,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2487,7 +2532,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2527,15 +2572,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2564,30 +2609,35 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
 
       // Validate().saveString(Validate.cashbookRecieptMetaUpdateDate,
       //     cashbookReceiptMetaFields.tab_cashbook_receipt!.modified!);
-      if (role == 'Cluster Coordinator') {
+      if (role == CustomText.clusterCoordinator) {
         await callCMCCCMetaApi(userName, password, token, false);
-      } else if (role == 'Creche Supervisor') {
+      } else if (role == CustomText.crecheSupervisor) {
         await crecheMonitoringApiMeta(userName, password, token, false);
-      } else if (role == 'Accounts and Logistics Manager') {
+      } else if (role == CustomText.alm) {
         await callCMCALMMetaApi(userName, password, token, false);
-      } else {
+      } else if (role == CustomText.cbm){
         await callCMCCBMMetaApi(userName, password, token, false);
+      } else if (role == CustomText.safetyManager){
+        await callSMCheckListMMetaApi(userName, password, token, false);
+      }else {
+        Navigator.pop(context);
+        countDataExcution();
       }
-      countDataExcution();
+
       // Navigator.pop(context);
     } else if (responce.statusCode == 401) {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2620,15 +2670,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2656,19 +2706,53 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       // Validate().saveString(Validate.crecheMonitoringMeta,
       //     cmcCBMMEtaFields.tabCreche_Monitoring_CheckList_CBM!.modified!);
       Navigator.pop(context);
-    } else if (responce.statusCode == 401) {
+    }
+    else if (responce.statusCode == 401) {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
-    } else {
+    }
+    else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
+          false,
+          context);
+    }
+  }
+
+  callSMCheckListMMetaApi(
+      String userName, String password, String token, bool only) async {
+    if (only) showLoaderDialog(context);
+    var responce = await CrecheMonetringCheckListSMApi()
+        .smCheckListMetaApi(userName, password, token);
+    if (responce.statusCode == 200) {
+      CheckListSMMetaFieldsModel cmcCBMMEtaFields =
+      CheckListSMMetaFieldsModel.fromJson(jsonDecode(responce.body));
+
+      await callInsertSMCheckListData(cmcCBMMEtaFields);
+
+      Navigator.pop(context);
+    }
+    else if (responce.statusCode == 401) {
+      Navigator.pop(context);
+      Validate().singleButtonPopup(
+          Global.returnTrLable(
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
+          false,
+          context);
+    }
+    else {
+      Navigator.pop(context);
+      Validate().singleButtonPopup(
+          Global.errorBodyToString(responce.body, 'message'),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2679,6 +2763,14 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
     if (items.tabCreche_Monitoring_CheckList_CBM != null) {
       await CrecheMoniteringCheckListCMBFieldsHelper()
           .insertcmcCBMMeta(items.tabCreche_Monitoring_CheckList_CBM!.fields!);
+    }
+  }
+
+  Future<void> callInsertSMCheckListData(CheckListSMMetaFieldsModel items) async {
+    await DatabaseHelper.database!.delete('tabCreche_Monitering_CheckList_SM');
+    if (items.tabCreche_Monitoring_CheckList_SM != null) {
+      await CrecheMoniteringCheckListSMFieldsHelper()
+          .insertcmcSMMeta(items.tabCreche_Monitoring_CheckList_SM!.fields!);
     }
   }
 
@@ -2696,19 +2788,20 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       // Validate().saveString(Validate.crecheMonitoringMeta,
       //     cmcCCMEtaFields.tabCreche_Monitoring_CheckList_CC!.modified!);
       Navigator.pop(context);
-    } else if (responce.statusCode == 401) {
+    }
+    else if (responce.statusCode == 401) {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2742,8 +2835,8 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         print("Data needs to be downloaded first ====>");
         Validate().singleButtonPopup(
             Global.returnTrLable(
-                locationControlls, CustomText.downloadFiyrst, lng!),
-            Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                locationControlls, CustomText.downloadFiyrst, lng),
+            Global.returnTrLable(locationControlls, CustomText.ok, lng),
             false,
             context);
       }
@@ -2754,7 +2847,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(Global.returnTrLable(
-                locationControlls, CustomText.token_expired, lng!))),
+                locationControlls, CustomText.token_expired, lng))),
       );
       Navigator.pushReplacement(
           context,
@@ -2765,7 +2858,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(response.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2804,15 +2897,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2858,15 +2951,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2903,15 +2996,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -2949,15 +3042,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.returnTrLable(
-              locationControlls, CustomText.token_expired, lng!),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+              locationControlls, CustomText.token_expired, lng),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     } else {
       Navigator.pop(context);
       Validate().singleButtonPopup(
           Global.errorBodyToString(responce.body, 'message'),
-          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng),
           false,
           context);
     }
@@ -3078,7 +3171,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   }
 
   Future<int> callDarftData() async {
-    if (role == 'Creche Supervisor') {
+    if (role == CustomText.crecheSupervisor) {
       var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
       var childEnrollExitData = await EnrolledExitChilrenResponceHelper()
           .callChildrenForUploadDarftEdited();
@@ -3094,15 +3187,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           villageProfile.length +
           creCheMonitoring.length +
           chilAttendence.length);
-    } else if (role == 'Cluster Coordinator') {
+    } else if (role == CustomText.clusterCoordinator) {
       var creCheMonitoring =
           await CmcCCTabResponseHelper().getCcForUploadEditDarft();
       return creCheMonitoring.length;
-    } else if (role == 'Accounts and Logistics Manager') {
+    } else if (role == CustomText.alm) {
       var visitNots =
           await CmcALMTabResponseHelper().getAlmForUploadDarftEdited();
       return visitNots.length;
-    } else if (role == 'Capacity and Building Manager') {
+    } else if (role == CustomText.cbm) {
       var visitNots = await CmcCBMTabResponseHelper().getCBMForUploadDarft();
       return visitNots.length;
     }
@@ -3209,7 +3302,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
   Widget homeScreenCardItem(int i) {
     return InkWell(
       onTap: () async {
-        onclick(i, image[i], lng!);
+        onclick(i, image[i], lng);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -3299,7 +3392,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
                     child: Text(
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      Global.returnTrLable(locationControlls, text[i], lng!),
+                      Global.returnTrLable(locationControlls, text[i], lng),
                       style: Styles.listlablefont,
                       textAlign: TextAlign.center,
                     ),

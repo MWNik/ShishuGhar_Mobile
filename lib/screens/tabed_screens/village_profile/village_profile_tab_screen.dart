@@ -104,7 +104,7 @@ class _VillageProfileTabScreenState extends State<VillageProfileTabScreen>
                     translatsLabel, CustomText.villageProfile, lng),
                 style: Styles.white145),
             // actions: [
-            //   (role == 'Cluster Coordinator')
+            //   (role == CustomText.clusterCoordinator)
             //       ? GestureDetector(
             //           onTap: () async {
             //             await updateVerificationStatus(context);

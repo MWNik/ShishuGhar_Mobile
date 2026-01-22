@@ -66,6 +66,7 @@ import '../database/helper/child_health/child_health_response_helper.dart';
 import '../database/helper/child_immunization/child_immunization_response_helper.dart';
 import '../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../database/helper/cmc_CC/creche_monitering_checklist_CC_response_helper.dart';
+import '../database/helper/cmc_SM/creche_monitering_checklist_SM_response_helper.dart';
 import '../database/helper/cmc_alm/creche_monitering_checkList_ALM_response_helper.dart';
 import '../database/helper/cmc_cbm/creche_monitering_checklist_CBM_response_helper.dart';
 import '../database/helper/creche_comite_meeting/creche_committie_response_helper.dart';
@@ -201,7 +202,7 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                       return InkWell(
                         onTap: () async {
                           if (i == 0) {
-                            if (role == 'Creche Supervisor') {
+                            if (role == CustomText.crecheSupervisor) {
                               if (pendindTaskCount == 0) {
                                 var hhItems = await HouseHoldTabResponceHelper()
                                     .getHouseHoldItems();
@@ -263,18 +264,22 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                         locationControlls, CustomText.ok, lngtr!),
                                     false,
                                     context);
-                            } else {
+                            }
+                            else {
                               if (pendindTaskCount == 0) {
                                 List<dynamic> visitNotes = [];
-                                if (role == CustomText.clusterCoordinator)
+                                if (role == CustomText.clusterCoordinator) {
                                   visitNotes = await CmcCCTabResponseHelper()
                                       .getCcForUploadEditDarft();
-                                else if (role == CustomText.alm)
+                                }else if (role == CustomText.alm) {
                                   visitNotes = await CmcALMTabResponseHelper()
                                       .getAlmForUploadDarftEdited();
-                                else if (role == CustomText.cbm)
+                                } else if (role == CustomText.cbm){
                                   visitNotes = await CmcCBMTabResponseHelper()
                                       .getCBMForUploadDarft();
+                                } else if (role == CustomText.safetyManager){
+                                  visitNotes = await CmcSMTabResponseHelper().getSMForUpload();
+                                }
                                 var crecheCheckIn = await CheckInResponseHelper()
                                     .callCrecheCheckInResponses();
 
@@ -338,7 +343,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                     false,
                                     context);
                             }
-                          } else if (i == 1) {
+                          }
+                          else if (i == 1) {
                             String refStatus = '';
                             if (role == CustomText.crecheSupervisor) {
                               if (pendindTaskCount > 0) {
@@ -358,7 +364,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                         locationControlls, CustomText.ok, lngtr!),
                                     false,
                                     context);
-                            } else if (role == CustomText.clusterCoordinator) {
+                            }
+                            else if (role == CustomText.clusterCoordinator) {
                               if (pendindTaskCount > 0) {
                                 refStatus = await Navigator.of(context).push(
                                       MaterialPageRoute(
@@ -376,7 +383,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                         locationControlls, CustomText.ok, lngtr!),
                                     false,
                                     context);
-                            } else if (role == 'Accounts and Logistics Manager') {
+                            }
+                            else if (role == CustomText.alm) {
                               var visitNots = await CmcALMTabResponseHelper()
                                   .getAlmForUpload();
                               if (pendindTaskCount > 0) {
@@ -396,7 +404,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                         locationControlls, CustomText.ok, lngtr!),
                                     false,
                                     context);
-                            } else if (role == 'Capacity and Building Manager') {
+                            }
+                            else if (role == CustomText.cbm) {
                               var visitNots = await CmcCBMTabResponseHelper()
                                   .getCBMForUpload();
                               if (pendindTaskCount > 0) {
@@ -416,7 +425,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                         locationControlls, CustomText.ok, lngtr!),
                                     false,
                                     context);
-                            } else {
+                            }
+                            else {
                               if (pendindTaskCount > 0) {
                                 refStatus = await Navigator.of(context).push(
                                       MaterialPageRoute(
@@ -438,7 +448,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                             if (refStatus == 'itemRefresh') {
                               await initializeData();
                             }
-                          } else if (i == 2) {
+                          }
+                          else if (i == 2) {
                             var network =
                                 await Validate().checkNetworkConnection();
                             if (network) {
@@ -934,11 +945,13 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
           .displeDateFormateMobileDateTimeFormate(doctypeDownloadDate);
     }
 
-    if (role == 'Creche Supervisor') {
+    if (role == CustomText.crecheSupervisor) {
       pendindTaskCount = await callCountForUpload();
-    } else if (role == 'Cluster Coordinator') {
+    }
+    else if (role == CustomText.clusterCoordinator) {
       pendindTaskCount = await callCountForUploadCC();
-    } else if (role == 'Accounts and Logistics Manager') {
+    }
+    else if (role == CustomText.alm) {
       var crecheCheckIn =
           await CheckInResponseHelper().callCrecheCheckInResponses();
 
@@ -951,7 +964,8 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
           crecheCheckIn.length +
           grievanceData.length +
           ImageFileData.length;
-    } else if (role == 'Capacity and Building Manager') {
+    }
+    else if (role == CustomText.cbm) {
       var crecheCheckIn =
           await CheckInResponseHelper().callCrecheCheckInResponses();
 
@@ -964,9 +978,36 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
           crecheCheckIn.length +
           grievanceData.length +
           ImageFileData.length;
-    } else {
-      var grievanceData = await ChildGrievancesTabResponceHelper()
-          .getChildGrievanceForUploadDarft();
+    }
+    else if (role == CustomText.partnerAdministrator) {
+      var crecheCheckIn =
+          await CheckInResponseHelper().callCrecheCheckInResponses();
+
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+      pendindTaskCount =
+          crecheCheckIn.length +
+          ImageFileData.length;
+    }
+    else if (role == CustomText.MISAdministrator) {
+      var crecheCheckIn =
+          await CheckInResponseHelper().callCrecheCheckInResponses();
+
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+      pendindTaskCount =
+          crecheCheckIn.length +
+          ImageFileData.length;
+    }
+    else if (role == CustomText.safetyManager) {
+      var crecheCheckIn =
+          await CheckInResponseHelper().callCrecheCheckInResponses();
+      var visitNots = await CmcSMTabResponseHelper().getSMForUpload();
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+      pendindTaskCount =
+          crecheCheckIn.length +
+          ImageFileData.length+visitNots.length;
+    }
+    else {
+      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
       pendindTaskCount = grievanceData.length;
     }
 

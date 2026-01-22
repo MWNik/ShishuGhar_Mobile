@@ -71,6 +71,9 @@ class _CheckInsScreenState extends State<CheckIns> {
                   : (role == CustomText.crecheSupervisor ||
                           role == CustomText.clusterCoordinator ||
                           role == CustomText.alm ||
+                          role == CustomText.partnerAdministrator ||
+                          role == CustomText.MISAdministrator ||
+                          role == CustomText.safetyManager ||
                           role == CustomText.cbm)
                       ? InkWell(
                           onTap: () async {

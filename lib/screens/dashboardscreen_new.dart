@@ -143,7 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future setOnClick(int index) async {
     String refreshStatus = '';
     // if (_currentIndex == 1) {
-    //   if (role == 'Creche Supervisor') {
+    //   if (role == CustomText.crecheSupervisor) {
     //     Navigator.pushReplacement(
     //         context,
     //         MaterialPageRoute(
@@ -256,7 +256,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       label: Global.returnTrLable(dashboardControlls, CustomText.More, lng),
     ));
-    // if (role == 'Creche Supervisor') {
+    // if (role == CustomText.crecheSupervisor) {
     //   bottomItem.add(BottomNavigationBarItem(
     //     icon: Padding(
     //       padding: EdgeInsets.only(bottom: 5.h),

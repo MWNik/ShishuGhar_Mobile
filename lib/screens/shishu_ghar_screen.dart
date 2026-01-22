@@ -478,7 +478,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                             //     Global.getItemValues(
                             //         filteredCrecheData[index]['responces']!,
                             //         'village_id'));
-                            if (role == 'Creche Supervisor') {
+                            if (role == CustomText.crecheSupervisor) {
                               refStatus = await Navigator.of(context).push(
                                   MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -493,7 +493,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                                                   index]
                                                   ['responces']!,
                                                   'creche_name'))));
-                            } else if (role == 'Cluster Coordinator') {
+                            } else if (role == CustomText.clusterCoordinator) {
                               refStatus = await Navigator.of(context).push(
                                   MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -508,7 +508,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                                                   index]['responces'],
                                                   'creche_name'))));
                             } else if (role ==
-                                'Accounts and Logistics Manager') {
+                                CustomText.alm) {
                               refStatus = await Navigator.of(context).push(
                                   MaterialPageRoute(
                                       builder: (BuildContext context) =>
@@ -524,7 +524,7 @@ class _ShiShuGharScreenState extends State<ShiShuGharScreen> {
                                                   ['responces'],
                                                   'creche_name'))));
                             } else if (role ==
-                                'Capacity and Building Manager') {
+                                CustomText.cbm) {
                               refStatus = await Navigator.of(context).push(
                                   MaterialPageRoute(
                                       builder: (BuildContext context) =>

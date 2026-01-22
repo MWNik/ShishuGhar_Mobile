@@ -132,7 +132,7 @@
 //                       itemBuilder: (BuildContext context, int index) {
 //                         return GestureDetector(
 //                           onTap: () async {
-//                             if (userRole == 'Creche Supervisor') {
+//                             if (userRole == CustomText.crecheSupervisor) {
 //                                  if(selectAllOpt==0){
 //                                    if (index > 0 && index < 11)
 //                                      await uploadDataSequence1(context, index);
@@ -249,7 +249,7 @@
 //         locationControlls, CustomText.recordAvailable, lng!)}';
 //     syncInfoCount[Global.returnTrLable(
 //         locationControlls, CustomText.HHListing, lng!)] = hhItems.length;
-//     if (userRole == 'Creche Supervisor') {
+//     if (userRole == CustomText.crecheSupervisor) {
 //       syncCount=await callCountForUpload();
 //       hhItems = hhItems
 //           .where((element) =>
@@ -1416,7 +1416,7 @@
 //       CustomText.CrecheProfileView,
 //       CustomText.fllowUp
 //     ];
-//     if (userRole == 'Creche Supervisor') {
+//     if (userRole == CustomText.crecheSupervisor) {
 //       methods = [
 //         uploadData,
 //         uploadChildProfile,
@@ -1438,18 +1438,18 @@
 //         uploadVillageProfile,
 //       ];
 //     }
-//     else if (userRole == 'Cluster Coordinator') {
+//     else if (userRole == CustomText.clusterCoordinator) {
 //       methods = [
 //         uploadDataCoordinator,
 //         uploadcmcCCData
 //       ];
 //     }
-//     else if (userRole == 'Accounts and Logistics Manager') {
+//     else if (userRole == CustomText.alm) {
 //       methods = [
 //         uploadcmcALMData,
 //       ];
 //     }
-//     else if (userRole == 'Capacity and Building Manager') {
+//     else if (userRole == CustomText.cbm) {
 //       methods = [
 //         uploadcmcCBMData,
 //       ];

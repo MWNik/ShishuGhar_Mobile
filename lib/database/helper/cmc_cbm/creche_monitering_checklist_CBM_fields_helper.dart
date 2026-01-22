@@ -3,6 +3,7 @@ import '../../../../model/apimodel/house_hold_field_item_model_api.dart';
 
 class CrecheMoniteringCheckListCMBFieldsHelper {
   DatabaseHelper databaseHelper = DatabaseHelper();
+
   Future<void> insertcmcCBMMeta(
       List<HouseHoldFielItemdModel> houseFieldItem) async {
     if (houseFieldItem.isNotEmpty) {

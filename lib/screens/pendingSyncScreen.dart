@@ -32,6 +32,7 @@ import '../api/creche_checkIn_api.dart';
 import '../api/creche_commettie_upload_api.dart';
 import '../api/creche_monetering_checkList_cbm_api.dart';
 import '../api/creche_monitering_checklist_cc_api.dart';
+import '../api/creche_monitering_checklist_sm_api.dart';
 import '../api/creche_monitoring_api.dart';
 import '../api/creche_profile_data_upload_api.dart';
 import '../api/hh_data_upload_api.dart';
@@ -54,6 +55,7 @@ import '../database/helper/child_health/child_health_response_helper.dart';
 import '../database/helper/child_immunization/child_immunization_response_helper.dart';
 import '../database/helper/child_reffrel/child_refferal_response_helper.dart';
 import '../database/helper/cmc_CC/creche_monitering_checklist_CC_response_helper.dart';
+import '../database/helper/cmc_SM/creche_monitering_checklist_SM_response_helper.dart';
 import '../database/helper/cmc_alm/creche_monitering_checkList_ALM_response_helper.dart';
 import '../database/helper/cmc_cbm/creche_monitering_checklist_CBM_response_helper.dart';
 import '../database/helper/creche_comite_meeting/creche_committie_response_helper.dart';
@@ -190,7 +192,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                                         var checkInte = await Validate()
                                             .checkNetworkConnection();
                                         if (checkInte) {
-                                          if (userRole == 'Creche Supervisor') {
+                                          if (userRole == CustomText.crecheSupervisor) {
                                             if (selectAllOpt == 0) {
                                               if (index > 0 && index < 9)
                                                 await uploadDataSequence1(
@@ -198,7 +200,8 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                                               else
                                                 await methods[index](context);
                                             }
-                                          } else {
+                                          }
+                                          else {
                                             await methods[index](context);
                                           }
                                         } else
@@ -306,7 +309,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
                                     var checkInte =
                                         await Validate().checkNetworkConnection();
                                     if (checkInte) {
-                                      if (userRole == 'Creche Supervisor') {
+                                      if (userRole == CustomText.crecheSupervisor) {
                                         if (selectAllOpt == 0) {
                                           if (index > 0 && index < 9)
                                             await uploadDataSequence1(
@@ -456,7 +459,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
   callUploadData() async {
     sysHeader = '';
 
-    if (userRole == 'Creche Supervisor') {
+    if (userRole == CustomText.crecheSupervisor) {
       var hhItems = await HouseHoldTabResponceHelper().getHouseHoldItems();
       syncCount = await callCountForUpload();
       //    syncCount = 1;
@@ -800,7 +803,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
     }
-    else if (userRole == 'Cluster Coordinator') {
+    else if (userRole == CustomText.clusterCoordinator) {
 
       var cmcCCData = await CmcCCTabResponseHelper().getCcForUpload();
       if (cmcCCData.length > 1) {
@@ -870,7 +873,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
     }
-    else if (userRole == 'Accounts and Logistics Manager') {
+    else if (userRole == CustomText.alm) {
       var cmcALMData = await CmcALMTabResponseHelper().getAlmForUpload();
       if (cmcALMData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -925,7 +928,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
     }
-    else if (userRole == 'Capacity and Building Manager') {
+    else if (userRole == CustomText.cbm) {
       var cmcCBMData = await CmcCBMTabResponseHelper().getCBMForUpload();
       if (cmcCBMData.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -980,18 +983,126 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
     }
+    else if(userRole == CustomText.partnerAdministrator){
+      var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
+      var imageData = await ImageFileTabHelper().getImageForUpload();
+      if (checkins.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] =
+        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      }
+      else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] =
+        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      if( checkins.isNotEmpty){
+        syncInfoCount[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] = checkins.length;
+      }
+
+      if (imageData.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
+    }
+    else if(userRole == CustomText.MISAdministrator){
+      var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
+      var imageData = await ImageFileTabHelper().getImageForUpload();
+      if (checkins.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] =
+        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      }
+      else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] =
+        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      if( checkins.isNotEmpty){
+        syncInfoCount[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] = checkins.length;
+      }
+
+      if (imageData.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
+    }
+    else if(userRole == CustomText.safetyManager){
+      var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
+      var visitNots = await CmcSMTabResponseHelper().getSMForUpload();
+      var imageData = await ImageFileTabHelper().getImageForUpload();
+      if (visitNots.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.VisitNotes, lng!)] =
+        '[b]${visitNots.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.VisitNotes, lng!)] =
+        '[b]${visitNots.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.VisitNotes, lng!)] = visitNots.length;
+
+      if (imageData.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      } else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
+
+      if (checkins.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] =
+        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      }
+      else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] =
+        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      if( checkins.isNotEmpty){
+        syncInfoCount[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] = checkins.length;
+      }
+    }
     else {
-      var grievanceData =
-          await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
+      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
       if (grievanceData.length > 1) {
         syncInfo[Global.returnTrLable(
                 locationControlls, CustomText.ChildGrievances, lng!)] =
             '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
-      } else {
+      }
+      else {
         syncInfo[Global.returnTrLable(
                 locationControlls, CustomText.ChildGrievances, lng!)] =
             '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
       }
+
+
       syncInfoCount[Global.returnTrLable(
               locationControlls, CustomText.ChildGrievances, lng!)] =
           grievanceData.length;
@@ -2013,7 +2124,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       CustomText.all,
       CustomText.unsynched,
     ];
-    if (userRole == 'Creche Supervisor') {
+    if (userRole == CustomText.crecheSupervisor) {
       methods = [
         uploadData, //0
         uploadChildEnrolledExit, //1
@@ -2037,7 +2148,7 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         uploadImageFile, //19
       ];
     }
-    else if (userRole == 'Cluster Coordinator') {
+    else if (userRole == CustomText.clusterCoordinator) {
       methods = [
         uploadcmcCCData,
         uploadChildGrievanceData,
@@ -2046,21 +2157,42 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         uploadImageFile
       ];
     }
-    else if (userRole == 'Accounts and Logistics Manager') {
+    else if (userRole == CustomText.alm) {
       methods = [
         uploadcmcALMData,
         uploadChildGrievanceData,
         uploadCheckInData,
         uploadImageFile
       ];
-    } else if (userRole == 'Capacity and Building Manager') {
+    }
+    else if (userRole == CustomText.cbm) {
       methods = [
         uploadcmcCBMData,
         uploadChildGrievanceData,
         uploadCheckInData,
         uploadImageFile
       ];
-    } else {
+    }
+    else if(userRole == CustomText.partnerAdministrator){
+      methods = [
+        uploadCheckInData,
+        uploadImageFile,
+      ];
+    }
+    else if(userRole == CustomText.MISAdministrator){
+      methods = [
+        uploadCheckInData,
+        uploadImageFile,
+      ];
+    }
+    else if(userRole == CustomText.safetyManager){
+      methods = [
+        uploadcmcSMData,
+        uploadImageFile,
+        uploadCheckInData,
+      ];
+    }
+    else {
       methods = [
         uploadChildGrievanceData,
       ];
@@ -4050,6 +4182,141 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       Map<String, dynamic> resultMap = jsonDecode(value.body);
       print(" responce $resultMap");
       await CmcALMTabResponseHelper().updateUploadedItem(resultMap);
+      await callUploadData();
+    } catch (e) {
+      print("exp ${e.toString()}");
+    }
+  }
+
+  Future<void> uploadcmcSMData(BuildContext mContext) async {
+    var cmcSMData = await CmcSMTabResponseHelper().getSMForUpload();
+    if (cmcSMData.length > 0) {
+      loadingTextUpdatedText =
+          Global.returnTrLable(locationControlls, CustomText.VisitNotes, lng!);
+      int currentItem = 1;
+      var token = await Validate().readString(Validate.appToken);
+      loadingTextUpdatedCount = '($currentItem/${cmcSMData.length})';
+      loadingText =
+          Global.returnTrLable(locationControlls, CustomText.uploading, lng!);
+      loadingText =
+      '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+      showLoaderDialog(mContext);
+      cmcSMData.forEach((element) async {
+        if (element.name != null) {
+          var responce = await CrecheMonetringCheckListSMApi()
+              .cmcSMUploadUdate(token!, element.responces!, element.name);
+          if (responce.statusCode == 200) {
+            Validate().saveString(
+                Validate.dataUploadDateTime, Validate().currentDateTime());
+            await updateResponsescmcSMData(responce);
+            if ((cmcSMData.indexOf(element)) == (cmcSMData.length - 1)) {
+              Navigator.pop(mContext);
+              Validate().singleButtonPopup(
+                  Global.returnTrLable(locationControlls,
+                      CustomText.data_upload_success_msg, lng!),
+                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                  false,
+                  context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '($currentItem/${cmcSMData.length})';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+              '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
+            }
+          } else if (responce.statusCode == 401) {
+            Navigator.pop(mContext);
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.remove(Validate.Password);
+            ScaffoldMessenger.of(mContext).showSnackBar(
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
+            );
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (mContext) => LoginScreen(),
+                ));
+          } else {
+            Navigator.pop(mContext);
+            await callUploadData();
+            Validate().singleButtonPopup(
+                Global.errorBodyToStringFromList(responce.body),
+                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                false,
+                context);
+
+            return;
+          }
+        } else {
+          var responce = await CrecheMonetringCheckListSMApi()
+              .cmcSMUpload(token!, element.responces!);
+          if (responce.statusCode == 200) {
+            Validate().saveString(
+                Validate.dataUploadDateTime, Validate().currentDateTime());
+            await updateResponsescmcSMData(responce);
+            if ((cmcSMData.indexOf(element)) == (cmcSMData.length - 1)) {
+              Navigator.pop(mContext);
+              Validate().singleButtonPopup(
+                  Global.returnTrLable(locationControlls,
+                      CustomText.data_upload_success_msg, lng!),
+                  Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                  false,
+                  context);
+            } else {
+              currentItem = currentItem + 1;
+              loadingTextUpdatedCount = '($currentItem/${cmcSMData.length})';
+              loadingText = Global.returnTrLable(
+                  locationControlls, CustomText.uploading, lng!);
+              loadingText =
+              '$loadingText, $loadingTextUpdatedText $loadingTextUpdatedCount';
+              updateLoadingText(dialogSetState, loadingText);
+            }
+          } else if (responce.statusCode == 401) {
+            Navigator.pop(mContext);
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.remove(Validate.Password);
+            ScaffoldMessenger.of(mContext).showSnackBar(
+              SnackBar(
+                  content: Text(Global.returnTrLable(
+                      locationControlls, CustomText.token_expired, lng!))),
+            );
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (mContext) => LoginScreen(),
+                ));
+          } else {
+            Navigator.pop(mContext);
+            await callUploadData();
+            Validate().singleButtonPopup(
+                Global.errorBodyToStringFromList(responce.body),
+                Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+                false,
+                context);
+
+            return;
+          }
+        }
+      });
+    } else {
+      Validate().singleButtonPopup(
+          Global.returnTrLable(
+              locationControlls, CustomText.nothing_for_upload_msg, lng!),
+          Global.returnTrLable(locationControlls, CustomText.ok, lng!),
+          false,
+          mContext);
+    }
+  }
+
+  Future<void> updateResponsescmcSMData(Response value) async {
+    try {
+      Map<String, dynamic> resultMap = jsonDecode(value.body);
+      print(" responce $resultMap");
+      await CmcSMTabResponseHelper().updateUploadedItem(resultMap);
       await callUploadData();
     } catch (e) {
       print("exp ${e.toString()}");
