@@ -71,7 +71,8 @@ class _cmcALMListingScreenState extends State<AllcmcALMListingScreen> {
       CustomText.usynchedAndDraft,
       CustomText.areSureToDelete,
       CustomText.Cancel,
-      CustomText.delete
+      CustomText.delete,
+      CustomText.Filter,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)

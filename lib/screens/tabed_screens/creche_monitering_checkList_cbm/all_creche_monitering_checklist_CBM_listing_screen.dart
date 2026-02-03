@@ -71,6 +71,7 @@ class _cmcCBMListingScreenState extends State<AllcmcCBMListingScreen> {
       CustomText.usynchedAndDraft,
       CustomText.areSureToDelete,
       CustomText.Cancel,
+      CustomText.Filter,
       CustomText.delete
     ];
 

@@ -240,6 +240,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
                   /// 🔹 USERNAME
                   CustomTextFieldRow(
+                    enabled:Global.validString(savedUsername)?false:true,
                     controller: mobileController,
                     hintText: CustomText.Email,
                     prefixIcon:

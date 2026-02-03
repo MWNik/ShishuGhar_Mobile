@@ -168,6 +168,7 @@ class _DashReportCardDetailState extends State<DashReportCardDetailScreen> {
     }
 
     List<String> valueItems = [
+      CustomText.Filter,
       CustomText.DashBoardReport,
       CustomText.NorecordAvailable,
       CustomText.pleaseSelectMonth,

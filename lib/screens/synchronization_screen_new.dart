@@ -385,8 +385,6 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                     context);
                             }
                             else if (role == CustomText.alm) {
-                              var visitNots = await CmcALMTabResponseHelper()
-                                  .getAlmForUpload();
                               if (pendindTaskCount > 0) {
                                 refStatus = await Navigator.of(context).push(
                                       MaterialPageRoute(
@@ -406,8 +404,6 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
                                     context);
                             }
                             else if (role == CustomText.cbm) {
-                              var visitNots = await CmcCBMTabResponseHelper()
-                                  .getCBMForUpload();
                               if (pendindTaskCount > 0) {
                                 refStatus = await Navigator.of(context).push(
                                       MaterialPageRoute(
@@ -979,36 +975,23 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
           grievanceData.length +
           ImageFileData.length;
     }
-    else if (role == CustomText.partnerAdministrator) {
-      var crecheCheckIn =
-          await CheckInResponseHelper().callCrecheCheckInResponses();
-
-      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
-      pendindTaskCount =
-          crecheCheckIn.length +
-          ImageFileData.length;
-    }
-    else if (role == CustomText.MISAdministrator) {
-      var crecheCheckIn =
-          await CheckInResponseHelper().callCrecheCheckInResponses();
-
-      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
-      pendindTaskCount =
-          crecheCheckIn.length +
-          ImageFileData.length;
-    }
     else if (role == CustomText.safetyManager) {
       var crecheCheckIn =
           await CheckInResponseHelper().callCrecheCheckInResponses();
       var visitNots = await CmcSMTabResponseHelper().getSMForUpload();
       var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
       pendindTaskCount =
           crecheCheckIn.length +
-          ImageFileData.length+visitNots.length;
+          ImageFileData.length+visitNots.length+grievanceData.length;
     }
     else {
+      var crecheCheckIn =
+      await CheckInResponseHelper().callCrecheCheckInResponses();
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
       var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUploadDarft();
-      pendindTaskCount = grievanceData.length;
+      pendindTaskCount = grievanceData.length+ crecheCheckIn.length +
+          ImageFileData.length;
     }
 
     List<String> valueNames = [

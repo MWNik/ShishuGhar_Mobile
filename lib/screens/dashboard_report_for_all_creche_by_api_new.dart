@@ -175,6 +175,7 @@ class _DashboardReportSupeByApiState
       CustomText.CrecheStatus,
       CustomText.Partner,
       CustomText.Phase,
+      CustomText.Filter,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)

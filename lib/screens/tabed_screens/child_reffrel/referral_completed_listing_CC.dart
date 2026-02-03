@@ -93,6 +93,7 @@ class _ReferallCompletedListForCCState
       CustomText.ChildId,
       CustomText.Creche_Name,
       CustomText.DischangeDate,
+      CustomText.Filter,
       CustomText.visitDate
     ];
 

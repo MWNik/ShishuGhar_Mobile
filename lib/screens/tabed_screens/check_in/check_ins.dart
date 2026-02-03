@@ -68,54 +68,84 @@ class _CheckInsScreenState extends State<CheckIns> {
               ),
               floatingActionButton: (currentDateAttendece
                   ? SizedBox()
-                  : (role == CustomText.crecheSupervisor ||
-                          role == CustomText.clusterCoordinator ||
-                          role == CustomText.alm ||
-                          role == CustomText.partnerAdministrator ||
-                          role == CustomText.MISAdministrator ||
-                          role == CustomText.safetyManager ||
-                          role == CustomText.cbm)
-                      ? InkWell(
-                          onTap: () async {
-                            String hhGuid = '';
-                            if (!Global.validString(hhGuid)) {
-                              hhGuid = Validate().randomGuid();
-                              var refStatus = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      CheckInDetailsScreen(
-                                    ccinguid: hhGuid,
-                                    isEdit: false,
-                                    lastGrowthDate: maxDate,
-                                    creche_id: widget.crechId,
-                                        crecheLatLang: crecheLatLang,
-                                  ),
-                                ),
-                              );
-                              if (refStatus == 'itemRefresh') {
-                                initData();
-                              }
-                            }
+                  // : (role == CustomText.crecheSupervisor ||
+                  //         role == CustomText.clusterCoordinator ||
+                  //         role == CustomText.alm ||
+                  //         role == CustomText.partnerAdministrator ||
+                  //         role == CustomText.MISAdministrator ||
+                  //         role == CustomText.safetyManager ||
+                  //         role == CustomText.cbm)
+                  //     ? InkWell(
+                  //         onTap: () async {
+                  //           String hhGuid = '';
+                  //           if (!Global.validString(hhGuid)) {
+                  //             hhGuid = Validate().randomGuid();
+                  //             var refStatus = await Navigator.of(context).push(
+                  //               MaterialPageRoute(
+                  //                 builder: (BuildContext context) =>
+                  //                     CheckInDetailsScreen(
+                  //                   ccinguid: hhGuid,
+                  //                   isEdit: false,
+                  //                   lastGrowthDate: maxDate,
+                  //                   creche_id: widget.crechId,
+                  //                       crecheLatLang: crecheLatLang,
+                  //                 ),
+                  //               ),
+                  //             );
+                  //             if (refStatus == 'itemRefresh') {
+                  //               initData();
+                  //             }
+                  //           }
+                  //
+                  //
+                  //
+                  //         },
+                  //         child: Image.asset(
+                  //           "assets/add_btn.png",
+                  //           scale: 2.7,
+                  //           color: Color(0xff5979AA),
+                  //         ),
+                  //       )
+                  : InkWell(
+                onTap: () async {
+                  String hhGuid = '';
+                  if (!Global.validString(hhGuid)) {
+                    hhGuid = Validate().randomGuid();
+                    var refStatus = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            CheckInDetailsScreen(
+                              ccinguid: hhGuid,
+                              isEdit: false,
+                              lastGrowthDate: maxDate,
+                              creche_id: widget.crechId,
+                              crecheLatLang: crecheLatLang,
+                            ),
+                      ),
+                    );
+                    if (refStatus == 'itemRefresh') {
+                      initData();
+                    }
+                  }
 
-
-
-                          },
-                          child: Image.asset(
-                            "assets/add_btn.png",
-                            scale: 2.7,
-                            color: Color(0xff5979AA),
-                          ),
-                        )
-                      : null),
+                },
+                child: Image.asset(
+                  "assets/add_btn.png",
+                  scale: 2.7,
+                  color: Color(0xff5979AA),
+                ),
+              )
+                       ),
               body: Padding(
                 padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
                 child: Column(
                   children: [
-                    (role == CustomText.crecheSupervisor ||
-                            role == CustomText.clusterCoordinator ||
-                            role == CustomText.alm ||
-                            role == CustomText.cbm)
-                        ? Align(
+                    // (role == CustomText.crecheSupervisor ||
+                    //         role == CustomText.clusterCoordinator ||
+                    //         role == CustomText.alm ||
+                    //         role == CustomText.cbm)
+                    //     ?
+                    Align(
                             alignment: Alignment.topRight,
                             child: AnimatedRollingSwitch(
                               title1: Global.returnTrLable(
@@ -130,8 +160,8 @@ class _CheckInsScreenState extends State<CheckIns> {
                                 await initData();
                               },
                             ),
-                          )
-                        : SizedBox(),
+                          ),
+                        // : SizedBox(),
                     Expanded(
                       child: (items.isNotEmpty)
                           ? ListView.builder(

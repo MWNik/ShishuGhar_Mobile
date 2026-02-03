@@ -64,7 +64,7 @@ class _cmcSMListingScreenState extends State<AllcmcSMListingScreen> {
     }
     backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
     List<String> valueItems = [
-      CustomText.VisitNotes,
+      CustomText.safetyChecklist,
       CustomText.Creches,
       CustomText.datevisit,
       CustomText.entryTime,
@@ -133,7 +133,7 @@ class _cmcSMListingScreenState extends State<AllcmcSMListingScreen> {
           ),
           key: _scaffoldKey,
           appBar: CustomAppbar(
-            text: Global.returnTrLable(translats, CustomText.VisitNotes, lng),
+            text: Global.returnTrLable(translats, CustomText.safetyChecklist, lng),
             onTap: () => Navigator.pop(context, 'itemRefresh'),
           ),
           endDrawer: SafeArea(

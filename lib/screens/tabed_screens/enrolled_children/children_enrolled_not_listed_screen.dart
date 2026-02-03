@@ -80,6 +80,7 @@ class _NotEnrolledChildrenListedScreenState
       CustomText.Search,
       CustomText.clear,
       CustomText.Village,
+      CustomText.Filter,
       CustomText.ageInMonthEn
     ];
     await TranslationDataHelper()

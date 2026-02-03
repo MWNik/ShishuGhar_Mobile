@@ -64,7 +64,7 @@ class _cmcSMListingScreenState extends State<cmcSMListingScreen> {
       CustomText.ExitTime,
       CustomText.Creche,
       CustomText.datevisit,
-      CustomText.VisitNotes,
+      CustomText.safetyChecklist,
       CustomText.all,
       CustomText.usynchedAndDraft,
       CustomText.areSureToDelete,
@@ -123,7 +123,7 @@ class _cmcSMListingScreenState extends State<cmcSMListingScreen> {
           ),
         ),
         appBar: CustomAppbar(
-          text: Global.returnTrLable(translats, CustomText.VisitNotes, lng),
+          text: Global.returnTrLable(translats, CustomText.safetyChecklist, lng),
           subTitle: widget.crecheName,
           onTap: () => Navigator.pop(context, 'itemRefresh'),
         ),

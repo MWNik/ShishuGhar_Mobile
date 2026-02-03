@@ -76,7 +76,7 @@ class _CmcSMTabSCreenState extends State<CmcSMTabSCreen>
       CustomText.shouldExit,
       CustomText.exit,
       CustomText.Cancel,
-      CustomText.VisitNote
+      CustomText.safetyChecklist
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -126,7 +126,7 @@ class _CmcSMTabSCreenState extends State<CmcSMTabSCreen>
                   children: [
                     Text(
                       Global.returnTrLable(
-                          translatsLabel, CustomText.VisitNote, lng),
+                          translatsLabel, CustomText.safetyChecklist, lng),
                       style: Styles.white145,
                     ),
                     Text(

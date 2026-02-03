@@ -72,7 +72,7 @@ class _CmcSMTabSCreenForAddState extends State<CmcSMTabSCreenForAdd>
       CustomText.CrecheCaregiver,
       CustomText.Next,
       CustomText.back,
-      CustomText.VisitNote,
+      CustomText.safetyChecklist,
       CustomText.shouldExit,
       CustomText.exit,
       CustomText.Cancel
@@ -125,7 +125,7 @@ class _CmcSMTabSCreenForAddState extends State<CmcSMTabSCreenForAdd>
                   children: [
                     Text(
                       Global.returnTrLable(
-                          translatsLabel, CustomText.VisitNote, lng),
+                          translatsLabel, CustomText.safetyChecklist, lng),
                       style: Styles.white145,
                     ),
                     // Text(

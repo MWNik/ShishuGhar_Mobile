@@ -77,7 +77,8 @@ class _EnrolledChildrenListedScreenState
       CustomText.Village,
       CustomText.ageInMonthEn,
       CustomText.careGiverName,
-      CustomText.ChildId
+      CustomText.ChildId,
+      CustomText.Filter,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)

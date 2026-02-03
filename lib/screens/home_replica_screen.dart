@@ -1648,7 +1648,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         CustomText.Growthfaltering2,
         CustomText.childrenAtRisk,
         CustomText.fllowUp,
-        CustomText.VisitNote,
+        role == CustomText.safetyManager?CustomText.safetyChecklist:CustomText.VisitNote,
         // CustomText.villageProfile,
         // CustomText.Grievance,
         CustomText.sync,
@@ -1696,7 +1696,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
         CustomText.Growthfaltering2,
         CustomText.childrenAtRisk,
         CustomText.fllowUp,
-        CustomText.VisitNote,
+        role == CustomText.safetyManager?CustomText.safetyChecklist:CustomText.VisitNote,
         CustomText.sync,
       ];
     }
@@ -1762,6 +1762,7 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       CustomText.Growthfaltering1,
       CustomText.Growthfaltering2,
       CustomText.childrenAtRisk,
+      CustomText.safetyChecklist
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -1802,24 +1803,6 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
           grievanceData.length +
           ImageFileData.length;
     }
-    else if (role == CustomText.partnerAdministrator) {
-      var crecheCheckIn =
-          await CheckInResponseHelper().callCrecheCheckInResponses();
-      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
-
-      syncCount =
-          crecheCheckIn.length +
-          ImageFileData.length;
-    }
-    else if (role == CustomText.MISAdministrator) {
-      var crecheCheckIn =
-      await CheckInResponseHelper().callCrecheCheckInResponses();
-      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
-
-      syncCount =
-          crecheCheckIn.length +
-              ImageFileData.length;
-    }
     else if (role == CustomText.safetyManager) {
       var crecheCheckIn = await CheckInResponseHelper().callCrecheCheckInResponses();
       var ImageFileData = await ImageFileTabHelper().getImageForUpload();
@@ -1830,9 +1813,15 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
               ImageFileData.length+visitNots.length;
     }
     else {
+      var crecheCheckIn =
+      await CheckInResponseHelper().callCrecheCheckInResponses();
+      var ImageFileData = await ImageFileTabHelper().getImageForUpload();
+
       var grievanceData = await ChildGrievancesTabResponceHelper()
           .getChildGrievanceForUploadDarft();
-      syncCount = grievanceData.length;
+
+      syncCount = grievanceData.length+ crecheCheckIn.length +
+          ImageFileData.length;
     }
   }
 

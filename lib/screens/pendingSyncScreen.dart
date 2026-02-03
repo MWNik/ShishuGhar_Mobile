@@ -983,96 +983,38 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
       syncInfoCount[Global.returnTrLable(
           locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
     }
-    else if(userRole == CustomText.partnerAdministrator){
-      var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
-      var imageData = await ImageFileTabHelper().getImageForUpload();
-      if (checkins.length > 1) {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.checkIns, lng!)] =
-        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
-      }
-      else {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.checkIns, lng!)] =
-        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
-      }
-      if( checkins.isNotEmpty){
-        syncInfoCount[Global.returnTrLable(
-            locationControlls, CustomText.checkIns, lng!)] = checkins.length;
-      }
-
-      if (imageData.length > 1) {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.imageFiles, lng!)] =
-        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
-      } else {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.imageFiles, lng!)] =
-        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
-      }
-
-      syncInfoCount[Global.returnTrLable(
-          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    }
-    else if(userRole == CustomText.MISAdministrator){
-      var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
-      var imageData = await ImageFileTabHelper().getImageForUpload();
-      if (checkins.length > 1) {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.checkIns, lng!)] =
-        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
-      }
-      else {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.checkIns, lng!)] =
-        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
-      }
-      if( checkins.isNotEmpty){
-        syncInfoCount[Global.returnTrLable(
-            locationControlls, CustomText.checkIns, lng!)] = checkins.length;
-      }
-
-      if (imageData.length > 1) {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.imageFiles, lng!)] =
-        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
-      } else {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.imageFiles, lng!)] =
-        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
-      }
-
-      syncInfoCount[Global.returnTrLable(
-          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
-    }
     else if(userRole == CustomText.safetyManager){
       var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
       var visitNots = await CmcSMTabResponseHelper().getSMForUpload();
       var imageData = await ImageFileTabHelper().getImageForUpload();
+      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
+      if (grievanceData.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.ChildGrievances, lng!)] =
+        '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      }
+      else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.ChildGrievances, lng!)] =
+        '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.ChildGrievances, lng!)] =
+          grievanceData.length;
+
       if (visitNots.length > 1) {
         syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.VisitNotes, lng!)] =
+            locationControlls, CustomText.safetyChecklist, lng!)] =
         '[b]${visitNots.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
       } else {
         syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.VisitNotes, lng!)] =
+            locationControlls, CustomText.safetyChecklist, lng!)] =
         '[b]${visitNots.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
       }
       syncInfoCount[Global.returnTrLable(
-          locationControlls, CustomText.VisitNotes, lng!)] = visitNots.length;
-
-      if (imageData.length > 1) {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.imageFiles, lng!)] =
-        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
-      } else {
-        syncInfo[Global.returnTrLable(
-            locationControlls, CustomText.imageFiles, lng!)] =
-        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
-      }
-
-      syncInfoCount[Global.returnTrLable(
-          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
+          locationControlls, CustomText.safetyChecklist, lng!)] = visitNots.length;
 
       if (checkins.length > 1) {
         syncInfo[Global.returnTrLable(
@@ -1088,24 +1030,75 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         syncInfoCount[Global.returnTrLable(
             locationControlls, CustomText.checkIns, lng!)] = checkins.length;
       }
-    }
-    else {
-      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
-      if (grievanceData.length > 1) {
+
+      if (imageData.length > 1) {
         syncInfo[Global.returnTrLable(
-                locationControlls, CustomText.ChildGrievances, lng!)] =
-            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
       }
       else {
         syncInfo[Global.returnTrLable(
-                locationControlls, CustomText.ChildGrievances, lng!)] =
-            '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
+
+
+    }
+    else {
+
+      var grievanceData = await ChildGrievancesTabResponceHelper().getChildGrievanceForUpload();
+      if (grievanceData.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.ChildGrievances, lng!)] =
+        '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      }
+      else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.ChildGrievances, lng!)] =
+        '[b]${grievanceData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
       }
 
 
       syncInfoCount[Global.returnTrLable(
-              locationControlls, CustomText.ChildGrievances, lng!)] =
+          locationControlls, CustomText.ChildGrievances, lng!)] =
           grievanceData.length;
+
+      var checkins = await CheckInResponseHelper().callCrecheCheckInResponses();
+
+      if (checkins.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] =
+        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      }
+      else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] =
+        '[b]${checkins.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+      if( checkins.isNotEmpty){
+        syncInfoCount[Global.returnTrLable(
+            locationControlls, CustomText.checkIns, lng!)] = checkins.length;
+      }
+
+      var imageData = await ImageFileTabHelper().getImageForUpload();
+      if (imageData.length > 1) {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordsAvailable, lng!)}';
+      }
+      else {
+        syncInfo[Global.returnTrLable(
+            locationControlls, CustomText.imageFiles, lng!)] =
+        '[b]${imageData.length}[/b] ${Global.returnTrLable(locationControlls, CustomText.recordAvailable, lng!)}';
+      }
+
+      syncInfoCount[Global.returnTrLable(
+          locationControlls, CustomText.imageFiles, lng!)] = imageData.length;
+
+
     }
 
     setState(() {
@@ -2173,28 +2166,20 @@ class _PendingSyncScreenState extends State<PendingSyncScreen> {
         uploadImageFile
       ];
     }
-    else if(userRole == CustomText.partnerAdministrator){
-      methods = [
-        uploadCheckInData,
-        uploadImageFile,
-      ];
-    }
-    else if(userRole == CustomText.MISAdministrator){
-      methods = [
-        uploadCheckInData,
-        uploadImageFile,
-      ];
-    }
     else if(userRole == CustomText.safetyManager){
       methods = [
+        uploadChildGrievanceData,
         uploadcmcSMData,
-        uploadImageFile,
         uploadCheckInData,
+        uploadImageFile,
+
       ];
     }
     else {
       methods = [
         uploadChildGrievanceData,
+        uploadCheckInData,
+        uploadImageFile,
       ];
     }
 

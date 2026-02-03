@@ -64,7 +64,10 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenCC> {
       CustomText.hhNameS,
       CustomText.NorecordAvailable,
       CustomText.Search,
-      CustomText.Village
+      CustomText.Village,
+      CustomText.measurementDate,
+      CustomText.GrowthMonitoring,
+      CustomText.schduleed
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)

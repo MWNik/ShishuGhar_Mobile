@@ -726,6 +726,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
                       initialvalue:
                           // quesItem.fieldname == 'checkin_location'?address ?? '':
                           myMap[quesItem.fieldname!],
+                      isVisible: logic!.callDependingLogic(myMap, quesItem),
                       onChanged: (value) {
                         print('Entered text: $value');
                         if (value.isNotEmpty)
@@ -756,6 +757,7 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
                 ],
               )
             : DynamicCustomTextFieldNew(
+            isVisible: logic!.callDependingLogic(myMap, quesItem),
                 titleText: Global.returnTrLable(
                     translats, quesItem.label!.trim(), lng!),
                 isRequred: quesItem.reqd == 1
@@ -1560,9 +1562,9 @@ class _CheckInDetailsScreen extends State<CheckInDetailsScreen> {
         if (locations.length > 1) {
           double targetLat = Global.stringToDouble(locations[0]);
           double targetLng = Global.stringToDouble(locations[1]);
-          // int maxAllowedDistance =
-          //     await Validate().readInt(Validate.max_allow_range) ?? 50;
-          int maxAllowedDistance = 50000;
+          int maxAllowedDistance =
+              await Validate().readInt(Validate.max_allow_range) ?? 50;
+          // int maxAllowedDistance = 5000000;
           if (locations[0].length > 3 && locations[1].length > 3) {
             showDialog(
               context: context,

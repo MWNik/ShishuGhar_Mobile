@@ -367,7 +367,7 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       CustomText.creche_committee_meeting,
       CustomText.Attendance,
       CustomText.GrowthMonitoring,
-      CustomText.VisitNote,
+      role == CustomText.safetyManager?CustomText.safetyChecklist:CustomText.VisitNote,
       CustomText.Cashbook,
       CustomText.Stock,
       // CustomText.DashBoardReport,
@@ -388,7 +388,8 @@ class _ShishuGharDetailsReplicaState extends State<ShishuGharDetailsReplica> {
       CustomText.DontHaveChildrenForAnthropometry,
       CustomText.ok,
       CustomText.nointernetconnectionavailable,
-      CustomText.ChildIsNotEnrolledInthisCreche
+      CustomText.ChildIsNotEnrolledInthisCreche,
+      CustomText.safetyChecklist
     ];
 
     await TranslationDataHelper()

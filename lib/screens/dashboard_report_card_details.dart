@@ -198,6 +198,7 @@ class _DashboardReportCardDetailState
       CustomText.totalCount,
       CustomText.Search,
       CustomText.Phase,
+      CustomText.Filter,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)

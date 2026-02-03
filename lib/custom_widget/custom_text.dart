@@ -740,6 +740,7 @@ class CustomText {
   static String   GF1='GF1';
   static String   GF2='GF2';
   static String   childrenAtRisk='Children at risk';
+  static String   safetyChecklist='Safety checklist';
 
 
 

@@ -90,7 +90,8 @@ class _ShishuGHarNavigationState extends State<ShishuGHarNavigation> {
       CustomText.NorecordAvailable,
       CustomText.pleaseWait,
       CustomText.ok,
-      CustomText.ShishuGharList
+      CustomText.ShishuGharList,
+      CustomText.Filter,
     ];
 
     await TranslationDataHelper()

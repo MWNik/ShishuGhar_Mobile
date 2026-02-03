@@ -238,6 +238,7 @@ class _DashReportState extends State<DashReport> {
       CustomText.SeverelyStunted,
       CustomText.Growthfaltering1,
       CustomText.Growthfaltering2,
+      CustomText.Filter
     ];
     await TranslationDataHelper()
         .callTranslateString(valueItems)

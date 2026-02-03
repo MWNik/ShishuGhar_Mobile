@@ -146,6 +146,9 @@ class _LocationScreenState extends State<CoordinatorLocationNewScreen> {
         } else if (lng == 'od' &&
             Global.validString(state.state_od.toString())) {
           value = state.state_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(state.state_kn.toString())) {
+          value = state.state_kn.toString();
         }
         selectedState = OptionsModel(
             name: state.name.toString(), values: value, flag: 'tabState');
@@ -169,6 +172,9 @@ class _LocationScreenState extends State<CoordinatorLocationNewScreen> {
         } else if (lng == 'od' &&
             Global.validString(disct.district_od.toString())) {
           value = disct.district_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(disct.district_kn.toString())) {
+          value = disct.district_kn.toString();
         }
         selectedDistrict = OptionsModel(
             name: disct.name.toString(), values: value, flag: 'tabDistrict');
@@ -191,6 +197,9 @@ class _LocationScreenState extends State<CoordinatorLocationNewScreen> {
         } else if (lng == 'od' &&
             Global.validString(blks.block_od.toString())) {
           value = blks.block_od.toString();
+        } else if (lng == 'kn' &&
+            Global.validString(blks.block_kn.toString())) {
+          value = blks.block_kn.toString();
         }
         selectedBlock = OptionsModel(
             name: blks.name.toString(), values: value, flag: 'tabBlock');
