@@ -72,6 +72,7 @@ class _ChildGrowthExpendedFormState
   List<HouseHoldFielItemdModel> formItem = [];
   HouseHoldFielItemdModel? measurement_date;
   HouseHoldFielItemdModel? measurement_equipment;
+  HouseHoldFielItemdModel? measurement_position;
   HouseHoldFielItemdModel? do_you_have_height_weight;
   HouseHoldFielItemdModel? measurement_taken_date;
   TextEditingController Searchcontroller = TextEditingController();
@@ -89,6 +90,7 @@ class _ChildGrowthExpendedFormState
     'measurement_equipment',
     'do_you_have_height_weight',
     'measurement_taken_date',
+    'measurement_position',
     'height_for_age_zscore',
     'weight_for_height_zscore',
     'weight_for_age_zscore',
@@ -111,6 +113,7 @@ class _ChildGrowthExpendedFormState
     're_do_you_have_height_weight',
     're_measurement_taken_date',
     're_measurement_reason',
+    're_measurement_position'
     're_height',
     're_weight',
     're_age_months',
@@ -818,6 +821,10 @@ class _ChildGrowthExpendedFormState
                             ? widgetTypeWidget(measurement_equipment!,
                             cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
+                        measurement_position != null
+                            ? widgetTypeWidget(measurement_position!,
+                            cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
+                            : SizedBox(),
                         Row(
                           children: cWidgetInputType(
                               filterdData[i].ChildEnrollGUID!, cWidgetDatamap),
@@ -955,6 +962,7 @@ class _ChildGrowthExpendedFormState
           item.remove('weight_for_height');
           item.remove('measurement_equipment');
           item.remove('measurement_taken_date');
+          item.remove('measurement_position');
           item.remove('height');
           item.remove('weight');
           item['do_you_have_height_weight'] = 0;
@@ -996,6 +1004,7 @@ class _ChildGrowthExpendedFormState
           item['weight_for_age'] = weightForAge;
           item['height_for_age'] = heightForAge;
           item['weight_for_height'] = weightForHeight;
+          item['any_medical_major_illness'] = 0;
         }
         childValues.add(item);
             });
@@ -1191,11 +1200,17 @@ class _ChildGrowthExpendedFormState
     var measurementEquipment = formItem
         .where((element) => element.fieldname == 'measurement_equipment')
         .toList();
+    var measurementPosition = formItem
+        .where((element) => element.fieldname == 'measurement_position')
+        .toList();
     if (measurementDate.length > 0) {
       measurement_date = measurementDate.first;
     }
     if (measurementEquipment.length > 0) {
       measurement_equipment = measurementEquipment.first;
+    }
+    if (measurementPosition.length > 0) {
+      measurement_position = measurementPosition.first;
     }
     if (measurementTakenDate.length > 0) {
       measurement_taken_date = measurementTakenDate.first;

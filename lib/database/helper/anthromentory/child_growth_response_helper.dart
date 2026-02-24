@@ -16,11 +16,27 @@ class ChildGrowthResponseHelper {
   }
 
   Future<List<HouseHoldFielItemdModel>> getChildHHFieldsForm(
-      String parents) async {
+      String parents)
+  async {
     String query =
         'select * from tabChildGrowthMeta where  hidden=0 ORDER by idx asc';
     List<Map<String, dynamic>> result =
         await DatabaseHelper.database!.rawQuery(query);
+
+    List<HouseHoldFielItemdModel> houseHoldFieldItem = [];
+
+    for (var element in result) {
+      HouseHoldFielItemdModel state = HouseHoldFielItemdModel.fromJson(element);
+      houseHoldFieldItem.add(state);
+    }
+    return houseHoldFieldItem;
+  }
+
+  Future<List<HouseHoldFielItemdModel>> callMultiSelectTabItem() async {
+    String query =
+        'select * from tabChildGrowthMeta where parent in (select options from tabChildGrowthMeta where fieldtype =?)';
+    List<Map<String, dynamic>> result =
+    await DatabaseHelper.database!.rawQuery(query, ['Table MultiSelect']);
 
     List<HouseHoldFielItemdModel> houseHoldFieldItem = [];
 

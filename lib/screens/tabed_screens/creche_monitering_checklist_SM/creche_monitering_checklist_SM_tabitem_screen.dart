@@ -82,7 +82,7 @@ class _CmcSMTabItemSCreenState extends State<CmcSMTabItemSCreen> {
     applicableDate = Validate().stringToDate(date ?? "2024-12-31");
     _role = await Validate().readString(Validate.role);
     username = (await Validate().readString(Validate.userName))!;
-    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.cmcDoctype);
+    backdatedConfigirationModel = await BackdatedConfigirationHelper().excuteBackdatedConfigirationModel(CustomText.safetyIndicatorys);
     List<String> valueNames = [
       CustomText.Creches,
       CustomText.Next,
@@ -325,7 +325,7 @@ class _CmcSMTabItemSCreenState extends State<CmcSMTabItemSCreen> {
                   : Global.validToInt(backdatedConfigirationModel?.back_dated_data_entry_allowed)>0?DateTime.now().subtract(Duration(days: backdatedConfigirationModel!.back_dated_data_entry_allowed!)):null
               : null,
           fieldName: quesItem.fieldname,
-          // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
+          readable: quesItem.fieldname == 'date_of_visit'?true:null,
           isRequred: quesItem.reqd == 1
               ? quesItem.reqd
               : logic!.dependeOnMendotory(_myMap, quesItem),
@@ -557,6 +557,7 @@ class _CmcSMTabItemSCreenState extends State<CmcSMTabItemSCreen> {
   }
 
   nextTab(int type, BuildContext mContext) async {
+    unpicableDates = await fetchDatesList();
     if (type == 1) {
       if (_checkValidation()) {
         if (widget.tabIndex < (widget.totalTab - 1)) {
@@ -591,6 +592,7 @@ class _CmcSMTabItemSCreenState extends State<CmcSMTabItemSCreen> {
   }
 
   bool _checkValidation() {
+
     var validStatus = true;
     var items = widget.screenItem[widget.tabBreakItem.name];
     if (items != null) {
@@ -608,11 +610,11 @@ class _CmcSMTabItemSCreenState extends State<CmcSMTabItemSCreen> {
             validStatus = false;
             break;
           } else if (element.fieldname == 'date_of_visit') {
-            if (unpicableDates.contains(values)) {
-              _myMap.remove(element.fieldname);
-              setState(() {});
+            if (hasRecordExists(values)) {
+              // _myMap.remove(element.fieldname);
+              // setState(() {});
               var message = Global.returnTrLable(
-                  _translation, CustomText.visitNoteAlrdyExists, _language);
+                  _translation, CustomText.saftyCheckListAlrdyExists, _language);
               message = message.replaceAll(
                   RegExp("@", caseSensitive: false), '$values');
               Validate().singleButtonPopup(
@@ -645,6 +647,7 @@ class _CmcSMTabItemSCreenState extends State<CmcSMTabItemSCreen> {
   }
 
   Future<void> saveOnly(int type) async {
+    unpicableDates = await fetchDatesList();
     if (type == 1) {
       if (_checkValidation()) {
         await saveDataInData(false);
@@ -752,16 +755,16 @@ class _CmcSMTabItemSCreenState extends State<CmcSMTabItemSCreen> {
 
   Future<List<String>> fetchDatesList() async {
     List<CmcSMResponseModel> cmcRespose = await CmcSMTabResponseHelper()
-        .childALMChild(Global.stringToInt(widget.creche_id));
+        .childALMChildNotInSmguid(Global.stringToInt(widget.creche_id),widget.smguid);
     List<String> visitdatesListString = [];
     cmcRespose.forEach((element) {
       visitdatesListString
           .add(Global.getItemValues(element.responces, 'date_of_visit'));
     });
-    if (Global.validString(widget.date_of_visit) &&
-        visitdatesListString.contains(widget.date_of_visit)) {
-      visitdatesListString.remove(widget.date_of_visit);
-    }
+    // if (Global.validString(widget.date_of_visit) &&
+    //     visitdatesListString.contains(widget.date_of_visit)) {
+    //   visitdatesListString.remove(widget.date_of_visit);
+    // }
     return visitdatesListString;
   }
 
@@ -787,5 +790,18 @@ class _CmcSMTabItemSCreenState extends State<CmcSMTabItemSCreen> {
     } else {
       await ImageFileTabHelper().updateImageOnlyItem(items);
     }
+  }
+
+  bool hasRecordExists(String yearMonth) {
+    var monthYearVisitDate=Global.getMonthYearCurrentDayByDate(yearMonth);
+    return unpicableDates.any((date) {
+      try {
+        final parts = date.split("-");
+        final formatted = "${parts[0]}-${parts[1]}";
+        return formatted == monthYearVisitDate;
+      } catch (e) {
+        return false;
+      }
+    });
   }
 }

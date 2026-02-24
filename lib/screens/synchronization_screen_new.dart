@@ -122,7 +122,6 @@ class _SynchronizationScreenNewState extends State<SynchronizationScreenNew> {
     'assets/download_data.png',
     'assets/upload_data.png',
     'assets/ic_master_data.png',
-    // 'assets/update_doctype.png',
   ];
   List<Translation> locationControlls = [];
   List<String> text = [

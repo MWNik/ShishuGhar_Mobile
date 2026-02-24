@@ -1503,6 +1503,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
                   myMap['measurement_equipment'];
                   newChild['measurement_taken_date'] =
                   myMap['measurement_date'];
+                  newChild['measurement_position'] = myMap['measurement_position'];
                   newChild['s_flag'] = '0';
                   newChild['thr'] = '0';
                   newChild['vhsnd'] = '1';
@@ -1571,6 +1572,7 @@ class _EnrolledChilrenTabItemState extends State<EnrolledExitChildTabItem> {
               growthChild['weight']=childItem.first['weight'];
               growthChild['height']=childItem.first['height'];
               growthChild['measurement_equipment']=Global.validString(childItem.first['measurement_equipment'])?childItem.first['measurement_equipment']:myMap['measurement_equipment'];
+              growthChild['measurement_position']=Global.validString(childItem.first['measurement_position'])?childItem.first['measurement_position']:myMap['measurement_position'];
               growthChild['measurement_taken_date']=childItem.first['measurement_taken_date'];
               growthChild['gender_id']=myMap['gender_id'];
               growthChild['age_months']=calucalteDate;

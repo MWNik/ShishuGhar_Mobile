@@ -18,6 +18,7 @@ import '../../../custom_widget/dynamic_screen_widget/dynamic_custom_yesno_checkb
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customdatepicker.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_int.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamic_customtextfield_new.dart';
+import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen.dart';
 import '../../../custom_widget/dynamic_screen_widget/dynamin_multi_check_screen_growth.dart';
 import '../../../custom_widget/single_poup_dailog.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
@@ -73,10 +74,12 @@ class _ChildGrowthExpendedFormState
     extends State<ChildGrowthExpendedFormScreen> {
   List<HouseHoldFielItemdModel> formItem = [];
   HouseHoldFielItemdModel? measurement_date;
+  HouseHoldFielItemdModel? measurement_position;
   HouseHoldFielItemdModel? measurement_equipment;
   HouseHoldFielItemdModel? do_you_have_height_weight;
   HouseHoldFielItemdModel? measurement_taken_date;
   TextEditingController Searchcontroller = TextEditingController();
+  List<HouseHoldFielItemdModel> multselectItemTab = [];
   bool _isLoading = true;
   List<Translation> translatsLabel = [];
   List<int> mesureMonths = [1, 4, 7, 10];
@@ -96,6 +99,7 @@ class _ChildGrowthExpendedFormState
     'height',
     'weight',
     'measurement_equipment',
+    'measurement_position',
     'do_you_have_height_weight',
     'measurement_taken_date'
   ];
@@ -123,6 +127,7 @@ class _ChildGrowthExpendedFormState
     're_weight_for_age_zcore',
     're_weight_for_height_zcore',
     're_height_for_age_zcore',
+    're_measurement_position',
     're_updated_by',
     're_updated_on',
     're_created_by',
@@ -183,7 +188,7 @@ class _ChildGrowthExpendedFormState
     tabWeightToHeightGirls =
     await HeightWeightBoysGirlsHelper().callWeightToHeightGirls();
     genders = await OptionsModelHelper().getMstCommonOptions('Gender', lng);
-
+    multselectItemTab = await ChildGrowthResponseHelper().callMultiSelectTabItem();
     translatsLabel.clear();
     List<String> valueNames = [
       CustomText.Save,
@@ -240,6 +245,7 @@ class _ChildGrowthExpendedFormState
       CustomText.updateMeasurement,
       CustomText.reEnter,
       CustomText.ChildAlredExitSelectValidDAte,
+      CustomText.plsSelectMesurePosition,
     ];
     await TranslationDataHelper()
         .callTranslateString(valueNames)
@@ -866,6 +872,10 @@ class _ChildGrowthExpendedFormState
                             ? widgetTypeWidget(measurement_equipment!,
                             cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
                             : SizedBox(),
+                        measurement_position != null
+                            ? widgetTypeWidget(measurement_position!,
+                            cWidgetDatamap, filterdData[i].ChildEnrollGUID!)
+                            : SizedBox(),
                         Row(
                           children: cWidgetInputType(
                               filterdData[i].ChildEnrollGUID!, cWidgetDatamap),
@@ -1010,6 +1020,7 @@ class _ChildGrowthExpendedFormState
           item.remove('dob_when_measurement_taken');
           item.remove('height');
           item.remove('weight');
+          item.remove('measurement_position');
           item['do_you_have_height_weight'] = 0;
           // print(item['height']);
         } else {
@@ -1085,6 +1096,7 @@ class _ChildGrowthExpendedFormState
           item['weight_for_height_zscore'] = weight_for_height_zscore;
           item['height_for_age_zscore'] = height_for_age_zscore;
           item['s_flag'] = 1;
+          item['any_medical_major_illness'] = 0;
 
         }
         childValues.add(item);
@@ -1140,6 +1152,7 @@ class _ChildGrowthExpendedFormState
                     var height = item['height'];
                     var weight = item['weight'];
                     var measurmenTakenDate = item['measurement_taken_date'];
+                    var measurementPosition = item['measurement_position'];
 
                     if (!Global.validString(elmeItemValue) &&
                         Global.stringToDouble(height.toString()) > 0) {
@@ -1152,7 +1165,20 @@ class _ChildGrowthExpendedFormState
                           false,
                           context);
                       return validStatus;
-                    } else if (Global.stringToDouble(height.toString()) == 0) {
+                    }
+                    else if (!Global.validString(measurementPosition) &&
+                        Global.stringToDouble(height.toString()) > 0) {
+                      validStatus = false;
+                      Validate().singleButtonPopup(
+                          Global.returnTrLable(translatsLabel,
+                              CustomText.plsSelectMesurePosition, lng),
+                          Global.returnTrLable(
+                              translatsLabel, CustomText.ok, lng),
+                          false,
+                          context);
+                      return validStatus;
+                    }
+                    else if (Global.stringToDouble(height.toString()) == 0) {
                       // if (isMesurement(myMap[measurement_date!.fieldname])) {
                         validStatus = false;
                         Validate().singleButtonPopup(
@@ -1164,7 +1190,8 @@ class _ChildGrowthExpendedFormState
                             context);
                         return validStatus;
                       // }
-                    } else if (Global.stringToDouble(weight.toString()) == 0) {
+                    }
+                    else if (Global.stringToDouble(weight.toString()) == 0) {
                       validStatus = false;
                       Validate().singleButtonPopup(
                           Global.returnTrLable(
@@ -1174,7 +1201,8 @@ class _ChildGrowthExpendedFormState
                           false,
                           context);
                       return validStatus;
-                    } else if (!Global.validString(measurmenTakenDate)) {
+                    }
+                    else if (!Global.validString(measurmenTakenDate)) {
                       validStatus = false;
                       Validate().singleButtonPopup(
                           Global.returnTrLable(translatsLabel,
@@ -1185,7 +1213,8 @@ class _ChildGrowthExpendedFormState
                           context);
                       return validStatus;
                     }
-                  } else if (elmeItemValue == '2') {
+                  }
+                  else if (elmeItemValue == '2') {
                     var measurement_reason = item['measurement_reason'];
                     if (!Global.validString(measurement_reason.toString())) {
                       validStatus = false;
@@ -1281,6 +1310,11 @@ class _ChildGrowthExpendedFormState
     var measurementEquipment = formItem
         .where((element) => element.fieldname == 'measurement_equipment')
         .toList();
+
+    var measurementPosition = formItem
+        .where((element) => element.fieldname == 'measurement_position')
+        .toList();
+
     if (measurementDate.length > 0) {
       measurement_date = measurementDate.first;
     }
@@ -1289,6 +1323,9 @@ class _ChildGrowthExpendedFormState
     }
     if (measurementTakenDate.length > 0) {
       measurement_taken_date = measurementTakenDate.first;
+    }
+    if (measurementPosition.length > 0) {
+      measurement_position = measurementPosition.first;
     }
 
     List<String> tranlatItems = [];
@@ -1642,6 +1679,40 @@ class _ChildGrowthExpendedFormState
               updateItemsForChildren(itemsAnswred, ChildEnrollGUID);
               // setState(() {});
             }
+          },
+        );
+      case 'Table MultiSelect': // Multi select Drop Down
+        String itemResopnceField = '';
+        List<OptionsModel> items = options
+            .where(
+                (element) => element.flag == 'tab${quesItem.multiselectlink}')
+            .toList();
+        List<HouseHoldFielItemdModel> msFieldName = multselectItemTab
+            .where((element) => element.parent == '${quesItem.options}')
+            .toList();
+        if (msFieldName.length > 0) {
+          itemResopnceField = msFieldName[0].fieldname!;
+        }
+        return DynamicMultiCheckGridView(
+          items: items,
+          isRequred: quesItem.reqd == 1
+              ? quesItem.reqd
+              : logic!.dependeOnMendotory(myMap, quesItem),
+          titleText:
+          Global.returnTrLable(translatsLabel, quesItem.label!.trim(), lng),
+          isVisible: logic!.callDependingLogic(myMap, quesItem),
+          selectedItem: myMap[quesItem.fieldname],
+          responceFieldName: itemResopnceField,
+          readable: role == CustomText.crecheSupervisor
+    ? logic!.callReadableLogic(itemsAnswred, quesItem)
+        : true,
+          onChanged: (value) {
+            if (value != null)
+              myMap[quesItem.fieldname!] = value;
+            else
+              myMap.remove(quesItem.fieldname);
+
+            setState(() {});
           },
         );
       default:
@@ -2386,6 +2457,7 @@ class _ChildGrowthExpendedFormState
     }
 
     HouseHoldFielItemdModel? re_measurement_equipment;
+    HouseHoldFielItemdModel? re_measurement_position;
     HouseHoldFielItemdModel? re_do_you_have_height_weight;
     HouseHoldFielItemdModel? re_measurement_taken_date;
     HouseHoldFielItemdModel? re_height;
@@ -2394,6 +2466,9 @@ class _ChildGrowthExpendedFormState
 
     var measurementTakenDate = formItem
         .where((element) => element.fieldname == 're_measurement_taken_date')
+        .toList();
+    var re_measurementPosition = formItem
+        .where((element) => element.fieldname == 're_measurement_position')
         .toList();
 
     var haveMesure = formItem
@@ -2421,6 +2496,9 @@ class _ChildGrowthExpendedFormState
     if (measurementEquipment.length > 0) {
       re_measurement_equipment = measurementEquipment.first;
     }
+    if (re_measurementPosition.length > 0) {
+      re_measurement_position = re_measurementPosition.first;
+    }
     if (measurementTakenDate.length > 0) {
       re_measurement_taken_date = measurementTakenDate.first;
     }
@@ -2438,6 +2516,12 @@ class _ChildGrowthExpendedFormState
         .where((element) =>
     element.flag == 'tab${re_measurement_equipment!.options}')
         .toList();
+
+    List<OptionsModel> positionItem = options
+        .where((element) =>
+    element.flag == 'tab${re_measurement_position!.options}')
+        .toList();
+
 
     List<OptionsModel> reasonItems = options
         .where(
@@ -2570,6 +2654,29 @@ class _ChildGrowthExpendedFormState
                                             cWidgetDatamap
                                                 .remove(re_measurement_equipment!.fieldname);
                                   
+                                          setState(() {});
+                                        },
+                                      ),
+                                      DynamicCustomDropdownField(
+                                        hintText: Global.returnTrLable(
+                                            translatsLabel, CustomText.select_here, lng),
+                                        titleText: Global.returnTrLable(translatsLabel,
+                                            re_measurement_position!.label!.trim(), lng),
+                                        isRequred: logic!.dependeOnMendotory(
+                                            cWidgetDatamap, re_measurement_position),
+                                        items: positionItem,
+                                        selectedItem: cWidgetDatamap[
+                                        re_measurement_position.fieldname!],
+                                        isVisible: logic!.callDependingLogic(
+                                            cWidgetDatamap, re_measurement_position),
+                                        onChanged: (value) {
+                                          if (value != null)
+                                            cWidgetDatamap[re_measurement_position!
+                                                .fieldname!] = value.name;
+                                          else
+                                            cWidgetDatamap
+                                                .remove(re_measurement_position!.fieldname);
+
                                           setState(() {});
                                         },
                                       ),
@@ -2849,6 +2956,7 @@ class _ChildGrowthExpendedFormState
               cWidgetDatamap.remove('re_weight_for_age_zscore');
               cWidgetDatamap.remove('re_weight_for_height_zscore');
               cWidgetDatamap.remove('re_height_for_age_zscore');
+              cWidgetDatamap.remove('re_measurement_position');
 
               childItem.first.remove('re_height');
               childItem.first.remove('re_weight');
@@ -2862,6 +2970,7 @@ class _ChildGrowthExpendedFormState
               childItem.first.remove('re_weight_for_age_zscore');
               childItem.first.remove('re_weight_for_height_zscore');
               childItem.first.remove('re_height_for_age_zscore');
+              childItem.first.remove('re_measurement_position');
             }
             if(cWidgetDatamap['re_created_on']!=null || cWidgetDatamap['re_created_by']!=null){
               cWidgetDatamap['re_updated_by'] = userName;
@@ -2932,6 +3041,36 @@ class _ChildGrowthExpendedFormState
           Validate().singleButtonPopup(
               Global.returnTrLable(
                   translatsLabel, CustomText.plsSelectMesureDate, lng),
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
+          validStatus = false;
+        } else
+        if (!Global.validString(cWidgetDatamap['re_measurement_equipment'])) {
+          Validate().singleButtonPopup(
+              Global.returnTrLable(
+                  translatsLabel, CustomText.plsSelectMesureEquip, lng),
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
+          validStatus = false;
+        } else
+        if (Global.stringToDouble(cWidgetDatamap['re_weight'].toString()) ==
+            0) {
+          Validate().singleButtonPopup(
+              Global.returnTrLable(
+                  translatsLabel, CustomText.plsSelectWeight, lng),
+              Global.returnTrLable(translatsLabel, CustomText.ok, lng),
+              false,
+              context);
+          validStatus = false;
+        }
+      }
+      if (cWidgetDatamap['re_do_you_have_height_weight'].toString() == '1') {
+        if (!Global.validString(cWidgetDatamap['re_measurement_position'])) {
+          Validate().singleButtonPopup(
+              Global.returnTrLable(
+                  translatsLabel, CustomText.plsSelectMesurePosition, lng),
               Global.returnTrLable(translatsLabel, CustomText.ok, lng),
               false,
               context);

@@ -1464,11 +1464,11 @@ class DependingLogic {
     int retuenValu = 0;
 
     if (fieldname == 'weight_for_age'|| fieldname == 're_weight_for_age') {
-      var age = cWidgetDatamap['age_months'];
+      var age = Global.validToInt(cWidgetDatamap['age_months']);
       var weight = cWidgetDatamap['weight'];
       if(fieldname == 're_weight_for_age'){
         weight = cWidgetDatamap['re_weight'];
-        age = cWidgetDatamap['re_age_months'];
+        age = Global.validToInt(cWidgetDatamap['re_age_months']);
       }
       print('AgeeInmonth $age');
       if (age != null && weight != null) {
@@ -1518,22 +1518,24 @@ class DependingLogic {
       }
     }
     else if (fieldname == 'height_for_age'|| fieldname == 're_height_for_age') {
-      var age = cWidgetDatamap['age_months'];
+      var age = Global.validToInt(cWidgetDatamap['age_months']);
       var height = cWidgetDatamap['height'];
-      var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      // var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      var measurementPosition = cWidgetDatamap['measurement_position'];
       if(fieldname == 're_height_for_age'){
-        age = cWidgetDatamap['re_age_months'];
+        age = Global.validToInt(cWidgetDatamap['re_age_months']);
         height = cWidgetDatamap['re_height'];
-        measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+        // measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+        measurementPosition = cWidgetDatamap['re_measurement_position'];
       }
 
       if (age != null && height != null) {
-        if (age <= Global.getbackDaysByMonth(mesurmentTakenDate,24) && height > 0 && measurement_equipment == '1') {
+        if (age <= Global.getbackDaysByMonth(mesurmentTakenDate,24) && height > 0 && measurementPosition == '1') {
           ///Stediometer
           height = Global.stringToDouble(height.toString()) + 0.7;
         } else if (age > Global.getbackDaysByMonth(mesurmentTakenDate,24) &&
             height > 0 &&
-            measurement_equipment == '2') {
+            measurementPosition == '2') {
           ///Infantometer
           height = Global.stringToDouble(height.toString()) - 0.7;
         }
@@ -1583,24 +1585,26 @@ class DependingLogic {
     else if (fieldname == 'weight_for_height'||fieldname == 're_weight_for_height') {
       var weight = cWidgetDatamap['weight'];
       var height = cWidgetDatamap['height'];
-      var measurement_equipment = cWidgetDatamap['measurement_equipment'];
-      var age = cWidgetDatamap['age_months'];
+      // var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      var measurementPosition = cWidgetDatamap['measurement_position'];
+      var age = Global.validToInt(cWidgetDatamap['age_months']);
       if(fieldname == 're_weight_for_height'){
         weight = cWidgetDatamap['re_weight'];
         height = cWidgetDatamap['re_height'];
-        measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
-         age = cWidgetDatamap['re_age_months'];
+        // measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+        measurementPosition = cWidgetDatamap['re_measurement_position'];
+         age = Global.validToInt(cWidgetDatamap['re_age_months']);
       }
       int preHeight=0;
       if (weight != null && height != null) {
         if(age <= 730){
           preHeight=0;
-          if(measurement_equipment == '1'){
+          if(measurementPosition == '1'){
             height =  Global.stringToDouble(height.toString()) + 0.7;
           }
         }else  if (age > 730){
           preHeight=24;
-          if(measurement_equipment == '2'){
+          if(measurementPosition == '2'){
             height =  Global.stringToDouble(height.toString()) - 0.7;
           }
         }
@@ -1676,10 +1680,10 @@ class DependingLogic {
     String growthValue = '';
 
     if (fieldname == 'weight_for_age'||fieldname == 're_weight_for_age') {
-      var age = cWidgetDatamap['age_months'];
+      var age = Global.validToInt(cWidgetDatamap['age_months']);
       var weight = cWidgetDatamap['weight'];
       if(fieldname == 're_weight_for_age'){
-        age = cWidgetDatamap['re_age_months'];
+        age = Global.validToInt(cWidgetDatamap['re_age_months']);
         weight = cWidgetDatamap['re_weight'];
       }
 
@@ -1753,25 +1757,27 @@ class DependingLogic {
       }
     }
     else if (fieldname == 'height_for_age'||fieldname == 're_height_for_age') {
-      var age = cWidgetDatamap['age_months'];
+      var age = Global.validToInt(cWidgetDatamap['age_months']);
       var height = cWidgetDatamap['height'];
-      var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      var measurementPosition = cWidgetDatamap['measurement_position'];
+      // var measurement_equipment = cWidgetDatamap['measurement_equipment'];
       if(fieldname == 're_height_for_age'){
-        age = cWidgetDatamap['re_age_months'];
+        age = Global.validToInt(cWidgetDatamap['re_age_months']);
         height = cWidgetDatamap['re_height'];
-        measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+        // measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+        measurementPosition = cWidgetDatamap['re_measurement_position'];
       }
 
       if (age != null && height != null) {
 
 
         if (age < Global.getbackDaysByMonth(mesurmentTakenDate,24) && height >
-            0 && measurement_equipment == '1') {
+            0 && measurementPosition == '1') {
           ///Stediometer
           height = Global.stringToDouble(height.toString()) + 0.7;
         } else if (age > Global.getbackDaysByMonth(mesurmentTakenDate,24) &&
             height > 0 &&
-            measurement_equipment == '2') {
+            measurementPosition == '2') {
           ///Infantometer
           height = Global.stringToDouble(height.toString()) - 0.7;
         }
@@ -1845,13 +1851,15 @@ class DependingLogic {
     else if (fieldname == 'weight_for_height'||fieldname == 're_weight_for_height') {
       var weight = cWidgetDatamap['weight'];
       var height = cWidgetDatamap['height'];
-      var age = cWidgetDatamap['age_months'];
-      var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      var age = Global.validToInt(cWidgetDatamap['age_months']);
+      // var measurement_equipment = cWidgetDatamap['measurement_equipment'];
+      var measurementPosition = cWidgetDatamap['measurement_position'];
       if(fieldname == 're_weight_for_height'){
         weight = cWidgetDatamap['re_weight'];
         height = cWidgetDatamap['re_height'];
-        age = cWidgetDatamap['re_age_months'];
-        measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+        age = Global.validToInt(cWidgetDatamap['re_age_months']);
+        // measurement_equipment = cWidgetDatamap['re_measurement_equipment'];
+        measurementPosition = cWidgetDatamap['re_measurement_position'];
       }
       int preHeight=0;
       if (weight != null && height != null) {
@@ -1877,13 +1885,13 @@ class DependingLogic {
         // }
         if(age <= 730){
           preHeight=0;
-          if(measurement_equipment == '1'){
+          if(measurementPosition == '1'){
             height =  Global.stringToDouble(height.toString()) + 0.7;
           }
         }
         else  if (age > 730){
           preHeight=24;
-          if(measurement_equipment == '2'){
+          if(measurementPosition == '2'){
             height =  Global.stringToDouble(height.toString()) - 0.7;
           }
         }

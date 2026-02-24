@@ -165,16 +165,16 @@ class _CmcSMTabItemSCreenForAddState extends State<CmcSMTabItemSCreenForAdd> {
 
   Future<List<String>> fetchDatesList(String creche_id) async {
     List<CmcSMResponseModel> cmcRespose = await CmcSMTabResponseHelper()
-        .childALMChild(Global.stringToInt(creche_id));
+        .childALMChildNotInSmguid(Global.stringToInt(creche_id),widget.smguid);
     List<String> visitdatesListString = [];
     cmcRespose.forEach((element) {
       visitdatesListString
           .add(Global.getItemValues(element.responces, 'date_of_visit'));
     });
-    if (Global.validString(widget.date_of_visit) &&
-        visitdatesListString.contains(widget.date_of_visit)) {
-      visitdatesListString.remove(widget.date_of_visit);
-    }
+    // if (Global.validString(widget.date_of_visit) &&
+    //     visitdatesListString.contains(widget.date_of_visit)) {
+    //   visitdatesListString.remove(widget.date_of_visit);
+    // }
     return visitdatesListString;
   }
 
@@ -545,7 +545,7 @@ class _CmcSMTabItemSCreenForAddState extends State<CmcSMTabItemSCreenForAdd> {
         return CustomDatepickerDynamic(
           initialvalue: _myMap[quesItem.fieldname!],
           fieldName: quesItem.fieldname,
-          // readable: quesItem.fieldname == 'date_of_visit'?widget.isEdit:null,
+          readable: quesItem.fieldname == 'date_of_visit'?true:null,
           minDate: quesItem.fieldname == 'date_of_visit'
               ? now.isBefore(applicableDate)
                   ? null
@@ -777,6 +777,10 @@ class _CmcSMTabItemSCreenForAddState extends State<CmcSMTabItemSCreenForAdd> {
   }
 
   nextTab(int type, BuildContext mContext) async {
+    var dateOfVi = _myMap['date_of_visit'];
+    if (dateOfVi.length > 0 && Global.validString(_myMap['creche_id'])) {
+      unpicableDates = await fetchDatesList(_myMap['creche_id']);
+    }
     if (type == 1) {
       if (_checkValidation()) {
         if (widget.tabIndex < (widget.totalTab - 1)) {
@@ -830,12 +834,13 @@ class _CmcSMTabItemSCreenForAddState extends State<CmcSMTabItemSCreenForAdd> {
                 context);
             validStatus = false;
             break;
-          } else if (element.fieldname == 'date_of_visit') {
-            if (unpicableDates.contains(values)) {
-              _myMap.remove(element.fieldname);
-              setState(() {});
+          }
+          else if (element.fieldname == 'date_of_visit') {
+            if (hasRecordExists(values)) {
+              // _myMap.remove(element.fieldname);
+              // setState(() {});
               var message = Global.returnTrLable(
-                  _translation, CustomText.visitNoteAlrdyExists, _language);
+                  _translation, CustomText.saftyCheckListAlrdyExists, _language);
               message = message.replaceAll(
                   RegExp("@", caseSensitive: false), '$values');
               Validate().singleButtonPopup(
@@ -858,8 +863,7 @@ class _CmcSMTabItemSCreenForAddState extends State<CmcSMTabItemSCreenForAdd> {
           validStatus = false;
           break;
         }
-      }
-      ;
+      };
     } else {
       print("selected items is null");
     }
@@ -868,6 +872,10 @@ class _CmcSMTabItemSCreenForAddState extends State<CmcSMTabItemSCreenForAdd> {
   }
 
   Future<void> saveOnly(int type) async {
+    var dateOfVi = _myMap['date_of_visit'];
+    if (dateOfVi.length > 0 && Global.validString(_myMap['creche_id'])) {
+      unpicableDates = await fetchDatesList(_myMap['creche_id']);
+    }
     if (type == 1) {
       if (_checkValidation()) {
         if (widget.tabIndex == 0)
@@ -1015,5 +1023,18 @@ class _CmcSMTabItemSCreenForAddState extends State<CmcSMTabItemSCreenForAdd> {
     } else {
       await ImageFileTabHelper().updateImageOnlyItem(items);
     }
+  }
+
+  bool hasRecordExists(String yearMonth) {
+    var monthYearVisitDate=Global.getMonthYearCurrentDayByDate(yearMonth);
+    return unpicableDates.any((date) {
+      try {
+        final parts = date.split("-");
+        final formatted = "${parts[0]}-${parts[1]}";
+        return formatted == monthYearVisitDate;
+      } catch (e) {
+        return false;
+      }
+    });
   }
 }

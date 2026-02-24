@@ -54,6 +54,7 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
   List<HouseHoldFielItemdModel> formItem = [];
   List<Translation> translats = [];
   List<OptionsModel> mesureMentEqupmet = [];
+  List<OptionsModel> mesureMentPostion = [];
   List<OptionsModel> inless = [];
   String lng = 'en';
   bool currentDateGrowth = false;
@@ -130,6 +131,10 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
 
     mesureMentEqupmet = await OptionsModelHelper()
         .getMstCommonOptions('Measurement Equipment', lng);
+
+    mesureMentPostion = await OptionsModelHelper()
+        .getMstCommonOptions('Measurement Position', lng);
+
     inless = await OptionsModelHelper().getMstCommonOptions('Illness', lng);
 
     await ChildGrowthResponseHelper()
@@ -324,6 +329,18 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                       StrutStyle(height: 1.2),
                                                 ),
                                                 callGetChildDataFromAnthro(
+                                                    childHHData[index]
+                                                        .responces!,
+                                                    'do_you_have_height_weight') ==
+                                                    '1'
+                                                    ? Text(
+                                                  '${Global.returnTrLable(translats, CustomText.measurementPosition, lng).trim()} : ',
+                                                  style: Styles.black104,
+                                                  strutStyle: StrutStyle(
+                                                      height: 1.2),
+                                                )
+                                                    : SizedBox(),
+                                                callGetChildDataFromAnthro(
                                                             childHHData[index]
                                                                 .responces!,
                                                             'do_you_have_height_weight') ==
@@ -413,6 +430,32 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
                                                         StrutStyle(height: 1.2),
                                                     overflow:
                                                         TextOverflow.ellipsis,
+                                                  ),
+                                                  callGetChildDataFromAnthro(
+                                                      childHHData[index]
+                                                          .responces!,
+                                                      'do_you_have_height_weight') ==
+                                                      '1'
+                                                      ? Text(
+                                                    getMesumentPositation(
+                                                        childHHData[index]
+                                                            .responces!,
+                                                        'measurement_position'),
+                                                    style:
+                                                    Styles.cardBlue10,
+                                                    strutStyle: StrutStyle(
+                                                        height: 1.2),
+                                                    overflow: TextOverflow
+                                                        .ellipsis,
+                                                  )
+                                                      : Text(
+                                                    '${Global.returnTrLable(translats, CustomText.No, lng).trim()}',
+                                                    style:
+                                                    Styles.cardBlue10,
+                                                    strutStyle: StrutStyle(
+                                                        height: 1.2),
+                                                    overflow: TextOverflow
+                                                        .ellipsis,
                                                   ),
                                                   callGetChildDataFromAnthro(
                                                               childHHData[index]
@@ -813,6 +856,18 @@ class _ChildGrowthListingState extends State<ChildGrowthListingScreenInChild> {
     String eqp = '';
     var eqpId = callGetChildDataFromAnthro(responce, key);
     var items = mesureMentEqupmet
+        .where((element) => element.name.toString() == eqpId)
+        .toList();
+    if (items.length > 0) {
+      eqp = items[0].values!;
+    }
+    return eqp;
+  }
+
+  String getMesumentPositation(responce, String key) {
+    String eqp = '';
+    var eqpId = callGetChildDataFromAnthro(responce, key);
+    var items = mesureMentPostion
         .where((element) => element.name.toString() == eqpId)
         .toList();
     if (items.length > 0) {

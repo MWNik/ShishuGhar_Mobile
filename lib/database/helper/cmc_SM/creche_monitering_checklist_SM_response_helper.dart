@@ -60,6 +60,21 @@ class CmcSMTabResponseHelper {
     return items;
   }
 
+  Future<List<CmcSMResponseModel>> childALMChildNotInSmguid(int? crecheIdName,String smguid) async {
+    var query =
+        'Select * from  tabCreche_Monitering_Checklist_SM_response  where creche_id=? and smguid !=? ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';
+
+    List<Map<String, dynamic>> result =
+        await DatabaseHelper.database!.rawQuery(query, [crecheIdName,smguid]);
+
+    List<CmcSMResponseModel> items = [];
+    result.forEach((itemMap) {
+      items.add(CmcSMResponseModel.fromJson(itemMap));
+    });
+
+    return items;
+  }
+
   Future<List<CmcSMResponseModel>> callCrechMonitoringSM() async {
     var query =
         'Select * from  tabCreche_Monitering_Checklist_SM_response ORDER BY CASE  WHEN update_at IS NOT NULL AND length(RTRIM(LTRIM(update_at))) > 0 THEN update_at ELSE created_at END DESC';

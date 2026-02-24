@@ -476,8 +476,8 @@ class CustomText {
   static String actionTaken = "Action Taken";
   static String boy = "Boy";
   static String girl = "Girl";
-  static String visitNoteAlrdyExists =
-      "A Visit Note already exists for the selected Date";
+  static String visitNoteAlrdyExists = "A Visit Note already exists for the selected Date";
+  static String saftyCheckListAlrdyExists = "A Safety Check already exists for the month and year";
   static String enrollExitChild = "Child Enrollment and Exit";
   static String requisition = "Requisition";
   static String stockDetails = "Stock Detail";
@@ -582,6 +582,7 @@ class CustomText {
   static String crecheMeeting = "Creche Committee Meeting"; //17
   static String cmcALMDoctype = "Creche Monitoring Checklist ALM"; //18
   static String childAttendance = "Child Attendance"; //19
+  static String safetyIndicatorys = "Safety Indicators"; //19
   static String cashbook = "Cashbook"; //20
   static String childFollowUp = "Child Follow up"; //21
   static String childExit = "Child Exit"; //22
@@ -741,6 +742,8 @@ class CustomText {
   static String   GF2='GF2';
   static String   childrenAtRisk='Children at risk';
   static String   safetyChecklist='Safety checklist';
+  static String plsSelectMesurePosition = "Please select Measurement Position!";
+  static String measurementPosition = "Measurement Position";
 
 
 
