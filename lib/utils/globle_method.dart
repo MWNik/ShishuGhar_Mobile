@@ -878,5 +878,7 @@ class Global {
 
   }
 
-
+  static double convertToOne(double value) {
+    return value.abs();
+  }
 }

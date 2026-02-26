@@ -136,7 +136,8 @@ class _CmcSMTabItemSCreenForAddState extends State<CmcSMTabItemSCreenForAdd> {
       CustomText.plsFilManForm,
       CustomText.wesUsageGraterQuatOpen,
       CustomText.leavingLesThanjoining,
-      CustomText.Submit
+      CustomText.Submit,
+      CustomText.saftyCheckListAlrdyExists
     ];
 
     final itemz = widget.screenItem[widget.tabBreakItem.name]!;

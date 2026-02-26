@@ -744,6 +744,9 @@ class CustomText {
   static String   safetyChecklist='Safety checklist';
   static String plsSelectMesurePosition = "Please select Measurement Position!";
   static String measurementPosition = "Measurement Position";
+  static String Growthfaltering1P = "Growth faltering 1+";
+  static String ZigZagPattern = "Zig-Zag Pattern";
+  static String SNC = "SNC";
 
 
 

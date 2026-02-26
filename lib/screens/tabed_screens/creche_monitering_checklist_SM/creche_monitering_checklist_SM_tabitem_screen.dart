@@ -115,7 +115,8 @@ class _CmcSMTabItemSCreenState extends State<CmcSMTabItemSCreen> {
       CustomText.PleaseSelectBeforTimeInIsValidTime,
       CustomText.plsFilManForm,
       CustomText.wesUsageGraterQuatOpen,
-      CustomText.leavingLesThanjoining
+      CustomText.leavingLesThanjoining,
+      CustomText.saftyCheckListAlrdyExists
     ];
 
     final itemz = widget.screenItem[widget.tabBreakItem.name]!;

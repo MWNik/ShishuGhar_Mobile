@@ -2821,34 +2821,6 @@ left join (
     return allChildren;
   }
 
-  // GF1
-  Future<List<Map<String, dynamic>>> excuteGF1({
-    String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
-    String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
-
-    for (int i = 0; i < childrenMeasurementTaken.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-        var gfReco = await checkSUWCondition(element['childenrollguid']
-            ,element['measurement_taken_date'],element);
-        if(gfReco=='GF1'){
-          allChildren.add(element);
-        }
-      }
-
-    }
-
-    return allChildren;
-  }
-
   // GF1 with all anthro
   Future<List<Map<String, dynamic>>> excuteGF1Anthro({
     String? stateId, String? districtId,
@@ -2879,31 +2851,6 @@ left join (
     return allChildren;
   }
 
-  // GF1  with  With Measurement Taken
-  Future<List<Map<String, dynamic>>> excuteGF1WithMeasurementTaken({
-    String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
-    String? partnerId, String? crecheStatus, String? filterDate
-    ,List<Map<String, dynamic>>? childrenMeasurementTaken,
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-
-    for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-        var gfReco = await checkSUWCondition(element['childenrollguid']
-            ,element['measurement_taken_date'],element);
-        if(gfReco=='GF1'){
-          allChildren.add(element);
-        }
-      }
-
-    }
-
-    return allChildren;
-  }
 
 
   // GF1   With Measurement Taken  local
@@ -2919,7 +2866,7 @@ left join (
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
       var element=childrenMeasurementTaken[i];
       if(element['measurement_taken_date']!=null){
-        var gfReco = await checkRedFlagGrowthMonitoring(element['childenrollguid']
+        var gfReco = await checkGF1GrowthMonitoring(element['childenrollguid']
             ,element['measurement_taken_date'],element['cgmguid'],
             element,allAntroData!);
         if(gfReco=='GF1'){
@@ -2927,32 +2874,6 @@ left join (
         }
       }
 
-    }
-
-    return allChildren;
-  }
-
-  // GF2
-  Future<List<Map<String, dynamic>>> excuteGF2({
-    String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
-    String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
-
-    for (int i = 0; i < childrenMeasurementTaken.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-      var gfReco = await checkSUWCondition(element['childenrollguid']
-          ,element['measurement_taken_date'],element);
-      if(gfReco=='GF2'){
-        allChildren.add(element);
-      }}
     }
 
     return allChildren;
@@ -3002,7 +2923,7 @@ left join (
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
       var element=childrenMeasurementTaken[i];
       if(element['measurement_taken_date']!=null){
-        var gfReco = await checkRedFlagGrowthMonitoring(element['childenrollguid']
+        var gfReco = await checkGF2GrowthMonitoring(element['childenrollguid']
             ,element['measurement_taken_date'],element['cgmguid'],
             element,allAntroData!);
         if(gfReco=='GF2'){
@@ -3013,12 +2934,13 @@ left join (
     return allChildren;
   }
 
-  // GF2   With Measurement Taken  with
-  Future<List<Map<String, dynamic>>> excuteGF2MeasurementTaken({
+  // GF1+   With Measurement Taken  local
+  Future<List<Map<String, dynamic>>> excuteGF1PMeasurementTakenAllAnthro({
     String? stateId, String? districtId,
     String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<Map<String, dynamic>>? childrenMeasurementTaken,
+    List<ChildGrowthMetaResponseModel>? allAntroData
   })
   async {
 
@@ -3027,8 +2949,9 @@ left join (
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
       var element=childrenMeasurementTaken[i];
       if(element['measurement_taken_date']!=null){
-        var gfReco = await checkSUWCondition(element['childenrollguid']
-            ,element['measurement_taken_date'],element);
+        var gfReco = await checkGFP1GrowthMonitoring(element['childenrollguid']
+            ,element['measurement_taken_date'],element['cgmguid'],
+            element,allAntroData!);
         if(gfReco=='GF2'){
           allChildren.add(element);
         }}
@@ -3037,40 +2960,59 @@ left join (
     return allChildren;
   }
 
-  // Red flag children
-  Future<List<Map<String, dynamic>>> excuteRedFlag({
+  // ZIG-ZAG   With Measurement Taken  local
+  Future<List<Map<String, dynamic>>> excuteZigZagMeasurementTakenAllAnthro({
     String? stateId, String? districtId,
     String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
+    List<Map<String, dynamic>>? childrenMeasurementTaken,
+    List<ChildGrowthMetaResponseModel>? allAntroData
   })
   async {
 
     List<Map<String, dynamic>> allChildren=[];
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
 
-    for (int i = 0; i < childrenMeasurementTaken.length; i++) {
+    for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
       var element=childrenMeasurementTaken[i];
       if(element['measurement_taken_date']!=null){
-        var gfReco = await checkSUWCondition(element['childenrollguid']
-            ,element['measurement_taken_date'],element);
-
-        if (Global.stringToDouble(
-            element['weight_for_height'].toString()) ==
-            1 ||
-            gfReco=='GF2' ||
-            Global.stringToInt(
-                element['any_medical_major_illness'].toString()) ==
-                1 ||
-            Global.stringToDouble(element['weight_for_age'].toString()) ==
-                1) {
+        var gfReco = await checkZigZagGrowthMonitoring(element['childenrollguid']
+            ,element['measurement_taken_date'],element['cgmguid'],
+            element,allAntroData!);
+        if(gfReco=='GF2'){
           allChildren.add(element);
         }}
     }
 
     return allChildren;
   }
+
+  // SNC Pattern  With Measurement Taken  local
+  Future<List<Map<String, dynamic>>> excuteSNCPatternMeasurementTakenAllAnthro({
+    String? stateId, String? districtId,
+    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? partnerId, String? crecheStatus, String? filterDate,
+    List<Map<String, dynamic>>? childrenMeasurementTaken,
+    List<ChildGrowthMetaResponseModel>? allAntroData
+  })
+  async {
+
+    List<Map<String, dynamic>> allChildren=[];
+
+    for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
+      var element=childrenMeasurementTaken[i];
+      if(element['measurement_taken_date']!=null){
+        var gfReco = await checkSNCGrowthMonitoring(element['childenrollguid']
+            ,element['measurement_taken_date'],element['cgmguid'],
+            element,allAntroData!);
+        if(gfReco=='GF2'){
+          allChildren.add(element);
+        }}
+    }
+
+    return allChildren;
+  }
+
+
 
   // Red flag children
   Future<List<Map<String, dynamic>>> excuteRedFlagAnthro({
@@ -3109,39 +3051,6 @@ left join (
     return allChildren;
   }
 
-  // Red flag children  measument taken
-  Future<List<Map<String, dynamic>>> excuteRedFlagMeasurmentTaken({
-    String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
-    String? partnerId, String? crecheStatus, String? filterDate,
-    List<Map<String, dynamic>>? childrenMeasurementTaken,
-
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-
-    for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-        var gfReco = await checkSUWCondition(element['childenrollguid']
-            ,element['measurement_taken_date'],element);
-
-        if (Global.stringToDouble(
-            element['weight_for_height'].toString()) ==
-            1 ||
-            gfReco=='GF2' ||
-            Global.stringToInt(
-                element['any_medical_major_illness'].toString()) ==
-                1 ||
-            Global.stringToDouble(element['weight_for_age'].toString()) ==
-                1) {
-          allChildren.add(element);
-        }}
-    }
-
-    return allChildren;
-  }
 
 
   // Red flag children  measument taken  all anthro
@@ -3265,6 +3174,17 @@ left join (
     return genratedValue;
   }
 
+
+
+
+
+
+
+
+
+
+
+
 //With  local growth monitoring
   Future<String?> checkRedFlagGrowthMonitoring(String enrolChildGuid,
       String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
@@ -3338,8 +3258,6 @@ left join (
         }
       }
 
-
-
       if (lastGrowhthDetails.isNotEmpty &&
           (Global.stringToDouble(growhthDetails['weight'].toString()) <=
               Global.stringToDouble(lastGrowhthDetails['weight'].toString()))) {
@@ -3354,12 +3272,450 @@ left join (
         }
       }
 
+
     }
 
 
 
     return genratedValue;
   }
+
+  //With  local growth monitoring GF1
+  Future<String?> checkGF1GrowthMonitoring(String enrolChildGuid,
+      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems)
+  async {
+    String? genratedValue;
+
+    // lastMonth
+    String lastMonthDate = Validate().getOneMonthPreviousDate(measurement_date);
+    var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
+
+
+
+    var items=growthItems.where(
+            (element) => (element.cgmguid == cgmguid))
+        .toList();
+
+    if(items.length>0){
+      var filterdLastRecord=growthItems.where(
+              (element) => (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!)==
+                  lastMonthYear))
+          .toList();
+
+
+      Map<String, dynamic> lastGrowhthDetails = {};
+
+      if(filterdLastRecord.length>0){
+        var lastAntroRecord=filterdLastRecord.first;
+
+        if (lastAntroRecord.responces!=null) {
+          Map<String, dynamic> lastGrowthRec =
+          jsonDecode(lastAntroRecord.responces!);
+          var lastdChild = lastGrowthRec['anthropromatic_details'];
+          if (lastdChild != null) {
+            var child = lastdChild
+                .where((element) => element['childenrollguid'] == enrolChildGuid
+                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .toList();
+            if (child.length > 0) {
+              lastGrowhthDetails = child.first;
+            }
+          }
+        }
+      }
+
+
+      if (lastGrowhthDetails.isNotEmpty &&
+          (Global.convertToOne(Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString()))) >0&&
+          Global.convertToOne(Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString()))>0) {
+
+        var currentWAZ=Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString());
+        var lastWAZ=Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString());
+
+        var gf1diff=currentWAZ-lastWAZ;
+        if(gf1diff < 0){
+          genratedValue = 'GF1';
+        }
+      }
+    }
+
+
+
+    return genratedValue;
+  }
+
+  //With  local growth monitoring GF+1
+  Future<String?> checkGFP1GrowthMonitoring(String enrolChildGuid,
+      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems)
+  async {
+    String? genratedValue;
+
+    // lastMonth
+    String lastMonthDate = Validate().getOneMonthPreviousDate(measurement_date);
+    var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
+
+
+
+    var items=growthItems.where(
+            (element) => (element.cgmguid == cgmguid))
+        .toList();
+
+    if(items.length>0){
+      var filterdLastRecord=growthItems.where(
+              (element) => (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!)==
+                  lastMonthYear))
+          .toList();
+
+
+      Map<String, dynamic> lastGrowhthDetails = {};
+
+      if(filterdLastRecord.length>0){
+        var lastAntroRecord=filterdLastRecord.first;
+
+        if (lastAntroRecord.responces!=null) {
+          Map<String, dynamic> lastGrowthRec =
+          jsonDecode(lastAntroRecord.responces!);
+          var lastdChild = lastGrowthRec['anthropromatic_details'];
+          if (lastdChild != null) {
+            var child = lastdChild
+                .where((element) => element['childenrollguid'] == enrolChildGuid
+                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .toList();
+            if (child.length > 0) {
+              lastGrowhthDetails = child.first;
+            }
+          }
+        }
+      }
+
+      if (lastGrowhthDetails.isNotEmpty &&
+          (Global.convertToOne(Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString()))) >0&&
+          Global.convertToOne(Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString()))>0) {
+
+        var currentWAZ=Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString());
+        var lastWAZ=Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString());
+
+        var gf1diff=currentWAZ-lastWAZ;
+        if(gf1diff <= -0.5){
+          genratedValue = 'GF1+';
+        }
+      }
+
+    }
+
+
+
+    return genratedValue;
+  }
+
+  //With  local growth monitoring  GF2
+  Future<String?> checkGF2GrowthMonitoring(String enrolChildGuid,
+      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems)
+  async {
+    String? genratedValue;
+
+    // lastMonth
+    String lastMonthDate = Validate().getOneMonthPreviousDate(measurement_date);
+    var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
+
+    ////secondLastMonth
+    String secoundLast = Validate().getOneMonthPreviousDate(lastMonthDate);
+    var secoundLastMonthYear = Validate().dateToMonthYear(secoundLast);
+
+
+    var items=growthItems.where(
+            (element) => (element.cgmguid == cgmguid))
+        .toList();
+
+    if(items.length>0){
+      var filterdLastRecord=growthItems.where(
+              (element) => (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!)==
+                  lastMonthYear))
+          .toList();
+
+      var filterdSencondLastRecord=growthItems.where(
+              (element) => (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!)==
+                  secoundLastMonthYear))
+          .toList();
+
+      Map<String, dynamic> lastGrowhthDetails = {};
+      Map<String, dynamic> secondlastGrowhthDetails = {};
+
+      if(filterdLastRecord.length>0){
+        var lastAntroRecord=filterdLastRecord.first;
+
+        if (lastAntroRecord.responces!=null) {
+          Map<String, dynamic> lastGrowthRec =
+          jsonDecode(lastAntroRecord.responces!);
+          var lastdChild = lastGrowthRec['anthropromatic_details'];
+          if (lastdChild != null) {
+            var child = lastdChild
+                .where((element) => element['childenrollguid'] == enrolChildGuid
+                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .toList();
+            if (child.length > 0) {
+              lastGrowhthDetails = child.first;
+            }
+          }
+        }
+      }
+
+      if(filterdSencondLastRecord.length>0){
+        var secondLastAntroRecord=filterdSencondLastRecord.first;
+        if (secondLastAntroRecord.responces!=null) {
+          Map<String, dynamic> lastGrowthRec =
+          jsonDecode(secondLastAntroRecord.responces!);
+          var lastdChild = lastGrowthRec['anthropromatic_details'];
+          if (lastdChild != null) {
+            var child = lastdChild
+                .where((element) => element['childenrollguid'] == enrolChildGuid
+                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .toList();
+            if (child.length > 0) {
+              secondlastGrowhthDetails = child.first;
+            }
+          }
+        }
+      }
+
+      if (lastGrowhthDetails.isNotEmpty &&
+          (Global.convertToOne(Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString()))) >0&&
+          Global.convertToOne(Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString()))>0) {
+
+        var currentWAZ=Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString());
+        var lastWAZ=Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString());
+
+        var gf1diff=currentWAZ-lastWAZ;
+        if(gf1diff < 0){
+          if (secondlastGrowhthDetails.isNotEmpty &&
+              (Global.convertToOne(Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString()))) >0&&
+              Global.convertToOne(Global.stringToDouble(secondlastGrowhthDetails['weight_for_age_zscore'].toString()))>0) {
+            var currentWAZ=Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString());
+            var seconLasWAZ=Global.stringToDouble(secondlastGrowhthDetails['weight_for_age_zscore'].toString());
+            double overallChange = currentWAZ - seconLasWAZ;
+
+            if (overallChange <= -0.5) {
+              genratedValue = 'GF2';
+            }
+          }
+        }
+      }
+
+
+    }
+
+
+
+    return genratedValue;
+  }
+
+  //With  local growth monitoring  ZigZag
+  Future<String?> checkZigZagGrowthMonitoring(String enrolChildGuid,
+      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems)
+  async {
+    String? genratedValue;
+    List<double> lastFourMonthsWaz=[];
+    // lastMonth
+    String lastMonthDate = Validate().getOneMonthPreviousDate(measurement_date);
+    var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
+
+    ////secondLastMonth
+    String secoundLast = Validate().getOneMonthPreviousDate(lastMonthDate);
+    var secoundLastMonthYear = Validate().dateToMonthYear(secoundLast);
+
+    ////third LastMonth
+    String thirdLast = Validate().getOneMonthPreviousDate(secoundLast);
+    var thirdLastMonthYear = Validate().dateToMonthYear(thirdLast);
+
+    ////fourth LastMonth
+    String fourthLast = Validate().getOneMonthPreviousDate(thirdLast);
+    var fourthLastMonthYear = Validate().dateToMonthYear(fourthLast);
+
+
+    var items=growthItems.where(
+            (element) => (element.cgmguid == cgmguid))
+        .toList();
+
+    if(items.length>0){
+      var filterdLastRecord=growthItems.where(
+              (element) => (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!)==
+                  lastMonthYear))
+          .toList();
+
+      var filterdSencondLastRecord=growthItems.where(
+              (element) => (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!)==
+                  secoundLastMonthYear))
+          .toList();
+
+      var filterdThirdLastRecord=growthItems.where(
+              (element) => (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!)==
+                  thirdLastMonthYear))
+          .toList();
+
+      var filterdFourthLastRecord=growthItems.where(
+              (element) => (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!)==
+                      fourthLastMonthYear))
+          .toList();
+
+      Map<String, dynamic> lastGrowhthDetails = {};
+      Map<String, dynamic> secondlastGrowhthDetails = {};
+      Map<String, dynamic> thirdlastGrowhthDetails = {};
+      Map<String, dynamic> fourthlastGrowhthDetails = {};
+
+      if(filterdLastRecord.length>0){
+        var lastAntroRecord=filterdLastRecord.first;
+
+        if (lastAntroRecord.responces!=null) {
+          Map<String, dynamic> lastGrowthRec =
+          jsonDecode(lastAntroRecord.responces!);
+          var lastdChild = lastGrowthRec['anthropromatic_details'];
+          if (lastdChild != null) {
+            var child = lastdChild
+                .where((element) => element['childenrollguid'] == enrolChildGuid
+                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .toList();
+            if (child.length > 0) {
+              lastGrowhthDetails = child.first;
+            }
+          }
+        }
+      }
+
+      if(filterdSencondLastRecord.length>0){
+        var secondLastAntroRecord=filterdSencondLastRecord.first;
+        if (secondLastAntroRecord.responces!=null) {
+          Map<String, dynamic> lastGrowthRec =
+          jsonDecode(secondLastAntroRecord.responces!);
+          var lastdChild = lastGrowthRec['anthropromatic_details'];
+          if (lastdChild != null) {
+            var child = lastdChild
+                .where((element) => element['childenrollguid'] == enrolChildGuid
+                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .toList();
+            if (child.length > 0) {
+              secondlastGrowhthDetails = child.first;
+            }
+          }
+        }
+      }
+
+      if(filterdThirdLastRecord.length>0){
+        var thirdLastAntroRecord=filterdThirdLastRecord.first;
+        if (thirdLastAntroRecord.responces!=null) {
+          Map<String, dynamic> lastGrowthRec =
+          jsonDecode(thirdLastAntroRecord.responces!);
+          var lastdChild = lastGrowthRec['anthropromatic_details'];
+          if (lastdChild != null) {
+            var child = lastdChild
+                .where((element) => element['childenrollguid'] == enrolChildGuid
+                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .toList();
+            if (child.length > 0) {
+              thirdlastGrowhthDetails = child.first;
+            }
+          }
+        }
+      }
+
+      if(filterdFourthLastRecord.length>0){
+        var fourthLastAntroRecord=filterdFourthLastRecord.first;
+        if (fourthLastAntroRecord.responces!=null) {
+          Map<String, dynamic> lastGrowthRec =
+          jsonDecode(fourthLastAntroRecord.responces!);
+          var lastdChild = lastGrowthRec['anthropromatic_details'];
+          if (lastdChild != null) {
+            var child = lastdChild
+                .where((element) => element['childenrollguid'] == enrolChildGuid
+                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .toList();
+            if (child.length > 0) {
+              fourthlastGrowhthDetails = child.first;
+            }
+          }
+        }
+      }
+      if(lastGrowhthDetails.isNotEmpty){
+        if(Global.convertToOne(Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString())) >0){
+          var currentWAZ=Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString());
+          lastFourMonthsWaz.add(currentWAZ);
+        }
+      }
+
+      if(secondlastGrowhthDetails.isNotEmpty){
+        if(Global.convertToOne(Global.stringToDouble(secondlastGrowhthDetails['weight_for_age_zscore'].toString())) >0){
+          var currentWAZ=Global.stringToDouble(secondlastGrowhthDetails['weight_for_age_zscore'].toString());
+          lastFourMonthsWaz.add(currentWAZ);
+        }
+      }
+
+      if(thirdlastGrowhthDetails.isNotEmpty){
+        if(Global.convertToOne(Global.stringToDouble(thirdlastGrowhthDetails['weight_for_age_zscore'].toString())) >0){
+          var currentWAZ=Global.stringToDouble(thirdlastGrowhthDetails['weight_for_age_zscore'].toString());
+          lastFourMonthsWaz.add(currentWAZ);
+        }
+      }
+
+      if(fourthlastGrowhthDetails.isNotEmpty){
+        if(Global.convertToOne(Global.stringToDouble(fourthlastGrowhthDetails['weight_for_age_zscore'].toString())) >0){
+          var currentWAZ=Global.stringToDouble(fourthlastGrowhthDetails['weight_for_age_zscore'].toString());
+          lastFourMonthsWaz.add(currentWAZ);
+        }
+      }
+      if(lastFourMonthsWaz.length==4){
+        double highest = lastFourMonthsWaz.reduce((a, b) => a > b ? a : b);
+        if(Global.convertToOne(Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString())) >0){
+          var currentWAZ=Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString());
+          double overallChange = currentWAZ - highest;
+          if (overallChange <= -0.5) {
+            genratedValue = 'Zig-Zag';
+          }
+        }
+
+      }
+
+
+    }
+
+
+
+    return genratedValue;
+  }
+
+  //With  local growth monitoring  SNC
+  Future<String?> checkSNCGrowthMonitoring(String enrolChildGuid,
+      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems)
+  async {
+    String? genratedValue;
+    var gf1=await checkGF1GrowthMonitoring( enrolChildGuid,
+         measurement_date,  cgmguid, growhthDetails, growthItems);
+    var gf1p=await checkGFP1GrowthMonitoring( enrolChildGuid,
+        measurement_date,  cgmguid, growhthDetails, growthItems);
+    var gf2=await checkGF2GrowthMonitoring( enrolChildGuid,
+        measurement_date,  cgmguid, growhthDetails, growthItems);
+    var zigZag=await checkZigZagGrowthMonitoring( enrolChildGuid,
+        measurement_date,  cgmguid, growhthDetails, growthItems);
+    if(Global.validString(gf1)&&Global.validString(gf1p)&&
+        Global.validString(gf2)&&Global.validString(zigZag)){
+      genratedValue='SNC';
+    }
+
+
+    return genratedValue;
+  }
+
 
   String crecheDataQuery(){
     return '''SELECT *
