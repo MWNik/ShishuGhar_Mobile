@@ -3293,100 +3293,171 @@ class _HomeReplicaScreenState extends State<HomeReplicaScreen> {
       onTap: () async {
         onclick(i, image[i], lng);
       },
+      // child: Container(
+      //   decoration: BoxDecoration(
+      //       boxShadow: [
+      //         BoxShadow(
+      //           color: Color(0xff5A5A5A)
+      //               .withOpacity(0.1), // Shadow color with opacity
+      //           offset: Offset(0, 1), // Horizontal and vertical offset
+      //           blurRadius: 5, // Blur radius
+      //           spreadRadius: 0, // Spread radius
+      //         ),
+      //       ],
+      //       color: Color(0xffF2F7FF),
+      //       borderRadius: BorderRadius.circular(5.r),
+      //       border: Border.all(
+      //         color: Color(0xffE7F0FF),
+      //       )),
+      //   height: 168.h,
+      //   width: 146.w,
+      //   child: Column(
+      //     crossAxisAlignment: CrossAxisAlignment.center,
+      //     children: [
+      //       Expanded(
+      //         child: Column(
+      //           crossAxisAlignment: CrossAxisAlignment.center,
+      //           mainAxisAlignment: MainAxisAlignment.center,
+      //           children: [
+      //             Visibility(
+      //               visible: true,
+      //               child: Stack(
+      //                 children: [
+      //                   SizedBox(
+      //                     height: 40,
+      //                     width: 60,
+      //                     child: Image.asset(
+      //                       height: 30,
+      //                       width: 30,
+      //                       image[i],
+      //                       filterQuality: FilterQuality.high,
+      //                       // scale: image[i] == 'assets/creche_profile/flagged_children_new.png' ||
+      //                       //     image[i] == 'assets/creche_profile/child_followUp_new.png' ||
+      //                       //     image[i] == 'assets/village_ic.png'
+      //                       //     ? 0.9
+      //                       //     : 3.8,
+      //                       color: image[i] ==
+      //                               'assets/creche_profile/flagged_children_new.png'
+      //                           ? null
+      //                           : Color(0xff5979AA),
+      //                     ),
+      //                   ),
+      //                   // if (image[i] == 'assets/shishughar.png'||
+      //                   //     image[i]=='assets/creche_profile/flagged_children_new.png'||
+      //                   //     image[i]=='assets/creche_profile/child_followUp_new.png')
+      //                   if (getCount(image[i]) > 0)
+      //                     Positioned(
+      //                       left: 30,
+      //                       bottom: 10,
+      //                       child: Container(
+      //                         alignment: Alignment.center,
+      //                         height: 25,
+      //                         // Smaller badge size
+      //                         width: 25,
+      //                         decoration: BoxDecoration(
+      //                           shape: BoxShape.circle,
+      //                           color: Color(0xffF26BA3),
+      //                           border:
+      //                               Border.all(color: Colors.white, width: 1.5),
+      //                         ),
+      //                         child: Text(
+      //                           "${getCount(image[i])}",
+      //                           style: TextStyle(
+      //                             color: Colors.white,
+      //                             fontSize: 10,
+      //                             fontWeight: FontWeight.bold,
+      //                           ),
+      //                         ),
+      //                       ),
+      //                     ),
+      //                 ],
+      //               ),
+      //             ),
+      //             SizedBox(
+      //               height: 15.h,
+      //             ),
+      //             Padding(
+      //               padding: EdgeInsets.symmetric(horizontal: 7),
+      //               child: Text(
+      //                 maxLines: 3,
+      //                 overflow: TextOverflow.ellipsis,
+      //                 Global.returnTrLable(locationControlls, text[i], lng),
+      //                 style: Styles.listlablefont,
+      //                 textAlign: TextAlign.center,
+      //               ),
+      //             )
+      //           ],
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ),
       child: Container(
-        decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Color(0xff5A5A5A)
-                    .withOpacity(0.1), // Shadow color with opacity
-                offset: Offset(0, 1), // Horizontal and vertical offset
-                blurRadius: 5, // Blur radius
-                spreadRadius: 0, // Spread radius
-              ),
-            ],
-            color: Color(0xffF2F7FF),
-            borderRadius: BorderRadius.circular(5.r),
-            border: Border.all(
-              color: Color(0xffE7F0FF),
-            )),
         height: 168.h,
         width: 146.w,
+        decoration: BoxDecoration(
+          color: const Color(0xffF2F7FF),
+          borderRadius: BorderRadius.circular(5.r),
+          border: Border.all(color: const Color(0xffE7F0FF)),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xff5A5A5A).withOpacity(0.1),
+              offset: const Offset(0, 1),
+              blurRadius: 5,
+            ),
+          ],
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Visibility(
-                    visible: true,
-                    child: Stack(
-                      children: [
-                        SizedBox(
-                          height: 40,
-                          width: 60,
-                          child: Image.asset(
-                            height: 30,
-                            width: 30,
-                            image[i],
-                            filterQuality: FilterQuality.high,
-                            // scale: image[i] == 'assets/creche_profile/flagged_children_new.png' ||
-                            //     image[i] == 'assets/creche_profile/child_followUp_new.png' ||
-                            //     image[i] == 'assets/village_ic.png'
-                            //     ? 0.9
-                            //     : 3.8,
-                            color: image[i] ==
-                                    'assets/creche_profile/flagged_children_new.png'
-                                ? null
-                                : Color(0xff5979AA),
-                          ),
+            Stack(
+              children: [
+                SizedBox(
+                  height: 40,
+                  width: 60,
+                  child: Image.asset(
+                    image[i],
+                    filterQuality: FilterQuality.high,
+                    color: image[i] ==
+                        'assets/creche_profile/flagged_children_new.png'
+                        ? null
+                        : const Color(0xff5979AA),
+                  ),
+                ),
+                if (getCount(image[i]) > 0)
+                  Positioned(
+                    left: 30,
+                    bottom: 10,
+                    child: Container(
+                      height: 25,
+                      width: 25,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xffF26BA3),
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                      child: Text(
+                        "${getCount(image[i])}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
                         ),
-                        // if (image[i] == 'assets/shishughar.png'||
-                        //     image[i]=='assets/creche_profile/flagged_children_new.png'||
-                        //     image[i]=='assets/creche_profile/child_followUp_new.png')
-                        if (getCount(image[i]) > 0)
-                          Positioned(
-                            left: 30,
-                            bottom: 10,
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 25,
-                              // Smaller badge size
-                              width: 25,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xffF26BA3),
-                                border:
-                                    Border.all(color: Colors.white, width: 1.5),
-                              ),
-                              child: Text(
-                                "${getCount(image[i])}",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
+                      ),
                     ),
                   ),
-                  SizedBox(
-                    height: 15.h,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 7),
-                    child: Text(
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      Global.returnTrLable(locationControlls, text[i], lng),
-                      style: Styles.listlablefont,
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                ],
+              ],
+            ),
+            SizedBox(height: (MediaQuery.of(context).size.height)* 0.01),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 7),
+              child: Text(
+                Global.returnTrLable(locationControlls, text[i], lng),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Styles.listlablefont,
               ),
             ),
           ],

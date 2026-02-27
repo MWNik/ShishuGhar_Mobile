@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -26,34 +28,37 @@ class StrockColorCirclePainter extends CustomPainter {
     final radius = size.width / 2;
 
     // Define angles for each segment (90 degrees each) with spacing
-    final angle = (2 * 3.1415926) / 4; // 90 degrees
-    final spacing = 0.1; // Adjust spacing as needed
-    final angleWithSpacing = angle + spacing;
+    final totalSegments = 3;
+    final totalAngle = 2 * pi; // Full circle
+    final gapAngle = 0.1; // Gap between segments (in radians)
+    final availableAngle = totalAngle - (gapAngle * totalSegments);
+    final segmentAngle = availableAngle / totalSegments; // Each segment angle
+
+    // Start angle
+    double startAngle = -pi / 2; // Start from top (-90 degrees)
 
     // First color stroke segment (Red)  weight_for_age  SUW
     paint.color = weight_for_age==3.0?Color(0xff8BF649):weight_for_age! ==2.0?Color(0xffF4B81D):weight_for_age! ==1.0?Color(0xffF35858):Color(0xffffffff);
     // paint.color = Color(0xffF35858);
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), 0, angle, false, paint);
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius),  startAngle,
+        segmentAngle, false, paint);
 
+    startAngle += segmentAngle + gapAngle;
     // Second color stroke segment (Green)  weight_for_height Sam
     paint.color = weight_for_height==3.0?Color(0xff8BF649):weight_for_height ==2.0?Color(0xffF4B81D):weight_for_height ==1.0?Color(0xffF35858):Color(0xffffffff);
     // paint.color = Color(0xffF35858);
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), angleWithSpacing, angle, false, paint);
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius),  startAngle,
+        segmentAngle, false, paint);
+
+    startAngle += segmentAngle + gapAngle;
 
     // Third color stroke segment (Blue)
     paint.color = height_for_age==3.0?Color(0xff8BF649):height_for_age ! ==2.0?Color(0xffF4B81D):height_for_age ==1.0?Color(0xffF35858):Color(0xffffffff);
     // paint.color = Color(0xffF4B81D);
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), angleWithSpacing * 2, angle, false, paint);
-
-    // Fourth color stroke segment (Yellow)
-    // paint.color = mdical_condition==1.0?Color(0xffF35858):Color(0xffffffff);
-    if(mdical_condition!=null){
-      paint.color = mdical_condition==1.0?Color(0xffF35858):Color(0xff8BF649);
-    }else paint.color=Color(0xffffffff);
-    // paint.color = Color(0xffF35858);
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius),  startAngle,
+        segmentAngle, false, paint);
 
 
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), angleWithSpacing * 3, angle, false, paint);
   }
 
   @override

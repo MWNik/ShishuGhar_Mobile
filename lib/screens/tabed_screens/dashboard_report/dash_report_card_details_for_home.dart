@@ -1472,7 +1472,7 @@ class _DashReportCardDetailState extends State<DashReportCardDetailForHomeScreen
     //Growth faltering 2
     if (widget.query_type == 'Growthfaltering1') {
       allAntroData=await ChildGrowthResponseHelper().allAnthormentry();
-      growthChild = await DashboardReportHelper().excuteGF1Anthro(
+      growthChild = await DashboardReportHelper().excuteGF1AnthroNew(
           stateId: stateId,
           districtId: districtId,
           blockId: blockId,
@@ -1502,7 +1502,7 @@ class _DashReportCardDetailState extends State<DashReportCardDetailForHomeScreen
       //Growth faltering 1
     if (widget.query_type == 'Growthfaltering2') {
       allAntroData=await ChildGrowthResponseHelper().allAnthormentry();
-      growthChild = await DashboardReportHelper().excuteGF2Antro(
+      growthChild = await DashboardReportHelper().excuteGF2AntroNew(
           stateId: stateId,
           districtId: districtId,
           blockId: blockId,
@@ -1897,6 +1897,12 @@ class _DashReportCardDetailState extends State<DashReportCardDetailForHomeScreen
       return callCrecheItem(item);
     } else if (widget.query_type == 'NotEligbleButNotEnrolled') {
       return callCurrentEligibleChildItem(item);
+    } else if (widget.query_type == 'Growthfaltering1Plush') {
+      return callGrowthFaltringItem(item);
+    } else if (widget.query_type == 'zagZag') {
+      return callGrowthFaltringItem(item);
+    } else if (widget.query_type == 'SNC') {
+      return callGrowthFaltringItem(item);
     } else
       return SizedBox();
   }

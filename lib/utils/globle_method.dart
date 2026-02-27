@@ -783,12 +783,15 @@ class Global {
     'ModeratelyWasted': Color(0xfffce9cf),
     'Growthfaltering1': Color(0xfffce9cf),
     'ModeratelyStunted': Color(0xfffce9cf),
+    'Growthfaltering1Plush': Color(0xfffce9cf),
+    'SNC': Color(0xfffce9cf),
 
     'ChildrenMeasurementNotTaken': Color(0xfffcd9d9),
     'SeverelyUnderweight': Color(0xfffcd9d9),
     'SeverelyWasted': Color(0xfffcd9d9),
     'Growthfaltering2': Color(0xfffcd9d9),
     'SeverelyStunted': Color(0xfffcd9d9),
+    'zagZag': Color(0xfffcd9d9),
   };
 
   static Map<String, Color> cardBorderColors = {
@@ -815,12 +818,15 @@ class Global {
     'ModeratelyWasted': Color(0xfff3cf9e),
     'Growthfaltering1': Color(0xfff3cf9e),
     'ModeratelyStunted': Color(0xfff3cf9e),
+    'Growthfaltering1Plush': Color(0xfff3cf9e),
+    'SNC': Color(0xfff3cf9e),
 
     'ChildrenMeasurementNotTaken': Color(0xffff9090),
     'SeverelyUnderweight': Color(0xffff9090),
     'SeverelyWasted': Color(0xffff9090),
     'Growthfaltering2': Color(0xffff9090),
     'SeverelyStunted': Color(0xffff9090),
+    'zagZag': Color(0xffff9090),
   };
 
   static Color getCardColor(String cardId) {

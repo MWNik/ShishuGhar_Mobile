@@ -1470,10 +1470,39 @@ class _DashReportCardDetailState extends State<DashReportCardDetailScreen> {
       }
     }
 
-    //Growth faltering 2
+    //Growth faltering 1
     if (widget.query_type == 'Growthfaltering1') {
       allAntroData=await ChildGrowthResponseHelper().allAnthormentry();
-      growthChild = await DashboardReportHelper().excuteGF1Anthro(
+      growthChild = await DashboardReportHelper().excuteGF1AnthroNew(
+          stateId: stateId,
+          districtId: districtId,
+          blockId: blockId,
+          gpId: gpId,
+          villageId: villageId,
+          crecheId: crecheId,
+          phase: phase,
+          partnerId: partnerId,
+          crecheStatus: crecheStatus,
+          filterDate: Global.getDateByMonthYear(
+              Global.stringToInt(selectedYear),
+              Global.stringToInt(selectedMonth?.name)),allAntroData:allAntroData);
+
+      var submitedId='';
+      for (int i = 0; i < growthChild.length; i++) {
+        if(Global.validString(submitedId)){
+          submitedId="$submitedId,'${growthChild[i]['childenrollguid']}'";
+        }else submitedId="'${growthChild[i]['childenrollguid']}'";
+      }
+      if(Global.validString(submitedId)) {
+        items = await DashboardReportHelper().excuteGetChildrenByGUIDES(
+            childIdes: submitedId);
+      }
+    }
+
+    //Growth faltering 1 plus
+    if (widget.query_type == 'Growthfaltering1Plush') {
+      allAntroData=await ChildGrowthResponseHelper().allAnthormentry();
+      growthChild = await DashboardReportHelper().excuteGF1PlAnthroNew(
           stateId: stateId,
           districtId: districtId,
           blockId: blockId,
@@ -1503,7 +1532,65 @@ class _DashReportCardDetailState extends State<DashReportCardDetailScreen> {
       //Growth faltering 1
     if (widget.query_type == 'Growthfaltering2') {
       allAntroData=await ChildGrowthResponseHelper().allAnthormentry();
-      growthChild = await DashboardReportHelper().excuteGF2Antro(
+      growthChild = await DashboardReportHelper().excuteGF2AntroNew(
+          stateId: stateId,
+          districtId: districtId,
+          blockId: blockId,
+          gpId: gpId,
+          villageId: villageId,
+          crecheId: crecheId,
+          phase: phase,
+          partnerId: partnerId,
+          crecheStatus: crecheStatus,
+          filterDate: Global.getDateByMonthYear(
+              Global.stringToInt(selectedYear),
+              Global.stringToInt(selectedMonth?.name)),allAntroData:allAntroData);
+
+      var submitedId='';
+      for (int i = 0; i < growthChild.length; i++) {
+        if(Global.validString(submitedId)){
+          submitedId="$submitedId,'${growthChild[i]['childenrollguid']}'";
+        }else submitedId="'${growthChild[i]['childenrollguid']}'";
+      }
+      if(Global.validString(submitedId)) {
+        items = await DashboardReportHelper().excuteGetChildrenByGUIDES(
+            childIdes: submitedId);
+      }
+    }
+
+    //Growth faltering Zig Zag
+    if (widget.query_type == 'zagZag') {
+      allAntroData=await ChildGrowthResponseHelper().allAnthormentry();
+      growthChild = await DashboardReportHelper().excuteZigZagAntroNew(
+          stateId: stateId,
+          districtId: districtId,
+          blockId: blockId,
+          gpId: gpId,
+          villageId: villageId,
+          crecheId: crecheId,
+          phase: phase,
+          partnerId: partnerId,
+          crecheStatus: crecheStatus,
+          filterDate: Global.getDateByMonthYear(
+              Global.stringToInt(selectedYear),
+              Global.stringToInt(selectedMonth?.name)),allAntroData:allAntroData);
+
+      var submitedId='';
+      for (int i = 0; i < growthChild.length; i++) {
+        if(Global.validString(submitedId)){
+          submitedId="$submitedId,'${growthChild[i]['childenrollguid']}'";
+        }else submitedId="'${growthChild[i]['childenrollguid']}'";
+      }
+      if(Global.validString(submitedId)) {
+        items = await DashboardReportHelper().excuteGetChildrenByGUIDES(
+            childIdes: submitedId);
+      }
+    }
+
+    //Growth faltering SNC
+    if (widget.query_type == 'SNC') {
+      allAntroData=await ChildGrowthResponseHelper().allAnthormentry();
+      growthChild = await DashboardReportHelper().excuteSNCAntroNew(
           stateId: stateId,
           districtId: districtId,
           blockId: blockId,
@@ -1831,6 +1918,12 @@ class _DashReportCardDetailState extends State<DashReportCardDetailScreen> {
     } else if (widget.query_type == 'AnthroDataNotSubmitted'
         ||widget.query_type == 'AnthroDataSubmitted') {
       return callCrecheItem(item);
+    } else if (widget.query_type == 'Growthfaltering1Plush') {
+      return callGrowthFaltringItem(item);
+    } else if (widget.query_type == 'zagZag') {
+      return callGrowthFaltringItem(item);
+    } else if (widget.query_type == 'SNC') {
+      return callGrowthFaltringItem(item);
     } else
       return SizedBox();
   }

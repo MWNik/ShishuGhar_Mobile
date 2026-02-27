@@ -1760,7 +1760,8 @@ class _ChildGrowthExpendedFormState
               setState(() {});
             },
           );
-        } else {
+        }
+        else {
           return DynamicCustomTextFieldNew(
             titleText: Global.returnTrLable(
                 translatsLabel, quesItem.label!.trim(), lng),
@@ -2058,7 +2059,8 @@ class _ChildGrowthExpendedFormState
           }
         }
         countMesuredChildren();
-      } else {
+      }
+      else {
         var creCheDetails = await CrecheDataHelper()
             .getCrecheResponceItem(widget.creche_nameId);
         if (creCheDetails.length > 0) {
