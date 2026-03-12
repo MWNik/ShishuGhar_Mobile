@@ -105,169 +105,336 @@ class _CashBookReceiptListingScreenState
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        child: Column(children: [
-          role == CustomText.crecheSupervisor
-              ? Align(
-                  alignment: Alignment.topRight,
-                  child: AnimatedRollingSwitch(
-                    title1:
-                        Global.returnTrLable(translats, CustomText.all, lng!),
-                    title2: Global.returnTrLable(
-                        translats, CustomText.unsynched, lng!),
-                    isOnlyUnsynched: isOnlyUnsynched ?? false,
-                    onChange: (value) async {
-                      setState(() {
-                        isOnlyUnsynched = value;
-                      });
-                      await fetchCashbookData();
-                    },
-                  ),
-                )
-              : SizedBox(),
-          (receiptData.length > 0)
-              ? ListView.builder(
-                  itemCount: receiptData.length,
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  scrollDirection: Axis.vertical,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () async {
-                        if (role == CustomText.crecheSupervisor) {
-                          if (Global.getItemValues(
-                                  receiptData[index].responces!, 'status') !=
-                              "1") {
-                            await callUpdateStatus(
-                                receiptData[index].responces!,
-                                receiptData[index].name!);
-                          }
+        // child: Column(children: [
+        //   role == CustomText.crecheSupervisor
+        //       ? Align(
+        //           alignment: Alignment.topRight,
+        //           child: AnimatedRollingSwitch(
+        //             title1:
+        //                 Global.returnTrLable(translats, CustomText.all, lng!),
+        //             title2: Global.returnTrLable(
+        //                 translats, CustomText.unsynched, lng!),
+        //             isOnlyUnsynched: isOnlyUnsynched ?? false,
+        //             onChange: (value) async {
+        //               setState(() {
+        //                 isOnlyUnsynched = value;
+        //               });
+        //               await fetchCashbookData();
+        //             },
+        //           ),
+        //         )
+        //       : SizedBox(),
+        //   (receiptData.length > 0)
+        //       ? ListView.builder(
+        //           itemCount: receiptData.length,
+        //           shrinkWrap: true,
+        //           physics: BouncingScrollPhysics(),
+        //           scrollDirection: Axis.vertical,
+        //           itemBuilder: (BuildContext context, int index) {
+        //             return GestureDetector(
+        //               onTap: () async {
+        //                 if (role == CustomText.crecheSupervisor) {
+        //                   if (Global.getItemValues(
+        //                           receiptData[index].responces!, 'status') !=
+        //                       "1") {
+        //                     await callUpdateStatus(
+        //                         receiptData[index].responces!,
+        //                         receiptData[index].name!);
+        //                   }
+        //                 }
+        //               },
+        //               child: Padding(
+        //                 padding: EdgeInsets.symmetric(vertical: 5.h),
+        //                 child: Container(
+        //                   decoration: BoxDecoration(
+        //                       boxShadow: [
+        //                         BoxShadow(
+        //                           color: Color(0xff5A5A5A).withOpacity(0.2),
+        //                           offset: Offset(0, 3),
+        //                           blurRadius: 6,
+        //                           spreadRadius: 0,
+        //                         ),
+        //                       ],
+        //                       color: Colors.white,
+        //                       border: Border.all(color: Color(0xffE7F0FF)),
+        //                       borderRadius: BorderRadius.circular(10.r)),
+        //                   child: Padding(
+        //                     padding: EdgeInsets.symmetric(
+        //                         horizontal: 10.w, vertical: 8.h),
+        //                     child: Row(
+        //                       mainAxisAlignment: MainAxisAlignment.start,
+        //                       crossAxisAlignment: CrossAxisAlignment.center,
+        //                       children: [
+        //                         Column(
+        //                           crossAxisAlignment: CrossAxisAlignment.start,
+        //                           mainAxisAlignment: MainAxisAlignment.start,
+        //                           children: [
+        //                             Text(
+        //                               '${Global.returnTrLable(translats, CustomText.DateS, lng!).trim()} :',
+        //                               style: Styles.black104,
+        //                             ),
+        //                             Text(
+        //                               '${Global.returnTrLable(translats, CustomText.amount, lng!).trim()} :',
+        //                               style: Styles.black104,
+        //                               strutStyle: StrutStyle(height: 1.2),
+        //                             ),
+        //                             Text(
+        //                               '${Global.returnTrLable(translats, CustomText.Status, lng!).trim()} :',
+        //                               style: Styles.black104,
+        //                               strutStyle: StrutStyle(height: 1.2),
+        //                             ),
+        //                           ],
+        //                         ),
+        //                         SizedBox(width: 10),
+        //                         SizedBox(
+        //                           height: 10.h,
+        //                           width: 2,
+        //                           child: VerticalDivider(
+        //                             color: Color(0xffE6E6E6),
+        //                           ),
+        //                         ),
+        //                         SizedBox(width: 10),
+        //                         Expanded(
+        //                           child: Column(
+        //                             crossAxisAlignment:
+        //                                 CrossAxisAlignment.start,
+        //                             mainAxisAlignment: MainAxisAlignment.start,
+        //                             children: [
+        //                               Text(
+        //                                 Validate().displeDateFormate(
+        //                                     Global.getItemValues(
+        //                                         receiptData[index].responces!,
+        //                                         'date')),
+        //                                 style: Styles.cardBlue10,
+        //
+        //                                 overflow: TextOverflow.ellipsis,
+        //                               ),
+        //                               Text(
+        //                                 '₹ ${Global.getItemValues(receiptData[index].responces!, 'amount')}',
+        //                                 style: Styles.cardBlue10,
+        //                                 strutStyle: StrutStyle(height: 1.2),
+        //                                 overflow: TextOverflow.ellipsis,
+        //                               ),
+        //                               Text(
+        //                                 getStatusValue(Global.getItemValues(
+        //                                     receiptData[index].responces!,
+        //                                     'status')),
+        //                                 style: Styles.cardBlue10,
+        //                                 strutStyle: StrutStyle(height: 1.2),
+        //                                 overflow: TextOverflow.ellipsis,
+        //                               ),
+        //                             ],
+        //                           ),
+        //                         ),
+        //                         Column(children: [
+        //                           Image.asset('assets/verifydata.png',
+        //                               filterQuality: FilterQuality.high,
+        //                               scale: 4.5,
+        //                               color: Global.getItemValues(
+        //                                           receiptData[index].responces!,
+        //                                           'status') ==
+        //                                       '1'
+        //                                   ? Color(0xff369A8D)
+        //                                   : Global.getItemValues(
+        //                                               receiptData[index]
+        //                                                   .responces!,
+        //                                               'status') ==
+        //                                           '2'
+        //                                       ? Color(0xffF26BA3)
+        //                                       : Colors.grey),
+        //                           SizedBox(height: 5),
+        //                           (receiptData[index].is_edited == 0 &&
+        //                                   receiptData[index].is_uploaded == 1)
+        //                               ? Image.asset(
+        //                                   "assets/sync.png",
+        //                                   scale: 1.5,
+        //                                 )
+        //                               : Image.asset(
+        //                                   "assets/sync_gray.png",
+        //                                   scale: 1.5,
+        //                                 )
+        //                         ])
+        //                       ],
+        //                     ),
+        //                   ),
+        //                 ),
+        //               ),
+        //             );
+        //           })
+        //       : Expanded(
+        //           child: Center(
+        //             child: Text(Global.returnTrLable(
+        //                 translats, CustomText.NorecordAvailable, lng!)),
+        //           ),
+        //         ),
+        // ]),
+        child: Column(
+          children: [
+            role == CustomText.crecheSupervisor
+                ? Align(
+              alignment: Alignment.topRight,
+              child: AnimatedRollingSwitch(
+                title1: Global.returnTrLable(translats, CustomText.all, lng!),
+                title2: Global.returnTrLable(translats, CustomText.unsynched, lng!),
+                isOnlyUnsynched: isOnlyUnsynched ?? false,
+                onChange: (value) async {
+                  setState(() {
+                    isOnlyUnsynched = value;
+                  });
+                  await fetchCashbookData();
+                },
+              ),
+            )
+                : SizedBox(),
+
+            receiptData.length > 0
+                ? Expanded(
+              child: ListView.builder(
+                itemCount: receiptData.length,
+                physics: BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () async {
+                      if (role == CustomText.crecheSupervisor) {
+                        if (Global.getItemValues(
+                            receiptData[index].responces!, 'status') !=
+                            "1") {
+                          await callUpdateStatus(
+                              receiptData[index].responces!,
+                              receiptData[index].name!);
                         }
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5.h),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xff5A5A5A).withOpacity(0.2),
-                                  offset: Offset(0, 3),
-                                  blurRadius: 6,
-                                  spreadRadius: 0,
+                      }
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 5.h),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xff5A5A5A).withOpacity(0.2),
+                                offset: Offset(0, 3),
+                                blurRadius: 6,
+                                spreadRadius: 0,
+                              ),
+                            ],
+                            color: Colors.white,
+                            border: Border.all(color: Color(0xffE7F0FF)),
+                            borderRadius: BorderRadius.circular(10.r)),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10.w, vertical: 8.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${Global.returnTrLable(translats, CustomText.DateS, lng!).trim()} :',
+                                    style: Styles.black104,
+                                  ),
+                                  Text(
+                                    '${Global.returnTrLable(translats, CustomText.amount, lng!).trim()} :',
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
+                                  ),
+                                  Text(
+                                    '${Global.returnTrLable(translats, CustomText.Status, lng!).trim()} :',
+                                    style: Styles.black104,
+                                    strutStyle: StrutStyle(height: 1.2),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: 10),
+                              SizedBox(
+                                height: 10.h,
+                                width: 2,
+                                child: VerticalDivider(
+                                  color: Color(0xffE6E6E6),
                                 ),
-                              ],
-                              color: Colors.white,
-                              border: Border.all(color: Color(0xffE7F0FF)),
-                              borderRadius: BorderRadius.circular(10.r)),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10.w, vertical: 8.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${Global.returnTrLable(translats, CustomText.DateS, lng!).trim()} :',
-                                      style: Styles.black104,
+                                      Validate().displeDateFormate(
+                                          Global.getItemValues(
+                                              receiptData[index].responces!,
+                                              'date')),
+                                      style: Styles.cardBlue10,
+
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
-                                      '${Global.returnTrLable(translats, CustomText.amount, lng!).trim()} :',
-                                      style: Styles.black104,
+                                      '₹ ${Global.getItemValues(receiptData[index].responces!, 'amount')}',
+                                      style: Styles.cardBlue10,
                                       strutStyle: StrutStyle(height: 1.2),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
-                                      '${Global.returnTrLable(translats, CustomText.Status, lng!).trim()} :',
-                                      style: Styles.black104,
+                                      getStatusValue(Global.getItemValues(
+                                          receiptData[index].responces!,
+                                          'status')),
+                                      style: Styles.cardBlue10,
                                       strutStyle: StrutStyle(height: 1.2),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
-                                SizedBox(width: 10),
-                                SizedBox(
-                                  height: 10.h,
-                                  width: 2,
-                                  child: VerticalDivider(
-                                    color: Color(0xffE6E6E6),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        Validate().displeDateFormate(
-                                            Global.getItemValues(
-                                                receiptData[index].responces!,
-                                                'date')),
-                                        style: Styles.cardBlue10,
-                                        
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        '₹ ${Global.getItemValues(receiptData[index].responces!, 'amount')}',
-                                        style: Styles.cardBlue10,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        getStatusValue(Global.getItemValues(
-                                            receiptData[index].responces!,
-                                            'status')),
-                                        style: Styles.cardBlue10,
-                                        strutStyle: StrutStyle(height: 1.2),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Column(children: [
-                                  Image.asset('assets/verifydata.png',
-                                      filterQuality: FilterQuality.high,
-                                      scale: 4.5,
-                                      color: Global.getItemValues(
-                                                  receiptData[index].responces!,
-                                                  'status') ==
-                                              '1'
-                                          ? Color(0xff369A8D)
-                                          : Global.getItemValues(
-                                                      receiptData[index]
-                                                          .responces!,
-                                                      'status') ==
-                                                  '2'
-                                              ? Color(0xffF26BA3)
-                                              : Colors.grey),
-                                  SizedBox(height: 5),
-                                  (receiptData[index].is_edited == 0 &&
-                                          receiptData[index].is_uploaded == 1)
-                                      ? Image.asset(
-                                          "assets/sync.png",
-                                          scale: 1.5,
-                                        )
-                                      : Image.asset(
-                                          "assets/sync_gray.png",
-                                          scale: 1.5,
-                                        )
-                                ])
-                              ],
-                            ),
+                              ),
+                              Column(children: [
+                                Image.asset('assets/verifydata.png',
+                                    filterQuality: FilterQuality.high,
+                                    scale: 4.5,
+                                    color: Global.getItemValues(
+                                        receiptData[index].responces!,
+                                        'status') ==
+                                        '1'
+                                        ? Color(0xff369A8D)
+                                        : Global.getItemValues(
+                                        receiptData[index]
+                                            .responces!,
+                                        'status') ==
+                                        '2'
+                                        ? Color(0xffF26BA3)
+                                        : Colors.grey),
+                                SizedBox(height: 5),
+                                (receiptData[index].is_edited == 0 &&
+                                    receiptData[index].is_uploaded == 1)
+                                    ? Image.asset(
+                                  "assets/sync.png",
+                                  scale: 1.5,
+                                )
+                                    : Image.asset(
+                                  "assets/sync_gray.png",
+                                  scale: 1.5,
+                                )
+                              ])
+                            ],
                           ),
                         ),
                       ),
-                    );
-                  })
-              : Expanded(
-                  child: Center(
-                    child: Text(Global.returnTrLable(
-                        translats, CustomText.NorecordAvailable, lng!)),
-                  ),
+                    ),
+                  );
+                },
+              ),
+            )
+                : Expanded(
+              child: Center(
+                child: Text(
+                  Global.returnTrLable(
+                      translats, CustomText.NorecordAvailable, lng!),
                 ),
-        ]),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

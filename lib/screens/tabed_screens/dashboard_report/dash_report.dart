@@ -1192,13 +1192,13 @@ class _DashReportState extends State<DashReport> {
       'count': 0,
     };
 
-    cardItems['RedFlagChildren'] = {
-      'title': Global.returnTrLable(translats, CustomText.RedFlagChildren, lng),
-      // 'subtitle':
-      //     Global.returnTrLable(translats, CustomText.SubRedFlagChildren, lng),
-      'subtitle': '',
-      'count': 0,
-    };
+    // cardItems['RedFlagChildren'] = {
+    //   'title': Global.returnTrLable(translats, CustomText.RedFlagChildren, lng),
+    //   // 'subtitle':
+    //   //     Global.returnTrLable(translats, CustomText.SubRedFlagChildren, lng),
+    //   'subtitle': '',
+    //   'count': 0,
+    // };
 
     ///avg card
 
