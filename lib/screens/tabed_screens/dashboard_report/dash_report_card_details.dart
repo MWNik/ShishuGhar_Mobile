@@ -4760,7 +4760,7 @@ class _DashReportCardDetailState extends State<DashReportCardDetailScreen> {
         .where((element) => element['childenrollguid'] == childGuid)
         .toList();
     if(items.isNotEmpty){
-      returnValue=items.first[key];
+      returnValue=Global.validToString(items.first[key]);
     }
     return returnValue;
   }

@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -8,31 +6,45 @@ import 'package:sqflite/sqflite.dart';
 
 import '../../../database/database_helper.dart';
 import '../../../database/helper/anthromentory/child_growth_response_helper.dart';
+import '../../../database/helper/enrolled_exit_child/enrolled_exit_child_responce_helper.dart';
 import '../../../model/databasemodel/child_growth_responce_model.dart';
 import '../../../utils/validate.dart';
 
 
 class DashboardReportHelper {
   DatabaseHelper databaseHelper = DatabaseHelper();
-  List<String> location=['partner_id','state_id','district_id','block_id','gp_id','village_id'];
-  List<String> crecheItems=['creche_opening_date','creche_status_id'];
-
-
+  List<String> location = [
+    'partner_id',
+    'state_id',
+    'district_id',
+    'block_id',
+    'gp_id',
+    'village_id'
+  ];
+  List<String> crecheItems = ['creche_opening_date', 'creche_status_id'];
 
 
   Future<List<Map<String, dynamic>>> excuteCrecheCount({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
+  }) async {
     print('current date ${filterDate}');
-    var db=await databaseHelper.openDb();
-   String whereColue= crecheWhereCondition(stateId,  districtId,
-       blockId,  gpId, villageId, crecheId,  phase,
-       partnerId,  crecheStatus,filterDate,1);
-    var query=crecheDataQuery();
-    var finalQuery='$query $whereColue';
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        1);
+    var query = crecheDataQuery();
+    var finalQuery = '$query $whereColue';
     print('result $finalQuery');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
@@ -42,17 +54,24 @@ class DashboardReportHelper {
 
   Future<List<Map<String, dynamic>>> excuteCurrentActiveChildren({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
+  }) async {
     print('current date ${filterDate}');
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
-    var crecheQuery=crecheDataQuery();
-    var enrolled_child='''SELECT 
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var crecheQuery = crecheDataQuery();
+    var enrolled_child = '''SELECT 
                *,
                 CASE
                 WHEN INSTR(responces, 'date_of_enrollment":"') > 0
@@ -72,8 +91,8 @@ class DashboardReportHelper {
               FROM enrollred_exit_child_responce''';
 
 
-    var enrollMentDate ="'$filterDate'";
-    var finalQuery='$crecheQuery  as creche INNER join ($enrolled_child) as childs on childs.creche_id=creche.name $whereColue and (childs.date_of_exit is null or childs.date_of_exit >$enrollMentDate) and childs.date_of_enrollment <=$enrollMentDate';
+    var enrollMentDate = "'$filterDate'";
+    var finalQuery = '$crecheQuery  as creche INNER join ($enrolled_child) as childs on childs.creche_id=creche.name $whereColue and (childs.date_of_exit is null or childs.date_of_exit >$enrollMentDate) and childs.date_of_enrollment <=$enrollMentDate';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
@@ -83,20 +102,27 @@ class DashboardReportHelper {
 
   Future<List<Map<String, dynamic>>> excuteNoOfCrecheNotSubmitedAttendence({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-    async {
-      print('current date ${filterDate}');
-      var db=await databaseHelper.openDb();
-      String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-          blockId,  gpId, villageId, crecheId,  phase,
-          partnerId,  crecheStatus,filterDate);
-      var enrollMentDate ="'$filterDate'";
-      var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-      var monthYear ="'${Global.getMonthYearByDate(filterDate)}'";
-      var eligibleCondition ="and  creche.elgdays > IFNULL(attenDays.atteneDays, 0)";
-      var eligbleDays='''SELECT 
+  }) async {
+    print('current date ${filterDate}');
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var monthYear = "'${Global.getMonthYearByDate(filterDate)}'";
+    var eligibleCondition = "and  creche.elgdays > IFNULL(attenDays.atteneDays, 0)";
+    var eligbleDays = '''SELECT 
     creche.*,
     IFNULL(attenDays.atteneDays, 0) AS atteneDays
 FROM (
@@ -278,32 +304,37 @@ LEFT JOIN (
     ON attenDays.creche_id = creche.name''';
 
 
-
-
-      var finalQuery='$eligbleDays $whereColue $eligibleCondition';
-      print('query ${finalQuery}');
-      List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
-      print('result $result');
-      // var count=result.length ?? 0;
-      return result;
+    var finalQuery = '$eligbleDays $whereColue $eligibleCondition';
+    print('query ${finalQuery}');
+    List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
+    print('result $result');
+    // var count=result.length ?? 0;
+    return result;
   }
 
   Future<List<Map<String, dynamic>>> excuteNoOfCrecheSubmitedAttendence({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
+  }) async {
     print('current date ${filterDate}');
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var monthYear ="'${Global.getMonthYearByDate(filterDate)}'";
-    var eligibleCondition ="and  creche.elgdays <= IFNULL(attenDays.atteneDays, 0)";
-    var eligbleDays='''SELECT 
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var monthYear = "'${Global.getMonthYearByDate(filterDate)}'";
+    var eligibleCondition = "and  creche.elgdays <= IFNULL(attenDays.atteneDays, 0)";
+    var eligbleDays = '''SELECT 
     creche.*,
     IFNULL(attenDays.atteneDays, 0) AS atteneDays
 FROM (
@@ -485,9 +516,7 @@ LEFT JOIN (
     ON attenDays.creche_id = creche.name''';
 
 
-
-
-    var finalQuery='$eligbleDays $whereColue $eligibleCondition';
+    var finalQuery = '$eligbleDays $whereColue $eligibleCondition';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
@@ -497,17 +526,24 @@ LEFT JOIN (
 
   Future<List<Map<String, dynamic>>> excuteEnrolldCildThisMonth({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
+  }) async {
     print('current date ${filterDate}');
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
-    var crecheQuery=crecheDataQuery();
-    var enrolled_child='''SELECT 
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var crecheQuery = crecheDataQuery();
+    var enrolled_child = '''SELECT 
                *,
                 CASE
                 WHEN INSTR(responces, 'date_of_enrollment":"') > 0
@@ -527,9 +563,9 @@ LEFT JOIN (
               FROM enrollred_exit_child_responce''';
 
 
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var finalQuery='$crecheQuery  as creche INNER join ($enrolled_child) as childs on childs.creche_id=creche.name $whereColue  and childs.date_of_enrollment  BETWEEN $startDate and $enrollMentDate';
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var finalQuery = '$crecheQuery  as creche INNER join ($enrolled_child) as childs on childs.creche_id=creche.name $whereColue  and childs.date_of_enrollment  BETWEEN $startDate and $enrollMentDate';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
@@ -539,17 +575,24 @@ LEFT JOIN (
 
   Future<List<Map<String, dynamic>>> excuteExitCildThisMonth({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
+  }) async {
     print('current date ${filterDate}');
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
-    var crecheQuery=crecheDataQuery();
-    var enrolled_child='''SELECT 
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var crecheQuery = crecheDataQuery();
+    var enrolled_child = '''SELECT 
                *,
                 CASE
                 WHEN INSTR(responces, 'date_of_enrollment":"') > 0
@@ -569,32 +612,40 @@ LEFT JOIN (
               FROM enrollred_exit_child_responce''';
 
 
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var finalQuery='$crecheQuery  as creche INNER join ($enrolled_child) as childs on childs.creche_id=creche.name $whereColue  and childs.date_of_exit  BETWEEN $startDate and $enrollMentDate';
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var finalQuery = '$crecheQuery  as creche INNER join ($enrolled_child) as childs on childs.creche_id=creche.name $whereColue  and childs.date_of_exit  BETWEEN $startDate and $enrollMentDate';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
-    var count=result.length ?? 0;
+    var count = result.length ?? 0;
     return result;
   }
 
 
   Future<int> excuteMaximumAttendanceADay({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
+  }) async {
     print('current date ${filterDate}');
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,0);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var childAttendE='group by date_of_attendance)';
-    var childAttendJoin='''select max (maxAtn) as mxAtCount from (Select sum (presentCount) as maxAtn from(select * from ( SELECT  
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        0);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var childAttendE = 'group by date_of_attendance)';
+    var childAttendJoin = '''select max (maxAtn) as mxAtCount from (Select sum (presentCount) as maxAtn from(select * from ( SELECT  
         attendance.creche_id,
         attendance.childattenguid,presentCount,
     CASE 
@@ -747,41 +798,47 @@ LEFT JOIN (
 on creche.name=childAttence.creche_id) ''';
 
 
-
-    var finalQuery='$childAttendJoin $whereColue $childAttendE ';
+    var finalQuery = '$childAttendJoin $whereColue $childAttendE ';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
-    var count=result.length ?? 0;
-    if(count>0){
-      count=Global.validToInt(result.first['mxAtCount']);
+    var count = result.length ?? 0;
+    if (count > 0) {
+      count = Global.validToInt(result.first['mxAtCount']);
     }
     return count;
   }
 
   Future<List<Map<String, dynamic>>> excuteCurrentEligibleChild({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String finalDateValue=filterDate!;
-    var finalDate=Global.isCurrentMonth(filterDate);
-    if(finalDate){
-      finalDateValue=Validate().currentDate();
+  }) async {
+    var db = await databaseHelper.openDb();
+    String finalDateValue = filterDate!;
+    var finalDate = Global.isCurrentMonth(filterDate);
+    if (finalDate) {
+      finalDateValue = Validate().currentDate();
     }
-    String whereColue= crecheWhereWithJoinCondition( stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,finalDateValue);
-    var crecheQuery=crecheDataQuery();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        finalDateValue);
+    var crecheQuery = crecheDataQuery();
 
-    var minus36MonthBack=Global.subtractMonths(finalDateValue,36);
-    var minus6MonthBack=Global.subtractMonths(finalDateValue,6);
-    var childBeetween='''and DATE(children.child_dob) BETWEEN 
+    var minus36MonthBack = Global.subtractMonths(finalDateValue, 36);
+    var minus6MonthBack = Global.subtractMonths(finalDateValue, 6);
+    var childBeetween = '''and DATE(children.child_dob) BETWEEN 
         DATE('$minus36MonthBack')
         AND  DATE('$minus6MonthBack')''';
-    var hhChildren='''creche left join 
+    var hhChildren = '''creche left join 
 (SELECT 
     children.*,
     hh.creche_id AS crecheId, enrollreChild.responces as enrolledChildResponce,
@@ -860,42 +917,47 @@ WHERE
     is_dob_available = '1'  and child_status ISNULL  ) as children  on children.crecheId=creche.name''';
 
 
-
-    var finalQuery='$crecheQuery  $hhChildren  $whereColue $childBeetween ';
+    var finalQuery = '$crecheQuery  $hhChildren  $whereColue $childBeetween ';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
-    var count=result.length ?? 0;
+    var count = result.length ?? 0;
     return result;
   }
-
 
 
   Future<List<Map<String, dynamic>>> excuteCurrentEligibleButNotEnrlolledChild({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String finalDateValue=filterDate!;
-    var finalDate=Global.isCurrentMonth(filterDate);
-    if(finalDate){
-      finalDateValue=Validate().currentDate();
+  }) async {
+    var db = await databaseHelper.openDb();
+    String finalDateValue = filterDate!;
+    var finalDate = Global.isCurrentMonth(filterDate);
+    if (finalDate) {
+      finalDateValue = Validate().currentDate();
     }
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,finalDateValue);
-    var crecheQuery=crecheDataQuery();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        finalDateValue);
+    var crecheQuery = crecheDataQuery();
 
-    var minus36MonthBack=Global.subtractMonths(finalDateValue,36);
-    var minus6MonthBack=Global.subtractMonths(finalDateValue,6);
-    var childEnrlled='''and children.CHHGUID not in  (select CHHGUID from enrollred_exit_child_responce where ChildEnrollGUID NOT in ( select ChildEnrollGUID  from enrollred_exit_child_responce
+    var minus36MonthBack = Global.subtractMonths(finalDateValue, 36);
+    var minus6MonthBack = Global.subtractMonths(finalDateValue, 6);
+    var childEnrlled = '''and children.CHHGUID not in  (select CHHGUID from enrollred_exit_child_responce where ChildEnrollGUID NOT in ( select ChildEnrollGUID  from enrollred_exit_child_responce
     where date_of_exit < '$finalDateValue'))''';
-    var childBeetween='''and DATE(children.child_dob) BETWEEN 
+    var childBeetween = '''and DATE(children.child_dob) BETWEEN 
         DATE('$minus36MonthBack')
         AND  DATE('$minus6MonthBack')''';
-    var hhChildren='''creche left join 
+    var hhChildren = '''creche left join 
 (SELECT 
     children.*,
     hh.creche_id AS crecheId, enrollreChild.responces as enrolledChildResponce,
@@ -974,30 +1036,35 @@ WHERE
     is_dob_available = '1'  and child_status ISNULL  ) as children  on children.crecheId=creche.name''';
 
 
-
-    var finalQuery='$crecheQuery  $hhChildren  $whereColue $childBeetween $childEnrlled';
+    var finalQuery = '$crecheQuery  $hhChildren  $whereColue $childBeetween $childEnrlled';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
-    var count=result.length ?? 0;
+    var count = result.length ?? 0;
     return result;
   }
 
 
-
   Future<List<Map<String, dynamic>>> excuteCumulativeEnrolledChild({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
-    var crecheQuery=crecheDataQuery();
-    var enrollMentDate ="'$filterDate'";
-    var exitedChild='''creche
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var crecheQuery = crecheDataQuery();
+    var enrollMentDate = "'$filterDate'";
+    var exitedChild = '''creche
 	inner join (select *,CASE WHEN INSTR(responces, 'date_of_enrollment":"') > 0 
         THEN SUBSTR(
             responces,
@@ -1013,61 +1080,80 @@ WHERE
 	extedChild  on extedChild.creche_id=creche.name''';
 
 
-
-    var finalQuery='$crecheQuery  $exitedChild  $whereColue';
+    var finalQuery = '$crecheQuery  $exitedChild  $whereColue';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
-    var count=result.length ?? 0;
+    var count = result.length ?? 0;
     return result;
   }
 
   Future<List<Map<String, dynamic>>> excuteCumulativeExitChild({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
-    var crecheQuery=crecheDataQuery();
-    var enrollMentDate ="'$filterDate'";
-    var exitedChild='''creche
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var crecheQuery = crecheDataQuery();
+    var enrollMentDate = "'$filterDate'";
+    var exitedChild = '''creche
 	inner join (select * from enrollred_exit_child_responce where date_of_exit <= $enrollMentDate) 
 	extedChild  on extedChild.creche_id=creche.name''';
 
 
-
-    var finalQuery='$crecheQuery  $exitedChild  $whereColue';
+    var finalQuery = '$crecheQuery  $exitedChild  $whereColue';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
-    var count=result.length ?? 0;
+    var count = result.length ?? 0;
     return result;
   }
 
   Future<int> excuteAvgNoOfDaysCrecheOpenedChild({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
-    var crechCount=await excuteCrecheCount(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var crechCount = await excuteCrecheCount(stateId: stateId,
+        districtId: districtId,
+        blockId: blockId,
+        gpId: gpId,
+        villageId: villageId,
+        crecheId: crecheId,
+        phase: phase,
+        partnerId: partnerId,
+        crecheStatus: crecheStatus,
+        filterDate: filterDate);
 
-    var crecheQuery=crecheDataForJoinQuery();
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var startQury ="Select IFNULL(COUNT(*), 0) AS total_count ";
-    var betWeen ="and date_of_attendance BETWEEN $startDate and $enrollMentDate";
-    var avgOpenDayCount='''creche	INNER join (
+    var crecheQuery = crecheDataForJoinQuery();
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var startQury = "Select IFNULL(COUNT(*), 0) AS total_count ";
+    var betWeen = "and date_of_attendance BETWEEN $startDate and $enrollMentDate";
+    var avgOpenDayCount = '''creche	INNER join (
 select * ,CASE 
         WHEN INSTR(responces, 'is_shishu_ghar_is_closed_for_the_day":') > 0 
         THEN SUBSTR(
@@ -1086,33 +1172,39 @@ select * ,CASE
 on childAttendence.creche_id=creche.name''';
 
 
-
-    var finalQuery='$startQury $crecheQuery $avgOpenDayCount  $whereColue $betWeen';
+    var finalQuery = '$startQury $crecheQuery $avgOpenDayCount  $whereColue $betWeen';
     print('query ${finalQuery}');
     List<Map<String, dynamic>> result = await db.rawQuery(finalQuery);
     print('result $result');
-    var count=result.length ?? 0;
-    if(count>0&&crechCount.length>0){
-      count=result.first['total_count'];
-      count=(Global.validToInt(count)/crechCount.length).ceil();
+    var count = result.length ?? 0;
+    if (count > 0 && crechCount.length > 0) {
+      count = result.first['total_count'];
+      count = (Global.validToInt(count) / crechCount.length).ceil();
     }
     return count;
   }
 
- Future<double> excuteAvgAttendancePerDay({
+  Future<double> excuteAvgAttendancePerDay({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
 
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var no_children_present_creche_opened ='''SELECT *
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var no_children_present_creche_opened = '''SELECT *
              FROM (select * from child_attendence where attendance=1) cal
              JOIN (select *, CASE 
         WHEN INSTR(responces, 'is_shishu_ghar_is_closed_for_the_day":') > 0 
@@ -1251,7 +1343,7 @@ on childAttendence.creche_id=creche.name''';
 
     FROM  ${eligbleCrecheQuery()}  ) creche ON creche.name = childAttendence.creche_id
 ''';
-    var no_days_creche_opened ='''SELECT  * from (Select *, CASE 
+    var no_days_creche_opened = '''SELECT  * from (Select *, CASE 
         WHEN INSTR(responces, 'is_shishu_ghar_is_closed_for_the_day":') > 0 
         THEN SUBSTR(
             responces,
@@ -1388,19 +1480,24 @@ on childAttendence.creche_id=creche.name''';
 
     FROM  ${eligbleCrecheQuery()}  ) creche ON creche.name = childAttendence.creche_id
 ''';
-    var betWeen ="and childAttendence. date_of_attendance BETWEEN $startDate and $enrollMentDate";
+    var betWeen = "and childAttendence. date_of_attendance BETWEEN $startDate and $enrollMentDate";
 
 
-
-    var no_children_present_creche_openedQuery='$no_children_present_creche_opened  $whereColue $betWeen';
-    var no_days_creche_openedQuery='$no_days_creche_opened  $whereColue $betWeen';
-    List<Map<String, dynamic>> no_children_present_creche_openedResult = await db.rawQuery(no_children_present_creche_openedQuery);
-    List<Map<String, dynamic>> no_days_creche_openedResult = await db.rawQuery(no_days_creche_openedQuery);
-    var no_children_present_creche_openedCount=no_children_present_creche_openedResult.length ?? 0;
-    var no_days_creche_openedCount=no_days_creche_openedResult.length ?? 0;
-    var count=0.0;
-    if(no_children_present_creche_openedCount>0&&no_days_creche_openedCount>0){
-      count=no_children_present_creche_openedCount/no_days_creche_openedCount;
+    var no_children_present_creche_openedQuery = '$no_children_present_creche_opened  $whereColue $betWeen';
+    var no_days_creche_openedQuery = '$no_days_creche_opened  $whereColue $betWeen';
+    List<
+        Map<String, dynamic>> no_children_present_creche_openedResult = await db
+        .rawQuery(no_children_present_creche_openedQuery);
+    List<Map<String, dynamic>> no_days_creche_openedResult = await db.rawQuery(
+        no_days_creche_openedQuery);
+    var no_children_present_creche_openedCount = no_children_present_creche_openedResult
+        .length ?? 0;
+    var no_days_creche_openedCount = no_days_creche_openedResult.length ?? 0;
+    var count = 0.0;
+    if (no_children_present_creche_openedCount > 0 &&
+        no_days_creche_openedCount > 0) {
+      count =
+          no_children_present_creche_openedCount / no_days_creche_openedCount;
       count = double.parse(count.toStringAsFixed(1));
     }
     return count;
@@ -1409,20 +1506,34 @@ on childAttendence.creche_id=creche.name''';
 
   Future<int> excuteDaysAttendanceSubmitted({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
-    var crechCount=await excuteCrecheCount(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var No_of_days_creche_attendance_submitted ='''SELECT  * from (Select *, CASE 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var crechCount = await excuteCrecheCount(stateId: stateId,
+        districtId: districtId,
+        blockId: blockId,
+        gpId: gpId,
+        villageId: villageId,
+        crecheId: crecheId,
+        phase: phase,
+        partnerId: partnerId,
+        crecheStatus: crecheStatus,
+        filterDate: filterDate);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var No_of_days_creche_attendance_submitted = '''SELECT  * from (Select *, CASE 
         WHEN INSTR(responces, 'is_shishu_ghar_is_closed_for_the_day":') > 0 
         THEN SUBSTR(
             responces,
@@ -1559,16 +1670,19 @@ on childAttendence.creche_id=creche.name''';
 
     FROM  ${eligbleCrecheQuery()}  ) creche ON creche.name = childAttendence.creche_id
 ''';
-    var betWeen ="and childAttendence. date_of_attendance BETWEEN $startDate and $enrollMentDate";
+    var betWeen = "and childAttendence. date_of_attendance BETWEEN $startDate and $enrollMentDate";
 
 
-
-    var no_children_present_creche_openedQuery='$No_of_days_creche_attendance_submitted  $whereColue $betWeen';
-    List<Map<String, dynamic>> no_children_present_creche_openedResult = await db.rawQuery(no_children_present_creche_openedQuery);
-    var no_children_present_creche_openedCount=no_children_present_creche_openedResult.length ?? 0;
-    var count=0;
-    if(no_children_present_creche_openedCount>0&&crechCount.length>0){
-      count=(no_children_present_creche_openedCount/crechCount.length).ceil();
+    var no_children_present_creche_openedQuery = '$No_of_days_creche_attendance_submitted  $whereColue $betWeen';
+    List<
+        Map<String, dynamic>> no_children_present_creche_openedResult = await db
+        .rawQuery(no_children_present_creche_openedQuery);
+    var no_children_present_creche_openedCount = no_children_present_creche_openedResult
+        .length ?? 0;
+    var count = 0;
+    if (no_children_present_creche_openedCount > 0 && crechCount.length > 0) {
+      count =
+          (no_children_present_creche_openedCount / crechCount.length).ceil();
     }
     return count;
   }
@@ -1576,68 +1690,90 @@ on childAttendence.creche_id=creche.name''';
 
   Future<List<Map<String, dynamic>>> excuteAnthroDataNotSubmitted({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,1);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var crecheQuery =crecheDataQuery();
-    var anthroQuery ='''and name NOT IN ( SELECT creche_id FROM child_anthormentry_responce 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        1);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var crecheQuery = crecheDataQuery();
+    var anthroQuery = '''and name NOT IN ( SELECT creche_id FROM child_anthormentry_responce 
          WHERE measurement_date BETWEEN $startDate AND $enrollMentDate
     )''';
 
 
-
-    var antroDataNotSubmited='$crecheQuery  $whereColue $anthroQuery';
+    var antroDataNotSubmited = '$crecheQuery  $whereColue $anthroQuery';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
-     var count=result.length ?? 0;
+    var count = result.length ?? 0;
     return result;
   }
 
   Future<List<Map<String, dynamic>>> excuteAnthroDataSubmitted({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,1);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var crecheQuery =crecheDataQuery();
-    var anthroQuery ='''and name  IN ( SELECT creche_id FROM child_anthormentry_responce 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        1);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var crecheQuery = crecheDataQuery();
+    var anthroQuery = '''and name  IN ( SELECT creche_id FROM child_anthormentry_responce 
          WHERE measurement_date BETWEEN $startDate AND $enrollMentDate
     )''';
 
 
-
-    var antroDataNotSubmited='$crecheQuery  $whereColue $anthroQuery';
+    var antroDataNotSubmited = '$crecheQuery  $whereColue $anthroQuery';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
-    var count=result.length ?? 0;
+    var count = result.length ?? 0;
     return result;
   }
 
 
-Future<List<Map<String, dynamic>>> excuteChildrenMeasermentTaken({
+  Future<List<Map<String, dynamic>>> excuteChildrenMeasermentTaken({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,0);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var anthroQuery ='''Select * from (SELECT * from (select * 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        0);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var anthroQuery = '''Select * from (SELECT * from (select * 
     FROM child_anthormentry_responce  WHERE measurement_date BETWEEN $startDate AND $enrollMentDate) anthro
 left join (
     SELECT 
@@ -1764,56 +1900,62 @@ left join (
     ''';
 
 
-
-    var antroDataSubmited='$anthroQuery  $whereColue )';
+    var antroDataSubmited = '$anthroQuery  $whereColue )';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataSubmited);
-    List<Map<String, dynamic>> allChildren=[];
+    List<Map<String, dynamic>> allChildren = [];
     for (int i = 0; i < result.length; i++) {
-      var responceItem=result[i]['responces'];
+      var responceItem = result[i]['responces'];
       Map<String, dynamic> responseData = jsonDecode(responceItem);
       var childs = responseData['anthropromatic_details'];
       if (childs != null) {
         List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
             responseData['anthropromatic_details']);
-        var itemChildren=children
-            .where((element) => element['do_you_have_height_weight'].toString() ==
+        var itemChildren = children
+            .where((element) =>
+        element['do_you_have_height_weight'].toString() ==
             '1')
             .toList();
         allChildren.addAll(itemChildren);
-    }}
+      }
+    }
     return allChildren;
   }
 
   Future<List<Map<String, dynamic>>> excuteGetChildrenByGUIDES({
     String? childIdes,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    var childQuery='''select childs.*,creche.responces as crecheData from enrollred_exit_child_responce  childs
+  }) async {
+    var db = await databaseHelper.openDb();
+    var childQuery = '''select childs.*,creche.responces as crecheData from enrollred_exit_child_responce  childs
   left join tab_creche_response as creche on childs.creche_id=creche.name
   where ChildEnrollGUID in  ($childIdes)''';
-    var antroDataNotSubmited='$childQuery';
+    var antroDataNotSubmited = '$childQuery';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
 
     return result;
   }
 
 
-
   Future<List<Map<String, dynamic>>> excuteChildrenMeasermentNotTaken({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereWithJoinCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate);
-    var enrollMentDate ="'$filterDate'";
-    var crecheQuery=crecheDataQuery();
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereWithJoinCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate);
+    var enrollMentDate = "'$filterDate'";
+    var crecheQuery = crecheDataQuery();
 
-    var anthroQuery ='''creche  inner join (
+    var anthroQuery = '''creche  inner join (
 select *,CASE WHEN INSTR(responces, 'date_of_enrollment":"') > 0 
         THEN SUBSTR(
             responces,
@@ -1830,19 +1972,29 @@ select *,CASE WHEN INSTR(responces, 'date_of_enrollment":"') > 0
 		and (date_of_exit IS NULL OR date_of_exit > $enrollMentDate)  )  as enrolledChild
 		on enrolledChild.creche_id=creche.name  
     ''';
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
-    var submitedId='';
+    var childrenMeasurementTaken = await DashboardReportHelper()
+        .excuteChildrenMeasermentTaken(stateId: stateId,
+        districtId: districtId,
+        blockId: blockId,
+        gpId: gpId,
+        villageId: villageId,
+        crecheId: crecheId,
+        phase: phase,
+        partnerId: partnerId,
+        crecheStatus: crecheStatus,
+        filterDate: filterDate);
+    var submitedId = '';
     for (int i = 0; i < childrenMeasurementTaken.length; i++) {
-      if(Global.validString(submitedId)){
-        submitedId="$submitedId,'${childrenMeasurementTaken[i]['childenrollguid']}'";
-      }else submitedId="'${childrenMeasurementTaken[i]['childenrollguid']}'";
+      if (Global.validString(submitedId)) {
+        submitedId =
+        "$submitedId,'${childrenMeasurementTaken[i]['childenrollguid']}'";
+      } else
+        submitedId = "'${childrenMeasurementTaken[i]['childenrollguid']}'";
     }
 
-    var submitedChild ="and enrolledChild.ChildEnrollGUID not in ($submitedId)";
+    var submitedChild = "and enrolledChild.ChildEnrollGUID not in ($submitedId)";
 
-    var antroDataNotSubmited='$crecheQuery $anthroQuery  $whereColue $submitedChild';
+    var antroDataNotSubmited = '$crecheQuery $anthroQuery  $whereColue $submitedChild';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
     return result;
   }
@@ -1850,17 +2002,25 @@ select *,CASE WHEN INSTR(responces, 'date_of_enrollment":"') > 0
   // Severely underweight
   Future<List<Map<String, dynamic>>> excuteSeverUnderWeight({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,0);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var anthroQuery ='''Select * from (SELECT * from (select * 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        0);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var anthroQuery = '''Select * from (SELECT * from (select * 
     FROM child_anthormentry_responce  WHERE measurement_date BETWEEN $startDate AND $enrollMentDate) anthro
 left join (
     SELECT 
@@ -1987,43 +2147,53 @@ left join (
     ''';
 
 
-
-    var antroDataNotSubmited='$anthroQuery  $whereColue';
+    var antroDataNotSubmited = '$anthroQuery  $whereColue';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
-    List<Map<String, dynamic>> allChildren=[];
+    List<Map<String, dynamic>> allChildren = [];
     for (int i = 0; i < result.length; i++) {
-      var responceItem=result[i]['responces'];
+      var responceItem = result[i]['responces'];
       Map<String, dynamic> responseData = jsonDecode(responceItem);
       var childs = responseData['anthropromatic_details'];
       if (childs != null) {
         List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
             responseData['anthropromatic_details']);
-        var itemChildren=children
-            .where((element) => element['do_you_have_height_weight'].toString() ==
-            '1'&& Global.stringToDouble(element['weight_for_age'].toString()) ==
-            1)
+        var itemChildren = children
+            .where((element) =>
+        element['do_you_have_height_weight'].toString() ==
+            '1' &&
+            Global.stringToDouble(element['weight_for_age'].toString()) ==
+                1)
             .toList();
         allChildren.addAll(itemChildren);
-      }}
+      }
+    }
 
-    var count=allChildren.length ?? 0;
+    var count = allChildren.length ?? 0;
     return allChildren;
   }
 
   // Severely stunted
-Future<List<Map<String, dynamic>>> excuteSeverelyStunted({
+  Future<List<Map<String, dynamic>>> excuteSeverelyStunted({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,0);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var anthroQuery ='''Select * from (SELECT * from (select * 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        0);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var anthroQuery = '''Select * from (SELECT * from (select * 
     FROM child_anthormentry_responce  WHERE measurement_date BETWEEN $startDate AND $enrollMentDate) anthro
 left join (
     SELECT 
@@ -2150,42 +2320,52 @@ left join (
     ''';
 
 
-
-    var antroDataNotSubmited='$anthroQuery  $whereColue';
+    var antroDataNotSubmited = '$anthroQuery  $whereColue';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
-    List<Map<String, dynamic>> allChildren=[];
+    List<Map<String, dynamic>> allChildren = [];
     for (int i = 0; i < result.length; i++) {
-      var responceItem=result[i]['responces'];
+      var responceItem = result[i]['responces'];
       Map<String, dynamic> responseData = jsonDecode(responceItem);
       var childs = responseData['anthropromatic_details'];
       if (childs != null) {
         List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
             responseData['anthropromatic_details']);
-        var itemChildren=children
-            .where((element) => element['do_you_have_height_weight'].toString() ==
-            '1'&& Global.stringToDouble(element['height_for_age'].toString()) ==
-            1)
+        var itemChildren = children
+            .where((element) =>
+        element['do_you_have_height_weight'].toString() ==
+            '1' &&
+            Global.stringToDouble(element['height_for_age'].toString()) ==
+                1)
             .toList();
         allChildren.addAll(itemChildren);
-      }}
-    var count=allChildren.length ?? 0;
+      }
+    }
+    var count = allChildren.length ?? 0;
     return allChildren;
   }
 
 // Severely wasted
-Future< List<Map<String, dynamic>>> excuteSeverelyWasted({
+  Future<List<Map<String, dynamic>>> excuteSeverelyWasted({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,0);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var anthroQuery ='''Select * from (SELECT * from (select * 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        0);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var anthroQuery = '''Select * from (SELECT * from (select * 
     FROM child_anthormentry_responce  WHERE measurement_date BETWEEN $startDate AND $enrollMentDate) anthro
 left join (
     SELECT 
@@ -2312,42 +2492,52 @@ left join (
     ''';
 
 
-
-    var antroDataNotSubmited='$anthroQuery  $whereColue';
+    var antroDataNotSubmited = '$anthroQuery  $whereColue';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
-    List<Map<String, dynamic>> allChildren=[];
+    List<Map<String, dynamic>> allChildren = [];
     for (int i = 0; i < result.length; i++) {
-      var responceItem=result[i]['responces'];
+      var responceItem = result[i]['responces'];
       Map<String, dynamic> responseData = jsonDecode(responceItem);
       var childs = responseData['anthropromatic_details'];
       if (childs != null) {
         List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
             responseData['anthropromatic_details']);
-        var itemChildren=children
-            .where((element) => element['do_you_have_height_weight'].toString() ==
-            '1'&& Global.stringToDouble(element['weight_for_height'].toString()) ==
-            1)
+        var itemChildren = children
+            .where((element) =>
+        element['do_you_have_height_weight'].toString() ==
+            '1' &&
+            Global.stringToDouble(element['weight_for_height'].toString()) ==
+                1)
             .toList();
         allChildren.addAll(itemChildren);
-      }}
-    var count=allChildren.length ?? 0;
+      }
+    }
+    var count = allChildren.length ?? 0;
     return allChildren;
   }
 
   // Moderately underweight
-  Future< List<Map<String, dynamic>>> excuteModerateUnderWeight({
+  Future<List<Map<String, dynamic>>> excuteModerateUnderWeight({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,0);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var anthroQuery ='''Select * from (SELECT * from (select * 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        0);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var anthroQuery = '''Select * from (SELECT * from (select * 
     FROM child_anthormentry_responce  WHERE measurement_date BETWEEN $startDate AND $enrollMentDate) anthro
 left join (
     SELECT 
@@ -2474,43 +2664,53 @@ left join (
     ''';
 
 
-
-    var antroDataNotSubmited='$anthroQuery  $whereColue';
+    var antroDataNotSubmited = '$anthroQuery  $whereColue';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
-    List<Map<String, dynamic>> allChildren=[];
+    List<Map<String, dynamic>> allChildren = [];
     for (int i = 0; i < result.length; i++) {
-      var responceItem=result[i]['responces'];
+      var responceItem = result[i]['responces'];
       Map<String, dynamic> responseData = jsonDecode(responceItem);
       var childs = responseData['anthropromatic_details'];
       if (childs != null) {
         List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
             responseData['anthropromatic_details']);
-        var itemChildren=children
-            .where((element) => element['do_you_have_height_weight'].toString() ==
-            '1'&& Global.stringToDouble(element['weight_for_age'].toString()) ==
-            2)
+        var itemChildren = children
+            .where((element) =>
+        element['do_you_have_height_weight'].toString() ==
+            '1' &&
+            Global.stringToDouble(element['weight_for_age'].toString()) ==
+                2)
             .toList();
         allChildren.addAll(itemChildren);
-      }}
-    var count=allChildren.length ?? 0;
+      }
+    }
+    var count = allChildren.length ?? 0;
     return allChildren;
   }
 
 
   // Moderately wasted
-  Future< List<Map<String, dynamic>>> excuteModerateWastage({
+  Future<List<Map<String, dynamic>>> excuteModerateWastage({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,0);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var anthroQuery ='''Select * from (SELECT * from (select * 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        0);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var anthroQuery = '''Select * from (SELECT * from (select * 
     FROM child_anthormentry_responce  WHERE measurement_date BETWEEN $startDate AND $enrollMentDate) anthro
 left join (
     SELECT 
@@ -2637,42 +2837,52 @@ left join (
     ''';
 
 
-
-    var antroDataNotSubmited='$anthroQuery  $whereColue';
+    var antroDataNotSubmited = '$anthroQuery  $whereColue';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
-    List<Map<String, dynamic>> allChildren=[];
+    List<Map<String, dynamic>> allChildren = [];
     for (int i = 0; i < result.length; i++) {
-      var responceItem=result[i]['responces'];
+      var responceItem = result[i]['responces'];
       Map<String, dynamic> responseData = jsonDecode(responceItem);
       var childs = responseData['anthropromatic_details'];
       if (childs != null) {
         List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
             responseData['anthropromatic_details']);
-        var itemChildren=children
-            .where((element) => element['do_you_have_height_weight'].toString() ==
-            '1'&& Global.stringToDouble(element['weight_for_height'].toString()) ==
-            2)
+        var itemChildren = children
+            .where((element) =>
+        element['do_you_have_height_weight'].toString() ==
+            '1' &&
+            Global.stringToDouble(element['weight_for_height'].toString()) ==
+                2)
             .toList();
         allChildren.addAll(itemChildren);
-      }}
-    var count=allChildren.length ?? 0;
+      }
+    }
+    var count = allChildren.length ?? 0;
     return allChildren;
   }
 
   // Moderately stunted
-  Future< List<Map<String, dynamic>>> excuteModerateStunted({
+  Future<List<Map<String, dynamic>>> excuteModerateStunted({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
-  })
-  async {
-    var db=await databaseHelper.openDb();
-    String whereColue= crecheWhereCondition(  stateId,  districtId,
-        blockId,  gpId, villageId, crecheId,  phase,
-        partnerId,  crecheStatus,filterDate,0);
-    var enrollMentDate ="'$filterDate'";
-    var startDate ="'${Global.getFirstDayDateByDate(filterDate!)}'";
-    var anthroQuery ='''Select * from (SELECT * from (select * 
+  }) async {
+    var db = await databaseHelper.openDb();
+    String whereColue = crecheWhereCondition(
+        stateId,
+        districtId,
+        blockId,
+        gpId,
+        villageId,
+        crecheId,
+        phase,
+        partnerId,
+        crecheStatus,
+        filterDate,
+        0);
+    var enrollMentDate = "'$filterDate'";
+    var startDate = "'${Global.getFirstDayDateByDate(filterDate!)}'";
+    var anthroQuery = '''Select * from (SELECT * from (select * 
     FROM child_anthormentry_responce  WHERE measurement_date BETWEEN $startDate AND $enrollMentDate) anthro
 left join (
     SELECT 
@@ -2799,25 +3009,27 @@ left join (
     ''';
 
 
-
-    var antroDataNotSubmited='$anthroQuery  $whereColue';
+    var antroDataNotSubmited = '$anthroQuery  $whereColue';
     List<Map<String, dynamic>> result = await db.rawQuery(antroDataNotSubmited);
-    List<Map<String, dynamic>> allChildren=[];
+    List<Map<String, dynamic>> allChildren = [];
     for (int i = 0; i < result.length; i++) {
-      var responceItem=result[i]['responces'];
+      var responceItem = result[i]['responces'];
       Map<String, dynamic> responseData = jsonDecode(responceItem);
       var childs = responseData['anthropromatic_details'];
       if (childs != null) {
         List<Map<String, dynamic>> children = List<Map<String, dynamic>>.from(
             responseData['anthropromatic_details']);
-        var itemChildren=children
-            .where((element) => element['do_you_have_height_weight'].toString() ==
-            '1'&& Global.stringToDouble(element['height_for_age'].toString()) ==
-            2)
+        var itemChildren = children
+            .where((element) =>
+        element['do_you_have_height_weight'].toString() ==
+            '1' &&
+            Global.stringToDouble(element['height_for_age'].toString()) ==
+                2)
             .toList();
         allChildren.addAll(itemChildren);
-      }}
-    var count=allChildren.length ?? 0;
+      }
+    }
+    var count = allChildren.length ?? 0;
     return allChildren;
   }
 
@@ -2854,28 +3066,33 @@ left join (
   // GF1 with all anthro  Updated
   Future<List<Map<String, dynamic>>> excuteGF1AnthroNew({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
+    var childrenMeasurementTaken = await DashboardReportHelper()
+        .excuteChildrenMeasermentTaken(stateId: stateId,
+        districtId: districtId,
+        blockId: blockId,
+        gpId: gpId,
+        villageId: villageId,
+        crecheId: crecheId,
+        phase: phase,
+        partnerId: partnerId,
+        crecheStatus: crecheStatus,
+        filterDate: filterDate);
 
     for (int i = 0; i < childrenMeasurementTaken.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
+      var element = childrenMeasurementTaken[i];
+      if (element['measurement_taken_date'] != null) {
         var gfReco = await checkGF1GrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='GF1'){
+            , element['measurement_taken_date'], element['cgmguid'],
+            element, allAntroData!);
+        if (gfReco == 'GF1') {
           allChildren.add(element);
         }
       }
-
     }
 
     return allChildren;
@@ -2884,57 +3101,60 @@ left join (
   // GF1 + with all  anthro  Updated
   Future<List<Map<String, dynamic>>> excuteGF1PlAnthroNew({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
+    var childrenMeasurementTaken = await DashboardReportHelper()
+        .excuteChildrenMeasermentTaken(stateId: stateId,
+        districtId: districtId,
+        blockId: blockId,
+        gpId: gpId,
+        villageId: villageId,
+        crecheId: crecheId,
+        phase: phase,
+        partnerId: partnerId,
+        crecheStatus: crecheStatus,
+        filterDate: filterDate);
 
     for (int i = 0; i < childrenMeasurementTaken.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
+      var element = childrenMeasurementTaken[i];
+      if (element['measurement_taken_date'] != null) {
         var gfReco = await checkGFP1GrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='GF1+'){
+            , element['measurement_taken_date'], element['cgmguid'],
+            element, allAntroData!);
+        if (gfReco == 'GF1+') {
           allChildren.add(element);
         }
       }
-
     }
 
     return allChildren;
   }
 
 
-
-
   // GF1   With Measurement Taken  local
   Future<List<Map<String, dynamic>>> excuteGF1AllAnthro({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
-    String? partnerId, String? crecheStatus, String? filterDate,List<Map<String, dynamic>>? childrenMeasurementTaken,
-    List<ChildGrowthMetaResponseModel>? allAntroData})
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
+    String? partnerId, String? crecheStatus, String? filterDate, List<
+        Map<String, dynamic>>? childrenMeasurementTaken,
+    List<ChildGrowthMetaResponseModel>? allAntroData}) async {
+    List<Map<String, dynamic>> allChildren = [];
 
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
+      var element = childrenMeasurementTaken[i];
+      if (element['measurement_taken_date'] != null &&
+          Global.stringToInt(element['do_you_have_height_weight'].toString()) ==
+              1) {
         var gfReco = await checkGF1GrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='GF1'){
+            , element['measurement_taken_date'], element['cgmguid'],
+            element, allAntroData!);
+        if (gfReco == 'GF1') {
           allChildren.add(element);
         }
       }
-
     }
 
     return allChildren;
@@ -2972,26 +3192,33 @@ left join (
   // GF2  with anthro updated
   Future<List<Map<String, dynamic>>> excuteGF2AntroNew({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
+    var childrenMeasurementTaken = await DashboardReportHelper()
+        .excuteChildrenMeasermentTaken(stateId: stateId,
+        districtId: districtId,
+        blockId: blockId,
+        gpId: gpId,
+        villageId: villageId,
+        crecheId: crecheId,
+        phase: phase,
+        partnerId: partnerId,
+        crecheStatus: crecheStatus,
+        filterDate: filterDate);
 
     for (int i = 0; i < childrenMeasurementTaken.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
+      var element = childrenMeasurementTaken[i];
+      if (element['measurement_taken_date'] != null) {
         var gfReco = await checkGF2GrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='GF2'){
+            , element['measurement_taken_date'], element['cgmguid'],
+            element, allAntroData!);
+        if (gfReco == 'GF2') {
           allChildren.add(element);
-        }}
+        }
+      }
     }
 
     return allChildren;
@@ -3000,26 +3227,54 @@ left join (
   // ZigZag  with anthro updated
   Future<List<Map<String, dynamic>>> excuteZigZagAntroNew({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
-
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
+    var childrenMeasurementTaken = await DashboardReportHelper()
+        .excuteChildrenMeasermentTaken(stateId: stateId,
+        districtId: districtId,
+        blockId: blockId,
+        gpId: gpId,
+        villageId: villageId,
+        crecheId: crecheId,
+        phase: phase,
+        partnerId: partnerId,
+        crecheStatus: crecheStatus,
+        filterDate: filterDate);
+    List<Map<String,
+        dynamic>> enrolledChild = await EnrolledExitChilrenResponceHelper()
+        .callEnrollChildrenWithoutExtAll();
     for (int i = 0; i < childrenMeasurementTaken.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-        var gfReco = await checkZigZagGrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='Zig-Zag'){
-          allChildren.add(element);
-        }}
+      var element = childrenMeasurementTaken[i];
+      var childGUID=element['childenrollguid'];
+      if (element['measurement_taken_date'] != null) {
+        var child = enrolledChild.where(
+                (element) =>
+            (element['ChildEnrollGUID'] == childGUID))
+            .toList();
+        if (child.isNotEmpty) {
+          var dateOfEnro= Global.getItemValues(child.first['responces'],'date_of_enrollment');
+          if (Global.validString(dateOfEnro) &&
+              filterDate != null) {
+            var enroledDate = Validate().stringToDate(dateOfEnro);
+            var filteDate = Validate().stringToDate(filterDate);
+            var calculateAgeInMonthsDepenExp = Validate()
+                .calculateAgeInMonthsDepenExp(enroledDate, filteDate);
+            if (calculateAgeInMonthsDepenExp > 4) {
+              var gfReco = await checkZigZagGrowthMonitoring(
+                  element['childenrollguid']
+                  , element['measurement_taken_date'], element['cgmguid'],
+                  element, allAntroData!);
+              if (gfReco == 'Zig-Zag') {
+                allChildren.add(element);
+              }
+            }
+          }
+        }
+
+      }
     }
 
     return allChildren;
@@ -3028,26 +3283,60 @@ left join (
   // SNC  with anthro updated
   Future<List<Map<String, dynamic>>> excuteSNCAntroNew({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
-
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
+    var childrenMeasurementTaken = await DashboardReportHelper()
+        .excuteChildrenMeasermentTaken(stateId: stateId,
+        districtId: districtId,
+        blockId: blockId,
+        gpId: gpId,
+        villageId: villageId,
+        crecheId: crecheId,
+        phase: phase,
+        partnerId: partnerId,
+        crecheStatus: crecheStatus,
+        filterDate: filterDate);
+    List<Map<String,
+        dynamic>> enrolledChild = await EnrolledExitChilrenResponceHelper()
+        .callEnrollChildrenWithoutExtAll();
     for (int i = 0; i < childrenMeasurementTaken.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-        var gfReco = await checkSNCGrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='SNC'){
-          allChildren.add(element);
-        }}
+      var element = childrenMeasurementTaken[i];
+      var childGUID=element['childenrollguid'];
+      if (element['measurement_taken_date'] != null) {
+        var child = enrolledChild.where(
+                (element) =>
+            (element['ChildEnrollGUID'] == childGUID))
+            .toList();
+        if (child.isNotEmpty) {
+          var dateOfEnro= Global.getItemValues(child.first['responces'],'date_of_enrollment');
+          if (Global.validString(dateOfEnro) &&
+              filterDate != null) {
+            var enroledDate = Validate().stringToDate(dateOfEnro);
+            var filteDate = Validate().stringToDate(filterDate);
+            var calculateAgeInMonthsDepenExp = Validate()
+                .calculateAgeInMonthsDepenExp(enroledDate, filteDate);
+            if (calculateAgeInMonthsDepenExp > 4) {
+              var gfReco = await checkSNCGrowthMonitoring(element['childenrollguid']
+                  , element['measurement_taken_date'], element['cgmguid'],
+                  element, allAntroData!,1);
+              if (gfReco == 'SNC') {
+                allChildren.add(element);
+              }
+            }else{
+              var gfReco = await checkSNCGrowthMonitoring(element['childenrollguid']
+                  , element['measurement_taken_date'], element['cgmguid'],
+                  element, allAntroData!,0);
+              if (gfReco == 'SNC') {
+                allChildren.add(element);
+              }
+            }
+          }
+        }
+
+      }
     }
 
     return allChildren;
@@ -3056,24 +3345,23 @@ left join (
   // GF2   With Measurement Taken  local
   Future<List<Map<String, dynamic>>> excuteGF2MeasurementTakenAllAnthro({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<Map<String, dynamic>>? childrenMeasurementTaken,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
 
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
+      var element = childrenMeasurementTaken[i];
+      if (element['measurement_taken_date'] != null) {
         var gfReco = await checkGF2GrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='GF2'){
+            , element['measurement_taken_date'], element['cgmguid'],
+            element, allAntroData!);
+        if (gfReco == 'GF2') {
           allChildren.add(element);
-        }}
+        }
+      }
     }
 
     return allChildren;
@@ -3082,24 +3370,23 @@ left join (
   // GF1+   With Measurement Taken  local
   Future<List<Map<String, dynamic>>> excuteGF1PMeasurementTakenAllAnthro({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<Map<String, dynamic>>? childrenMeasurementTaken,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
 
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
+      var element = childrenMeasurementTaken[i];
+      if (element['measurement_taken_date'] != null) {
         var gfReco = await checkGFP1GrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='GF1+'){
+            , element['measurement_taken_date'], element['cgmguid'],
+            element, allAntroData!);
+        if (gfReco == 'GF1+') {
           allChildren.add(element);
-        }}
+        }
+      }
     }
 
     return allChildren;
@@ -3108,24 +3395,46 @@ left join (
   // ZIG-ZAG   With Measurement Taken  local
   Future<List<Map<String, dynamic>>> excuteZigZagMeasurementTakenAllAnthro({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<Map<String, dynamic>>? childrenMeasurementTaken,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
+    List<Map<String,
+        dynamic>> enrolledChild = await EnrolledExitChilrenResponceHelper()
+        .callEnrollChildrenWithoutExtAll();
 
-    List<Map<String, dynamic>> allChildren=[];
 
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-        var gfReco = await checkZigZagGrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='Zig-Zag'){
-          allChildren.add(element);
-        }}
+      var element = childrenMeasurementTaken[i];
+      var childGUID=element['childenrollguid'];
+      if (element['measurement_taken_date'] != null) {
+        var child = enrolledChild.where(
+                (element) =>
+            (element['ChildEnrollGUID'] == childGUID))
+            .toList();
+        if (child.isNotEmpty) {
+          var dateOfEnro= Global.getItemValues(child.first['responces'],'date_of_enrollment');
+          if (Global.validString(dateOfEnro) &&
+              filterDate != null) {
+            var enroledDate = Validate().stringToDate(dateOfEnro);
+            var filteDate = Validate().stringToDate(filterDate);
+            var calculateAgeInMonthsDepenExp = Validate()
+                .calculateAgeInMonthsDepenExp(enroledDate, filteDate);
+            if (calculateAgeInMonthsDepenExp > 4) {
+              var gfReco = await checkZigZagGrowthMonitoring(
+                  element['childenrollguid']
+                  , element['measurement_taken_date'], element['cgmguid'],
+                  element, allAntroData!);
+              if (gfReco == 'Zig-Zag') {
+                allChildren.add(element);
+              }
+            }
+          }
+        }
+
+      }
     }
 
     return allChildren;
@@ -3134,133 +3443,170 @@ left join (
   // SNC Pattern  With Measurement Taken  local
   Future<List<Map<String, dynamic>>> excuteSNCPatternMeasurementTakenAllAnthro({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<Map<String, dynamic>>? childrenMeasurementTaken,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
+    List<Map<String,
+        dynamic>> enrolledChild = await EnrolledExitChilrenResponceHelper()
+        .callEnrollChildrenWithoutExtAll();
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-        var gfReco = await checkSNCGrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
-        if(gfReco=='SNC'){
-          allChildren.add(element);
-        }}
+      var element = childrenMeasurementTaken[i];
+      var childGUID=element['childenrollguid'];
+      if (element['measurement_taken_date'] != null) {
+        var child = enrolledChild.where(
+                (element) =>
+            (element['ChildEnrollGUID'] == childGUID))
+            .toList();
+        if (child.isNotEmpty) {
+          var dateOfEnro= Global.getItemValues(child.first['responces'],'date_of_enrollment');
+          if (Global.validString(dateOfEnro) &&
+              filterDate != null) {
+            var enroledDate = Validate().stringToDate(dateOfEnro);
+            var filteDate = Validate().stringToDate(filterDate);
+            var calculateAgeInMonthsDepenExp = Validate()
+                .calculateAgeInMonthsDepenExp(enroledDate, filteDate);
+            if (calculateAgeInMonthsDepenExp > 4) {
+              var gfReco = await checkSNCGrowthMonitoring(element['childenrollguid']
+                  , element['measurement_taken_date'], element['cgmguid'],
+                  element, allAntroData!,1);
+              if (gfReco == 'SNC') {
+                allChildren.add(element);
+              }
+            }else{
+              var gfReco = await checkSNCGrowthMonitoring(element['childenrollguid']
+                  , element['measurement_taken_date'], element['cgmguid'],
+                  element, allAntroData!,0);
+              if (gfReco == 'SNC') {
+                allChildren.add(element);
+              }
+            }
+          }
+        }
+        // var gfReco = await checkSNCGrowthMonitoring(element['childenrollguid']
+        //     , element['measurement_taken_date'], element['cgmguid'],
+        //     element, allAntroData!,0);
+        // if (gfReco == 'SNC') {
+        //   allChildren.add(element);
+        // }
+
+      }
     }
 
     return allChildren;
   }
-
 
 
   // Red flag children
   Future<List<Map<String, dynamic>>> excuteRedFlagAnthro({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
-    var childrenMeasurementTaken  = await DashboardReportHelper().excuteChildrenMeasermentTaken(stateId: stateId,
-        districtId:  districtId,blockId:  blockId, gpId: gpId,   villageId: villageId,  crecheId: crecheId, phase: phase,  partnerId: partnerId,
-        crecheStatus: crecheStatus,filterDate:filterDate);
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
+    var childrenMeasurementTaken = await DashboardReportHelper()
+        .excuteChildrenMeasermentTaken(stateId: stateId,
+        districtId: districtId,
+        blockId: blockId,
+        gpId: gpId,
+        villageId: villageId,
+        crecheId: crecheId,
+        phase: phase,
+        partnerId: partnerId,
+        crecheStatus: crecheStatus,
+        filterDate: filterDate);
 
     for (int i = 0; i < childrenMeasurementTaken.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-        var gfReco = await checkRedFlagGrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
+      var element = childrenMeasurementTaken[i];
+      if (element['measurement_taken_date'] != null) {
+        var gfReco = await checkRedFlagGrowthMonitoring(
+            element['childenrollguid']
+            , element['measurement_taken_date'], element['cgmguid'],
+            element, allAntroData!);
 
         if (Global.stringToDouble(
             element['weight_for_height'].toString()) ==
             1 ||
-            gfReco=='GF2' ||
+            gfReco == 'GF2' ||
             Global.stringToInt(
                 element['any_medical_major_illness'].toString()) ==
                 1 ||
             Global.stringToDouble(element['weight_for_age'].toString()) ==
                 1) {
           allChildren.add(element);
-        }}
+        }
+      }
     }
 
     return allChildren;
   }
 
 
-
   // Red flag children  measument taken  all anthro
   Future<List<Map<String, dynamic>>> excuteRedFlagMeasurmentTakenAllAnthro({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<Map<String, dynamic>>? childrenMeasurementTaken,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
 
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
-        var gfReco = await checkRedFlagGrowthMonitoring(element['childenrollguid']
-            ,element['measurement_taken_date'],element['cgmguid'],
-            element,allAntroData!);
+      var element = childrenMeasurementTaken[i];
+      if (element['measurement_taken_date'] != null) {
+        var gfReco = await checkRedFlagGrowthMonitoring(
+            element['childenrollguid']
+            , element['measurement_taken_date'], element['cgmguid'],
+            element, allAntroData!);
 
         if (Global.stringToDouble(
             element['weight_for_height'].toString()) ==
             1 ||
-            gfReco=='GF2' ||
+            gfReco == 'GF2' ||
             Global.stringToInt(
                 element['any_medical_major_illness'].toString()) ==
                 1 ||
             Global.stringToDouble(element['weight_for_age'].toString()) ==
                 1) {
           allChildren.add(element);
-        }}
+        }
+      }
     }
 
     return allChildren;
   }
 
 // children at Risk measument taken  all anthro
-  Future<List<Map<String, dynamic>>> excuteChildrenAtRiskMeasurmentTakenAllAnthro({
+  Future<
+      List<Map<String, dynamic>>> excuteChildrenAtRiskMeasurmentTakenAllAnthro({
     String? stateId, String? districtId,
-    String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
+    String? blockId, String? gpId, String? villageId, String? crecheId, String? phase,
     String? partnerId, String? crecheStatus, String? filterDate,
     List<Map<String, dynamic>>? childrenMeasurementTaken,
     List<ChildGrowthMetaResponseModel>? allAntroData
-  })
-  async {
-
-    List<Map<String, dynamic>> allChildren=[];
+  }) async {
+    List<Map<String, dynamic>> allChildren = [];
 
     for (int i = 0; i < childrenMeasurementTaken!.length; i++) {
-      var element=childrenMeasurementTaken[i];
-      if(element['measurement_taken_date']!=null){
+      var element = childrenMeasurementTaken[i];
+      if (element['measurement_taken_date'] != null) {
         if (Global.stringToDouble(
             element['weight_for_height_zscore'].toString()) <
             -3) {
           allChildren.add(element);
-        }}
+        }
+      }
     }
 
     return allChildren;
   }
 
   Future<String?> checkSUWCondition(String enrolChildGuid,
-      String measurement_date, Map<String, dynamic> growhthDetails)
-  async {
+      String measurement_date, Map<String, dynamic> growhthDetails) async {
     String? genratedValue;
     String lastMonthDate = Validate().getOneMonthPreviousDate(measurement_date);
     var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
@@ -3279,8 +3625,10 @@ left join (
       var lastdChild = lastGrowthRec['anthropromatic_details'];
       if (lastdChild != null) {
         var child = lastdChild
-            .where((element) => element['childenrollguid'] == enrolChildGuid
-            &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+            .where((element) =>
+        element['childenrollguid'] == enrolChildGuid
+            && (Global.stringToInt(
+            element['do_you_have_height_weight'].toString()) == 1))
             .toList();
         if (child.length > 0) {
           lastGrowhthDetails = child.first;
@@ -3295,8 +3643,10 @@ left join (
       var lastdChild = secondlastGrowthRec['anthropromatic_details'];
       if (lastdChild != null) {
         var child = lastdChild
-            .where((element) => element['childenrollguid'] == enrolChildGuid
-            &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+            .where((element) =>
+        element['childenrollguid'] == enrolChildGuid
+            && (Global.stringToInt(
+            element['do_you_have_height_weight'].toString()) == 1))
             .toList();
         if (child.length > 0) {
           secondlastGrowhthDetails = child.first;
@@ -3311,8 +3661,9 @@ left join (
 
       if (secondlastGrowhthDetails.isNotEmpty &&
           (Global.stringToDouble(
-              lastGrowhthDetails['weight'].toString())<=
-              Global.stringToDouble(secondlastGrowhthDetails['weight'].toString()))) {
+              lastGrowhthDetails['weight'].toString()) <=
+              Global.stringToDouble(
+                  secondlastGrowhthDetails['weight'].toString()))) {
         genratedValue = 'GF2';
       }
     }
@@ -3320,21 +3671,11 @@ left join (
   }
 
 
-
-
-
-
-
-
-
-
-
-
 //With  local growth monitoring
   Future<String?> checkRedFlagGrowthMonitoring(String enrolChildGuid,
-      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
-      List<ChildGrowthMetaResponseModel> growthItems)
-  async {
+      String measurement_date, String cgmguid,
+      Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems) async {
     String? genratedValue;
 
     // lastMonth
@@ -3346,37 +3687,41 @@ left join (
     var secoundLastMonthYear = Validate().dateToMonthYear(secoundLast);
 
 
-    var items=growthItems.where(
+    var items = growthItems.where(
             (element) => (element.cgmguid == cgmguid))
         .toList();
 
-    if(items.length>0){
-      var filterdLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
-                      lastMonthYear))
+    if (items.length > 0) {
+      var filterdLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
+                  lastMonthYear))
           .toList();
 
-      var filterdSencondLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
-                      secoundLastMonthYear))
+      var filterdSencondLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
+                  secoundLastMonthYear))
           .toList();
 
       Map<String, dynamic> lastGrowhthDetails = {};
       Map<String, dynamic> secondlastGrowhthDetails = {};
 
-      if(filterdLastRecord.length>0){
-        var lastAntroRecord=filterdLastRecord.first;
+      if (filterdLastRecord.length > 0) {
+        var lastAntroRecord = filterdLastRecord.first;
 
-        if (lastAntroRecord.responces!=null) {
+        if (lastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(lastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               lastGrowhthDetails = child.first;
@@ -3385,16 +3730,18 @@ left join (
         }
       }
 
-      if(filterdSencondLastRecord.length>0){
-        var secondLastAntroRecord=filterdSencondLastRecord.first;
-        if (secondLastAntroRecord.responces!=null) {
+      if (filterdSencondLastRecord.length > 0) {
+        var secondLastAntroRecord = filterdSencondLastRecord.first;
+        if (secondLastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(secondLastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               secondlastGrowhthDetails = child.first;
@@ -3410,16 +3757,13 @@ left join (
 
         if (secondlastGrowhthDetails.isNotEmpty &&
             (Global.stringToDouble(
-                lastGrowhthDetails['weight'].toString())<=
+                lastGrowhthDetails['weight'].toString()) <=
                 Global.stringToDouble(secondlastGrowhthDetails['weight']
                     .toString()))) {
           genratedValue = 'GF2';
         }
       }
-
-
     }
-
 
 
     return genratedValue;
@@ -3427,9 +3771,9 @@ left join (
 
   //With  local growth monitoring GF1
   Future<String?> checkGF1GrowthMonitoring(String enrolChildGuid,
-      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
-      List<ChildGrowthMetaResponseModel> growthItems)
-  async {
+      String measurement_date, String cgmguid,
+      Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems) async {
     String? genratedValue;
 
     // lastMonth
@@ -3437,32 +3781,34 @@ left join (
     var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
 
 
-
-    var items=growthItems.where(
+    var items = growthItems.where(
             (element) => (element.cgmguid == cgmguid))
         .toList();
 
-    if(items.length>0){
-      var filterdLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
+    if (items.length > 0) {
+      var filterdLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
                   lastMonthYear))
           .toList();
 
 
       Map<String, dynamic> lastGrowhthDetails = {};
 
-      if(filterdLastRecord.length>0){
-        var lastAntroRecord=filterdLastRecord.first;
+      if (filterdLastRecord.length > 0) {
+        var lastAntroRecord = filterdLastRecord.first;
 
-        if (lastAntroRecord.responces!=null) {
+        if (lastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(lastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               lastGrowhthDetails = child.first;
@@ -3473,19 +3819,69 @@ left join (
 
 
       if (lastGrowhthDetails.isNotEmpty &&
-          (Global.convertToOne(Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString()))) >0&&
-          Global.convertToOne(Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString()))>0) {
+          Global.validString(growhthDetails['weight_for_age_zscore']) &&
+              Global.validString(lastGrowhthDetails['weight_for_age_zscore'])) {
+        var currentWAZ = Global.stringToDouble(
+            growhthDetails['weight_for_age_zscore'].toString());
+        var lastWAZ = Global.stringToDouble(
+            lastGrowhthDetails['weight_for_age_zscore'].toString());
 
-        var currentWAZ=Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString());
-        var lastWAZ=Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString());
-
-        var gf1diff=currentWAZ-lastWAZ;
-        if(gf1diff < 0){
+        var gf1diff = currentWAZ - lastWAZ;
+        if (gf1diff < 0) {
           genratedValue = 'GF1';
         }
       }
-    }
+      else {
+        ////secondLastMonth
+        String secoundLast = Validate().getOneMonthPreviousDate(lastMonthDate);
+        var secoundLastMonthYear = Validate().dateToMonthYear(secoundLast);
 
+
+        var filterdSencondLastRecord = growthItems.where(
+                (element) =>
+            (element.creche_id == items.first.creche_id
+                && Validate().dateToMonthYear(element.measurement_date!) ==
+                    secoundLastMonthYear))
+            .toList();
+        Map<String, dynamic> secondlastGrowhthDetails = {};
+
+        if (filterdSencondLastRecord.length > 0) {
+          var secondLastAntroRecord = filterdSencondLastRecord.first;
+          if (secondLastAntroRecord.responces != null) {
+            Map<String, dynamic> lastGrowthRec =
+            jsonDecode(secondLastAntroRecord.responces!);
+            var lastdChild = lastGrowthRec['anthropromatic_details'];
+            if (lastdChild != null) {
+              var child = lastdChild
+                  .where((element) =>
+              element['childenrollguid'] == enrolChildGuid
+                  && (Global.stringToInt(
+                  element['do_you_have_height_weight'].toString()) == 1))
+                  .toList();
+              if (child.length > 0) {
+                secondlastGrowhthDetails = child.first;
+              }
+            }
+          }
+        }
+
+        if (secondlastGrowhthDetails.isNotEmpty &&
+            Global.validString(
+                growhthDetails['weight_for_age_zscore'])&&
+      Global.validString(
+                secondlastGrowhthDetails['weight_for_age_zscore'])) {
+          var currentWAZ = Global.stringToDouble(
+              growhthDetails['weight_for_age_zscore'].toString());
+          var secLastWAZ = Global.stringToDouble(
+              secondlastGrowhthDetails['weight_for_age_zscore'].toString());
+
+          var gf1diff = currentWAZ - secLastWAZ;
+          if (gf1diff < 0) {
+            genratedValue = 'GF1';
+          }
+        }
+      }
+    }
 
 
     return genratedValue;
@@ -3493,9 +3889,9 @@ left join (
 
   //With  local growth monitoring GF+1
   Future<String?> checkGFP1GrowthMonitoring(String enrolChildGuid,
-      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
-      List<ChildGrowthMetaResponseModel> growthItems)
-  async {
+      String measurement_date, String cgmguid,
+      Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems) async {
     String? genratedValue;
 
     // lastMonth
@@ -3503,32 +3899,34 @@ left join (
     var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
 
 
-
-    var items=growthItems.where(
+    var items = growthItems.where(
             (element) => (element.cgmguid == cgmguid))
         .toList();
 
-    if(items.length>0){
-      var filterdLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
+    if (items.length > 0) {
+      var filterdLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
                   lastMonthYear))
           .toList();
 
 
       Map<String, dynamic> lastGrowhthDetails = {};
 
-      if(filterdLastRecord.length>0){
-        var lastAntroRecord=filterdLastRecord.first;
+      if (filterdLastRecord.length > 0) {
+        var lastAntroRecord = filterdLastRecord.first;
 
-        if (lastAntroRecord.responces!=null) {
+        if (lastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(lastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               lastGrowhthDetails = child.first;
@@ -3538,20 +3936,71 @@ left join (
       }
 
       if (lastGrowhthDetails.isNotEmpty &&
-          (Global.convertToOne(Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString()))) >0&&
-          Global.convertToOne(Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString()))>0) {
+          Global.validString(
+              growhthDetails['weight_for_age_zscore'])  &&
+    Global.validString(
+              lastGrowhthDetails['weight_for_age_zscore'])) {
+        var currentWAZ = Global.stringToDouble(
+            growhthDetails['weight_for_age_zscore'].toString());
+        var lastWAZ = Global.stringToDouble(
+            lastGrowhthDetails['weight_for_age_zscore'].toString());
 
-        var currentWAZ=Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString());
-        var lastWAZ=Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString());
-
-        var gf1diff=currentWAZ-lastWAZ;
-        if(gf1diff <= -0.5){
+        var gf1diff = currentWAZ - lastWAZ;
+        if (gf1diff <= -0.5) {
           genratedValue = 'GF1+';
         }
       }
+      else {
+        ////secondLastMonth
+        String secoundLast = Validate().getOneMonthPreviousDate(lastMonthDate);
+        var secoundLastMonthYear = Validate().dateToMonthYear(secoundLast);
 
+
+        var filterdSencondLastRecord = growthItems.where(
+                (element) =>
+            (element.creche_id == items.first.creche_id
+                && Validate().dateToMonthYear(element.measurement_date!) ==
+                    secoundLastMonthYear))
+            .toList();
+        Map<String, dynamic> secondlastGrowhthDetails = {};
+
+        if (filterdSencondLastRecord.length > 0) {
+          var secondLastAntroRecord = filterdSencondLastRecord.first;
+          if (secondLastAntroRecord.responces != null) {
+            Map<String, dynamic> lastGrowthRec =
+            jsonDecode(secondLastAntroRecord.responces!);
+            var lastdChild = lastGrowthRec['anthropromatic_details'];
+            if (lastdChild != null) {
+              var child = lastdChild
+                  .where((element) =>
+              element['childenrollguid'] == enrolChildGuid
+                  && (Global.stringToInt(
+                  element['do_you_have_height_weight'].toString()) == 1))
+                  .toList();
+              if (child.length > 0) {
+                secondlastGrowhthDetails = child.first;
+              }
+            }
+          }
+        }
+
+        if (secondlastGrowhthDetails.isNotEmpty &&
+            Global.validString(
+                growhthDetails['weight_for_age_zscore']) &&
+    Global.validString(
+                secondlastGrowhthDetails['weight_for_age_zscore']) ) {
+          var currentWAZ = Global.stringToDouble(
+              growhthDetails['weight_for_age_zscore'].toString());
+          var secLastWAZ = Global.stringToDouble(
+              secondlastGrowhthDetails['weight_for_age_zscore'].toString());
+
+          var gf1diff = currentWAZ - secLastWAZ;
+          if (gf1diff <= -0.5) {
+            genratedValue = 'GF1+';
+          }
+        }
+      }
     }
-
 
 
     return genratedValue;
@@ -3559,9 +4008,9 @@ left join (
 
   //With  local growth monitoring  GF2
   Future<String?> checkGF2GrowthMonitoring(String enrolChildGuid,
-      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
-      List<ChildGrowthMetaResponseModel> growthItems)
-  async {
+      String measurement_date, String cgmguid,
+      Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems) async {
     String? genratedValue;
 
     // lastMonth
@@ -3572,38 +4021,53 @@ left join (
     String secoundLast = Validate().getOneMonthPreviousDate(lastMonthDate);
     var secoundLastMonthYear = Validate().dateToMonthYear(secoundLast);
 
+    ////thirdLastMonth
+    String thirdLastMonth = Validate().getOneMonthPreviousDate(secoundLast);
+    var thirdLastMonthYear = Validate().dateToMonthYear(thirdLastMonth);
 
-    var items=growthItems.where(
+
+    var items = growthItems.where(
             (element) => (element.cgmguid == cgmguid))
         .toList();
 
-    if(items.length>0){
-      var filterdLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
+    if (items.length > 0) {
+      var filterdLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
                   lastMonthYear))
           .toList();
 
-      var filterdSencondLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
+      var filterdSencondLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
                   secoundLastMonthYear))
+          .toList();
+
+      var filterdThirdLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
+                  thirdLastMonthYear))
           .toList();
 
       Map<String, dynamic> lastGrowhthDetails = {};
       Map<String, dynamic> secondlastGrowhthDetails = {};
 
-      if(filterdLastRecord.length>0){
-        var lastAntroRecord=filterdLastRecord.first;
+      if (filterdLastRecord.length > 0) {
+        var lastAntroRecord = filterdLastRecord.first;
 
-        if (lastAntroRecord.responces!=null) {
+        if (lastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(lastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               lastGrowhthDetails = child.first;
@@ -3612,16 +4076,18 @@ left join (
         }
       }
 
-      if(filterdSencondLastRecord.length>0){
-        var secondLastAntroRecord=filterdSencondLastRecord.first;
-        if (secondLastAntroRecord.responces!=null) {
+      if (filterdSencondLastRecord.length > 0) {
+        var secondLastAntroRecord = filterdSencondLastRecord.first;
+        if (secondLastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(secondLastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               secondlastGrowhthDetails = child.first;
@@ -3630,32 +4096,55 @@ left join (
         }
       }
 
-      if (lastGrowhthDetails.isNotEmpty &&
-          (Global.convertToOne(Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString()))) >0&&
-          Global.convertToOne(Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString()))>0) {
-
-        var currentWAZ=Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString());
-        var lastWAZ=Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString());
-
-        var gf1diff=currentWAZ-lastWAZ;
-        if(gf1diff < 0){
-          if (secondlastGrowhthDetails.isNotEmpty &&
-              (Global.convertToOne(Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString()))) >0&&
-              Global.convertToOne(Global.stringToDouble(secondlastGrowhthDetails['weight_for_age_zscore'].toString()))>0) {
-            var currentWAZ=Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString());
-            var seconLasWAZ=Global.stringToDouble(secondlastGrowhthDetails['weight_for_age_zscore'].toString());
-            double overallChange = currentWAZ - seconLasWAZ;
-
-            if (overallChange <= -0.5) {
-              genratedValue = 'GF2';
+      if (secondlastGrowhthDetails.isEmpty) {
+        if (filterdThirdLastRecord.length > 0) {
+          var thirdLastAntroRecord = filterdThirdLastRecord.first;
+          if (thirdLastAntroRecord.responces != null) {
+            Map<String, dynamic> lastGrowthRec =
+            jsonDecode(thirdLastAntroRecord.responces!);
+            var lastdChild = lastGrowthRec['anthropromatic_details'];
+            if (lastdChild != null) {
+              var child = lastdChild
+                  .where((element) =>
+              element['childenrollguid'] == enrolChildGuid
+                  && (Global.stringToInt(
+                  element['do_you_have_height_weight'].toString()) == 1))
+                  .toList();
+              if (child.length > 0) {
+                secondlastGrowhthDetails = child.first;
+              }
             }
           }
         }
       }
 
+      if (secondlastGrowhthDetails.isNotEmpty) {
+        var currentWAZ = Global.stringToDouble(
+            growhthDetails['weight_for_age_zscore'].toString());
+        var lastWAZ = Global.stringToDouble(
+            lastGrowhthDetails['weight_for_age_zscore'].toString());
 
+        var gf1diff = currentWAZ - lastWAZ;
+        // if(gf1diff < 0){
+        if (secondlastGrowhthDetails.isNotEmpty &&
+            Global.validString(
+                growhthDetails['weight_for_age_zscore']) &&
+    Global.validString(
+                secondlastGrowhthDetails['weight_for_age_zscore'])
+                ) {
+          var currentWAZ = Global.stringToDouble(
+              growhthDetails['weight_for_age_zscore'].toString());
+          var seconLasWAZ = Global.stringToDouble(
+              secondlastGrowhthDetails['weight_for_age_zscore'].toString());
+          double overallChange = currentWAZ - seconLasWAZ;
+
+          if (overallChange <= -0.5) {
+            genratedValue = 'GF2';
+          }
+        }
+        // }
+      }
     }
-
 
 
     return genratedValue;
@@ -3663,11 +4152,11 @@ left join (
 
   //With  local growth monitoring  ZigZag
   Future<String?> checkZigZagGrowthMonitoring(String enrolChildGuid,
-      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
-      List<ChildGrowthMetaResponseModel> growthItems)
-  async {
+      String measurement_date, String cgmguid,
+      Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems) async {
     String? genratedValue;
-    List<double> lastFourMonthsWaz=[];
+    List<double> lastFourMonthsWaz = [];
     // lastMonth
     String lastMonthDate = Validate().getOneMonthPreviousDate(measurement_date);
     var lastMonthYear = Validate().dateToMonthYear(lastMonthDate);
@@ -3685,33 +4174,37 @@ left join (
     var fourthLastMonthYear = Validate().dateToMonthYear(fourthLast);
 
 
-    var items=growthItems.where(
+    var items = growthItems.where(
             (element) => (element.cgmguid == cgmguid))
         .toList();
 
-    if(items.length>0){
-      var filterdLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
+    if (items.length > 0) {
+      var filterdLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
                   lastMonthYear))
           .toList();
 
-      var filterdSencondLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
+      var filterdSencondLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
                   secoundLastMonthYear))
           .toList();
 
-      var filterdThirdLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
+      var filterdThirdLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
                   thirdLastMonthYear))
           .toList();
 
-      var filterdFourthLastRecord=growthItems.where(
-              (element) => (element.creche_id == items.first.creche_id
-              && Validate().dateToMonthYear(element.measurement_date!)==
-                      fourthLastMonthYear))
+      var filterdFourthLastRecord = growthItems.where(
+              (element) =>
+          (element.creche_id == items.first.creche_id
+              && Validate().dateToMonthYear(element.measurement_date!) ==
+                  fourthLastMonthYear))
           .toList();
 
       Map<String, dynamic> lastGrowhthDetails = {};
@@ -3719,17 +4212,19 @@ left join (
       Map<String, dynamic> thirdlastGrowhthDetails = {};
       Map<String, dynamic> fourthlastGrowhthDetails = {};
 
-      if(filterdLastRecord.length>0){
-        var lastAntroRecord=filterdLastRecord.first;
+      if (filterdLastRecord.length > 0) {
+        var lastAntroRecord = filterdLastRecord.first;
 
-        if (lastAntroRecord.responces!=null) {
+        if (lastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(lastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               lastGrowhthDetails = child.first;
@@ -3738,16 +4233,18 @@ left join (
         }
       }
 
-      if(filterdSencondLastRecord.length>0){
-        var secondLastAntroRecord=filterdSencondLastRecord.first;
-        if (secondLastAntroRecord.responces!=null) {
+      if (filterdSencondLastRecord.length > 0) {
+        var secondLastAntroRecord = filterdSencondLastRecord.first;
+        if (secondLastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(secondLastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               secondlastGrowhthDetails = child.first;
@@ -3756,16 +4253,18 @@ left join (
         }
       }
 
-      if(filterdThirdLastRecord.length>0){
-        var thirdLastAntroRecord=filterdThirdLastRecord.first;
-        if (thirdLastAntroRecord.responces!=null) {
+      if (filterdThirdLastRecord.length > 0) {
+        var thirdLastAntroRecord = filterdThirdLastRecord.first;
+        if (thirdLastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(thirdLastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               thirdlastGrowhthDetails = child.first;
@@ -3774,16 +4273,18 @@ left join (
         }
       }
 
-      if(filterdFourthLastRecord.length>0){
-        var fourthLastAntroRecord=filterdFourthLastRecord.first;
-        if (fourthLastAntroRecord.responces!=null) {
+      if (filterdFourthLastRecord.length > 0) {
+        var fourthLastAntroRecord = filterdFourthLastRecord.first;
+        if (fourthLastAntroRecord.responces != null) {
           Map<String, dynamic> lastGrowthRec =
           jsonDecode(fourthLastAntroRecord.responces!);
           var lastdChild = lastGrowthRec['anthropromatic_details'];
           if (lastdChild != null) {
             var child = lastdChild
-                .where((element) => element['childenrollguid'] == enrolChildGuid
-                &&(Global.stringToInt(element['do_you_have_height_weight'].toString()) == 1 ))
+                .where((element) =>
+            element['childenrollguid'] == enrolChildGuid
+                && (Global.stringToInt(
+                element['do_you_have_height_weight'].toString()) == 1))
                 .toList();
             if (child.length > 0) {
               fourthlastGrowhthDetails = child.first;
@@ -3791,48 +4292,53 @@ left join (
           }
         }
       }
-      if(lastGrowhthDetails.isNotEmpty){
-        if(Global.convertToOne(Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString())) >0){
-          var currentWAZ=Global.stringToDouble(lastGrowhthDetails['weight_for_age_zscore'].toString());
+
+      if (lastGrowhthDetails.isNotEmpty) {
+        if ( Global.validString(lastGrowhthDetails['weight_for_age_zscore'])) {
+          var currentWAZ = Global.stringToDouble(
+              lastGrowhthDetails['weight_for_age_zscore'].toString());
           lastFourMonthsWaz.add(currentWAZ);
         }
       }
 
-      if(secondlastGrowhthDetails.isNotEmpty){
-        if(Global.convertToOne(Global.stringToDouble(secondlastGrowhthDetails['weight_for_age_zscore'].toString())) >0){
-          var currentWAZ=Global.stringToDouble(secondlastGrowhthDetails['weight_for_age_zscore'].toString());
+      if (secondlastGrowhthDetails.isNotEmpty) {
+        if ( Global.validString(secondlastGrowhthDetails['weight_for_age_zscore'])) {
+          var currentWAZ = Global.stringToDouble(
+              secondlastGrowhthDetails['weight_for_age_zscore'].toString());
           lastFourMonthsWaz.add(currentWAZ);
         }
       }
 
-      if(thirdlastGrowhthDetails.isNotEmpty){
-        if(Global.convertToOne(Global.stringToDouble(thirdlastGrowhthDetails['weight_for_age_zscore'].toString())) >0){
-          var currentWAZ=Global.stringToDouble(thirdlastGrowhthDetails['weight_for_age_zscore'].toString());
+      if (thirdlastGrowhthDetails.isNotEmpty) {
+        if ( Global.validString(
+            thirdlastGrowhthDetails['weight_for_age_zscore'])) {
+          var currentWAZ = Global.stringToDouble(
+              thirdlastGrowhthDetails['weight_for_age_zscore'].toString());
           lastFourMonthsWaz.add(currentWAZ);
         }
       }
 
-      if(fourthlastGrowhthDetails.isNotEmpty){
-        if(Global.convertToOne(Global.stringToDouble(fourthlastGrowhthDetails['weight_for_age_zscore'].toString())) >0){
-          var currentWAZ=Global.stringToDouble(fourthlastGrowhthDetails['weight_for_age_zscore'].toString());
+      if (fourthlastGrowhthDetails.isNotEmpty) {
+        if ( Global.validString(
+            fourthlastGrowhthDetails['weight_for_age_zscore'])) {
+          var currentWAZ = Global.stringToDouble(
+              fourthlastGrowhthDetails['weight_for_age_zscore'].toString());
           lastFourMonthsWaz.add(currentWAZ);
         }
       }
-      if(lastFourMonthsWaz.length==4){
+      if (lastFourMonthsWaz.length > 1) {
         double highest = lastFourMonthsWaz.reduce((a, b) => a > b ? a : b);
-        if(Global.convertToOne(Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString())) >0){
-          var currentWAZ=Global.stringToDouble(growhthDetails['weight_for_age_zscore'].toString());
-          double overallChange =   highest-currentWAZ;
-          if (overallChange >= 0.5) {
+        if ( Global.validString(growhthDetails['weight_for_age_zscore'])) {
+          var currentWAZ = Global.stringToDouble(
+              growhthDetails['weight_for_age_zscore'].toString());
+          double overallChange = currentWAZ - highest;
+
+          if (overallChange <= -0.5) {
             genratedValue = 'Zig-Zag';
           }
         }
-
       }
-
-
     }
-
 
 
     return genratedValue;
@@ -3840,26 +4346,29 @@ left join (
 
   //With  local growth monitoring  SNC
   Future<String?> checkSNCGrowthMonitoring(String enrolChildGuid,
-      String measurement_date, String cgmguid,Map<String, dynamic> growhthDetails,
-      List<ChildGrowthMetaResponseModel> growthItems)
-  async {
+      String measurement_date, String cgmguid,
+      Map<String, dynamic> growhthDetails,
+      List<ChildGrowthMetaResponseModel> growthItems,int isZaigZag) async {
     String? genratedValue;
-    var gf1=await checkGF1GrowthMonitoring( enrolChildGuid,
-         measurement_date,  cgmguid, growhthDetails, growthItems);
-    var gf1p=await checkGFP1GrowthMonitoring( enrolChildGuid,
-        measurement_date,  cgmguid, growhthDetails, growthItems);
-    var gf2=await checkGF2GrowthMonitoring( enrolChildGuid,
-        measurement_date,  cgmguid, growhthDetails, growthItems);
-    var zigZag=await checkZigZagGrowthMonitoring( enrolChildGuid,
-        measurement_date,  cgmguid, growhthDetails, growthItems);
-    if(Global.validString(gf1)||Global.validString(gf1p)||
-        Global.validString(gf2)||Global.validString(zigZag)){
-      genratedValue='SNC';
+    var gf1 = await checkGF1GrowthMonitoring(enrolChildGuid,
+        measurement_date, cgmguid, growhthDetails, growthItems);
+    var gf1p = await checkGFP1GrowthMonitoring(enrolChildGuid,
+        measurement_date, cgmguid, growhthDetails, growthItems);
+    var gf2 = await checkGF2GrowthMonitoring(enrolChildGuid,
+        measurement_date, cgmguid, growhthDetails, growthItems);
+    var zigZag = isZaigZag==1?await checkZigZagGrowthMonitoring(enrolChildGuid,
+        measurement_date, cgmguid, growhthDetails, growthItems):'';
+    if (Global.validString(gf1) || Global.validString(gf1p) ||
+        Global.validString(gf2) || Global.validString(zigZag)) {
+      genratedValue = 'SNC';
     }
-    if(Global.stringToInt(growhthDetails['do_you_have_height_weight'].toString()) == 1 ){
-      if(Global.stringToDouble(growhthDetails['weight_for_height'].toString()) == 1 ||
-          Global.stringToDouble(growhthDetails['weight_for_age'].toString()) == 1){
-        genratedValue='SNC';
+    if (Global.stringToInt(
+        growhthDetails['do_you_have_height_weight'].toString()) == 1) {
+      if (Global.stringToDouble(
+          growhthDetails['weight_for_height'].toString()) == 1 ||
+          Global.stringToDouble(growhthDetails['weight_for_age'].toString()) ==
+              1) {
+        genratedValue = 'SNC';
       }
     }
 
@@ -3868,7 +4377,7 @@ left join (
   }
 
 
-  String crecheDataQuery(){
+  String crecheDataQuery() {
     return '''SELECT *
 FROM (
     SELECT 
@@ -3994,7 +4503,7 @@ FROM (
 ) ''';
   }
 
-  String crecheDataForJoinQuery(){
+  String crecheDataForJoinQuery() {
     return '''FROM (
     SELECT 
         name,
@@ -4120,148 +4629,163 @@ FROM (
 ) ''';
   }
 
-  String crecheWhereCondition( String? stateId, String? districtId,
-      String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
-      String? partnerId, String? crecheStatus, String? filterDate,int? quryType)
-  {
-    String whereCluse='';
-    if(Global.validString(stateId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and state_id='$stateId'";
-      }else whereCluse="where state_id='$stateId'";
+  String crecheWhereCondition(String? stateId, String? districtId,
+      String? blockId, String? gpId, String? villageId, String? crecheId,
+      String? phase,
+      String? partnerId, String? crecheStatus, String? filterDate,
+      int? quryType) {
+    String whereCluse = '';
+    if (Global.validString(stateId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and state_id='$stateId'";
+      } else
+        whereCluse = "where state_id='$stateId'";
     }
-    if(Global.validString(districtId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and district_id='$districtId'";
-      }else whereCluse="where district_id='$districtId'";
+    if (Global.validString(districtId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and district_id='$districtId'";
+      } else
+        whereCluse = "where district_id='$districtId'";
     }
-    if(Global.validString(blockId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and block_id='$blockId'";
-      }else whereCluse="where block_id='$blockId'";
+    if (Global.validString(blockId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and block_id='$blockId'";
+      } else
+        whereCluse = "where block_id='$blockId'";
     }
-    if(Global.validString(gpId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and gp_id='$gpId'";
-      }else whereCluse="where gp_id='$gpId'";
+    if (Global.validString(gpId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and gp_id='$gpId'";
+      } else
+        whereCluse = "where gp_id='$gpId'";
     }
-    if(Global.validString(villageId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and village_id='$villageId'";
-      }else whereCluse="where village_id='$villageId'";
+    if (Global.validString(villageId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and village_id='$villageId'";
+      } else
+        whereCluse = "where village_id='$villageId'";
     }
 
-    if(Global.validString(crecheStatus)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche_status_id='$crecheStatus'";
-      }else whereCluse="where creche_status_id='$crecheStatus'";
+    if (Global.validString(crecheStatus)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche_status_id='$crecheStatus'";
+      } else
+        whereCluse = "where creche_status_id='$crecheStatus'";
     }
 
-    if(Global.validString(crecheId)){
-      if(quryType==1){
-        if(Global.validString(whereCluse)){
-          whereCluse="$whereCluse and name=$crecheId";
-        }else whereCluse="where name=$crecheId";
-      }else{
-        if(Global.validString(whereCluse)){
-          whereCluse="$whereCluse and creche_id=$crecheId";
-        }else whereCluse="where creche_id=$crecheId";
+    if (Global.validString(crecheId)) {
+      if (quryType == 1) {
+        if (Global.validString(whereCluse)) {
+          whereCluse = "$whereCluse and name=$crecheId";
+        } else
+          whereCluse = "where name=$crecheId";
+      } else {
+        if (Global.validString(whereCluse)) {
+          whereCluse = "$whereCluse and creche_id=$crecheId";
+        } else
+          whereCluse = "where creche_id=$crecheId";
       }
-
     }
 
-    if(Global.validString(partnerId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and partner_id='$partnerId'";
-      }else whereCluse="where partner_id='$partnerId'";
+    if (Global.validString(partnerId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and partner_id='$partnerId'";
+      } else
+        whereCluse = "where partner_id='$partnerId'";
     }
 
-    if(Global.validString(phase)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and phase='$phase'";
-      }else whereCluse="where phase='$phase'";
+    if (Global.validString(phase)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and phase='$phase'";
+      } else
+        whereCluse = "where phase='$phase'";
     }
-    if(Global.validString(filterDate)&&crecheStatus!='1'){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche_opening_date <='$filterDate'";
-      }else whereCluse="where creche_opening_date <= '$filterDate'";
+    if (Global.validString(filterDate) && crecheStatus != '1') {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche_opening_date <='$filterDate'";
+      } else
+        whereCluse = "where creche_opening_date <= '$filterDate'";
     }
     return whereCluse;
   }
 
 
-
-
-  String eligbleCrecheQuery()
-  {
+  String eligbleCrecheQuery() {
     return '(select * from tab_creche_response where name in (select DISTINCT(creche_id) from house_hold_responce))';
   }
 
-  String crecheWhereWithJoinCondition( String? stateId, String? districtId,
-      String? blockId, String? gpId,String? villageId,String? crecheId, String? phase,
-      String? partnerId, String? crecheStatus, String? filterDate)
-  {
-    String whereCluse='';
-    if(Global.validString(stateId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.state_id='$stateId'";
-      }else whereCluse="where creche.state_id='$stateId'";
+  String crecheWhereWithJoinCondition(String? stateId, String? districtId,
+      String? blockId, String? gpId, String? villageId, String? crecheId,
+      String? phase,
+      String? partnerId, String? crecheStatus, String? filterDate) {
+    String whereCluse = '';
+    if (Global.validString(stateId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche.state_id='$stateId'";
+      } else
+        whereCluse = "where creche.state_id='$stateId'";
     }
-    if(Global.validString(districtId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.district_id='$districtId'";
-      }else whereCluse="where creche.district_id='$districtId'";
+    if (Global.validString(districtId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche.district_id='$districtId'";
+      } else
+        whereCluse = "where creche.district_id='$districtId'";
     }
-    if(Global.validString(blockId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.block_id='$blockId'";
-      }else whereCluse="where creche.block_id='$blockId'";
+    if (Global.validString(blockId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche.block_id='$blockId'";
+      } else
+        whereCluse = "where creche.block_id='$blockId'";
     }
-    if(Global.validString(gpId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.gp_id='$gpId'";
-      }else whereCluse="where creche.gp_id='$gpId'";
+    if (Global.validString(gpId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche.gp_id='$gpId'";
+      } else
+        whereCluse = "where creche.gp_id='$gpId'";
     }
-    if(Global.validString(villageId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.village_id='$villageId'";
-      }else whereCluse="where creche.village_id='$villageId'";
-    }
-
-    if(Global.validString(crecheStatus)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.creche_status_id='$crecheStatus'";
-      }else whereCluse="where creche.creche_status_id='$crecheStatus'";
-    }
-
-    if(Global.validString(crecheId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.name='$crecheId'";
-      }else whereCluse="where creche.name='$crecheId'";
+    if (Global.validString(villageId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche.village_id='$villageId'";
+      } else
+        whereCluse = "where creche.village_id='$villageId'";
     }
 
-    if(Global.validString(partnerId)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.partner_id='$partnerId'";
-      }else whereCluse="where creche.partner_id='$partnerId'";
+    if (Global.validString(crecheStatus)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche.creche_status_id='$crecheStatus'";
+      } else
+        whereCluse = "where creche.creche_status_id='$crecheStatus'";
     }
 
-    if(Global.validString(phase)){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.phase='$phase'";
-      }else whereCluse="where creche.phase='$phase'";
+    if (Global.validString(crecheId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche.name='$crecheId'";
+      } else
+        whereCluse = "where creche.name='$crecheId'";
     }
-    if(Global.validString(filterDate)&&crecheStatus!='1'){
-      if(Global.validString(whereCluse)){
-        whereCluse="$whereCluse and creche.creche_opening_date <='$filterDate'";
-      }else whereCluse="where creche.creche_opening_date <= '$filterDate'";
+
+    if (Global.validString(partnerId)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche.partner_id='$partnerId'";
+      } else
+        whereCluse = "where creche.partner_id='$partnerId'";
+    }
+
+    if (Global.validString(phase)) {
+      if (Global.validString(whereCluse)) {
+        whereCluse = "$whereCluse and creche.phase='$phase'";
+      } else
+        whereCluse = "where creche.phase='$phase'";
+    }
+    if (Global.validString(filterDate) && crecheStatus != '1') {
+      if (Global.validString(whereCluse)) {
+        whereCluse =
+        "$whereCluse and creche.creche_opening_date <='$filterDate'";
+      } else
+        whereCluse = "where creche.creche_opening_date <= '$filterDate'";
     }
     return whereCluse;
   }
-
-
-
-
 
 
 }

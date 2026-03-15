@@ -237,6 +237,16 @@ class EnrolledExitChilrenResponceHelper {
     return result;
   }
 
+  Future<List<Map<String, dynamic>>> callEnrollChildrenWithoutExtAll() async {
+    var query =
+        'Select * from (select * from enrollred_exit_child_responce WHERE CHHGUID in(Select CHHGUID from house_hold_children)  ) ens left join (select hhRes.HHGUID,hhRes.responces as hhResponce,chre.CHHGUID from house_hold_responce hhRes INNER join house_hold_children as  chre on hhRes.HHGUID=chre.HHGUID) as hhs on hhs.CHHGUID=ens.CHHGUID ORDER BY LOWER(SUBSTR(ens.responces, INSTR(ens.responces, ?) + LENGTH(?))) asc';
+
+    List<Map<String, dynamic>> result = await DatabaseHelper.database!
+        .rawQuery(query, ['child_name":"', 'child_name":"']);
+
+    return result;
+  }
+
   Future<List<EnrolledExitChildResponceModel>> enrolledChildByCreche(
       int crecheIdName) async {
     var query =
