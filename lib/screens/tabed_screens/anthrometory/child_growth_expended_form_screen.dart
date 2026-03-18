@@ -2495,9 +2495,9 @@ class _ChildGrowthExpendedFormState
         .where((element) => element.fieldname == 're_measurement_reason')
         .toList();
 
-    if (measurementEquipment.length > 0) {
-      re_measurement_equipment = measurementEquipment.first;
-    }
+    // if (measurementEquipment.length > 0) {
+    //   re_measurement_equipment = measurementEquipment.first;
+    // }
     if (re_measurementPosition.length > 0) {
       re_measurement_position = re_measurementPosition.first;
     }
@@ -2514,20 +2514,20 @@ class _ChildGrowthExpendedFormState
       re_measurement_reason = measurement_reason.first;
     }
 
-    List<OptionsModel> items = options
-        .where((element) =>
-    element.flag == 'tab${re_measurement_equipment!.options}')
-        .toList();
+    // List<OptionsModel> items = options
+    //     .where((element) =>
+    // element.flag == 'tab${re_measurement_equipment?.options}')
+    //     .toList();
 
     List<OptionsModel> positionItem = options
         .where((element) =>
-    element.flag == 'tab${re_measurement_position!.options}')
+    element.flag == 'tab${re_measurement_position?.options}')
         .toList();
 
 
     List<OptionsModel> reasonItems = options
         .where(
-            (element) => element.flag == 'tab${re_measurement_reason!.options}')
+            (element) => element.flag == 'tab${re_measurement_reason?.options}')
         .toList();
 
     showDialog(
@@ -2636,29 +2636,29 @@ class _ChildGrowthExpendedFormState
                                           setState(() {});
                                         },
                                       ),
-                                      DynamicCustomDropdownField(
-                                        hintText: Global.returnTrLable(
-                                            translatsLabel, CustomText.select_here, lng),
-                                        titleText: Global.returnTrLable(translatsLabel,
-                                            re_measurement_equipment!.label!.trim(), lng),
-                                        isRequred: logic!.dependeOnMendotory(
-                                            cWidgetDatamap, re_measurement_equipment),
-                                        items: items,
-                                        selectedItem: cWidgetDatamap[
-                                        re_measurement_equipment.fieldname!],
-                                        isVisible: logic!.callDependingLogic(
-                                            cWidgetDatamap, re_measurement_equipment),
-                                        onChanged: (value) {
-                                          if (value != null)
-                                            cWidgetDatamap[re_measurement_equipment!
-                                                .fieldname!] = value.name;
-                                          else
-                                            cWidgetDatamap
-                                                .remove(re_measurement_equipment!.fieldname);
-                                  
-                                          setState(() {});
-                                        },
-                                      ),
+                                      // DynamicCustomDropdownField(
+                                      //   hintText: Global.returnTrLable(
+                                      //       translatsLabel, CustomText.select_here, lng),
+                                      //   titleText: Global.returnTrLable(translatsLabel,
+                                      //       re_measurement_equipment!.label!.trim(), lng),
+                                      //   isRequred: logic!.dependeOnMendotory(
+                                      //       cWidgetDatamap, re_measurement_equipment),
+                                      //   items: items,
+                                      //   selectedItem: cWidgetDatamap[
+                                      //   re_measurement_equipment.fieldname!],
+                                      //   isVisible: logic!.callDependingLogic(
+                                      //       cWidgetDatamap, re_measurement_equipment),
+                                      //   onChanged: (value) {
+                                      //     if (value != null)
+                                      //       cWidgetDatamap[re_measurement_equipment!
+                                      //           .fieldname!] = value.name;
+                                      //     else
+                                      //       cWidgetDatamap
+                                      //           .remove(re_measurement_equipment!.fieldname);
+                                      //
+                                      //     setState(() {});
+                                      //   },
+                                      // ),
                                       DynamicCustomDropdownField(
                                         hintText: Global.returnTrLable(
                                             translatsLabel, CustomText.select_here, lng),
@@ -2821,6 +2821,20 @@ class _ChildGrowthExpendedFormState
                                                     translatsLabel, CustomText.Submit, lng),
                                                 color: Color(0xff369A8D),
                                                 onPressed: () async {
+                                                  if(cWidgetDatamap['re_do_you_have_height_weight'].toString() == '1'){
+                                                    // ;
+                                                    var childDOB=Validate().stringToDateNull(Global.getItemValues(childItem.first.responces, 'child_dob'));
+                                                    var measumenDate=Validate().stringToDateNull(cWidgetDatamap['re_measurement_taken_date']!=null?cWidgetDatamap['re_measurement_taken_date']:'');
+                                                    if(childDOB!=null&&measumenDate!=null){
+                                                     var  calucalteDate = Validate().calculateAgeInDaysEx(childDOB, measumenDate);
+                                                     if(calucalteDate<=730){
+                                                       cWidgetDatamap['re_measurement_equipment']='2';
+                                                     }else cWidgetDatamap['re_measurement_equipment']='1';
+                                                    }
+                                                  }else {
+                                                    cWidgetDatamap.remove('re_measurement_equipment');
+                                                  }
+
                                                   if(checkValidateForPop(cWidgetDatamap)){
                                                     await saveDataForPop(cWidgetDatamap, childEnrollGUID,childItem.first);
                                                     Navigator.of(context).pop();
@@ -3007,6 +3021,7 @@ class _ChildGrowthExpendedFormState
   bool checkValidateForPop(Map<String, dynamic> cWidgetDatamap) {
     bool validStatus=true;
     var popItem=formItem.where((element)=>popItems.contains(element.fieldname)).toList();
+
     for (int i = 0; i < popItem.length; i++) {
 
       var validationMsg = logic!.validationMessge(cWidgetDatamap, popItem[i]);
